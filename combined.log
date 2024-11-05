@@ -1,0 +1,249 @@
+2024-11-01 09:21:20 info: Entrando a loguearse
+2024-11-01 09:21:34 info: yasmany - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:21:45 info: yasmany - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:24:26 info: Entrando a loguearse
+2024-11-01 09:25:36 info: Entrando a loguearse
+2024-11-01 09:25:54 info: yasmany - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:26:09 info: yasmany - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:26:09 info: 1 - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:26:42 info: yasmany - Entra a buscar las tareas de una fecha dada
+2024-11-01 09:50:46 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 09:51:35 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 09:56:57 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 09:58:56 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:01:09 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:02:30 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:08:31 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:13:31 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:14:47 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:22:50 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:22:50 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:22:50 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:22:50 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:41:55 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:41:55 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:41:55 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:41:55 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:41:55 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:41:55 error: Error en getPeople: HomePerson is not defined
+2024-11-01 10:41:55 error: Error al obtener categorías: Error al obtener personas
+2024-11-01 10:42:36 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:42:36 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:42:36 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:42:36 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:42:36 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:46:27 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:46:27 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:46:27 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:46:27 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:46:27 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:48:45 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:48:45 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:48:45 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:48:45 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:48:45 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:48:45 info: firstHome
+2024-11-01 10:48:45 info: [object SequelizeInstance:HomePerson]
+2024-11-01 10:48:45 info: firstHome
+2024-11-01 10:48:45 info: [object SequelizeInstance:HomePerson]
+2024-11-01 10:51:49 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:51:49 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:51:49 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:51:49 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:51:49 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:51:49 info: firstHome
+2024-11-01 10:51:49 info: {
+  "id": 1,
+  "home_id": 1,
+  "person_id": 1,
+  "role_id": 4,
+  "createdAt": "2024-11-01T10:45:35.000Z",
+  "updatedAt": "2024-11-01T10:45:35.000Z",
+  "role": {
+    "id": 4,
+    "name": "Miembro",
+    "description": "Miembro de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:53.000Z",
+    "updatedAt": "2024-10-30T13:33:53.000Z"
+  }
+}
+2024-11-01 10:51:49 info: firstHome
+2024-11-01 10:51:49 info: {
+  "id": 2,
+  "home_id": 1,
+  "person_id": 2,
+  "role_id": 3,
+  "createdAt": "2024-11-01T10:46:02.000Z",
+  "updatedAt": "2024-11-01T10:46:02.000Z",
+  "role": {
+    "id": 3,
+    "name": "Padre",
+    "description": "Padre de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:40.000Z",
+    "updatedAt": "2024-10-30T13:33:40.000Z"
+  }
+}
+2024-11-01 10:56:02 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:56:02 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:56:02 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:56:02 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:56:02 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:56:02 info: firstHome
+2024-11-01 10:56:02 info: {
+  "id": 1,
+  "home_id": 1,
+  "person_id": 1,
+  "role_id": 4,
+  "createdAt": "2024-11-01T10:45:35.000Z",
+  "updatedAt": "2024-11-01T10:45:35.000Z",
+  "role": {
+    "id": 4,
+    "name": "Miembro",
+    "description": "Miembro de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:53.000Z",
+    "updatedAt": "2024-10-30T13:33:53.000Z"
+  }
+}
+2024-11-01 10:56:02 info: firstHome
+2024-11-01 10:56:02 info: {
+  "id": 2,
+  "home_id": 1,
+  "person_id": 2,
+  "role_id": 3,
+  "createdAt": "2024-11-01T10:46:02.000Z",
+  "updatedAt": "2024-11-01T10:46:02.000Z",
+  "role": {
+    "id": 3,
+    "name": "Padre",
+    "description": "Padre de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:40.000Z",
+    "updatedAt": "2024-10-30T13:33:40.000Z"
+  }
+}
+2024-11-01 10:56:42 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:56:42 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:56:42 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:56:42 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:56:42 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:56:42 info: firstHome
+2024-11-01 10:56:42 info: {
+  "id": 1,
+  "home_id": 1,
+  "person_id": 1,
+  "role_id": 4,
+  "createdAt": "2024-11-01T10:45:35.000Z",
+  "updatedAt": "2024-11-01T10:45:35.000Z",
+  "role": {
+    "id": 4,
+    "name": "Miembro",
+    "description": "Miembro de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:53.000Z",
+    "updatedAt": "2024-10-30T13:33:53.000Z"
+  }
+}
+2024-11-01 10:56:42 info: firstHome
+2024-11-01 10:56:42 info: {
+  "id": 2,
+  "home_id": 1,
+  "person_id": 2,
+  "role_id": 3,
+  "createdAt": "2024-11-01T10:46:02.000Z",
+  "updatedAt": "2024-11-01T10:46:02.000Z",
+  "role": {
+    "id": 3,
+    "name": "Padre",
+    "description": "Padre de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:40.000Z",
+    "updatedAt": "2024-10-30T13:33:40.000Z"
+  }
+}
+2024-11-01 10:59:00 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-01 10:59:00 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 10:59:00 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 10:59:00 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 10:59:00 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 10:59:00 info: firstHome
+2024-11-01 10:59:00 info: {
+  "id": 1,
+  "home_id": 1,
+  "person_id": 1,
+  "role_id": 4,
+  "createdAt": "2024-11-01T10:45:35.000Z",
+  "updatedAt": "2024-11-01T10:45:35.000Z",
+  "role": {
+    "id": 4,
+    "name": "Miembro",
+    "description": "Miembro de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:53.000Z",
+    "updatedAt": "2024-10-30T13:33:53.000Z"
+  }
+}
+2024-11-01 10:59:00 info: firstHome
+2024-11-01 10:59:00 info: {
+  "id": 2,
+  "home_id": 1,
+  "person_id": 2,
+  "role_id": 3,
+  "createdAt": "2024-11-01T10:46:02.000Z",
+  "updatedAt": "2024-11-01T10:46:02.000Z",
+  "role": {
+    "id": 3,
+    "name": "Padre",
+    "description": "Padre de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:40.000Z",
+    "updatedAt": "2024-10-30T13:33:40.000Z"
+  }
+}
+2024-11-01 11:36:10 info: Registrando Usuario.
+2024-11-01 11:37:43 info: Registrando Usuario.
+2024-11-01 11:38:00 info: prueba2 - Entra a la ruta unificada de Tasks
+2024-11-01 11:38:00 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-01 11:38:00 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-01 11:38:00 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-01 11:38:00 info: Entra a Buscar Las personas en (category_status_priority)
+2024-11-01 11:38:00 info: firstHome
+2024-11-01 11:38:00 info: {
+  "id": 1,
+  "home_id": 1,
+  "person_id": 1,
+  "role_id": 4,
+  "createdAt": "2024-11-01T10:45:35.000Z",
+  "updatedAt": "2024-11-01T10:45:35.000Z",
+  "role": {
+    "id": 4,
+    "name": "Miembro",
+    "description": "Miembro de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:53.000Z",
+    "updatedAt": "2024-10-30T13:33:53.000Z"
+  }
+}
+2024-11-01 11:38:00 info: firstHome
+2024-11-01 11:38:00 info: {
+  "id": 2,
+  "home_id": 1,
+  "person_id": 2,
+  "role_id": 3,
+  "createdAt": "2024-11-01T10:46:02.000Z",
+  "updatedAt": "2024-11-01T10:46:02.000Z",
+  "role": {
+    "id": 3,
+    "name": "Padre",
+    "description": "Padre de familia",
+    "type": "Home",
+    "createdAt": "2024-10-30T13:33:40.000Z",
+    "updatedAt": "2024-10-30T13:33:40.000Z"
+  }
+}
+2024-11-01 11:38:00 info: firstHome
+2024-11-01 11:38:00 info: undefined
+2024-11-01 11:38:00 info: firstHome
+2024-11-01 11:38:00 info: undefined
