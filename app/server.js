@@ -75,7 +75,7 @@ app.use(express.urlencoded({ extended: false}));
 app.use(passport.initialize());
 app.use(passport.session());
 //Rutas
-app.use(require('./routes'));
+app.use('/api', require('./routes'));
 
 app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}!`);

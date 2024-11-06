@@ -29,14 +29,14 @@ const PersonTaskController = require('./controllers/PersonTaskController');
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
 //Login y register
-router.post('/api/login', AuthController.login);
-router.post('/api/register', AuthController.register);
+router.post('/login', AuthController.login);
+router.post('/register', AuthController.register);
 
 // Rutas de autenticación
-router.get('/api/login-google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/api/login-facebook', passport.authenticate('facebook', { scope: ['profile', 'email'] }));
-//router.get('/api/facebook', AuthController.loginWithFacebook);
-router.get('/api/google-callback', (req, res, next) => {
+router.get('/login-google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/login-facebook', passport.authenticate('facebook', { scope: ['profile', 'email'] }));
+//router.get('/facebook', AuthController.loginWithFacebook);
+router.get('/google-callback', (req, res, next) => {
     passport.authenticate('google', { session: false }, async (err, user, info) => {
       if (err) {
         logger.error('Error en la autenticación de Google:', err);
@@ -56,8 +56,8 @@ router.get('/api/google-callback', (req, res, next) => {
       }
     })(req, res, next);
 });
-//router.get('/api/login-google', AuthController.loginWithGoogle);
-router.get('/api/facebook-callback', (req, res, next) => {
+//router.get('/login-google', AuthController.loginWithGoogle);
+router.get('/facebook-callback', (req, res, next) => {
     passport.authenticate('facebook', { session: false }, async (err, user, info) => {
         if (err) {
             logger.error('Error en la autenticación de Facebook:', err);
@@ -81,91 +81,91 @@ router.get('/api/facebook-callback', (req, res, next) => {
 router.use(auth);
 
 //Ruta Configurations
-router.get('/api/configuration-show', ConfigurationController.show);
-router.put('/api/configuration', ConfigurationController.update);
+router.get('/configuration-show', ConfigurationController.show);
+router.put('/configuration', ConfigurationController.update);
 
 //Rutas Personas
-router.get('/api/person', PersonController.index);
-router.post('/api/person-show', PersonController.show);
-router.post('/api/person', upload, PersonController.store);
-router.post('/api/person-update', upload, PersonController.update);
-router.post('/api/person-destroy', PersonController.destroy);
+router.get('/person', PersonController.index);
+router.post('/person-show', PersonController.show);
+router.post('/person', upload, PersonController.store);
+router.post('/person-update', upload, PersonController.update);
+router.post('/person-destroy', PersonController.destroy);
 
 //Rutas Statuses
-router.get('/api/status', StatusController.index);
-router.post('/api/status', StatusController.store);
-router.post('/api/status-show', StatusController.show);
-router.put('/api/status', StatusController.update);
-router.post('/api/status-destroy', StatusController.destroy);
+router.get('/status', StatusController.index);
+router.post('/status', StatusController.store);
+router.post('/status-show', StatusController.show);
+router.put('/status', StatusController.update);
+router.post('/status-destroy', StatusController.destroy);
 
 //Rutas Roles
-router.get('/api/rol', RoleController.index);
-router.post('/api/rol', RoleController.store);
-router.post('/api/rol-show', RoleController.show);
-router.put('/api/rol', RoleController.update);
-router.post('/api/rol-destroy', RoleController.destroy);
+router.get('/rol', RoleController.index);
+router.post('/rol', RoleController.store);
+router.post('/rol-show', RoleController.show);
+router.put('/rol', RoleController.update);
+router.post('/rol-destroy', RoleController.destroy);
 
 //Rutas Categirias
-router.get('/api/category', CategoryController.index);
-router.post('/api/category', multerCategory('icon', 'categories'), CategoryController.store);
-router.post('/api/category-show', CategoryController.show);
-router.post('/api/category-update', multerCategory('icon', 'categories'), CategoryController.update);
-router.post('/api/category-destroy', CategoryController.destroy);
+router.get('/category', CategoryController.index);
+router.post('/category', multerCategory('icon', 'categories'), CategoryController.store);
+router.post('/category-show', CategoryController.show);
+router.post('/category-update', multerCategory('icon', 'categories'), CategoryController.update);
+router.post('/category-destroy', CategoryController.destroy);
 
 //Rutas Prioridades
-router.get('/api/priority', PriorityController.index);
-router.post('/api/priority', PriorityController.store);
-router.post('/api/priority-show', PriorityController.show);
-router.put('/api/priority', PriorityController.update);
-router.post('/api/priority-destroy', PriorityController.destroy);
+router.get('/priority', PriorityController.index);
+router.post('/priority', PriorityController.store);
+router.post('/priority-show', PriorityController.show);
+router.put('/priority', PriorityController.update);
+router.post('/priority-destroy', PriorityController.destroy);
 
 //Rutas CategoryPerson
-router.get('/api/category-person', CategoryPersonController.index);
-router.post('/api/category-person', multerCategory('icon', 'categories'),CategoryPersonController.store);
-router.post('/api/category-person-show', CategoryPersonController.show);
-router.post('/api/category-person-update', multerCategory('icon', 'categories'), CategoryPersonController.update);
-router.post('/api/category-person-destroy', CategoryPersonController.destroy);
+router.get('/category-person', CategoryPersonController.index);
+router.post('/category-person', multerCategory('icon', 'categories'),CategoryPersonController.store);
+router.post('/category-person-show', CategoryPersonController.show);
+router.post('/category-person-update', multerCategory('icon', 'categories'), CategoryPersonController.update);
+router.post('/category-person-destroy', CategoryPersonController.destroy);
 
 //Rutas CategoryPerson
-router.get('/api/home-type', HomeTypeController.index);
-router.post('/api/home-type', HomeTypeController.store);
-router.post('/api/home-type-show', HomeTypeController.show);
-router.put('/api/home-type', HomeTypeController.update);
-router.post('/api/home-type-destroy', HomeTypeController.destroy);
+router.get('/home-type', HomeTypeController.index);
+router.post('/home-type', HomeTypeController.store);
+router.post('/home-type-show', HomeTypeController.show);
+router.put('/home-type', HomeTypeController.update);
+router.post('/home-type-destroy', HomeTypeController.destroy);
 
 //Rutas Home
-router.get('/api/home', HomeController.index);
-router.post('/api/home', multerCategory('image', 'homes'), HomeController.store);
-router.post('/api/home-show', HomeController.show);
-router.post('/api/home-update', multerCategory('image', 'homes'), HomeController.update);
-router.post('/api/home-destroy', HomeController.destroy);
+router.get('/home', HomeController.index);
+router.post('/home', multerCategory('image', 'homes'), HomeController.store);
+router.post('/home-show', HomeController.show);
+router.post('/home-update', multerCategory('image', 'homes'), HomeController.update);
+router.post('/home-destroy', HomeController.destroy);
 
 //Rutas HomePerson
-router.get('/api/home-person', HomePersonController.index);
-router.post('/api/home-person', HomePersonController.store);
-router.post('/api/home-people', HomePersonController.assignPeopleToHome);//Asociar a un hogar un array de [person_id, rol_id]
-router.post('/api/home-person-show', HomePersonController.show);
-router.put('/api/home-person',  HomePersonController.update);
-router.post('/api/home-person-destroy', HomePersonController.destroy);
+router.get('/home-person', HomePersonController.index);
+router.post('/home-person', HomePersonController.store);
+router.post('/home-people', HomePersonController.assignPeopleToHome);//Asociar a un hogar un array de [person_id, rol_id]
+router.post('/home-person-show', HomePersonController.show);
+router.put('/home-person',  HomePersonController.update);
+router.post('/home-person-destroy', HomePersonController.destroy);
 
 //Rutas Tareas
-router.get('/api/task', TaskController.index);
-router.post('/api/task-date-apk', TaskController.getTaskDate);
-router.post('/api/task', multerCategory('attachments', 'tasks'), TaskController.store);
-router.post('/api/task-show', TaskController.show);
-router.post('/api/task-update', multerCategory('attachments', 'tasks'), TaskController.update);
-router.post('/api/task-destroy', TaskController.destroy);
+router.get('/task', TaskController.index);
+router.post('/task-date-apk', TaskController.getTaskDate);
+router.post('/task', multerCategory('attachments', 'tasks'), TaskController.store);
+router.post('/task-show', TaskController.show);
+router.post('/task-update', multerCategory('attachments', 'tasks'), TaskController.update);
+router.post('/task-destroy', TaskController.destroy);
 
 //Rutas PersonTask
-router.get('/api/person-task', PersonTaskController.index);
-router.post('/api/person-task', PersonTaskController.store);
-router.post('/api/task-people', PersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
-router.post('/api/person-task-show', PersonTaskController.show);
-router.put('/api/person-task',  PersonTaskController.update);
-router.post('/api/person-task-destroy', PersonTaskController.destroy);
+router.get('/person-task', PersonTaskController.index);
+router.post('/person-task', PersonTaskController.store);
+router.post('/task-people', PersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
+router.post('/person-task-show', PersonTaskController.show);
+router.put('/person-task',  PersonTaskController.update);
+router.post('/person-task-destroy', PersonTaskController.destroy);
 
 // Ruta para servir imágenes desde la carpeta `public`
-router.get('/api/images/:foldername/:filename', (req, res) => {
+router.get('/images/:foldername/:filename', (req, res) => {
     const { foldername, filename } = req.params;
     const imagePath = path.join(__dirname, '../public', foldername, filename);
     if (!fs.existsSync(imagePath)) {
@@ -184,7 +184,7 @@ router.get('/api/images/:foldername/:filename', (req, res) => {
 });
 
 //Rutas Unificadas
-router.get('/api/category-status-priority-apk', TaskController.category_status_priority);
+router.get('/category-status-priority-apk', TaskController.category_status_priority);
 
 
 module.exports = router;
