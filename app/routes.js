@@ -25,6 +25,7 @@ const HomeController = require('./controllers/HomeController');
 const HomePersonController = require('./controllers/HomePersonController');
 const TaskController = require('./controllers/TaskController');
 const PersonTaskController = require('./controllers/PersonTaskController');
+const WarehouseController = require('./controllers/WarehouseController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -156,6 +157,7 @@ router.post('/task-show', TaskController.show);
 router.post('/task-update', multerCategory('attachments', 'tasks'), TaskController.update);
 router.post('/task-destroy', TaskController.destroy);
 
+
 //Rutas PersonTask
 router.get('/person-task', PersonTaskController.index);
 router.post('/person-task', PersonTaskController.store);
@@ -163,6 +165,14 @@ router.post('/task-people', PersonTaskController.assignPeopleToTask);//Asociar a
 router.post('/person-task-show', PersonTaskController.show);
 router.put('/person-task',  PersonTaskController.update);
 router.post('/person-task-destroy', PersonTaskController.destroy);
+
+
+//Rutas Almacenes
+router.get('/warehouse', WarehouseController.index);
+router.post('/warehouse', WarehouseController.store);
+router.post('/warehouse-show', WarehouseController.show);
+router.put('/warehouse', WarehouseController.update);
+router.post('/warehouse-destroy', WarehouseController.destroy);
 
 // Ruta para servir imágenes desde la carpeta `public`
 router.get('/images/:foldername/:filename', (req, res) => {

@@ -1,2 +1,6 @@
 2024-11-01 10:41:55 error: Error en getPeople: HomePerson is not defined
 2024-11-01 10:41:55 error: Error al obtener categorías: Error al obtener personas
+2024-11-06 14:33:36 error: Error de validación en WareHouseController->destroy: "title" is not allowed
+2024-11-06 14:55:26 error: Error en WarehouseController->update: fieldsToUpdate is not defined
+2024-11-06 14:56:50 error: Error en WarehouseController->update: category is not defined
+2024-11-06 15:03:19 error: Error de validación en WareHouseController->destroy: "title" is not allowed

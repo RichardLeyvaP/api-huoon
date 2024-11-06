@@ -817,8 +817,6 @@ const TaskController = {
 
             return people.map(person => {
                 const firstHome = person.homePeople[0]; // Obtener la primera relación
-                logger.info('firstHome');
-                logger.info(JSON.stringify(firstHome, null, 2));
                 return {
                     id: person.id,
                     namePerson: person.name,
