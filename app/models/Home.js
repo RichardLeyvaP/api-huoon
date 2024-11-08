@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const Person = require('./Person');
 module.exports = (sequelize, DataTypes) => {
   class Home extends Model {
     /**
@@ -21,6 +22,15 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'person_id',
         as: 'people',  // Alias para la relación
       });
+
+      Home.belongsToMany(models.Warehouse, {
+        through: models.HomeWarehouse,
+        foreignKey: 'home_id',    // La clave foránea en la tabla pivote HomeWarehouse
+        otherKey: 'warehouse_id', // La otra clave foránea en la tabla pivote HomeWarehouse
+        as: 'warehouses'          // Alias para acceder a los almacenes asociados al hogar
+    });
+
+      //Home.hasMany(models.HomeWarehouse, { foreignKey: 'home_id', as: 'homeWarehouses' });
     }
   }
   Home.init({

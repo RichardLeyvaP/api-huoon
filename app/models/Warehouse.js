@@ -10,7 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Warehouse.belongsToMany(models.Home, {
+        through: models.HomeWarehouse,
+        foreignKey: 'warehouse_id',    // La clave foránea en la tabla pivote HomeWarehouse
+        otherKey: 'home_id',           // La otra clave foránea en la tabla pivote HomeWarehouse
+        as: 'homes'                    // Alias para acceder a los hogares asociados al almacén
+    });
+      //Warehouse.hasMany(models.HomeWarehouse, {foreignKey: 'warehouse_id', as: 'warehouseHome'});
     }
   }
   Warehouse.init({

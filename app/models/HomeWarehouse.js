@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
   class HomeWarehouse extends Model {
     static associate(models) {
       // Define associations here
-      HomeWarehouse.belongsTo(models.Home, { foreignKey: 'home_id', onDelete: 'CASCADE' });
-      HomeWarehouse.belongsTo(models.Warehouse, { foreignKey: 'warehouse_id', onDelete: 'CASCADE' });
+      HomeWarehouse.belongsTo(models.Home, { foreignKey: 'home_id', as:"home" });
+      HomeWarehouse.belongsTo(models.Warehouse, { foreignKey: 'warehouse_id', as:"warehouse" });
     }
   }
   
