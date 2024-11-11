@@ -30,6 +30,12 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tasks',
         onDelete: 'CASCADE'
     });
+
+    Category.hasMany(models.Product, {
+      foreignKey: 'category_id',
+      as: 'products',
+      onDelete: 'CASCADE'
+  });
     }
   }
 
