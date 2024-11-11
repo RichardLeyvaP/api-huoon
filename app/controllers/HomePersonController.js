@@ -149,7 +149,7 @@ const HomePersonController = {
         logger.info(`${req.user.name} - Eliminando una relación Home-Person`);
 
         try {
-            const homePerson = await HomePerson.findByPk(req.params.id);
+            const homePerson = await HomePerson.findByPk(req.body.id);
             if (!homePerson) {
                 logger.error(`HomePersonController->destroy: Relación no encontrada con ID ${req.params.id}`);
                 return res.status(404).json({ msg: 'HomePersonNotFound' });

@@ -27,6 +27,7 @@ const TaskController = require('./controllers/TaskController');
 const PersonTaskController = require('./controllers/PersonTaskController');
 const WarehouseController = require('./controllers/WarehouseController');
 const HomeWareHouseController = require('./controllers/HomeWareHouseController');
+const PersonWareHouseController = require('./controllers/PersonWareHouseController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -181,6 +182,13 @@ router.post('/home-warehouse', HomeWareHouseController.store);
 router.post('/home-warehouse-show', HomeWareHouseController.show);
 router.put('/home-warehouse', HomeWareHouseController.update);
 router.post('/home-warehouse-destroy', HomeWareHouseController.destroy);
+
+//Rutas Almacenes
+router.get('/person-warehouse', PersonWareHouseController.index);
+router.post('/person-warehouse', PersonWareHouseController.store);
+router.post('/person-warehouse-show', PersonWareHouseController.show);
+router.put('/person-warehouse', PersonWareHouseController.update);
+router.post('/person-warehouse-destroy', PersonWareHouseController.destroy);
 
 // Ruta para servir imágenes desde la carpeta `public`
 router.get('/images/:foldername/:filename', (req, res) => {

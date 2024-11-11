@@ -103,14 +103,24 @@ const WarehouseController = {
                 }
     
             // Asociar el almacén al hogar en la tabla pivote
-            await home.addWarehouse(warehouse, {
+            const [homeWarehouse, created] = await HomeWarehouse.findOrCreate({
+                where: { home_id: home_id, warehouse_id: warehouse.id },
+                defaults: {
+                    title: title || warehouse.title,
+                    description: description || warehouse.description,
+                    location: location || warehouse.location,
+                    status: status !== undefined ? status : 0,
+                },
+                transaction: t
+            });
+            /*await home.addWarehouse(warehouse, {
                 through: {
                     title: title || warehouse.title,         // Asignar título del cuerpo o el que ya tiene el almacén
                     description: description || warehouse.description, // Asignar descripción
                     location: location || warehouse.location, // Asignar ubicación
                     status: status !== undefined ? status : 0, // Asignar el estado, si no se pasa, por defecto 1
                 }
-            }, { transaction: t });
+            }, { transaction: t });*/
             // Confirmar la transacción
             await t.commit();
                
@@ -204,7 +214,7 @@ const WarehouseController = {
     
         let warehouse;
     
-        if (warehouse_id !== undefined) {
+        if (warehouse_id) {
             warehouse = await Warehouse.findByPk(warehouse_id);
             if (!warehouse) {
                 logger.error(`WarehouseController->update: Almacén no encontrado con ID ${warehouse_id}`);

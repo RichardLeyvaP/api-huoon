@@ -80,6 +80,6 @@ app.use('/api', require('./routes'));
 app.listen(PORT, () => {
   console.log(`Example app listening on http://localhost:${PORT}!`);
   sequelize.authenticate().then(() => {
-    console.log('Nos hemos conectado al base de datos!!!!');
+    console.log('Nos hemos conectado a la base de datos!!!!');
   })
 });

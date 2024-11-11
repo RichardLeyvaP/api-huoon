@@ -37,6 +37,13 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'task_id',
         as: 'tasks',
         });
+
+        Person.belongsToMany(models.Warehouse, {
+          through: models.PersonWarehouse,
+          foreignKey: 'person_id',
+          otherKey: 'warehouse_id',
+          as: 'warehouses',
+          });
         Person.hasMany(models.PersonTask, { foreignKey: 'person_id', as: 'personTasks' });
         Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople' });
     }

@@ -16,7 +16,13 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'home_id',           // La otra clave foránea en la tabla pivote HomeWarehouse
         as: 'homes'                    // Alias para acceder a los hogares asociados al almacén
     });
-      //Warehouse.hasMany(models.HomeWarehouse, {foreignKey: 'warehouse_id', as: 'warehouseHome'});
+
+      Warehouse.belongsToMany(models.Person, {
+        through: models.PersonWarehouse,
+        foreignKey: 'warehouse_id',    // La clave foránea en la tabla pivote HomeWarehouse
+        otherKey: 'person_id',           // La otra clave foránea en la tabla pivote HomeWarehouse
+        as: 'people'                    // Alias para acceder a los hogares asociados al almacén
+    });
     }
   }
   Warehouse.init({

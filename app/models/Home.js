@@ -30,7 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'warehouses'          // Alias para acceder a los almacenes asociados al hogar
     });
 
-      //Home.hasMany(models.HomeWarehouse, { foreignKey: 'home_id', as: 'homeWarehouses' });
+    Home.hasMany(models.PersonWarehouse, {
+      foreignKey: 'home_id',  // Asegúrate de que el campo sea consistente
+      as: 'personWarehouses', // Nombre del alias
+      onDelete: 'CASCADE'     // Elimina las asociaciones en cascada si se elimina el hogar
+  });
     }
   }
   Home.init({
