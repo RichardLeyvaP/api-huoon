@@ -23,6 +23,8 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'person_id',           // La otra clave foránea en la tabla pivote HomeWarehouse
         as: 'people'                    // Alias para acceder a los hogares asociados al almacén
     });
+
+    Warehouse.hasMany(models.HomeWarehouseProduct, { foreignKey: 'warehouse_id', as: 'warehouseProducts', onDelete: 'CASCADE' });
     }
   }
   Warehouse.init({

@@ -29,6 +29,7 @@ const WarehouseController = require('./controllers/WarehouseController');
 const HomeWareHouseController = require('./controllers/HomeWareHouseController');
 const PersonWareHouseController = require('./controllers/PersonWareHouseController');
 const ProductController = require('./controllers/ProductController');
+const HomeWarehouseProductController = require('./controllers/HomeWarehouseProductController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -191,12 +192,20 @@ router.post('/person-warehouse-show', PersonWareHouseController.show);
 router.put('/person-warehouse', PersonWareHouseController.update);
 router.post('/person-warehouse-destroy', PersonWareHouseController.destroy);
 
-//Rutas Almacenes
+//Rutas Productos
 router.get('/product', ProductController.index);
 router.post('/product', multerCategory('image', 'products'), ProductController.store);
 router.post('/product-show', ProductController.show);
 router.post('/product-update', multerCategory('image', 'products'), ProductController.update);
 router.post('/product-destroy', ProductController.destroy);
+
+//Rutas Productos en almacenes del hogar
+router.get('/home-warehouse-product', HomeWarehouseProductController.index);
+router.post('/home-warehouse-product', multerCategory('image', 'homeWarehoseProducts'), HomeWarehouseProductController.store);
+router.post('/home-warehouse-product-show', HomeWarehouseProductController.show);
+router.post('/home-warehouse-products', HomeWarehouseProductController.homeWarehouseProducts);//Devolver los productos de un almacén en un hogar
+router.post('/home-warehouse-product-update', multerCategory('image', 'homeWarehoseProducts'), HomeWarehouseProductController.update);
+router.post('/home-warehouse-product-destroy', HomeWarehouseProductController.destroy);
 
 // Ruta para servir imágenes desde la carpeta `public`
 router.get('/images/:foldername/:filename', (req, res) => {

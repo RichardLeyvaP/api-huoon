@@ -35,6 +35,8 @@ module.exports = (sequelize, DataTypes) => {
       as: 'personWarehouses', // Nombre del alias
       onDelete: 'CASCADE'     // Elimina las asociaciones en cascada si se elimina el hogar
   });
+
+  Home.hasMany(models.HomeWarehouseProduct, { foreignKey: 'home_id', as: 'homeWarehousesProducts', onDelete: 'CASCADE' });
     }
   }
   Home.init({

@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Task.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category', onDelete: 'CASCADE' });
+      Product.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category', onDelete: 'CASCADE' });
+      Product.hasMany(models.HomeWarehouseProduct, { foreignKey: 'product_id', as: 'warehouseStocks', onDelete: 'CASCADE' });
     }
   }
   Product.init({

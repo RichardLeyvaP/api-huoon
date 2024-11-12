@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tasks',
         onDelete: 'CASCADE'
     });
+    Status.hasMany(models.HomeWarehouseProduct, { foreignKey: 'status_id', as: 'productStatuses', onDelete: 'CASCADE' });
     }
   }
   Status.init({
