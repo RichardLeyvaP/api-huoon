@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
           });
         Person.hasMany(models.PersonTask, { foreignKey: 'person_id', as: 'personTasks' });
         Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople' });
+        Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts' });
     }
 
     /**

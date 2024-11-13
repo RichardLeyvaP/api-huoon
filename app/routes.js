@@ -30,6 +30,7 @@ const HomeWareHouseController = require('./controllers/HomeWareHouseController')
 const PersonWareHouseController = require('./controllers/PersonWareHouseController');
 const ProductController = require('./controllers/ProductController');
 const HomeWarehouseProductController = require('./controllers/HomeWarehouseProductController');
+const PersonHomeWarehouseProductController = require('./controllers/PersonHomeWarehouseProductController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -207,6 +208,14 @@ router.post('/home-warehouse-products', HomeWarehouseProductController.homeWareh
 router.post('/home-warehouse-product-update', multerCategory('image', 'homeWarehoseProducts'), HomeWarehouseProductController.update);
 router.post('/home-warehouse-product-destroy', HomeWarehouseProductController.destroy);
 
+//Rutas Productos en almacenes de la persona en el hogar
+router.get('/person-home-warehouse-product', PersonHomeWarehouseProductController.index);
+router.post('/person-home-warehouse-product', multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.store);
+router.post('/person-home-warehouse-product-show', PersonHomeWarehouseProductController.show);
+router.post('/person-home-warehouse-products', PersonHomeWarehouseProductController.personHomeWarehouseProducts);//Devolver los productos de un almacén en un hogar
+router.post('/person-home-warehouse-product-update', multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.update);
+router.post('/person-home-warehouse-product-destroy', PersonHomeWarehouseProductController.destroy);
+
 // Ruta para servir imágenes desde la carpeta `public`
 router.get('/images/:foldername/:filename', (req, res) => {
     const { foldername, filename } = req.params;
@@ -227,6 +236,7 @@ router.get('/images/:foldername/:filename', (req, res) => {
 });
 
 //Rutas Unificadas
+router.get('/productcategory-productstatus-apk', ProductController.category_status);
 router.get('/category-status-priority-apk', TaskController.category_status_priority);
 
 

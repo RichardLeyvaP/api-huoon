@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Warehouse.hasMany(models.HomeWarehouseProduct, { foreignKey: 'warehouse_id', as: 'warehouseProducts', onDelete: 'CASCADE' });
+    Warehouse.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'warehouse_id', as: 'warehousePersonProducts', onDelete: 'CASCADE' });
     }
   }
   Warehouse.init({

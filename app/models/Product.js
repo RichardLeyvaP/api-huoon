@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Product.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category', onDelete: 'CASCADE' });
       Product.hasMany(models.HomeWarehouseProduct, { foreignKey: 'product_id', as: 'warehouseStocks', onDelete: 'CASCADE' });
+      Product.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'product_id', as: 'homeWarehouseProducts', onDelete: 'CASCADE' });
     }
   }
   Product.init({
