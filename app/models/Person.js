@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
 
        // Relación belongsToMany con Task a través de PersonTask
        Person.belongsToMany(models.Task, {
-        through: models.PersonTask,
+        through: models.HomePersonTask,
         foreignKey: 'person_id',
         otherKey: 'task_id',
         as: 'tasks',
@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
           otherKey: 'warehouse_id',
           as: 'warehouses',
           });
-        Person.hasMany(models.PersonTask, { foreignKey: 'person_id', as: 'personTasks' });
+        Person.hasMany(models.HomePersonTask, { foreignKey: 'person_id', as: 'homePersonTasks' });
         Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople' });
         Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts' });
     }

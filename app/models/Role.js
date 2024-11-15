@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         as: 'homePerson',  // Alias para la relación con home_person
       });
 
-      Role.hasMany(models.PersonTask, {
+      Role.hasMany(models.HomePersonTask, {
         foreignKey: 'role_id',
-        as: 'personTasks',  // Alias para la relación con home_person
+        as: 'homePersonTasks',  // Alias para la relación con home_person
       });
     }
   }

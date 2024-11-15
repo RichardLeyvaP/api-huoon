@@ -29,17 +29,17 @@ module.exports = (sequelize, DataTypes) => {
 
        // Relación many-to-many con Person
        Task.belongsToMany(models.Person, {
-        through: models.PersonTask,
+        through: models.HomePersonTask,
         foreignKey: 'task_id',
         otherKey: 'person_id',
         as: 'people',
         });
-        Task.hasMany(models.PersonTask, { foreignKey: 'task_id', as: 'personTasks' });
+        Task.hasMany(models.HomePersonTask, { foreignKey: 'task_id', as: 'homePersonTasks' });
     }
 
     // Método para obtener la información de las personas
   getPeople() {
-    return this.personTasks.map(personTask => ({
+    return this.homePersonTasks.map(personTask => ({
         id: personTask.person_id,
         name: personTask.person.name,
         image: personTask.person.image,

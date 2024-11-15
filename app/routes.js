@@ -24,13 +24,13 @@ const HomeTypeController = require('./controllers/HomeTypeController');
 const HomeController = require('./controllers/HomeController');
 const HomePersonController = require('./controllers/HomePersonController');
 const TaskController = require('./controllers/TaskController');
-const PersonTaskController = require('./controllers/PersonTaskController');
 const WarehouseController = require('./controllers/WarehouseController');
 const HomeWareHouseController = require('./controllers/HomeWareHouseController');
 const PersonWareHouseController = require('./controllers/PersonWareHouseController');
 const ProductController = require('./controllers/ProductController');
 const HomeWarehouseProductController = require('./controllers/HomeWarehouseProductController');
 const PersonHomeWarehouseProductController = require('./controllers/PersonHomeWarehouseProductController');
+const HomePersonTaskController = require('./controllers/HomePersonTaskController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -164,12 +164,12 @@ router.post('/task-destroy', TaskController.destroy);
 
 
 //Rutas PersonTask
-router.get('/person-task', PersonTaskController.index);
-router.post('/person-task', PersonTaskController.store);
-router.post('/task-people', PersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
-router.post('/person-task-show', PersonTaskController.show);
-router.put('/person-task',  PersonTaskController.update);
-router.post('/person-task-destroy', PersonTaskController.destroy);
+router.get('/home-person-task', HomePersonTaskController.index);
+router.post('/home-person-task', HomePersonTaskController.store);
+router.post('/task-people-home', HomePersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
+router.post('/home-person-task-show', HomePersonTaskController.show);
+router.put('/home-person-task',  HomePersonTaskController.update);
+router.post('/home-person-task-destroy', HomePersonTaskController.destroy);
 
 
 //Rutas Almacenes

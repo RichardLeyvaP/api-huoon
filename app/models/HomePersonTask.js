@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class PersonTask extends Model {
+  class HomePersonTask extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,12 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
      // Definir asociación con el modelo Person
-     PersonTask.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
-     PersonTask.belongsTo(models.Task, { foreignKey: 'task_id', as: 'task' });
-     PersonTask.belongsTo(models.Role, { foreignKey: 'role_id', as: 'role' });
+     HomePersonTask.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
+     HomePersonTask.belongsTo(models.Task, { foreignKey: 'task_id', as: 'task' });
+     HomePersonTask.belongsTo(models.Role, { foreignKey: 'role_id', as: 'role' });
+     HomePersonTask.belongsTo(models.Home, { foreignKey: 'home_id', as: 'home' });
     }
   }
-  PersonTask.init({
+  HomePersonTask.init({
     person_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -52,14 +53,26 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'El campo role_id debe ser un número entero'
         }
       }
+    },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'El campo home_id es obligatorio'
+        },
+        isInt: {
+          msg: 'El campo home_id debe ser un número entero'
+        }
+      }
     }
   },
   {
     sequelize,
-    modelName: 'PersonTask',
-    tableName: 'person_task',
+    modelName: 'HomePersonTask',
+    tableName: 'home_person_task',
     timestamps: true,
   }
 );
-  return PersonTask;
+  return HomePersonTask;
 };

@@ -2,7 +2,7 @@ const Joi = require('joi');
 const { Op } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
-const { Task, Priority, Status, Category, Person, PersonTask, Role, HomePerson, sequelize } = require('../models');  // Importar el modelo Home
+const { Task, Priority, Status, Category, Person, HomePersonTask, Role, Home, HomePerson, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 const ActivityLogService = require('../services/ActivityLogService');
 
@@ -27,7 +27,8 @@ const schema = Joi.object({
     people: Joi.array().items(
         Joi.object({
             person_id: Joi.number().required(),
-            role_id: Joi.number().required()
+            role_id: Joi.number().required(),
+            home_id: Joi.number().required()
         })
     ).optional()
 });
@@ -52,8 +53,8 @@ const TaskController = {
                             { model: Status, as: 'status' },
                             { model: Category, as: 'category' },
                             {
-                                model: PersonTask,
-                                as: 'personTasks',
+                                model: HomePersonTask,
+                                as: 'homePersonTasks',
                                 include: [
                                     {
                                         model: Role,
@@ -63,13 +64,17 @@ const TaskController = {
                                         model: Person,
                                         as: 'person', // Incluir persona si también es necesario
                                     },
+                                    {
+                                        model: Home,
+                                        as: 'home', // Incluir persona si también es necesario
+                                    }
                                 ],
                             },
                         ]
                     },
                     {
-                        model: PersonTask,
-                        as: 'personTasks',
+                        model: HomePersonTask,
+                        as: 'homePersonTasks',
                         include: [
                             {
                                 model: Role,
@@ -79,6 +84,10 @@ const TaskController = {
                                 model: Person,
                                 as: 'person', // Incluir persona si también es necesario
                             },
+                            {
+                                model: Home,
+                                as: 'home', // Incluir persona si también es necesario
+                            }
                         ],
                     },
                 ]
@@ -158,8 +167,8 @@ const TaskController = {
                             { model: Status, as: 'status' },
                             { model: Category, as: 'category' },
                             {
-                                model: PersonTask,
-                                as: 'personTasks',
+                                model: HomePersonTask,
+                                as: 'homePersonTasks',
                                 where: {
                                     person_id: personId // Filtrar por ID del usuario
                                 },
@@ -172,13 +181,17 @@ const TaskController = {
                                         model: Person,
                                         as: 'person', // Incluir persona si también es necesario
                                     },
+                                    {
+                                        model: Home,
+                                        as: 'home', // Incluir persona si también es necesario
+                                    }
                                 ],
                             },
                         ]
                     },
                     {
-                        model: PersonTask,
-                        as: 'personTasks', 
+                        model: HomePersonTask,
+                        as: 'homePersonTasks', 
                         where: {
                             person_id: personId // Filtrar por ID del usuario
                         },
@@ -191,6 +204,10 @@ const TaskController = {
                                 model: Person,
                                 as: 'person', // Incluir persona si también es necesario
                             },
+                            {
+                                model: Home,
+                                as: 'home', // Incluir persona si también es necesario
+                            }
                         ],
                     },
                 ]
@@ -314,6 +331,30 @@ const TaskController = {
         try {
             let filename = 'tasks/default.jpg'; // Imagen por defecto
     
+            // Verificar existencia de personas, roles y hogares antes de crear la tarea
+            if (value.people && value.people.length > 0) {
+                const personIds = value.people.map(person => person.person_id);
+                const roleIds = value.people.map(person => person.role_id);
+                const homeIds = value.people.map(person => person.home_id);
+
+                // Verificar personas, roles y hogares
+                const [persons, roles, homes] = await Promise.all([
+                    Person.findAll({ where: { id: personIds } }),
+                    Role.findAll({ where: { id: roleIds } }),
+                    Home.findAll({ where: { id: homeIds } })
+                ]);
+
+                // Comprobar si alguna entidad no existe
+                const missingPersons = personIds.filter(id => !persons.find(p => p.id === id));
+                const missingRoles = roleIds.filter(id => !roles.find(r => r.id === id));
+                const missingHomes = homeIds.filter(id => !homes.find(h => h.id === id));
+
+                if (missingPersons.length || missingRoles.length || missingHomes.length) {
+                    logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
+                                Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
+                    return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
+                }
+            }
             // Crear la tarea
             const task = await Task.create({
                 title: value.title,
@@ -355,16 +396,23 @@ const TaskController = {
             await ActivityLogService.createActivityLog('Task', task.id, 'create', req.user.id, JSON.stringify(task));
 
             // Procesar las relaciones con personas si existen            
-            let associationsData = []; // Array para almacenar las asociaciones creadas
+            /*let associationsData = []; // Array para almacenar las asociaciones creadas
             if (value.people && value.people.length > 0) {
                 const associations = value.people.map(async (person) => {
-                    const { person_id, role_id } = person;
+                    const { person_id, role_id, home_id } = person;
 
                     // Verificar si la persona existe
                     const personInstance = await Person.findByPk(person_id);
                     if (!personInstance) {
                         logger.error(`TaskController->store: No se encontró una persona con ID ${person_id}`);
                         return { error: `PersonNotFound: ID ${person_id}` };
+                    }
+
+                    // Verificar si la persona existe
+                    const homeInstance = await Home.findByPk(home_id);
+                    if (!homeInstance) {
+                        logger.error(`TaskController->store: No se encontró un hogar con ID ${home_id}`);
+                        return { error: `HomeNotFound: ID ${person_id}` };
                     }
 
                     // Verificar si el rol existe
@@ -375,16 +423,18 @@ const TaskController = {
                     }
 
                     // Crear la relación en la tabla PersonTask
-                    const personTaskAssociation = await PersonTask.create({
+                    const personTaskAssociation = await HomePersonTask.create({
                         task_id: task.id,
                         person_id: person_id,
                         role_id: role_id,
+                        home_id: home_id,
                     }, { transaction: t });
 
                      // Añadir la relación creada al array de asociaciones
                 associationsData.push({
                     person_id,
                     role_id,
+                    home_id,
                     association_id: personTaskAssociation.id,
                 });
                 });
@@ -398,7 +448,7 @@ const TaskController = {
                     .map(result => result.reason || result.value.error);
 
                 if (errors.length) {
-                    logger.error(`TaskController->store - Algunos errores ocurrieron al crear Person-Task: ${errors.join(', ')}`);
+                    logger.error(`TaskController->store - Algunos errores ocurrieron al crear Home-Person-Task: ${errors.join(', ')}`);
                     return res.status(400).json({ msg: errors });
                 }
             }
@@ -409,6 +459,40 @@ const TaskController = {
                 associations: associationsData,
             };
 
+            await ActivityLogService.createActivityLog(
+                'TaskWithAssociations',
+                task.id,
+                'create',
+                req.user.id,
+                JSON.stringify(activityData),
+                { transaction: t }  // Aquí pasas la transacción
+            );*/
+            const associationsData = [];
+            if (value.people && value.people.length > 0) {
+                // Crear las asociaciones en paralelo
+                for (const person of value.people) {
+                    const { person_id, role_id, home_id } = person;
+    
+                    const personTaskAssociation = await HomePersonTask.create({
+                        task_id: task.id,
+                        person_id,
+                        role_id,
+                        home_id
+                    }, { transaction: t });
+    
+                    associationsData.push({
+                        person_id,
+                        role_id,
+                        home_id,
+                        association_id: personTaskAssociation.id
+                    });
+                }
+            }
+             // Registrar la tarea y las asociaciones en el log de actividades
+            const activityData = {
+                task,
+                associations: associationsData
+            };
             await ActivityLogService.createActivityLog(
                 'TaskWithAssociations',
                 task.id,
@@ -458,8 +542,8 @@ const TaskController = {
                             { association: 'status' },
                             { association: 'category' },
                             {
-                                model: PersonTask,
-                                as: 'personTasks',
+                                model: HomePersonTask,
+                                as: 'homePersonTasks',
                                 include: [
                                     {
                                         model: Role,
@@ -469,6 +553,10 @@ const TaskController = {
                                         model: Person,
                                         as: 'person', // Incluir persona si también es necesario
                                     },
+                                    {
+                                        model: Home,
+                                        as: 'home', // Incluir persona si también es necesario
+                                    }
                                 ],
                             },
                         ]
@@ -477,8 +565,8 @@ const TaskController = {
                     { association: 'status' },
                     { association: 'category' },
                     {
-                        model: PersonTask,
-                        as: 'personTasks',
+                        model: HomePersonTask,
+                        as: 'homePersonTasks',
                         include: [
                             {
                                 model: Role,
@@ -488,6 +576,10 @@ const TaskController = {
                                 model: Person,
                                 as: 'person', // Incluir persona si también es necesario
                             },
+                            {
+                                model: Home,
+                                as: 'home', // Incluir persona si también es necesario
+                            }
                         ],
                     },
                 ]

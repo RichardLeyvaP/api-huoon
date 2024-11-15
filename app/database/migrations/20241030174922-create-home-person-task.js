@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('person_task', {
+    await queryInterface.createTable('home_person_task', {
       id: {
         type: Sequelize.BIGINT,
         autoIncrement: true,
@@ -36,6 +36,15 @@ module.exports = {
         onDelete: 'CASCADE',
         allowNull: false
       },
+      home_id: {
+        type: Sequelize.BIGINT,
+        references: {
+          model: 'homes', // Nombre de la tabla referenciada
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -47,6 +56,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('person_task');
+    await queryInterface.dropTable('home_person_task');
   }
 };
