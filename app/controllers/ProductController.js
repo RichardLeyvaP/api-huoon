@@ -1,6 +1,7 @@
 // controllers/productController.js
 const Joi = require('joi');
-const { Product } = require('../models'); // Importar el modelo Product
+const { Op } = require('sequelize');
+const { Product, Status, Category } = require('../models'); // Importar el modelo Product
 const path = require('path');
 const fs = require('fs');
 const logger = require('../../config/logger'); // Importa el logger
@@ -214,7 +215,110 @@ const ProductController = {
             logger.error('ProductController->destroy: ' + errorMsg);
             res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
-    }
+    },
+
+    //Ruta unificada de Mantenedores
+    async category_status(req, res){
+        logger.info(`${req.user.name} - Entra a la ruta unificada de Products`);
+
+         // Obtén el ID de la persona autenticada
+         const personId = req.person.id;
+            
+         if (!personId) {
+             return res.status(404).json({ error: 'Persona no encontrada' });
+         }
+        try {
+           const categories = await ProductController.getCategories(personId);
+           const statuses = await ProductController.getStatus();
+   
+            res.json([{
+                productcategories: categories,
+                productstatus: statuses,
+            }]);
+        } catch (error) {
+            logger.error('Error al obtener categorías:', error);
+            res.status(500).json({ error: 'Error al obtener categorías' });
+        }
+    },
+
+    async getCategories(personId){
+        logger.info('Entra a Buscar Las categories en (category_status_priority)');
+        try {
+            // Obtén las categorías relacionadas con la persona o con state = 1
+            const categories = await Category.findAll({
+                where: {
+                    type: 'Product',
+                    [Op.or]: [
+                        { state: 1 },
+                        { '$people.id$': personId } // Filtra por la relación en la tabla intermedia
+                    ]
+                },
+                include: [
+                    {
+                        association: 'people', // Incluye la relación
+                        required: false // Esto permite que devuelva categorías sin relación con personas
+                    },
+                    { association: 'children' }
+                ]
+            });
+    
+            // Llama a mapChildrenCategory usando `this`
+            const transformedCategories = await Promise.all(categories.map(async category => {
+                const children = category.children.length > 0 ? await ProductController.mapChildrenCategory(category.children) : [];
+                return {
+                    id: category.id,
+                    nameCategory: category.name,
+                    descriptionCategory: category.description,
+                    colorCategory: category.color,
+                    iconCategory: category.icon,
+                    parent_id: category.parent_id,
+                    children: children
+                };
+            }));
+    
+            return transformedCategories;
+        } catch (error) {
+            logger.error('Error al obtener categorías desde getCategories:', error);
+            throw new Error('Error al obtener categorías'); // Lanza el error para manejarlo en el controlador principal
+        }
+    },
+    async mapChildrenCategory(children) {
+        return Promise.all(
+            children.map(async (child) => {
+                const childChildren = child.children.length > 0 ? await ProductController.mapChildrenCategory(child.children) : [];
+                return {
+                    id: child.id,
+                    name: child.name,
+                    description: child.description,
+                    color: child.color,
+                    icon: child.icon,
+                    parent_id: child.parent_id,
+                    children: childChildren
+                };
+            })
+        );
+    },
+    async getStatus() {
+        logger.info('Entra a Buscar Los estados en (category_status_priority)');
+        try {
+            const statuses = await Status.findAll({
+                where: { type: 'Product' }
+            });
+    
+            return statuses.map(status => {
+                return {
+                    id: status.id,
+                    nameStatus: status.name,
+                    descriptionStatus: status.description,
+                    colorStatus: status.color,
+                    iconStatus: status.icon
+                };
+            });
+        } catch (error) {
+            logger.error('Error en getStatus:', error);
+            throw new Error('Error al obtener estados');
+        }
+    },
 };
 
 module.exports = ProductController;

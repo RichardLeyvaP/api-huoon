@@ -1,4 +1,7 @@
 node_modules/
 .env
-combined.log
-error.log
+# Ignorar todos los archivos .log en la raíz del proyecto
+*.log
+
+# Ignorar imágenes en la carpeta public
+public/
