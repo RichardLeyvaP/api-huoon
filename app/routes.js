@@ -36,6 +36,7 @@ router.get('/', (req, res) => res.json({ hello: "World" }));
 
 //Login y register
 router.post('/login', AuthController.login);
+router.post('/login-apk', AuthController.loginApk);
 router.post('/register', AuthController.register);
 
 // Rutas de autenticación

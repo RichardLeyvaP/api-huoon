@@ -1,12 +1,12 @@
-const { Configuration, User } = require('../models/index'); // Importa los modelos de Configuration y User
+const { Configuration, User } = require('../models'); // Importa los modelos de Configuration y User
 const logger = require('../../config/logger');
 const { config } = require('dotenv');
 module.exports = {    
     async show(req, res) 
     {
-        logger.info(`${req.user.user.name} - Accediendo a la configuración`)
+        logger.info(`${req.user.name} - Accediendo a la configuración`)
         try {
-            const userId = req.user.user.id; // Supone que tienes el ID del usuario en `req.user`.
+            const userId = req.user.id; // Supone que tienes el ID del usuario en `req.user`.
         // Buscar la configuración para el usuario
             let config = await Configuration.findOne({ where: { user_id: userId } });
     
