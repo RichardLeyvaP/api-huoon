@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { Warehouse, Home, Product, HomeWarehouseProduct, Status, Category, sequelize } = require('../models');
 const logger = require('../../config/logger');
-const homewarehouseproduct = require('../models/homewarehouseproduct');
 
 const schema = Joi.object({
     home_id: Joi.number().integer().optional(),
