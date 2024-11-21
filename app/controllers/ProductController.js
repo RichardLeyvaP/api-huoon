@@ -231,10 +231,10 @@ const ProductController = {
            const categories = await ProductController.getCategories(personId);
            const statuses = await ProductController.getStatus();
    
-            res.json([{
+            res.json({
                 productcategories: categories,
                 productstatus: statuses,
-            }]);
+            });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
             res.status(500).json({ error: 'Error al obtener categorías' });

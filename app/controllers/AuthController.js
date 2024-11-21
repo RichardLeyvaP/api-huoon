@@ -40,6 +40,10 @@ const schema = Joi.object({
             if (!user) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
+            // Verificar si el campo password es nulo o vacío
+            if (!user.password || user.password === '') {
+                return res.status(401).json({ msg: 'Credenciales inválidas' });
+            }
     
             const isMatch = await bcrypt.compare(req.body.password, user.password);
             if (!isMatch) {
@@ -86,6 +90,9 @@ const schema = Joi.object({
                 include: [{ model: Person, as: 'person' }]  });
             if (!user) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
+            }
+            if (!user.password || user.password === '') {
+                return res.status(401).json({ msg: 'Credenciales inválidas' }); 
             }
     
             const isMatch = await bcrypt.compare(req.body.password, user.password);
@@ -188,6 +195,7 @@ const schema = Joi.object({
         const transaction = await sequelize.transaction();
         try {
             const { id, name, email, image } = profile;
+            const extractedName = email.split('@')[0];
           // Busca al usuario en la base de datos usando el id de Google
           let user = await User.findOne({ 
             where: { 
@@ -225,7 +233,7 @@ const schema = Joi.object({
             } else {
               // Crea un nuevo usuario si no existe ni por `external_id` ni por correo
               user = await User.create({
-                name: name,
+                name: extractedName,
                 email: email,
                 external_id: id,
                 external_auth: 'google' // Guardamos la URL de la imagen

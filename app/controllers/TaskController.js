@@ -152,7 +152,7 @@ const TaskController = {
             // Obtener solo las tareas principales (sin padre) directamente en la consulta
             const tasks = await Task.findAll({
                 where: sequelize.where(
-                    sequelize.fn('DATE', sequelize.col('task.start_date')), // Convertir start_date a solo fecha
+                    sequelize.fn('DATE', sequelize.col('Task.start_date')), // Convertir start_date a solo fecha
                     req.body.start_date // Comparar solo la parte de la fecha
                 ),
                 include: [
@@ -169,46 +169,14 @@ const TaskController = {
                             {
                                 model: HomePersonTask,
                                 as: 'homePersonTasks',
-                                where: {
-                                    person_id: personId // Filtrar por ID del usuario
-                                },
-                                include: [
-                                    {
-                                        model: Role,
-                                        as: 'role', // Debe coincidir con la definición en el modelo
-                                    },
-                                    {
-                                        model: Person,
-                                        as: 'person', // Incluir persona si también es necesario
-                                    },
-                                    {
-                                        model: Home,
-                                        as: 'home', // Incluir persona si también es necesario
-                                    }
-                                ],
+                                where: { person_id: personId }, // Relación directa con la persona
                             },
                         ]
                     },
                     {
                         model: HomePersonTask,
                         as: 'homePersonTasks', 
-                        where: {
-                            person_id: personId // Filtrar por ID del usuario
-                        },
-                        include: [
-                            {
-                                model: Role,
-                                as: 'role', // Debe coincidir con la definición en el modelo
-                            },
-                            {
-                                model: Person,
-                                as: 'person', // Incluir persona si también es necesario
-                            },
-                            {
-                                model: Home,
-                                as: 'home', // Incluir persona si también es necesario
-                            }
-                        ],
+                        where: { person_id: personId }, // Relación directa con la persona
                     },
                 ]
             });
@@ -238,7 +206,8 @@ const TaskController = {
                     attachments: task.attachments,
                     geoLocation: task.geo_location,
                     parentId: task.parent_id,
-                    people: task.getPeople(),
+                    // Personas relacionadas con la tarea
+                    people: await TaskController.getPeopleForTask(task),
                     children: await TaskController.mapChildren(task.children) // Espera el mapeo de hijos
                 };
             }));
@@ -280,7 +249,37 @@ const TaskController = {
             logger.error('TaskController->mapParent', error.message);
         }
     },*/
+    
+    // Método auxiliar para obtener las personas relacionadas con una tarea
+    async  getPeopleForTask(task) {
+        // Obtener las personas relacionadas con la tarea desde la tabla homePersonTask
+        const homePersonTasks = await HomePersonTask.findAll({
+            where: { task_id: task.id },
+            include: [
+                {
+                    model: Role,
+                    as: 'role',
+                },
+                {
+                    model: Person,
+                    as: 'person',
+                },
+                {
+                    model: Home,
+                    as: 'home',
+                }
+            ]
+        });
 
+        // Devolver las personas mapeadas
+        return homePersonTasks.map(homePersonTask => ({
+            id: homePersonTask.person.id,
+            name: homePersonTask.person.name,
+            image: homePersonTask.person.image,
+            roleId: homePersonTask.role.id,
+            roleName: homePersonTask.role.name
+        }));
+    },
     // Función recursiva para mapear subtareas
     async mapChildren(children) {
         try {
@@ -303,7 +302,8 @@ const TaskController = {
                     attachments: child.attachments,
                     geoLocation: child.geo_location,
                     parentId: child.parent_id,
-                    people: child.getPeople(),
+                    // Personas relacionadas con la tarea hija
+                    people: await TaskController.getPeopleForTask(child),
                     // Llama recursivamente a mapChildren para obtener hijos de este hijo
                     children: child.children ? await TaskController.mapChildren(child.children) : [],
                     
@@ -779,13 +779,13 @@ const TaskController = {
             'Anual'
         ];
     
-            res.json([{
+            res.json({
                 taskcategories: categories,
                 taskstatus: statuses,
                 taskpriorities: priorities,
                 taskpeople: people,
                 taskrecurrences: recurrenceData
-            }]);
+            });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
             res.status(500).json({ error: 'Error al obtener categorías' });
@@ -913,7 +913,7 @@ const TaskController = {
                     id: person.id,
                     namePerson: person.name,
                     imagePerson: person.image,
-                    roleId: firstHome ? firstHome.role_id : null, // Accede a role_id
+                    roleId: firstHome ? firstHome.role_id : 0, // Accede a role_id
                     roleName: firstHome && firstHome.role ? firstHome.role.name : 'Sin Rol' // Accede a role.name
                 };
             });

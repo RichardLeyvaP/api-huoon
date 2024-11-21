@@ -53,9 +53,9 @@ module.exports = {
 
     async update(req, res) 
     {
-        logger.info(`${req.user.user.name} - Accediendo a actualizar la configuración`)
+        logger.info(`${req.user.name} - Accediendo a actualizar la configuración`)
         try {
-            const user = req.user.user; // Supone que tienes el ID del usuario en `req.user`.
+            const user = req.user; // Supone que tienes el ID del usuario en `req.user`.
         // Obtener la configuración por defecto del sistema
         const defaultConfig = await Configuration.findOne({ where: { isDefault: true } });
 
