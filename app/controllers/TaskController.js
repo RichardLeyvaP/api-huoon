@@ -543,21 +543,7 @@ const TaskController = {
                             { association: 'category' },
                             {
                                 model: HomePersonTask,
-                                as: 'homePersonTasks',
-                                include: [
-                                    {
-                                        model: Role,
-                                        as: 'role', // Debe coincidir con la definición en el modelo
-                                    },
-                                    {
-                                        model: Person,
-                                        as: 'person', // Incluir persona si también es necesario
-                                    },
-                                    {
-                                        model: Home,
-                                        as: 'home', // Incluir persona si también es necesario
-                                    }
-                                ],
+                                as: 'homePersonTasks'
                             },
                         ]
                     },
@@ -567,20 +553,6 @@ const TaskController = {
                     {
                         model: HomePersonTask,
                         as: 'homePersonTasks',
-                        include: [
-                            {
-                                model: Role,
-                                as: 'role', // Debe coincidir con la definición en el modelo
-                            },
-                            {
-                                model: Person,
-                                as: 'person', // Incluir persona si también es necesario
-                            },
-                            {
-                                model: Home,
-                                as: 'home', // Incluir persona si también es necesario
-                            }
-                        ],
                     },
                 ]
             });
@@ -609,7 +581,7 @@ const TaskController = {
                 attachments: task.attachments,
                 geoLocation: task.geo_location,
                 parentId: task.parent_id,
-                people: task.getPeople(),
+                people: await TaskController.getPeopleForTask(task),
                 children: await TaskController.mapChildren(task.children)
             };
 

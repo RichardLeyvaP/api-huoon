@@ -256,6 +256,8 @@ const schema = Joi.object({
                 await person.update({ image: savedImagePath }, { transaction });
             }
             }
+          }else{            
+          person = user.person;
           }    
           const userNew = {
             id: user.id,
@@ -356,7 +358,9 @@ const schema = Joi.object({
                 await person.update({ image: savedImagePath }, { transaction });
             }
                 }
-            }
+            }else{            
+                person = user.person;
+                } 
               
               const userNew = {
                 id: user.id,
