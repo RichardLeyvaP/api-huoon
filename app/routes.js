@@ -87,6 +87,8 @@ router.get('/facebook-callback', (req, res, next) => {
 });
 router.use(auth);
 
+router.get('/logout', AuthController.logout);
+
 //Ruta Configurations
 router.get('/configuration-show', ConfigurationController.show);
 router.put('/configuration', ConfigurationController.update);

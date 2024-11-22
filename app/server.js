@@ -4,6 +4,8 @@ const app = express();
 const { sequelize } = require('./models/index');
 const passport = require('passport');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const i18n = require('../config/i18n-config');  // Importar la configuración de i18n
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
@@ -71,6 +73,10 @@ const PORT = process.env.PORT || 8000;
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false}));
+
+// Middleware para gestionar el idioma
+app.use(cookieParser());
+app.use(i18n.init);  // Inicializar i18n como middleware
 
 app.use(passport.initialize());
 app.use(passport.session());

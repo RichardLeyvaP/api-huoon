@@ -1,0 +1,103 @@
+{
+    "category": {
+            "Limpieza": {
+              "name": "Cleaning",
+              "description": "Cleaning category"
+            },
+            "Cocina": {
+              "name": "Kitchen",
+              "description": "Kitchen category"
+            },
+            "Mantenimiento": {
+              "name": "Maintenance",
+              "description": "Maintenance category"
+            },
+            "Alimentos": {
+              "name": "Food",
+              "description": "Products for cooking"
+            },
+            "Electrónicos": {
+              "name": "Electronics",
+              "description": "Products for the home"
+            },
+            "Pintura": {
+              "name": "Painting",
+              "description": "Painting the home"
+            },
+            "Cumpleaños": {
+              "name": "Birthday",
+              "description": "Birthday party"
+            },
+            "Mercado": {
+              "name": "Market",
+              "description": "Grocery shopping"
+            },
+            "Limpiar la Casa": {
+              "name": "Clean the House",
+              "description": "Clean bedrooms, kitchen, living room"
+            },
+            "Lavandería": {
+              "name": "Laundry",
+              "description": "Washing clothes"
+            }
+    },
+  "priority": {
+      "Baja": {
+        "name": "Low",
+        "description": "Low priority"
+      },
+      "Media": {
+        "name": "Medium",
+        "description": "Medium priority"
+      },
+      "Alta": {
+        "name": "High",
+        "description": "High priority"
+      },
+      "Normal": {
+        "name": "Normal",
+        "description": "Normal priority"
+      }
+  },
+  "status":{
+    "Pendiente": {
+      "name": "Pending",
+      "description": "Pending state"
+    },
+    "En Progreso": {
+      "name": "In Progress",
+      "description": "In progress state"
+    },
+    "Completada": {
+      "name": "Completed",
+      "description": "Completed state"
+    },
+    "En Uso": {
+      "name": "In Use",
+      "description": "Products that are being used"
+    },
+    "Consumido": {
+      "name": "Consumed",
+      "description": "Products that are being consumed"
+    },
+    "Agotados": {
+      "name": "Out of Stock",
+      "description": "Products that are out of stock"
+    }
+  },
+  "recurrence": {
+    "Diaria": {
+      "name": "Daily"
+    },
+    "Semanal": {
+      "name": "Weekly"
+    },
+    "Mensual": {
+      "name": "Monthly"
+    },
+    "Anual": {
+      "name": "Yearly"
+    }
+  }
+  
+}

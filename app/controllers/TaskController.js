@@ -5,6 +5,7 @@ const fs = require('fs');
 const { Task, Priority, Status, Category, Person, HomePersonTask, Role, Home, HomePerson, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 const ActivityLogService = require('../services/ActivityLogService');
+const i18n = require('../../config/i18n-config');
 
 // Esquema de validación de Joi
 const schema = Joi.object({
@@ -735,7 +736,7 @@ const TaskController = {
 
          // Obtén el ID de la persona autenticada
          const personId = req.person.id;
-            
+        // Establecer el idioma de i18n dinámicamente
          if (!personId) {
              return res.status(404).json({ error: 'Persona no encontrada' });
          }
@@ -750,13 +751,16 @@ const TaskController = {
             'Mensual',
             'Anual'
         ];
+        const translatedRecurrenceData = recurrenceData.map(item => {
+            return i18n.__(`recurrence.${item}.name`);
+        });
     
             res.json({
                 taskcategories: categories,
                 taskstatus: statuses,
                 taskpriorities: priorities,
                 taskpeople: people,
-                taskrecurrences: recurrenceData
+                taskrecurrences: translatedRecurrenceData
             });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
@@ -787,10 +791,14 @@ const TaskController = {
             // Llama a mapChildrenCategory usando `this`
             const transformedCategories = await Promise.all(categories.map(async category => {
                 const children = category.children.length > 0 ? await TaskController.mapChildrenCategory(category.children) : [];
+
+                const translatedName = category.state === 1 ? i18n.__(`category.${category.name}.name`) : category.name;
+                const translatedDescription = category.state === 1 ? i18n.__(`category.${category.name}.description`) : category.description;
+
                 return {
                     id: category.id,
-                    nameCategory: category.name,
-                    descriptionCategory: category.description,
+                    nameCategory: translatedName,
+                    descriptionCategory: translatedDescription,
                     colorCategory: category.color,
                     iconCategory: category.icon,
                     parent_id: category.parent_id,
@@ -808,10 +816,13 @@ const TaskController = {
         return Promise.all(
             children.map(async (child) => {
                 const childChildren = child.children.length > 0 ? await TaskController.mapChildrenCategory(child.children) : [];
+                // Suponiendo que 'category' es un objeto con la propiedad 'name' como 'Limpieza'
+                const translatedName = child.state === 1 ? i18n.__(`category.${child.name}.name`) : child.name;  // Traduce el nombre
+                const translatedDescription = child.state === 1 ? i18n.__(`category.${child.name}.description`) : child.description;  // Traduce la descripción
                 return {
                     id: child.id,
-                    name: child.name,
-                    description: child.description,
+                    name: translatedName,
+                    description: translatedDescription,
                     color: child.color,
                     icon: child.icon,
                     parent_id: child.parent_id,
@@ -830,8 +841,8 @@ const TaskController = {
             return statuses.map(status => {
                 return {
                     id: status.id,
-                    nameStatus: status.name,
-                    descriptionStatus: status.description,
+                    nameStatus:  i18n.__(`status.${status.name}.name`),
+                    descriptionStatus: i18n.__(`status.${status.name}.description`),
                     colorStatus: status.color,
                     iconStatus: status.icon
                 };
@@ -847,10 +858,11 @@ const TaskController = {
             const priorities = await Priority.findAll(); // Obtén todas las prioridades
     
             return priorities.map(priority => {
+
                 return {
                     id: priority.id,
-                    namePriority: priority.name,
-                    descriptionPriority: priority.description,
+                    namePriority: i18n.__(`priority.${priority.name}.name`),
+                    descriptionPriority: i18n.__(`priority.${priority.name}.description`),
                     colorPriority: priority.color,
                     level: priority.level
                 };

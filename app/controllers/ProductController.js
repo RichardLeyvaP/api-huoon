@@ -5,6 +5,7 @@ const { Product, Status, Category } = require('../models'); // Importar el model
 const path = require('path');
 const fs = require('fs');
 const logger = require('../../config/logger'); // Importa el logger
+const i18n = require('../../config/i18n-config');
 
 // Esquema de validación de Joi
 const schema = Joi.object({
@@ -265,10 +266,12 @@ const ProductController = {
             // Llama a mapChildrenCategory usando `this`
             const transformedCategories = await Promise.all(categories.map(async category => {
                 const children = category.children.length > 0 ? await ProductController.mapChildrenCategory(category.children) : [];
+                const translatedName = category.state === 1 ? i18n.__(`category.${category.name}.name`) : category.name;
+                const translatedDescription = category.state === 1 ? i18n.__(`category.${category.name}.description`) : category.description;
                 return {
                     id: category.id,
-                    nameCategory: category.name,
-                    descriptionCategory: category.description,
+                    nameCategory: translatedName,
+                    descriptionCategory: translatedDescription,
                     colorCategory: category.color,
                     iconCategory: category.icon,
                     parent_id: category.parent_id,
@@ -286,10 +289,12 @@ const ProductController = {
         return Promise.all(
             children.map(async (child) => {
                 const childChildren = child.children.length > 0 ? await ProductController.mapChildrenCategory(child.children) : [];
+                const translatedName = child.state === 1 ? i18n.__(`category.${child.name}.name`) : child.name;  // Traduce el nombre
+                const translatedDescription = child.state === 1 ? i18n.__(`category.${child.name}.description`) : child.description;  // Traduce la descripción
                 return {
                     id: child.id,
-                    name: child.name,
-                    description: child.description,
+                    name: translatedName,
+                    description: translatedDescription,
                     color: child.color,
                     icon: child.icon,
                     parent_id: child.parent_id,
@@ -308,8 +313,8 @@ const ProductController = {
             return statuses.map(status => {
                 return {
                     id: status.id,
-                    nameStatus: status.name,
-                    descriptionStatus: status.description,
+                    nameStatus:  i18n.__(`status.${status.name}.name`),
+                    descriptionStatus: i18n.__(`status.${status.name}.description`),
                     colorStatus: status.color,
                     iconStatus: status.icon
                 };

@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id',   // Clave foránea en la tabla Configuration
         as: 'configurations'     // Alias para acceder a las configuraciones del usuario
       });
+
+      User.hasMany(models.UserToken, {
+        foreignKey: 'user_id',   // Clave foránea en la tabla Configuration
+        as: 'tokens'     // Alias para acceder a las configuraciones del usuario
+      });
       // Relación hasOne con el modelo Person
       User.hasOne(models.Person, {
         foreignKey: 'user_id', // Clave foránea en la tabla Person

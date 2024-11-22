@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { User, Person, sequelize } = require('../models'); // Importamos sequelize desde db
+const { User, Person, UserToken, sequelize } = require('../models'); // Importamos sequelize desde db
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authConfig = require('../../config/auth');
@@ -8,6 +8,7 @@ const passport = require('passport');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const moment = require('moment'); // Usamos moment.js para facilitar el manejo de fechas
 // Esquema de validación para el registro de usuario
 
 const schema = Joi.object({
@@ -49,9 +50,35 @@ const schema = Joi.object({
             if (!isMatch) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
-            // Creamos el token
-            const token = jwt.sign({ user: user}, authConfig.secret, {
+            
+            // Extraemos los datos de 'person'
+            const person = user.person ? {
+                id: user.person.id,
+                name: user.person.name,
+                email: user.person.email
+            } : null;
+
+            // Creamos el token con los datos específicos
+            const token = jwt.sign({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                language: user.language,
+                person: person  // Incluir los datos de person
+            }, authConfig.secret, {
                 expiresIn: authConfig.expires
+            });
+            // Decodificar el token para obtener la fecha de expiración
+            const decoded = jwt.decode(token);
+
+            // La fecha de expiración está en el campo 'exp' del JWT
+            const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
+
+             // Guardar el token en la base de datos
+            await UserToken.create({
+                user_id: user.id,
+                token: token,
+                expires_at: expiresAt
             });
     
             // Respuesta exitosa
@@ -99,10 +126,36 @@ const schema = Joi.object({
             if (!isMatch) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
-    
-            // Creamos el token
-            const token = jwt.sign({ user: user}, authConfig.secret, {
+
+            // Extraemos los datos de 'person'
+            const person = user.person ? {
+                id: user.person.id,
+                name: user.person.name,
+                email: user.person.email
+            } : null;
+
+            // Creamos el token con los datos específicos
+            const token = jwt.sign({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                language: user.language,
+                person: person  // Incluir los datos de person
+            }, authConfig.secret, {
                 expiresIn: authConfig.expires
+            });
+
+             // Decodificar el token para obtener la fecha de expiración
+            const decoded = jwt.decode(token);
+
+            // La fecha de expiración está en el campo 'exp' del JWT
+            const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
+
+             // Guardar el token en la base de datos
+            await UserToken.create({
+                user_id: user.id,
+                token: token,
+                expires_at: expiresAt
             });
     
             // Respuesta exitosa
@@ -171,6 +224,19 @@ const schema = Joi.object({
             // Creamos el token
             const token = jwt.sign({ user: userNew}, authConfig.secret, {
                 expiresIn: authConfig.expires
+            });
+
+            // Decodificar el token para obtener la fecha de expiración
+            const decoded = jwt.decode(token);
+
+            // La fecha de expiración está en el campo 'exp' del JWT
+            const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
+
+             // Guardar el token en la base de datos
+            await UserToken.create({
+                user_id: user.id,
+                token: token,
+                expires_at: expiresAt
             });
             // Respuesta en formato JSON
             res.status(201).json({
@@ -273,6 +339,19 @@ const schema = Joi.object({
         // Creamos el token
         const token = jwt.sign({ user: userNew}, authConfig.secret, {
             expiresIn: authConfig.expires
+        });
+
+        // Decodificar el token para obtener la fecha de expiración
+        const decoded = jwt.decode(token);
+
+        // La fecha de expiración está en el campo 'exp' del JWT
+        const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
+
+         // Guardar el token en la base de datos
+        await UserToken.create({
+            user_id: user.id,
+            token: token,
+            expires_at: expiresAt
         });
         // Confirma la transacción
         await transaction.commit();
@@ -377,6 +456,19 @@ const schema = Joi.object({
             const token = jwt.sign({ user: userNew}, authConfig.secret, {
                 expiresIn: authConfig.expires
             });
+
+            // Decodificar el token para obtener la fecha de expiración
+            const decoded = jwt.decode(token);
+
+            // La fecha de expiración está en el campo 'exp' del JWT
+            const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
+
+             // Guardar el token en la base de datos
+            await UserToken.create({
+                user_id: user.id,
+                token: token,
+                expires_at: expiresAt
+            });
             
             await transaction.commit();
             // Respuesta en formato JSON
@@ -427,6 +519,33 @@ const schema = Joi.object({
             console.error('Error al descargar la imagen:', error);
             return 'people/default.jpg'; // Retorna la imagen por defecto en caso de fallo
         }
+    },
+
+    async logout(req, res) {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1]; // Obtener el token del encabezado Authorization
+
+        if (!token) {
+            return res.status(400).json({ msg: 'No token proporcionado' });
+        }
+
+        // Marcar el token como revocado directamente en la base de datos
+        const [updated] = await UserToken.update(
+            { revoked: true },
+            { where: { token }, returning: true }
+        );
+
+        if (updated === 0) {
+            return res.status(400).json({ msg: 'Token no encontrado o ya revocado' });
+        }
+
+        // Responder al cliente
+        res.status(200).json({ msg: 'Logout exitoso' });
+    } catch (err) {
+        logger.error('Error al hacer logout: ' + err.message);
+        res.status(500).json({ error: 'Error en el servidor' });
     }
+    }
+
 }
 module.exports = AuthController;

@@ -1,0 +1,102 @@
+{
+    "category": {
+        "Limpieza": {
+          "name": "Limpieza",
+          "description": "Categoría de limpieza"
+        },
+        "Cocina": {
+          "name": "Cocina",
+          "description": "Categoría de cocina"
+        },
+        "Mantenimiento": {
+          "name": "Mantenimiento",
+          "description": "Categoría de mantenimiento"
+        },
+        "Alimentos": {
+          "name": "Alimentos",
+          "description": "Productos para cocinar"
+        },
+        "Electrónicos": {
+          "name": "Electrónicos",
+          "description": "Productos para el hogar"
+        },
+        "Pintura": {
+          "name": "Pintura",
+          "description": "Pintura del hogar"
+        },
+        "Cumpleaños": {
+          "name": "Cumpleaños",
+          "description": "Fiesta de cumpleaños"
+        },
+        "Mercado": {
+          "name": "Mercado",
+          "description": "Compra de víveres"
+        },
+        "Limpiar la Casa": {
+          "name": "Limpiar la Casa",
+          "description": "Limpiar dormitorios, cocina, sala de estar"
+        },
+        "Lavandería": {
+          "name": "Lavandería",
+          "description": "Lavar la ropa"
+        }
+      },
+    "priority": {
+      "Baja": {
+        "name": "Baja",
+        "description": "Prioridad baja"
+      },
+      "Media": {
+        "name": "Media",
+        "description": "Prioridad media"
+      },
+      "Alta": {
+        "name": "Alta",
+        "description": "Prioridad alta"
+      },
+      "Normal": {
+        "name": "Normal",
+        "description": "Prioridad normal"
+      }
+  },
+  "status": {
+    "Pendiente": {
+      "name": "Pendiente",
+      "description": "Estado pendiente"
+    },
+    "En Progreso": {
+      "name": "En Progreso",
+      "description": "Estado en progreso"
+    },
+    "Completado": {
+      "name": "Completado",
+      "description": "Estado completado"
+    },
+    "En Uso": {
+      "name": "En uso",
+      "description": "Productos que están en uso"
+    },
+    "Consumido": {
+      "name": "Consumido",
+      "description": "Productos que están siendo consumidos"
+    },
+    "Agotados": {
+      "name": "Agotados",
+      "description": "Productos que están agotados"
+    }
+  },
+  "recurrence": {
+    "Diaria": {
+      "name": "Diaria"
+    },
+    "Semanal": {
+      "name": "Semanal"
+    },
+    "Mensual": {
+      "name": "Mensual"
+    },
+    "Anual": {
+      "name": "Anual"
+    }
+  }
+}
