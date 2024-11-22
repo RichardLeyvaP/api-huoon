@@ -98,6 +98,42 @@
     "Anual": {
       "name": "Yearly"
     }
+  },
+  "homeType":{
+    "Casa": {
+      "name": "House",
+      "description": "Family residence type"
+    },
+    "Apartamento": {
+      "name": "Apartment",
+      "description": "Building residence type"
+    }
+  },
+  "roles": {
+    "Administrador": {
+      "name": "Administrator",
+      "description": "System administrator"
+    },
+    "Usuario": {
+      "name": "User",
+      "description": "System user"
+    },
+    "Padre": {
+      "name": "Father",
+      "description": "Head of family"
+    },
+    "Miembro": {
+      "name": "Member",
+      "description": "Family member"
+    },
+    "Responsable": {
+      "name": "Responsible",
+      "description": "Task owner"
+    },
+    "Colaborador": {
+      "name": "Collaborator",
+      "description": "Task collaborator"
+    }
   }
   
 }

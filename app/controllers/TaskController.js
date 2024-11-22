@@ -745,6 +745,7 @@ const TaskController = {
            const statuses = await TaskController.getStatus();
            const priorities = await TaskController.getPriorities();
            const people = await TaskController.getPeople();
+           const roles = await TaskController.getRoles();
            const recurrenceData = [
             'Diaria',
             'Semanal',
@@ -760,7 +761,8 @@ const TaskController = {
                 taskstatus: statuses,
                 taskpriorities: priorities,
                 taskpeople: people,
-                taskrecurrences: translatedRecurrenceData
+                taskrecurrences: translatedRecurrenceData,
+                taskRoles: roles
             });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
@@ -852,6 +854,29 @@ const TaskController = {
             throw new Error('Error al obtener estados');
         }
     },
+    async getRoles() {
+        logger.info('Entra a Buscar Los roles en (category_status_priority)');
+        try {
+            const roles = await Role.findAll({
+                where: { type: 'Task' }
+            });
+    
+            return roles.map(role => {
+                return {
+                    id: role.id,
+                    nameRol: i18n.__(`roles.${role.name}.name`) !== `roles.${role.name}.name`
+                    ? i18n.__(`roles.${role.name}.name`)
+                    : role.name,
+                    descriptionRol: i18n.__(`roles.${role.name}.name`) !== `roles.${role.name}.name`
+                    ? i18n.__(`roles.${role.name}.description`)
+                    : role.description
+                };
+            });
+        } catch (error) {
+            logger.error('Error en getRoles:', error);
+            throw new Error('Error al obtener los roles');
+        }
+    },
     async getPriorities() {
         logger.info('Entra a Buscar Las prioridades en (category_status_priority)');
         try {
@@ -861,8 +886,8 @@ const TaskController = {
 
                 return {
                     id: priority.id,
-                    namePriority: i18n.__(`priority.${priority.name}.name`),
-                    descriptionPriority: i18n.__(`priority.${priority.name}.description`),
+                    namePriority: i18n.__(`priority.${priority.name}.name`) !== `priority.${priority.name}.name` ? i18n.__(`priority.${priority.name}.name`) : priority.name,
+                    descriptionPriority: i18n.__(`priority.${priority.name}.name`) !== `priority.${priority.name}.name` ? i18n.__(`priority.${priority.name}.description`) : priority.description,
                     colorPriority: priority.color,
                     level: priority.level
                 };

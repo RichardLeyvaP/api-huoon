@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { HomeType, sequelize } = require('../models'); // Importar el modelo HomeType
 const logger = require('../../config/logger'); // Importa el logger
+const i18n = require('../../config/i18n-config');
 
 // Esquema de validación de Joi
 const schema = Joi.object({
@@ -17,7 +18,15 @@ const HomeTypeController = {
 
         try {
             const homeTypes = await HomeType.findAll();
-            res.status(200).json({ 'homeTypes': [homeTypes] });
+            const homeTypesMap = homeTypes.map(homeType => {
+                return{
+                    id: homeType.id,
+                    name: i18n.__(`homeType.${homeType.name}.name`),
+                    description: i18n.__(`homeType.${homeType.name}.description`),
+                    icon: homeType.icon
+                }
+            });
+            res.status(200).json({ 'homeTypes': homeTypesMap });
         } catch (error) {
             const errorMsg = error.details
             ? error.details.map(detail => detail.message).join(', ')

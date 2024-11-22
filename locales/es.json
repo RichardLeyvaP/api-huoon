@@ -98,5 +98,41 @@
     "Anual": {
       "name": "Anual"
     }
-  }
+  },
+  "homeType":{
+    "Casa": {
+      "name": "Casa",
+      "description": "Tipo de residencia familiar"
+    },
+    "Apartamento": {
+      "name": "Apartamento",
+      "description": "Tipo de residencia en edificio"
+    }
+  },
+  "roles": {
+    "Administrador": {
+      "name": "Administrador",
+      "description": "Administrador del sistema"
+    },
+    "Usuario": {
+      "name": "Usuario",
+      "description": "Usuario del sistema"
+    },
+    "Padre": {
+      "name": "Padre",
+      "description": "Padre de familia"
+    },
+    "Miembro": {
+      "name": "Miembro",
+      "description": "Miembro de familia"
+    },
+    "Responsable": {
+      "name": "Responsable",
+      "description": "Responsable de la tarea"
+    },
+    "Colaborador": {
+      "name": "Colaborador",
+      "description": "Colaborador de la tarea"
+    }
+  }  
 }

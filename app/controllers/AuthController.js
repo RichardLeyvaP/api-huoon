@@ -51,22 +51,25 @@ const schema = Joi.object({
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
             
-            // Extraemos los datos de 'person'
+            // Extraemos los datos de 'person' del usuario
             const person = user.person ? {
                 id: user.person.id,
                 name: user.person.name,
                 email: user.person.email
             } : null;
 
-            // Creamos el token con los datos específicos
-            const token = jwt.sign({
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                language: user.language,
-                person: person  // Incluir los datos de person
-            }, authConfig.secret, {
-                expiresIn: authConfig.expires
+            // Construimos el objeto del usuario con la estructura deseada
+            const userNew = {
+                id: user.id,                     // ID del usuario
+                email: user.email,               // Correo del usuario
+                name: user.name,                 // Nombre del usuario
+                language: user.language,         // Idioma del usuario
+                person: person                   // Datos de 'person'
+            };
+
+            // Creamos el token con el objeto estructurado
+            const token = jwt.sign({user: userNew}, authConfig.secret, {
+                expiresIn: authConfig.expires // Tiempo de expiración del token
             });
             // Decodificar el token para obtener la fecha de expiración
             const decoded = jwt.decode(token);
@@ -127,22 +130,25 @@ const schema = Joi.object({
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
 
-            // Extraemos los datos de 'person'
+            // Extraemos los datos de 'person' del usuario
             const person = user.person ? {
                 id: user.person.id,
                 name: user.person.name,
                 email: user.person.email
             } : null;
 
-            // Creamos el token con los datos específicos
-            const token = jwt.sign({
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                language: user.language,
-                person: person  // Incluir los datos de person
-            }, authConfig.secret, {
-                expiresIn: authConfig.expires
+            // Construimos el objeto del usuario con la estructura deseada
+            const userNew = {
+                id: user.id,                     // ID del usuario
+                email: user.email,               // Correo del usuario
+                name: user.name,                 // Nombre del usuario
+                language: user.language,         // Idioma del usuario
+                person: person                   // Datos de 'person'
+            };
+
+            // Creamos el token con el objeto estructurado
+            const token = jwt.sign({user: userNew}, authConfig.secret, {
+                expiresIn: authConfig.expires // Tiempo de expiración del token
             });
 
              // Decodificar el token para obtener la fecha de expiración
