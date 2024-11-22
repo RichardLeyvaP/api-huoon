@@ -25,6 +25,15 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
+      status_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'statuses', // nombre de la tabla de referencia
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
       residents: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -37,11 +46,6 @@ module.exports = {
       timezone: {
         type: Sequelize.STRING,
         allowNull: true,
-      },
-      status: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 'Activa',
       },
       image: {
         type: Sequelize.STRING,

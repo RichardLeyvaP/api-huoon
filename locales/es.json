@@ -83,6 +83,18 @@
     "Agotados": {
       "name": "Agotados",
       "description": "Productos que están agotados"
+    },
+    "Activa": {
+      "name": "Activa",
+      "description": "La casa está en uso y funcionando normalmente"
+    },
+    "Desocupada": {
+      "name": "Desocupada",
+      "description": "La casa está vacía pero en condiciones de ser utilizada"
+    },
+    "En Mantenimiento": {
+      "name": "En Mantenimiento",
+      "description": "La casa está en mantenimiento o reparaciones"
     }
   },
   "recurrence": {

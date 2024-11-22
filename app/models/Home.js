@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'homeType'
       });
 
+      Home.belongsTo(models.Status, {
+        foreignKey: 'status_id',
+        as: 'status'
+      });
+
       Home.belongsToMany(models.Person, {
         through: 'home_person',
         foreignKey: 'home_id',
@@ -64,6 +69,15 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       allowNull: false,
     },
+    home_type_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Status', // Nombre de la tabla de usuarios (asegúrate de que esté bien)
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
+      allowNull: false,
+    },
     residents: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -76,11 +90,6 @@ module.exports = (sequelize, DataTypes) => {
     timezone: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'Activa',
     },
     image: {
       type: DataTypes.STRING,

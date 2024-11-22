@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
-const { Home, HomeType, sequelize } = require('../models');  // Importar el modelo Home
+const { Home, HomeType, Status, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 
 // Esquema de validación de Joi
@@ -12,7 +12,7 @@ const schema = Joi.object({
     residents: Joi.number().integer().default(1).allow(null),
     geo_location: Joi.string().allow(null, ''),
     timezone: Joi.string().allow(null, ''),
-    status: Joi.string().valid('Activa', 'Inactiva').default('Activa').allow(null),
+    status_id: Joi.number().integer().optional(),
     image: Joi.string().allow(null, ''),
     id: Joi.number().optional(),
 });
@@ -24,10 +24,14 @@ const HomeController = {
 
         try {
             const homes = await Home.findAll({
-                attributes: ['id', 'name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status', 'image'],
+                attributes: ['id', 'name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status_id', 'image'],
                 include: [{
                     model: HomeType,
                     as: 'homeType',
+                    attributes: ['id', 'name'],
+                },{
+                    model: Status,
+                    as: 'status',
                     attributes: ['id', 'name'],
                 }],
             });
@@ -41,6 +45,7 @@ const HomeController = {
             const homeType = home.homeType; // Obtener el tipo de casa relacionado
             return {
                 id: home.id,
+                statusId: home.status_id,
                 name: home.name,
                 address: home.address,
                 homeTypeId: home.home_type_id,
@@ -48,7 +53,7 @@ const HomeController = {
                 residents: home.residents,
                 geoLocation: home.geo_location,
                 timezone: home.timezone,
-                status: home.status, // Aquí asumo que tienes una propiedad status directa en el modelo
+                nameStatus: home.status.name, // Aquí asumo que tienes una propiedad status directa en el modelo
                 image: home.image,
             };
         });
@@ -75,6 +80,19 @@ const HomeController = {
             return res.status(400).json({ msg: error.details.map(detail => detail.message) });
         }
 
+         // Verificar si el tipo de hogar existe
+         const homeType = await HomeType.findByPk(value.home_type_id);
+         if (!homeType) {
+             logger.error(`HomeController->store: Typo de Hogar no encontrado con ID ${value.home_type_id}`);
+             return res.status(404).json({ msg: 'TypeHomeNotFound' });
+         }
+         // Verificar si el estado exista
+         const status = await Status.findByPk(value.status_id);
+         if (!status) {
+             logger.error(`HomeController->store: Estado no encontrado con ID ${value.status_id}`);
+             return res.status(404).json({ msg: 'StatusNotFound' });
+         }
+
         const t = await sequelize.transaction();
         try {
             let filename = 'homes/default.jpg'; // Imagen por defecto
@@ -85,7 +103,7 @@ const HomeController = {
                 residents: value.residents,
                 geo_location: value.geo_location,
                 timezone: value.timezone,
-                status: value.status,
+                status_id: value.status_id,
                 image: filename,
             }, { transaction: t });
 
@@ -132,6 +150,10 @@ const HomeController = {
                     model: HomeType,
                     as: 'homeType',
                     attributes: ['id', 'name'],
+                },{
+                    model: Status,
+                    as: 'status',
+                    attributes: ['id', 'name'],
                 }],
             });
     
@@ -141,6 +163,7 @@ const HomeController = {
     
             const mappedHome = {
                 id: home.id,
+                statusId: home.status_id,
                 name: home.name,
                 address: home.address,
                 homeTypeId: home.home_type_id,
@@ -148,7 +171,7 @@ const HomeController = {
                 residents: home.residents,
                 geoLocation: home.geo_location,
                 timezone: home.timezone,
-                status: home.status,
+                nameStatus: home.status.name,
                 image: home.image,
             };
     
@@ -174,6 +197,15 @@ const HomeController = {
             return res.status(400).json({ msg: error.details.map(detail => detail.message) });
         }
 
+        if (status_id) {
+            // Verificar si el estado exista
+         const status = await Status.findByPk(value.status_id);
+         if (!status) {
+             logger.error(`HomeController->update: Estado no encontrado con ID ${value.status_id}`);
+             return res.status(404).json({ msg: 'StatusNotFound' });
+         }
+        }
+
         const t = await sequelize.transaction();
         try {
             const home = await Home.findByPk(value.id);
@@ -182,7 +214,7 @@ const HomeController = {
                 return res.status(404).json({ msg: 'HomeNotFound' });
             }
              // Lista de campos que pueden ser actualizados
-             const fieldsToUpdate = ['name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status'];
+             const fieldsToUpdate = ['name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status_id'];
            // Filtrar los campos presentes en req.body y construir el objeto updatedData
            const updatedData = Object.keys(req.body)
            .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)

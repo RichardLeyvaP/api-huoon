@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     Status.hasMany(models.HomeWarehouseProduct, { foreignKey: 'status_id', as: 'productHomeStatuses', onDelete: 'CASCADE' });
     Status.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'status_id', as: 'productPersonStatuses', onDelete: 'CASCADE' });
+    Status.hasMany(models.Home, { foreignKey: 'status_id', as: 'homes', onDelete: 'CASCADE' });
     }
   }
   Status.init({

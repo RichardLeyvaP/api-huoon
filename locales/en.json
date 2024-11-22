@@ -83,6 +83,18 @@
     "Agotados": {
       "name": "Out of Stock",
       "description": "Products that are out of stock"
+    },
+    "Active": {
+      "name": "Active",
+      "description": "The house is in use and functioning normally"
+    },
+    "Desocupada": {
+      "name": "Vacant",
+      "description": "The house is empty but ready for use"
+    },
+    "En Mantenimiento": {
+      "name": "Under Maintenance",
+      "description": "The house is under maintenance or repair"
     }
   },
   "recurrence": {
