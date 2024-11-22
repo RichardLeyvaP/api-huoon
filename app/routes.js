@@ -85,6 +85,26 @@ router.get('/facebook-callback', (req, res, next) => {
         }
     })(req, res, next);
 });
+
+// Ruta para servir imágenes desde la carpeta `public`
+router.get('/images/:foldername/:filename', (req, res) => {
+    const { foldername, filename } = req.params;
+    const imagePath = path.join(__dirname, '../public', foldername, filename);
+    if (!fs.existsSync(imagePath)) {
+        return res.status(404).send('Imagen no encontrada');
+    }
+
+    // Usa mime-types para obtener el tipo MIME
+    const fileType = mime.lookup(imagePath) || 'application/octet-stream';
+    fs.readFile(imagePath, (err, file) => {
+        if (err) {
+            return res.status(500).send('Error al leer la imagen');
+        }
+        res.writeHead(200, { 'Content-Type': fileType });
+        res.end(file);
+    });
+});
+
 router.use(auth);
 
 router.get('/logout', AuthController.logout);
@@ -219,28 +239,11 @@ router.post('/person-home-warehouse-products', PersonHomeWarehouseProductControl
 router.post('/person-home-warehouse-product-update', multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.update);
 router.post('/person-home-warehouse-product-destroy', PersonHomeWarehouseProductController.destroy);
 
-// Ruta para servir imágenes desde la carpeta `public`
-router.get('/images/:foldername/:filename', (req, res) => {
-    const { foldername, filename } = req.params;
-    const imagePath = path.join(__dirname, '../public', foldername, filename);
-    if (!fs.existsSync(imagePath)) {
-        return res.status(404).send('Imagen no encontrada');
-    }
-
-    // Usa mime-types para obtener el tipo MIME
-    const fileType = mime.lookup(imagePath) || 'application/octet-stream';
-    fs.readFile(imagePath, (err, file) => {
-        if (err) {
-            return res.status(500).send('Error al leer la imagen');
-        }
-        res.writeHead(200, { 'Content-Type': fileType });
-        res.end(file);
-    });
-});
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
 router.get('/category-status-priority-apk', TaskController.category_status_priority);
+router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 
 
 module.exports = router;

@@ -1,8 +1,9 @@
 const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
-const { Home, HomeType, Status, sequelize } = require('../models');  // Importar el modelo Home
+const { Home, HomeType, Status, Person, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
+const i18n = require('../../config/i18n-config');
 
 // Esquema de validación de Joi
 const schema = Joi.object({
@@ -311,6 +312,84 @@ const HomeController = {
 
             logger.error('HomeController->destroy: ' + errorMsg);
             res.status(500).json({ error: 'ServerError', details: errorMsg });
+        }
+    },
+
+    //Ruta unificada de Mantenedores
+    async homeType_status_people(req, res){
+        logger.info(`${req.user.name} - Entra a la ruta unificada de Homes`);
+
+        try {
+           const statuses = await HomeController.getStatus();
+           const hometypes = await HomeController.getHomeTypes();
+           const people = await HomeController.getPeople();
+    
+            res.json({
+                taskstatus: statuses,
+                taskhometypes: hometypes,
+                taskpeople: people
+            });
+        } catch (error) {
+            logger.error('Error al obtener los mantenedores:', error);
+            res.status(500).json({ error: 'Error al obtener los mantenedores' });
+        }
+    },
+
+    async getStatus() {
+        logger.info('Entra a Buscar Los estados en (homeType_status_people)');
+        try {
+            const statuses = await Status.findAll({
+                where: { type: 'Home' }
+            });
+    
+            return statuses.map(status => {
+                return {
+                    id: status.id,
+                    nameStatus:  i18n.__(`status.${status.name}.name`) !== `status.${status.name}.name` ? i18n.__(`status.${status.name}.name`) : status.name,
+                    descriptionStatus: i18n.__(`status.${status.name}.name`) !== `status.${status.name}.name` ? i18n.__(`status.${status.name}.description`) : status.description,
+                    colorStatus: status.color,
+                    iconStatus: status.icon
+                };
+            });
+        } catch (error) {
+            logger.error('Error en getStatus:', error);
+            throw new Error('Error al obtener estados');
+        }
+    },
+
+    async getHomeTypes() {
+        logger.info('Entra a Buscar Los tipos de hogar en (homeType_status_people)');
+        try {
+            const homeTypes = await HomeType.findAll();
+            return homeTypes.map(homeType => {
+                return{
+                    id: homeType.id,
+                    name: i18n.__(`homeType.${homeType.name}.name`) !== `homeType.${homeType.name}.name` ? i18n.__(`homeType.${homeType.name}.name`) : homeType.name,
+                    description: i18n.__(`homeType.${homeType.name}.name`) !== `homeType.${homeType.name}.name` ? i18n.__(`homeType.${homeType.name}.description`) : homeType.description,
+                    icon: homeType.icon
+                }
+            });
+        } catch (error) {
+            logger.error('Error en getStatus:', error);
+            throw new Error('Error al obtener estados');
+        }
+    },
+
+    async getPeople() {
+        logger.info('Entra a Buscar Las personas en (homeType_status_people)');
+        try {
+            const people = await Person.findAll();
+
+            return people.map(person => {
+                return {
+                    id: person.id,
+                    namePerson: person.name,
+                    imagePerson: person.image
+                };
+            });
+        } catch (error) {
+            logger.error('Error en getPeople:', error);
+            throw new Error('Error al obtener personas');
         }
     }
 };
