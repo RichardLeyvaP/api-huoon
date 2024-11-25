@@ -16,9 +16,47 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   HomePerson.init({
-    home_id: DataTypes.BIGINT,
-    person_id: DataTypes.BIGINT,
-    role_id: DataTypes.BIGINT
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,   // Indica que 'id' es la clave primaria
+      autoIncrement: true // Esto hace que el campo 'id' sea auto-incrementable
+    },
+    person_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'El campo person_id es obligatorio'
+        },
+        isInt: {
+          msg: 'El campo person_id debe ser un número entero'
+        }
+      }
+    },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'El campo role_id es obligatorio'
+        },
+        isInt: {
+          msg: 'El campo role_id debe ser un número entero'
+        }
+      }
+    },
+    home_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'El campo home_id es obligatorio'
+        },
+        isInt: {
+          msg: 'El campo home_id debe ser un número entero'
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'HomePerson',

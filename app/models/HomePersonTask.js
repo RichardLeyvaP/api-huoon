@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   HomePersonTask.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,   // Indica que 'id' es la clave primaria
+      autoIncrement: true // Esto hace que el campo 'id' sea auto-incrementable
+    },
     person_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -54,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    role_id: {
+    home_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {

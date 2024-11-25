@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   UserToken.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,   // Indica que 'id' es la clave primaria
+      autoIncrement: true // Esto hace que el campo 'id' sea auto-incrementable
+    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false

@@ -40,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Category.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,   // Indica que 'id' es la clave primaria
+      autoIncrement: true // Esto hace que el campo 'id' sea auto-incrementable
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false

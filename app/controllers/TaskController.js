@@ -16,7 +16,7 @@ const schema = Joi.object({
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
     priority_id: Joi.number().integer().optional(),
-    parent_id: Joi.number().integer().optional(),
+    parent_id: Joi.number().integer().optional().allow(null),
     status_id: Joi.number().integer().optional(),
     category_id: Joi.number().integer().optional(),
     recurrence: Joi.string().optional(), // Puede ser nulo o cadena vacía
@@ -326,36 +326,45 @@ const TaskController = {
             logger.error(`Error de validación en TaskController->store: ${errorMsg}`);
             return res.status(400).json({ msg: errorMsg });
         }
+
+        if (value.parent_id !== undefined && value.parent_id !== 0 && value.parent_id !== null) {
+            parent = await Task.findByPk(value.parent_id);
+            if (!parent) {
+                logger.error(`TaskController->store: Tarea no encontrada con ID ${value.parent_id}`);
+                return res.status(404).json({ msg: 'ParentNotFound' });
+            }
+        }
+
+        // Verificar existencia de personas, roles y hogares antes de crear la tarea
+        if (value.people && value.people.length > 0) {
+            const personIds = value.people.map(person => person.person_id);
+            const roleIds = value.people.map(person => person.role_id);
+            const homeIds = value.people.map(person => person.home_id);
+
+            // Verificar personas, roles y hogares
+            const [persons, roles, homes] = await Promise.all([
+                Person.findAll({ where: { id: personIds } }),
+                Role.findAll({ where: { id: roleIds } }),
+                Home.findAll({ where: { id: homeIds } })
+            ]);
+
+            // Comprobar si alguna entidad no existe
+            const missingPersons = personIds.filter(id => !persons.find(p => p.id === id));
+            const missingRoles = roleIds.filter(id => !roles.find(r => r.id === id));
+            const missingHomes = homeIds.filter(id => !homes.find(h => h.id === id));
+
+            if (missingPersons.length || missingRoles.length || missingHomes.length) {
+                logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
+                return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
+            }
+        }
     
         // Iniciar la transacción
         const t = await sequelize.transaction();
         try {
             let filename = 'tasks/default.jpg'; // Imagen por defecto
-    
-            // Verificar existencia de personas, roles y hogares antes de crear la tarea
-            if (value.people && value.people.length > 0) {
-                const personIds = value.people.map(person => person.person_id);
-                const roleIds = value.people.map(person => person.role_id);
-                const homeIds = value.people.map(person => person.home_id);
 
-                // Verificar personas, roles y hogares
-                const [persons, roles, homes] = await Promise.all([
-                    Person.findAll({ where: { id: personIds } }),
-                    Role.findAll({ where: { id: roleIds } }),
-                    Home.findAll({ where: { id: homeIds } })
-                ]);
-
-                // Comprobar si alguna entidad no existe
-                const missingPersons = personIds.filter(id => !persons.find(p => p.id === id));
-                const missingRoles = roleIds.filter(id => !roles.find(r => r.id === id));
-                const missingHomes = homeIds.filter(id => !homes.find(h => h.id === id));
-
-                if (missingPersons.length || missingRoles.length || missingHomes.length) {
-                    logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
-                                Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
-                    return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
-                }
-            }
             // Crear la tarea
             const task = await Task.create({
                 title: value.title,
@@ -396,78 +405,6 @@ const TaskController = {
             // Llamada a ActivityLogService para registrar la creación
             await ActivityLogService.createActivityLog('Task', task.id, 'create', req.user.id, JSON.stringify(task));
 
-            // Procesar las relaciones con personas si existen            
-            /*let associationsData = []; // Array para almacenar las asociaciones creadas
-            if (value.people && value.people.length > 0) {
-                const associations = value.people.map(async (person) => {
-                    const { person_id, role_id, home_id } = person;
-
-                    // Verificar si la persona existe
-                    const personInstance = await Person.findByPk(person_id);
-                    if (!personInstance) {
-                        logger.error(`TaskController->store: No se encontró una persona con ID ${person_id}`);
-                        return { error: `PersonNotFound: ID ${person_id}` };
-                    }
-
-                    // Verificar si la persona existe
-                    const homeInstance = await Home.findByPk(home_id);
-                    if (!homeInstance) {
-                        logger.error(`TaskController->store: No se encontró un hogar con ID ${home_id}`);
-                        return { error: `HomeNotFound: ID ${person_id}` };
-                    }
-
-                    // Verificar si el rol existe
-                    const roleInstance = await Role.findByPk(role_id);
-                    if (!roleInstance) {
-                        logger.error(`TaskController->store: No se encontró un rol con ID ${role_id}`);
-                        return { error: `RoleNotFound: ID ${role_id}` };
-                    }
-
-                    // Crear la relación en la tabla PersonTask
-                    const personTaskAssociation = await HomePersonTask.create({
-                        task_id: task.id,
-                        person_id: person_id,
-                        role_id: role_id,
-                        home_id: home_id,
-                    }, { transaction: t });
-
-                     // Añadir la relación creada al array de asociaciones
-                associationsData.push({
-                    person_id,
-                    role_id,
-                    home_id,
-                    association_id: personTaskAssociation.id,
-                });
-                });
-
-                // Ejecutar las asociaciones en paralelo y capturar resultados
-                const results = await Promise.allSettled(associations);
-
-                // Filtrar errores si alguno falló
-                const errors = results
-                    .filter(result => result.status === 'rejected' || result.value?.error)
-                    .map(result => result.reason || result.value.error);
-
-                if (errors.length) {
-                    logger.error(`TaskController->store - Algunos errores ocurrieron al crear Home-Person-Task: ${errors.join(', ')}`);
-                    return res.status(400).json({ msg: errors });
-                }
-            }
-
-            // Registrar la tarea y las asociaciones en el log de actividades
-            const activityData = {
-                task,
-                associations: associationsData,
-            };
-
-            await ActivityLogService.createActivityLog(
-                'TaskWithAssociations',
-                task.id,
-                'create',
-                req.user.id,
-                JSON.stringify(activityData),
-                { transaction: t }  // Aquí pasas la transacción
-            );*/
             const associationsData = [];
             if (value.people && value.people.length > 0) {
                 // Crear las asociaciones en paralelo
@@ -608,6 +545,39 @@ const TaskController = {
             logger.error(`Error de validación en TaskController->update: ${error.details.map(err => err.message).join(', ')}`);
             return res.status(400).json({ msg: error.details.map(detail => detail.message) });
         }
+
+        if (value.parent_id !== undefined && value.parent_id !== 0 && value.parent_id !== null) {
+            parent = await Task.findByPk(value.parent_id);
+            if (!parent) {
+                logger.error(`TaskController->store: Tarea no encontrada con ID ${value.parent_id}`);
+                return res.status(404).json({ msg: 'ParentNotFound' });
+            }
+        }
+
+        // Verificar existencia de personas, roles y hogares antes de crear la tarea
+        if (value.people && value.people.length > 0) {
+            const personIds = value.people.map(person => person.person_id);
+            const roleIds = value.people.map(person => person.role_id);
+            const homeIds = value.people.map(person => person.home_id);
+
+            // Verificar personas, roles y hogares
+            const [persons, roles, homes] = await Promise.all([
+                Person.findAll({ where: { id: personIds } }),
+                Role.findAll({ where: { id: roleIds } }),
+                Home.findAll({ where: { id: homeIds } })
+            ]);
+
+            // Comprobar si alguna entidad no existe
+            const missingPersons = personIds.filter(id => !persons.find(p => p.id === id));
+            const missingRoles = roleIds.filter(id => !roles.find(r => r.id === id));
+            const missingHomes = homeIds.filter(id => !homes.find(h => h.id === id));
+
+            if (missingPersons.length || missingRoles.length || missingHomes.length) {
+                logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
+                return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
+            }
+        }
     
         const t = await sequelize.transaction();
         try {
@@ -662,9 +632,23 @@ const TaskController = {
                 await task.update(updatedData);
                 logger.info(`Task actualizada exitosamente (ID: ${task.id})`);
             }
+            let associationsData = [];
+            // Sincronizar asociaciones
+            if (value.people && value.people.length > 0) {
+                const { toAdd, toUpdate, toDelete } = await TaskController.syncTaskPeople(value.id, value.people, t);
+                associationsData = toAdd.length || toUpdate.length || toDelete.length
+                ? { added: toAdd, updated: toUpdate, deleted: toDelete }
+                : null;
+            }
+
+             // Registrar la tarea y las asociaciones en el log de actividades
+             const activityData = {
+                updatedData,
+                associations: associationsData
+            };
             
             // Llamada a ActivityLogService para registrar la creación
-            await ActivityLogService.createActivityLog('Task', task.id, 'update', req.user.id, JSON.stringify(updatedData));
+            await ActivityLogService.createActivityLog('Task', task.id, 'update', req.user.id, JSON.stringify(activityData));
             await t.commit();
             res.status(200).json({ task });
         } catch (error) {
@@ -677,6 +661,162 @@ const TaskController = {
             res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
     },
+
+    async syncTaskPeople(taskId, peopleArray, transaction = null) {
+        // Obtener las asociaciones actuales para la tarea especificada
+        const currentAssociations = await HomePersonTask.findAll({
+            where: { task_id: taskId }
+        });
+        console.log('currentAssociations');
+        console.log(currentAssociations);
+            
+        const currentMap = currentAssociations.reduce((map, assoc) => {
+            map[`${assoc.person_id}-${assoc.home_id}`] = assoc; // Guardamos el objeto completo en el mapa
+            return map;
+        }, {});
+        // Crear un mapa del nuevo conjunto de datos (key: person_id-home_id)
+        const newMap = peopleArray.reduce((map, person) => {
+            map[`${person.person_id}-${person.home_id}`] = person;
+            return map;
+        }, {});
+    
+        const toAdd = [];
+        const toUpdate = [];
+        const toDelete = [];
+        const actions = []; // Array para registrar las acciones realizadas
+    
+        // Recorremos las nuevas asociaciones para determinar si agregar o actualizar
+        Object.keys(newMap).forEach(key => {
+            const incoming = newMap[key];
+    
+            // Verificar si ya existe una relación para esta combinación
+            const current = currentMap[key];
+    
+            if (!current) {
+                // Si la asociación no existe en la base de datos, agregarla
+                toAdd.push({
+                    task_id: taskId,
+                    ...incoming
+                });
+            } else {
+                // Si la asociación existe pero el rol ha cambiado, la actualizamos
+                if (current.role_id !== incoming.role_id) {
+                    toUpdate.push({
+                        id: current.id,  // Usamos el id de la relación actual
+                        role_id: incoming.role_id
+                    });
+                }
+            }
+        });
+    
+        // Recorremos las asociaciones actuales para eliminar las que ya no existen en el nuevo conjunto
+        currentAssociations.forEach(current => {
+            const key = `${current.person_id}-${current.home_id}`;
+            if (!newMap[key]) {
+                toDelete.push(current.id);
+            }
+        });
+    
+        // Aplicar las operaciones: eliminar, actualizar, agregar
+        if (toDelete.length > 0) {
+            await HomePersonTask.destroy({
+                where: { id: toDelete },
+                transaction
+            });
+            actions.push({ action: 'deleted', ids: toDelete });
+        }
+    
+        if (toUpdate.length > 0) {
+            for (const update of toUpdate) {
+                await HomePersonTask.update(
+                    { role_id: update.role_id },
+                    { where: { id: update.id }, transaction }
+                );
+            }
+            actions.push({ action: 'updated', ids: toUpdate.map(u => u.id) });
+        }
+    
+        if (toAdd.length > 0) {
+            await HomePersonTask.bulkCreate(toAdd, { transaction });
+            actions.push({ action: 'added', ids: toAdd.map(a => a.id) });
+        }
+    
+        // Devolver detalles de las operaciones realizadas
+        return { toAdd, toUpdate, toDelete, actions };
+    },
+    
+
+    /*//Actualizar las asociaciones de las personas con la tareas
+    async syncTaskPeople(taskId, peopleArray, transaction = null) {
+        // Obtener las asociaciones actuales
+        const currentAssociations = await HomePersonTask.findAll({
+            where: { task_id: taskId }
+        });
+    
+        const currentMap = currentAssociations.reduce((map, assoc) => {
+            const key = `${assoc.person_id}-${assoc.role_id}-${assoc.home_id}`;
+            map[key] = assoc;
+            return map;
+        }, {});
+    
+        const newMap = peopleArray.reduce((map, person) => {
+            const key = `${person.person_id}-${person.role_id}-${person.home_id}`;
+            map[key] = person;
+            return map;
+        }, {});
+    
+        const toAdd = [];
+        const toUpdate = [];
+        const toDelete = [];
+    
+        Object.keys(newMap).forEach(key => {
+            if (!currentMap[key]) {
+                toAdd.push({
+                    task_id: taskId,
+                    ...newMap[key]
+                });
+            } else {
+                const current = currentMap[key];
+                const incoming = newMap[key];
+                if (current.role_id !== incoming.role_id) {
+                    toUpdate.push({
+                        id: current.id,
+                        role_id: incoming.role_id
+                    });
+                }
+            }
+        });
+    
+        Object.keys(currentMap).forEach(key => {
+            if (!newMap[key]) {
+                toDelete.push(currentMap[key].id);
+            }
+        });
+    
+        // Aplicar cambios
+        if (toDelete.length > 0) {
+            await HomePersonTask.destroy({
+                where: { id: toDelete },
+                transaction
+            });
+        }
+    
+        if (toUpdate.length > 0) {
+            for (const update of toUpdate) {
+                await HomePersonTask.update(
+                    { role_id: update.role_id },
+                    { where: { id: update.id }, transaction }
+                );
+            }
+        }
+    
+        if (toAdd.length > 0) {
+            await HomePersonTask.bulkCreate(toAdd, { transaction });
+        }
+        // Devolver detalles de las operaciones
+        return { toAdd, toUpdate, toDelete };
+    },*/
+    
 
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina tarea con ID ${req.body.id}`);
