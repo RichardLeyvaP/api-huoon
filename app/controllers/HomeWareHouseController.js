@@ -5,9 +5,9 @@ const logger = require('../../config/logger');
 
 const schema = Joi.object({
     title: Joi.string(),
-    description: Joi.string().allow(null, ''),
-    location: Joi.string().allow(null, ''),
-    status: Joi.number().integer().valid(0, 1),
+    description: Joi.string().allow(null, '').empty(''),
+    location: Joi.string().allow(null, '').empty(''),
+    status: Joi.number().integer().valid(0, 1).default(0),
     home_id: Joi.number().integer().required(), // ID del hogar requerido al crear o actualizar
     warehouse_id: Joi.number().integer().optional() // ID del almacén requerido al crear o actualizar
 });

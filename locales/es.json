@@ -68,9 +68,9 @@
       "name": "En Progreso",
       "description": "Estado en progreso"
     },
-    "Completado": {
-      "name": "Completado",
-      "description": "Estado completado"
+    "Completada": {
+      "name": "Completada",
+      "description": "Estado completada"
     },
     "En Uso": {
       "name": "En uso",
@@ -145,6 +145,18 @@
     "Colaborador": {
       "name": "Colaborador",
       "description": "Colaborador de la tarea"
+    }
+  },
+  "warehouse": {
+    "Sótano": {
+      "title": "Sótano",
+      "description": "Guardar herramientas y útiles",
+      "location": "Debajo de la casa"
+    },
+    "Despensa": {
+      "title": "Despensa",
+      "description": "Productos para la cocina",
+      "location": "Entrando a la casa a la izquierda"
     }
   }  
 }

@@ -146,5 +146,17 @@
       "name": "Colaborador",
       "description": "Colaborador da tarefa"
     }
+  },
+  "warehouse": {
+    "Sótano": {
+      "title": "Porão",
+      "description": "Guardar ferramentas e utensílios",
+      "location": "Debaixo da casa"
+    },
+    "Despensa": {
+      "title": "Despensa",
+      "description": "Produtos para a cozinha",
+      "location": "Entrando na casa à esquerda"
+    }
   }
 }

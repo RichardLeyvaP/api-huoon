@@ -278,7 +278,7 @@ const logger = require('../../config/logger'); // Importa el logger
         }
 
         try {
-            const personId = req.user.person.id;
+            const personId = req.person.id;
 
             // Buscar la categoría por ID e incluir las relaciones necesarias
             const category = await Category.findByPk(req.body.id, {

@@ -108,6 +108,7 @@ router.get('/images/:foldername/:filename', (req, res) => {
 router.use(auth);
 
 router.get('/logout', AuthController.logout);
+router.post('/update-password', AuthController.updatePassword);
 
 //Ruta Configurations
 router.get('/configuration-show', ConfigurationController.show);
@@ -201,6 +202,7 @@ router.post('/warehouse', WarehouseController.store);
 router.post('/warehouse-show', WarehouseController.show);
 router.put('/warehouse', WarehouseController.update);
 router.post('/warehouse-destroy', WarehouseController.destroy);
+router.post('/get-warehouse', WarehouseController.getWarehouses);//devolver los alamcenes predeterminados 
 
 //Rutas Almacenes
 router.get('/home-warehouse', HomeWareHouseController.index);
@@ -215,6 +217,7 @@ router.post('/person-warehouse', PersonWareHouseController.store);
 router.post('/person-warehouse-show', PersonWareHouseController.show);
 router.put('/person-warehouse', PersonWareHouseController.update);
 router.post('/person-warehouse-destroy', PersonWareHouseController.destroy);
+router.post('/person-warehouse-home', PersonWareHouseController.getWarehouses); //devolver los almaces de una persona en un hogar dado
 
 //Rutas Productos
 router.get('/product', ProductController.index);
@@ -242,7 +245,7 @@ router.post('/person-home-warehouse-product-destroy', PersonHomeWarehouseProduct
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
-router.get('/category-status-priority-apk', TaskController.category_status_priority);
+router.post('/category-status-priority-apk', TaskController.category_status_priority);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 
 

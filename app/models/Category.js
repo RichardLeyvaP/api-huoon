@@ -1,5 +1,7 @@
 'use strict';
 const { Model } = require('sequelize');
+const { Op } = require('sequelize');
+const i18n = require('../../config/i18n-config');
 
 module.exports = (sequelize, DataTypes) => {
   class Category extends Model {
@@ -36,6 +38,92 @@ module.exports = (sequelize, DataTypes) => {
       as: 'products',
       onDelete: 'CASCADE'
   });
+    }
+
+    static async getCategories(personId, type) {
+      try {
+        const categories = await this.findAll({
+          where: {
+            type: type,
+            [Op.or]: [
+              { state: 1 },
+              { '$people.id$': personId }, // Filtra por relación en tabla intermedia
+            ],
+          },
+          include: [
+            {
+              association: 'people',
+              required: false, // Permite categorías sin relación con personas
+            },
+            { association: 'children' },
+          ],
+        });
+
+        // Transformar las categorías y procesar recursivamente las hijas
+        const transformedCategories = await Promise.all(
+          categories.map(async (category) => {
+            const children = category.children.length > 0
+              ? await this.mapChildrenCategory(category.children)
+              : [];
+
+            const translatedName =
+              category.state === 1
+                ? i18n.__(`category.${category.name}.name`)
+                : category.name;
+            const translatedDescription =
+              category.state === 1
+                ? i18n.__(`category.${category.name}.description`)
+                : category.description;
+
+            return {
+              id: category.id,
+              nameCategory: translatedName,
+              descriptionCategory: translatedDescription,
+              colorCategory: category.color,
+              iconCategory: category.icon,
+              parent_id: category.parent_id,
+              children: children,
+            };
+          })
+        );
+
+        return transformedCategories;
+      } catch (error) {
+        console.error('Error en getCategories:', error);
+        throw new Error('Error al obtener categorías');
+      }
+    }
+
+    /**
+     * Mapear recursivamente categorías hijas.
+     */
+    static async mapChildrenCategory(children) {
+      return Promise.all(
+        children.map(async (child) => {
+          const childChildren = child.children.length > 0
+            ? await this.mapChildrenCategory(child.children)
+            : [];
+
+          const translatedName =
+            child.state === 1
+              ? i18n.__(`category.${child.name}.name`)
+              : child.name;
+          const translatedDescription =
+            child.state === 1
+              ? i18n.__(`category.${child.name}.description`)
+              : child.description;
+
+          return {
+            id: child.id,
+            name: translatedName,
+            description: translatedDescription,
+            color: child.color,
+            icon: child.icon,
+            parent_id: child.parent_id,
+            children: childChildren,
+          };
+        })
+      );
     }
   }
 

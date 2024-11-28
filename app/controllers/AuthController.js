@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Joi = require('joi');
 const { User, Person, UserToken, sequelize } = require('../models'); // Importamos sequelize desde db
 const bcrypt = require('bcrypt');
@@ -19,6 +20,22 @@ const schema = Joi.object({
     language: Joi.string().valid('es', 'en', 'pt').default('es') // 'es' por defecto, acepta solo los valores 'es', 'en', 'fr'
   });
 
+  // Definir el esquema de validación
+    const updatePasswordSchema = Joi.object({
+        id: Joi.number().integer().required().messages({
+            'any.required': 'El ID del usuario es obligatorio.',
+            'number.base': 'El ID del usuario debe ser un número.',
+            'number.integer': 'El ID del usuario debe ser un entero.',
+        }),
+        currentPassword: Joi.string().allow('').messages({
+            'string.base': 'La contraseña actual debe ser un texto.',
+        }),
+        newPassword: Joi.string().min(8).required().messages({
+            'any.required': 'La nueva contraseña es obligatoria.',
+            'string.min': 'La nueva contraseña debe tener al menos 8 caracteres.',
+        }),
+    });
+
   const AuthController = {
     //login
     async login(req, res) {
@@ -26,7 +43,7 @@ const schema = Joi.object({
         
         // Validación de entrada
         const schema = Joi.object({
-            email: Joi.string().email().required(),
+            email: Joi.string().required(),
             password: Joi.string().required()
         });
         
@@ -36,8 +53,20 @@ const schema = Joi.object({
         }
     
         try {
-            const user = await User.findOne({ where: { email: req.body.email },
-                include: [{ model: Person, as: 'person' }]  }); // Incluir la relación `person`
+            const user = await User.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: req.body.email },  // Puede ser el correo
+                        { name: req.body.email }   // O puede ser el nombre de usuario
+                    ]
+                },
+                include: [
+                    {
+                        model: Person,
+                        as: 'person'
+                    }
+                ]
+            });
             if (!user) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
@@ -106,7 +135,7 @@ const schema = Joi.object({
         
         // Validación de entrada
         const schema = Joi.object({
-            email: Joi.string().email().required(),
+            email: Joi.string().required(),
             password: Joi.string().required()
         });
         
@@ -116,8 +145,20 @@ const schema = Joi.object({
         }
     
         try {
-            const user = await User.findOne({ where: { email: req.body.email },
-                include: [{ model: Person, as: 'person' }]  });
+            const user = await User.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: req.body.email },  // Puede ser el correo
+                        { name: req.body.email }   // O puede ser el nombre de usuario
+                    ]
+                },
+                include: [
+                    {
+                        model: Person,
+                        as: 'person'
+                    }
+                ]
+            });
             if (!user) {
                 return res.status(401).json({ msg: 'Credenciales inválidas' });
             }
@@ -194,10 +235,10 @@ const schema = Joi.object({
         try {
             // Generar un hashSync de la contraseña
             let hashedPassword = bcrypt.hashSync(req.body.password, Number.parseInt(authConfig.rounds));
-        
+            const extractedName = req.body.user ? req.body.user : req.body.email.split('@')[0];
             // Crear el usuario con la contraseña encriptada
             const user = await User.create({
-            name: req.body.user || req.body.email,
+            name: extractedName,
             email: req.body.email,
             password: hashedPassword,
             language: req.body.language || 'es' // Asigna 'es' si no se proporciona language
@@ -219,7 +260,7 @@ const schema = Joi.object({
             const userNew = {
                 id: user.id,
                 email: user.email,
-                name: person.name,
+                name: user.name,
                 language: user.language,
                 person: {
                     id: person.id, // Aquí accedes a la persona creada
@@ -551,7 +592,59 @@ const schema = Joi.object({
         logger.error('Error al hacer logout: ' + err.message);
         res.status(500).json({ error: 'Error en el servidor' });
     }
-    }
+    },
 
+    async updatePassword(req, res) {
+        logger.info(`${req.user.name} - Actualiza la contraseña del userID ${req.body.id}`);
+        try {
+            // Validar la entrada con Joi
+            const { error, value } = updatePasswordSchema.validate(req.body, { abortEarly: false });
+
+            if (error) {
+                const errorMessages = error.details.map((detail) => detail.message);
+                return res.status(400).json({ errors: errorMessages });
+            }
+
+            const { id, currentPassword, newPassword } = value;
+    
+            // Verificar que el usuario existe
+            const user = await User.findByPk(id);
+    
+            if (!user) {
+                return res.status(404).json({ msg: 'Usuario no encontrado' });
+            }
+    
+            // Verificar si el usuario está vinculado a un proveedor externo
+            if (user.external_id && user.external_auth) {
+                // Si ya tiene una contraseña configurada, validarla
+                if (user.password) {
+                    const passwordMatch = bcrypt.compareSync(currentPassword, user.password);
+    
+                    if (!passwordMatch) {
+                        return res.status(401).json({ msg: 'La contraseña actual no es correcta.' });
+                    }
+                }
+            } else {
+                // Validar la contraseña actual para cuentas estándar
+                const passwordMatch = bcrypt.compareSync(currentPassword, user.password);
+    
+                if (!passwordMatch) {
+                    return res.status(401).json({ msg: 'La contraseña actual no es correcta.' });
+                }
+            }
+    
+            // Encriptar la nueva contraseña
+            const hashedNewPassword = bcrypt.hashSync(newPassword, Number.parseInt(authConfig.rounds));
+    
+            // Actualizar la contraseña
+            await user.update({ password: hashedNewPassword });
+    
+            res.status(200).json({ msg: 'Contraseña actualizada correctamente.' });
+        } catch (err) {
+            logger.error('Error al actualizar la contraseña: ' + err.message);
+            res.status(500).json({ error: 'Error en el servidor' });
+        }
+    }
+    
 }
 module.exports = AuthController;

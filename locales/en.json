@@ -146,6 +146,18 @@
       "name": "Collaborator",
       "description": "Task collaborator"
     }
+  },
+  "warehouse": {
+    "Sótano": {
+      "title": "Basement",
+      "description": "Store tools and supplies",
+      "location": "Under the house"
+    },
+    "Despensa": {
+      "title": "Pantry",
+      "description": "Kitchen products",
+      "location": "Entering the house to the left"
+    }
   }
   
 }

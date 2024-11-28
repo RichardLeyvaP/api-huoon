@@ -6,27 +6,27 @@ const { Person, Warehouse, HomePerson, Home, Product, PersonHomeWarehouseProduct
 const logger = require('../../config/logger');
 
 const schema = Joi.object({
-    home_id: Joi.number().integer().optional(),
-    warehouse_id: Joi.number().integer().optional(),
-    product_id: Joi.number().integer().optional(),
-    status_id: Joi.number().integer().optional(),
-    category_id: Joi.number().integer().optional(),
-    name: Joi.string().max(255).optional(),
-    unit_price: Joi.number().precision(2).optional(),
-    quantity: Joi.number().optional(),
-    total_price: Joi.number().precision(2).optional(),
-    purchase_date: Joi.date().optional(),
-    purchase_place: Joi.string().optional(),
-    expiration_date: Joi.date().optional(),
-    brand: Joi.string().optional(),
-    additional_notes: Joi.string().optional(),
-    maintenance_date: Joi.date().optional(),
-    due_date: Joi.date().optional(),
-    frequency: Joi.string().optional(),
-    type: Joi.string().optional(),
+    home_id: Joi.number().integer().allow(null).empty('').optional(),
+    warehouse_id: Joi.number().integer().allow(null).empty('').optional(),
+    product_id: Joi.number().integer().allow(null).empty('').optional(),
+    status_id: Joi.number().integer().allow(null).empty('').optional(),
+    category_id: Joi.number().integer().allow(null).empty('').optional(),
+    name: Joi.string().max(255).allow(null).empty('').optional(),
+    unit_price: Joi.number().precision(2).allow(null).empty('').optional(),
+    quantity: Joi.number().allow(null).empty('').optional(),
+    total_price: Joi.number().precision(2).allow(null).empty('').optional(),
+    purchase_date: Joi.date().allow(null).empty('').optional(),
+    purchase_place: Joi.string().allow(null).empty('').optional(),
+    expiration_date: Joi.date().allow(null).empty('').optional(),
+    brand: Joi.string().allow(null).empty('').optional(),
+    additional_notes: Joi.string().allow(null).empty('').optional(),
+    maintenance_date: Joi.date().allow(null).empty('').optional(),
+    due_date: Joi.date().allow(null).empty('').optional(),
+    frequency: Joi.string().allow(null).empty('').optional(),
+    type: Joi.string().allow(null).empty('').optional(),
     image: Joi.string()
         .pattern(/\.(jpg|jpeg|png|gif)$/i)  // Validar formato de imagen
-        .allow(null)                        // Permite que sea nulo (opcional)
+        .allow(null).empty('')                        // Permite que sea nulo (opcional)
         .optional()                         // Hace que sea opcional
         .custom((value, helpers) => {
             const maxSize = 500 * 1024;     // 500 KB en bytes
@@ -38,7 +38,7 @@ const schema = Joi.object({
         .messages({
             'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
         }),
-        id: Joi.number().integer().optional(),
+        id: Joi.number().integer().allow(null).empty('').optional(),
 });
 
 const PersonHomeWarehouseProductController = {
@@ -134,7 +134,7 @@ const PersonHomeWarehouseProductController = {
     
         try {
             // Obtener el ID de la persona del usuario autenticado
-            const person_id = req.user.person.id;
+            const person_id = req.person.id;
     
             // Verificar si la persona está asociada con el hogar
             const person = await Person.findByPk(person_id, {
@@ -148,21 +148,21 @@ const PersonHomeWarehouseProductController = {
     
             if (!person) {
                 logger.error(`PersonHomeWarehouseController->homeWarehouseProducts: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
-                return res.status(404).json({ msg: 'PersonNotAssociatedWithHome' });
+                return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
             }
     
             // Verificar que el hogar existe
             const home = await Home.findByPk(home_id);
             if (!home) {
                 logger.error(`PersonHomeWarehouseController->homeWarehouseProducts: Hogar no encontrado con ID ${home_id}`);
-                return res.status(404).json({ msg: 'HomeNotFound' });
+                return res.status(204).json({ msg: 'HomeNotFound' });
             }
     
             // Verificar que el almacén existe
             const warehouse = await Warehouse.findByPk(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID ${warehouse_id}`);
-                return res.status(404).json({ msg: 'HomeWarehouseNotFound' });
+                return res.status(204).json({ msg: 'HomeWarehouseNotFound' });
             }
     
             // Buscar los productos específicos en el almacén del hogar
@@ -204,7 +204,7 @@ const PersonHomeWarehouseProductController = {
     
             if (!homeWarehouseProducts || homeWarehouseProducts.length === 0) {
                 logger.error(`PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: ${home_id}, warehouse_id: ${warehouse_id}`);
-                return res.status(404).json({ msg: 'NoProductsFound' });
+                return res.status(204).json({ msg: 'NoProductsFound' });
             }
     
             // Mapear los productos encontrados
@@ -231,7 +231,7 @@ const PersonHomeWarehouseProductController = {
                 image: homeWarehouseProduct.image
             }));
     
-            res.status(200).json({ homewarehouseproducts: result });
+            res.status(200).json({ products: result });
     
         } catch (error) {
             const errorMsg = error.details
@@ -244,7 +244,8 @@ const PersonHomeWarehouseProductController = {
 
     async store(req, res) {
         logger.info(`${req.user.name} - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico`);
-    
+        logger.info('datos recibidos al crear un producto');
+        logger.info(JSON.stringify(req.body));
         // Validar el cuerpo de la solicitud
         const { error, value } = schema.validate(req.body);
         if (error) {
@@ -263,11 +264,11 @@ const PersonHomeWarehouseProductController = {
         const home = await Home.findByPk(home_id);
         if (!home) {
             logger.error(`PersonHomeWarehouseController->store: Hogar no encontrado con ID ${home_id}`);
-            return res.status(404).json({ msg: 'HomeNotFound' });
+            return res.status(204).json({ msg: 'HomeNotFound' });
         }
     
         // Obtener el ID de la persona del usuario autenticado
-        const person_id = req.user.person.id;
+        const person_id = req.person.id;
     
         // Verificar si la persona está asociada con el hogar
         const person = await Person.findByPk(person_id, {
@@ -281,21 +282,21 @@ const PersonHomeWarehouseProductController = {
 
         if (!person) {
             logger.error(`PersonHomeWarehouseController->store: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
-            return res.status(404).json({ msg: 'PersonNotAssociatedWithHome' });
+            return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
         }
     
         // Verificar si el almacén existe
         const warehouse = await Warehouse.findByPk(warehouse_id);
         if (!warehouse) {
             logger.error(`PersonHomeWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
-            return res.status(404).json({ msg: 'WarehouseNotFound' });
+            return res.status(204).json({ msg: 'WarehouseNotFound' });
         }
     
         // Verificar si el estado existe
         const status = await Status.findByPk(status_id);
         if (!status) {
             logger.error(`PersonHomeWarehouseController->store: Estado no encontrado con ID ${status_id}`);
-            return res.status(404).json({ msg: 'StatusNotFound' });
+            return res.status(204).json({ msg: 'StatusNotFound' });
         }
     
         // Verificar si el producto existe o crear uno nuevo
@@ -305,7 +306,7 @@ const PersonHomeWarehouseProductController = {
             product = await Product.findByPk(product_id);
             if (!product) {
                 logger.error(`PersonHomeWarehouseController->store: Producto no encontrado con ID ${product_id}`);
-                return res.status(404).json({ msg: 'ProductNotFound' });
+                return res.status(204).json({ msg: 'ProductNotFound' });
             } else {
                 filename = product.image;
             }
@@ -316,7 +317,7 @@ const PersonHomeWarehouseProductController = {
             const category = await Category.findByPk(category_id);
             if (!category) {
                 logger.error(`PersonHomeWarehouseController->store: Categoría no encontrada con ID ${category_id}`);
-                return res.status(404).json({ msg: 'CategoryNotFound' });
+                return res.status(204).json({ msg: 'CategoryNotFound' });
             }
         }
     
@@ -454,16 +455,15 @@ const PersonHomeWarehouseProductController = {
         try {
 
             // Verificar que el hogar existe y está asociado a la persona
-            const home = await Home.findOne({
-                where: { id: home_id, person_id: person_id }
-            });
-            if (!home) {
-                logger.error(`PersonHomeWarehouseController->show: Hogar no encontrado o no asociado con la persona, home_id: ${home_id}`);
-                return res.status(404).json({ msg: 'HomeNotFound' });
-            }
+             // Verificar que el hogar existe
+             const home = await Home.findByPk(home_id);
+             if (!home) {
+                 logger.error(`PersonHomeWarehouseController->show: Hogar no encontrado con ID ${home_id}`);
+                 return res.status(204).json({ msg: 'HomeNotFound' });
+             }
 
             // Obtener el ID de la persona del usuario autenticado
-            const person_id = req.user.person.id;
+            const person_id = req.person.id;
         
             // Verificar si la persona está asociada con el hogar
             const person = await Person.findByPk(person_id, {
@@ -477,7 +477,7 @@ const PersonHomeWarehouseProductController = {
 
             if (!person) {
                 logger.error(`PersonHomeWarehouseController->show: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
-                return res.status(404).json({ msg: 'PersonNotAssociatedWithHome' });
+                return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
             }
 
             // Buscar el producto específico en el almacén del hogar de la persona
@@ -526,7 +526,7 @@ const PersonHomeWarehouseProductController = {
             
             if (!personHomeWarehouseProduct) {
                 logger.error(`PersonHomeWarehouseController->show: No se encontró la relación para person_id: ${person_id}, home_id: ${home_id}, warehouse_id: ${warehouse_id}, product_id: ${product_id}`);
-                return res.status(404).json({ msg: 'PersonHomeWarehouseProductNotFound' });
+                return res.status(204).json({ msg: 'PersonHomeWarehouseProductNotFound' });
             }
             
             const result = {
@@ -585,10 +585,10 @@ const PersonHomeWarehouseProductController = {
         const home = await Home.findByPk(home_id);
         if (!home) {
             logger.error(`PersonHomeWarehouseProductsController->update: Hogar no encontrado con ID ${home_id}`);
-            return res.status(404).json({ msg: 'HomeNotFound' });
+            return res.status(204).json({ msg: 'HomeNotFound' });
         }
         // Obtener el ID de la persona del usuario autenticado
-        const person_id = req.user.person.id;
+        const person_id = req.person.id;
         
         // Verificar si la persona está asociada con el hogar
         const person = await Person.findByPk(person_id, {
@@ -602,19 +602,19 @@ const PersonHomeWarehouseProductController = {
 
         if (!person) {
             logger.error(`PersonHomeWarehouseController->show: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
-            return res.status(404).json({ msg: 'PersonNotAssociatedWithHome' });
+            return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
         }
     
         const warehouse = await Warehouse.findByPk(warehouse_id);
         if (!warehouse) {
             logger.error(`PersonHomeWarehouseProductsController->update: Almacén no encontrado con ID ${warehouse_id}`);
-            return res.status(404).json({ msg: 'WarehouseNotFound' });
+            return res.status(204).json({ msg: 'WarehouseNotFound' });
         }
     
         const status = await Status.findByPk(status_id);
         if (!status) {
             logger.error(`PersonHomeWarehouseProductsController->update: Estado no encontrado con ID ${status_id}`);
-            return res.status(404).json({ msg: 'StatusNotFound' });
+            return res.status(204).json({ msg: 'StatusNotFound' });
         }
     
         let product;
@@ -623,7 +623,7 @@ const PersonHomeWarehouseProductController = {
             product = await Product.findByPk(product_id);
             if (!product) {
                 logger.error(`PersonHomeWarehouseProductsController->update: Producto no encontrado con ID ${product_id}`);
-                return res.status(404).json({ msg: 'ProductNotFound' });
+                return res.status(204).json({ msg: 'ProductNotFound' });
             }
         } else {
             filename = product.image;
@@ -634,7 +634,7 @@ const PersonHomeWarehouseProductController = {
             const category = await Category.findByPk(category_id);
             if (!category) {
                 logger.error(`HomeWarehouseProductController->store: Categoría no encontrado con ID ${category_id}`);
-                return res.status(404).json({ msg: 'CategoryNotFound' });
+                return res.status(204).json({ msg: 'CategoryNotFound' });
             }
         }
     
@@ -799,7 +799,7 @@ const PersonHomeWarehouseProductController = {
             const personHomeWarehouseProduct = await PersonHomeWarehouseProduct.findByPk(req.body.id);
             if (!personHomeWarehouseProduct) {
                 logger.error(`PersonHomeWarehouseProductsController->destroy: Producto no encontrado con ID ${req.body.id}`);
-                return res.status(404).json({ msg: 'PersonHomeWarehouseProductNotFound' });
+                return res.status(204).json({ msg: 'PersonHomeWarehouseProductNotFound' });
             }
 
             // Verificar y eliminar la imagen si no es la predeterminada

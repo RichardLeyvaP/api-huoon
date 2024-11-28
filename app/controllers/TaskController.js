@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { Task, Priority, Status, Category, Person, HomePersonTask, Role, Home, HomePerson, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
-const ActivityLogService = require('../services/ActivityLogService');
+const { CategoryService, StatusService, ActivityLogService, RoleService } = require('../services');
 const i18n = require('../../config/i18n-config');
 
 // Esquema de validación de Joi
@@ -12,19 +12,19 @@ const schema = Joi.object({
     title: Joi.string()
         .max(255)
         .optional(),
-    description: Joi.string().optional(), // Puede ser nulo o cadena vacía
+    description: Joi.string().optional().allow(null, '').empty('').default(null),
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
     priority_id: Joi.number().integer().optional(),
     parent_id: Joi.number().integer().optional().allow(null),
     status_id: Joi.number().integer().optional(),
     category_id: Joi.number().integer().optional(),
-    recurrence: Joi.string().optional(), // Puede ser nulo o cadena vacía
-    estimated_time: Joi.number().integer().optional(),
-    comments: Joi.string().optional(), // Puede ser nulo o cadena vacía
+    recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
+    estimated_time: Joi.number().integer().optional().allow(null),
+    comments: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
     attachments: Joi.string().optional(), // Puede ser nulo o cadena vacía
-    geo_location: Joi.string().optional(), // Puede ser nulo o cadena vacía
-    id: Joi.number().optional(),
+    geo_location: Joi.string().optional().allow(null, '').empty('').default(null),
+    id: Joi.number().optional().allow(null),
     people: Joi.array().items(
         Joi.object({
             person_id: Joi.number().required(),
@@ -252,7 +252,7 @@ const TaskController = {
     },*/
     
     // Método auxiliar para obtener las personas relacionadas con una tarea
-    async  getPeopleForTask(task) {
+    async getPeopleForTask(task) {
         // Obtener las personas relacionadas con la tarea desde la tabla homePersonTask
         const homePersonTasks = await HomePersonTask.findAll({
             where: { task_id: task.id },
@@ -319,6 +319,7 @@ const TaskController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva tarea`);
     
+        const personId = req.person.id;
         // Validación de los datos de entrada usando Joi
         const { error, value } = schema.validate(req.body);
         if (error) {
@@ -358,6 +359,30 @@ const TaskController = {
                             Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
                 return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
             }
+
+            
+
+        // Agregar el creador si no está incluido
+        if (!personIds.includes(personId)) {
+            logger.info(`Agregando automáticamente al creador con personId: ${personId}`);
+
+            // Buscar el rol "Creador"
+            const creatorRole = await Role.findOne({ where: { name: 'Creador' } });
+            if (!creatorRole) {
+                logger.error('No se encontró el rol "Creador" en la base de datos.');
+                return res.status(500).json({ msg: 'RoleNotFound' });
+            }
+
+            const defaultHomeId = value.people?.[0]?.home_id || null; // Usar un home_id del array o null
+            value.people = [
+                ...(value.people || []),
+                {
+                    person_id: personId,
+                    role_id: creatorRole.id,
+                    home_id: defaultHomeId
+                }
+            ];
+        }
         }
     
         // Iniciar la transacción
@@ -538,7 +563,7 @@ const TaskController = {
     // Actualizar una tarea
     async update(req, res) {
         logger.info(`${req.user.name} - Actualiza la tarea con ID ${req.body.id}`);
-    
+        const personId = req.person.id;
         // Validación de los datos de entrada
         const { error, value } = schema.validate({ ...req.body });
         if (error) {
@@ -576,6 +601,28 @@ const TaskController = {
                 logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
                             Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
                 return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
+            }
+
+            // Agregar el creador si no está incluido
+            if (!personIds.includes(personId)) {
+                logger.info(`Agregando automáticamente al creador con personId: ${personId}`);
+
+                // Buscar el rol "Creador"
+                const creatorRole = await Role.findOne({ where: { name: 'Creador' } });
+                if (!creatorRole) {
+                    logger.error('No se encontró el rol "Creador" en la base de datos.');
+                    return res.status(500).json({ msg: 'RoleNotFound' });
+                }
+
+                const defaultHomeId = value.people?.[0]?.home_id || null; // Usar un home_id del array o null
+                value.people = [
+                    ...(value.people || []),
+                    {
+                        person_id: personId,
+                        role_id: creatorRole.id,
+                        home_id: defaultHomeId
+                    }
+                ];
             }
         }
     
@@ -667,13 +714,12 @@ const TaskController = {
         const currentAssociations = await HomePersonTask.findAll({
             where: { task_id: taskId }
         });
-        console.log('currentAssociations');
-        console.log(currentAssociations);
             
         const currentMap = currentAssociations.reduce((map, assoc) => {
             map[`${assoc.person_id}-${assoc.home_id}`] = assoc; // Guardamos el objeto completo en el mapa
             return map;
         }, {});
+        
         // Crear un mapa del nuevo conjunto de datos (key: person_id-home_id)
         const newMap = peopleArray.reduce((map, person) => {
             map[`${person.person_id}-${person.home_id}`] = person;
@@ -744,79 +790,7 @@ const TaskController = {
         // Devolver detalles de las operaciones realizadas
         return { toAdd, toUpdate, toDelete, actions };
     },
-    
-
-    /*//Actualizar las asociaciones de las personas con la tareas
-    async syncTaskPeople(taskId, peopleArray, transaction = null) {
-        // Obtener las asociaciones actuales
-        const currentAssociations = await HomePersonTask.findAll({
-            where: { task_id: taskId }
-        });
-    
-        const currentMap = currentAssociations.reduce((map, assoc) => {
-            const key = `${assoc.person_id}-${assoc.role_id}-${assoc.home_id}`;
-            map[key] = assoc;
-            return map;
-        }, {});
-    
-        const newMap = peopleArray.reduce((map, person) => {
-            const key = `${person.person_id}-${person.role_id}-${person.home_id}`;
-            map[key] = person;
-            return map;
-        }, {});
-    
-        const toAdd = [];
-        const toUpdate = [];
-        const toDelete = [];
-    
-        Object.keys(newMap).forEach(key => {
-            if (!currentMap[key]) {
-                toAdd.push({
-                    task_id: taskId,
-                    ...newMap[key]
-                });
-            } else {
-                const current = currentMap[key];
-                const incoming = newMap[key];
-                if (current.role_id !== incoming.role_id) {
-                    toUpdate.push({
-                        id: current.id,
-                        role_id: incoming.role_id
-                    });
-                }
-            }
-        });
-    
-        Object.keys(currentMap).forEach(key => {
-            if (!newMap[key]) {
-                toDelete.push(currentMap[key].id);
-            }
-        });
-    
-        // Aplicar cambios
-        if (toDelete.length > 0) {
-            await HomePersonTask.destroy({
-                where: { id: toDelete },
-                transaction
-            });
-        }
-    
-        if (toUpdate.length > 0) {
-            for (const update of toUpdate) {
-                await HomePersonTask.update(
-                    { role_id: update.role_id },
-                    { where: { id: update.id }, transaction }
-                );
-            }
-        }
-    
-        if (toAdd.length > 0) {
-            await HomePersonTask.bulkCreate(toAdd, { transaction });
-        }
-        // Devolver detalles de las operaciones
-        return { toAdd, toUpdate, toDelete };
-    },*/
-    
+   
 
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina tarea con ID ${req.body.id}`);
@@ -874,6 +848,24 @@ const TaskController = {
     async category_status_priority(req, res){
         logger.info(`${req.user.name} - Entra a la ruta unificada de Tasks`);
 
+        const schema = Joi.object({
+            home_id: Joi.number().required()
+        });
+    
+        const { error, value } = schema.validate(req.body);
+    
+        if (error) {
+            logger.error(`Error de validación en TaskController->category_status_priority: ${error.details.map(err => err.message).join(', ')}`);
+            return res.status(400).json({ msg: error.details.map(err => err.message) });
+        }
+
+         // Verificar si el hogar existe
+         const home = await Home.findByPk(value.home_id);
+         if (!home) {
+             logger.error(`WarehouseController->category_status_priority: Hogar no encontrado con ID ${home_id}`);
+             return res.status(404).json({ msg: 'HomeNotFound' });
+         }
+
          // Obtén el ID de la persona autenticada
          const personId = req.person.id;
         // Establecer el idioma de i18n dinámicamente
@@ -881,11 +873,11 @@ const TaskController = {
              return res.status(404).json({ error: 'Persona no encontrada' });
          }
         try {
-           const categories = await TaskController.getCategories(personId);
-           const statuses = await TaskController.getStatus();
+           const categories = await CategoryService.getCategories(personId, "Task");//const categories = await TaskController.getCategories(personId);
+           const statuses = await StatusService.getStatus("Task");
            const priorities = await TaskController.getPriorities();
-           const people = await TaskController.getPeople();
-           const roles = await TaskController.getRoles();
+           const people = await TaskController.getPeople(value.home_id);//await TaskController.getPeople(value.home_id);
+           const roles = await RoleService.getRoles("Task");
            const recurrenceData = [
             'Diaria',
             'Semanal',
@@ -902,119 +894,11 @@ const TaskController = {
                 taskpriorities: priorities,
                 taskpeople: people,
                 taskrecurrences: translatedRecurrenceData,
-                taskRoles: roles
+                taskroles: roles
             });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
             res.status(500).json({ error: 'Error al obtener categorías' });
-        }
-    },
-    async getCategories(personId){
-        logger.info('Entra a Buscar Las categories en (category_status_priority)');
-        try {
-            // Obtén las categorías relacionadas con la persona o con state = 1
-            const categories = await Category.findAll({
-                where: {
-                    type: 'Task',
-                    [Op.or]: [
-                        { state: 1 },
-                        { '$people.id$': personId } // Filtra por la relación en la tabla intermedia
-                    ]
-                },
-                include: [
-                    {
-                        association: 'people', // Incluye la relación
-                        required: false // Esto permite que devuelva categorías sin relación con personas
-                    },
-                    { association: 'children' }
-                ]
-            });
-    
-            // Llama a mapChildrenCategory usando `this`
-            const transformedCategories = await Promise.all(categories.map(async category => {
-                const children = category.children.length > 0 ? await TaskController.mapChildrenCategory(category.children) : [];
-
-                const translatedName = category.state === 1 ? i18n.__(`category.${category.name}.name`) : category.name;
-                const translatedDescription = category.state === 1 ? i18n.__(`category.${category.name}.description`) : category.description;
-
-                return {
-                    id: category.id,
-                    nameCategory: translatedName,
-                    descriptionCategory: translatedDescription,
-                    colorCategory: category.color,
-                    iconCategory: category.icon,
-                    parent_id: category.parent_id,
-                    children: children
-                };
-            }));
-    
-            return transformedCategories;
-        } catch (error) {
-            logger.error('Error al obtener categorías desde getCategories:', error);
-            throw new Error('Error al obtener categorías'); // Lanza el error para manejarlo en el controlador principal
-        }
-    },
-    async mapChildrenCategory(children) {
-        return Promise.all(
-            children.map(async (child) => {
-                const childChildren = child.children.length > 0 ? await TaskController.mapChildrenCategory(child.children) : [];
-                // Suponiendo que 'category' es un objeto con la propiedad 'name' como 'Limpieza'
-                const translatedName = child.state === 1 ? i18n.__(`category.${child.name}.name`) : child.name;  // Traduce el nombre
-                const translatedDescription = child.state === 1 ? i18n.__(`category.${child.name}.description`) : child.description;  // Traduce la descripción
-                return {
-                    id: child.id,
-                    name: translatedName,
-                    description: translatedDescription,
-                    color: child.color,
-                    icon: child.icon,
-                    parent_id: child.parent_id,
-                    children: childChildren
-                };
-            })
-        );
-    },
-    async getStatus() {
-        logger.info('Entra a Buscar Los estados en (category_status_priority)');
-        try {
-            const statuses = await Status.findAll({
-                where: { type: 'Task' }
-            });
-    
-            return statuses.map(status => {
-                return {
-                    id: status.id,
-                    nameStatus:  i18n.__(`status.${status.name}.name`),
-                    descriptionStatus: i18n.__(`status.${status.name}.description`),
-                    colorStatus: status.color,
-                    iconStatus: status.icon
-                };
-            });
-        } catch (error) {
-            logger.error('Error en getStatus:', error);
-            throw new Error('Error al obtener estados');
-        }
-    },
-    async getRoles() {
-        logger.info('Entra a Buscar Los roles en (category_status_priority)');
-        try {
-            const roles = await Role.findAll({
-                where: { type: 'Task' }
-            });
-    
-            return roles.map(role => {
-                return {
-                    id: role.id,
-                    nameRol: i18n.__(`roles.${role.name}.name`) !== `roles.${role.name}.name`
-                    ? i18n.__(`roles.${role.name}.name`)
-                    : role.name,
-                    descriptionRol: i18n.__(`roles.${role.name}.name`) !== `roles.${role.name}.name`
-                    ? i18n.__(`roles.${role.name}.description`)
-                    : role.description
-                };
-            });
-        } catch (error) {
-            logger.error('Error en getRoles:', error);
-            throw new Error('Error al obtener los roles');
         }
     },
     async getPriorities() {
@@ -1037,7 +921,7 @@ const TaskController = {
             throw new Error('Error al obtener prioridades');
         }
     },
-    async getPeople() {
+    async getPeople(home_id) {
         logger.info('Entra a Buscar Las personas en (category_status_priority)');
         try {
             const people = await Person.findAll({
@@ -1045,6 +929,8 @@ const TaskController = {
                     {
                         model: HomePerson, // Incluye la relación con home_person
                         as: 'homePeople', // Asegúrate de que coincida con la definición en el modelo
+                        where: { home_id: home_id }, // Filtrar por el home_id específico
+                        required: true, // Asegurarse de que solo se incluyan personas asociadas al home_id
                         include: [
                             {
                                 model: Role, // Incluir el modelo de Role

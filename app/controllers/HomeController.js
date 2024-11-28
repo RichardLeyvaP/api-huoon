@@ -1,9 +1,10 @@
 const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
-const { Home, HomeType, Status, Person, sequelize } = require('../models');  // Importar el modelo Home
+const { Home, HomeType, Status, Person, Warehouse, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
+const { StatusService, RoleService } = require('../services');
 
 // Esquema de validación de Joi
 const schema = Joi.object({
@@ -320,14 +321,18 @@ const HomeController = {
         logger.info(`${req.user.name} - Entra a la ruta unificada de Homes`);
 
         try {
-           const statuses = await HomeController.getStatus();
+           const statuses = await StatusService.getStatus("Home");
+           const roles = await RoleService.getStatus("Home");
            const hometypes = await HomeController.getHomeTypes();
            const people = await HomeController.getPeople();
+           const warehouses = await HomeController.getWarehouses();
     
             res.json({
-                taskstatus: statuses,
-                taskhometypes: hometypes,
-                taskpeople: people
+                homestatus: statuses,
+                homeroles: roles,
+                hometypes: hometypes,
+                homepeople: people,
+                homewarehouses: warehouses
             });
         } catch (error) {
             logger.error('Error al obtener los mantenedores:', error);
@@ -335,25 +340,24 @@ const HomeController = {
         }
     },
 
-    async getStatus() {
-        logger.info('Entra a Buscar Los estados en (homeType_status_people)');
+    async getWarehouses() {
+        logger.info('Entra a Buscar Los alamcenes en (homeType_status_people)');
         try {
-            const statuses = await Status.findAll({
-                where: { type: 'Home' }
+            const warehouses = await Warehouse.findAll({
+                where: { status: 1 }
             });
     
-            return statuses.map(status => {
+            return warehouses.map(warehouse => {
                 return {
-                    id: status.id,
-                    nameStatus:  i18n.__(`status.${status.name}.name`) !== `status.${status.name}.name` ? i18n.__(`status.${status.name}.name`) : status.name,
-                    descriptionStatus: i18n.__(`status.${status.name}.name`) !== `status.${status.name}.name` ? i18n.__(`status.${status.name}.description`) : status.description,
-                    colorStatus: status.color,
-                    iconStatus: status.icon
+                    id: warehouse.id,
+                    nameWarehouses:  i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.title`) : warehouse.title,
+                    descriptionWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.description`) : warehouse.description,
+                    locationWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.location`) : warehouse.location
                 };
             });
         } catch (error) {
-            logger.error('Error en getStatus:', error);
-            throw new Error('Error al obtener estados');
+            logger.error('Error en getWarehouses:', error);
+            throw new Error('Error al obtener los almacenes');
         }
     },
 
