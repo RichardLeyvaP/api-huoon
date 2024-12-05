@@ -185,12 +185,12 @@ const PersonHomeWarehouseProductController = {
                     {
                         model: Product,
                         as: 'product',
-                        attributes: ['id', 'name'], // Datos del producto
+                        attributes: ['id', 'name', 'category_id'], // Datos del producto
                         include: [
                             {
                                 model: Category,
                                 as: 'category', // Relación con Category
-                                attributes: ['name']
+                                attributes: ['id','name']
                             }
                         ]
                     },
@@ -226,8 +226,8 @@ const PersonHomeWarehouseProductController = {
                 purchaseDate: homeWarehouseProduct.purchase_date,
                 expirationDate: homeWarehouseProduct.expiration_date,
                 purchasePlace: homeWarehouseProduct.purchase_place,
-                brand: homeWarehouseProduct.brand,
-                additionalNotes: homeWarehouseProduct.additional_notes,
+                brand: homeWarehouseProduct.brand ? homeWarehouseProduct.brand : "",
+                additionalNotes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
                 image: homeWarehouseProduct.image
             }));
     
@@ -313,7 +313,7 @@ const PersonHomeWarehouseProductController = {
         }
     
         // Verificar si la categoría existe
-        if (category_id !== undefined) {
+        if (category_id && category_id !== 0) {
             const category = await Category.findByPk(category_id);
             if (!category) {
                 logger.error(`PersonHomeWarehouseController->store: Categoría no encontrada con ID ${category_id}`);
@@ -356,6 +356,7 @@ const PersonHomeWarehouseProductController = {
                 }
             }
     
+            let filenamePersonHomeWarehouseProduct = 'personHomeWarehouseProducts/default.jpg'; // Imagen por defecto
             // Asociar el producto al almacén y al hogar en `person_home_warehouse_product`
             const [personHomeWarehouseProduct, created] = await PersonHomeWarehouseProduct.findOrCreate({
                 where: {
@@ -378,7 +379,7 @@ const PersonHomeWarehouseProductController = {
                     due_date: due_date,
                     frequency: frequency,
                     type: type,
-                    image: filename
+                    image: filenamePersonHomeWarehouseProduct
                 },
                 transaction: t
             });
@@ -566,7 +567,168 @@ const PersonHomeWarehouseProductController = {
 
     async update(req, res) {
         logger.info(`${req.user.name} - Inicia actualización de relación en person_home_warehouse_products`);
+        logger.info('Datos recibidos al editar un producto en un almacén');
+        logger.info(JSON.stringify(req.body));
     
+        const { error, value } = schema.validate(req.body);
+        if (error) {
+            const errorMsg = error.details.map(detail => detail.message).join(', ');
+            logger.error('Error en PersonHomeWarehouseProductsController->update: ' + errorMsg);
+            return res.status(400).json({ error: 'ValidationError', details: errorMsg });
+        }
+    
+        const {
+            id, // El ID del registro en la tabla person_home_warehouse_products
+            home_id, warehouse_id, product_id, status_id, unit_price, total_price,
+            quantity, purchase_date, expiration_date, purchase_place, brand, additional_notes,
+            maintenance_date, due_date, frequency, type, image, category_id, name
+        } = value;
+    
+        const t = await sequelize.transaction();
+        try {
+            // Verificar la existencia del registro por ID
+            const personHomeWarehouseProduct = await PersonHomeWarehouseProduct.findByPk(id, { transaction: t });
+            if (!personHomeWarehouseProduct) {
+                logger.error(`PersonHomeWarehouseProductsController->update: Registro no encontrado con ID ${id}`);
+                return res.status(204).json({ error: 'NotFound', message: `No se encontró un registro con el ID ${id}` });
+            }
+    
+            // Validar que el producto, almacén, hogar y estado existan
+            if (home_id) {
+                const home = await Home.findByPk(home_id);
+                if (!home) {
+                    logger.error(`PersonHomeWarehouseProductsController->update: Hogar no encontrado con ID ${home_id}`);
+                    return res.status(204).json({ msg: 'HomeNotFound' });
+                }
+            }
+    
+            if (warehouse_id) {
+                const warehouse = await Warehouse.findByPk(warehouse_id);
+                if (!warehouse) {
+                    logger.error(`PersonHomeWarehouseProductsController->update: Almacén no encontrado con ID ${warehouse_id}`);
+                    return res.status(204).json({ msg: 'WarehouseNotFound' });
+                }
+            }
+            let product;
+            if (product_id) {
+                product = await Product.findByPk(product_id);
+                if (!product) {
+                    logger.error(`PersonHomeWarehouseProductsController->update: Producto no encontrado con ID ${product_id}`);
+                    return res.status(204).json({ msg: 'ProductNotFound' });
+                }
+            }
+    
+            if (status_id) {
+                const status = await Status.findByPk(status_id);
+                if (!status) {
+                    logger.error(`PersonHomeWarehouseProductsController->update: Estado no encontrado con ID ${status_id}`);
+                    return res.status(204).json({ msg: 'StatusNotFound' });
+                }
+            }
+
+            //Actualizar datos del producto
+            // Lista de campos que pueden ser actualizados
+            const fieldsToUpdateProduct = ['name', 'category_id'];
+
+            // Construir el objeto updatedData con los campos presentes en req.body
+            const updatedDataProduct = Object.keys(req.body)
+                .filter(key => fieldsToUpdateProduct.includes(key) && req.body[key] !== undefined)
+                .reduce((obj, key) => {
+                    obj[key] = req.body[key];
+                    return obj;
+                }, {});
+
+            // Procesar la actualización del icono
+                if (req.file) {
+                    // Si se envía un archivo nuevo
+                    const extension = path.extname(req.file.originalname);
+                    const newFilename = `products/${product.id}${extension}`;
+
+                    // Eliminar el icono anterior si existe y no es el predeterminado
+                    if (product.image !== 'products/default.jpg') {
+                        const oldIconPath = path.join(__dirname, '../../public', product.image);
+                        try {
+                            await fs.promises.unlink(oldIconPath);
+                            logger.info(`Imagen anterior eliminada: ${oldIconPath}`);
+                        } catch (error) {
+                            logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
+                        }
+                    }
+
+                    // Mover el nuevo archivo a la carpeta pública
+                    const newPath = path.join(__dirname, '../../public', newFilename);
+                    await fs.promises.rename(req.file.path, newPath);
+                    updatedDataProduct.image = newFilename;
+
+                }
+             // Actualizar solo si hay datos que cambiar
+             if (Object.keys(updatedDataProduct).length > 0) {
+                await product.update(updatedDataProduct);
+                logger.info(`Producto actualizado exitosamente: ${product.name} (ID: ${product.id})`);
+            }
+    
+            // Actualizar la imagen si se envió un archivo
+            let updatedImage = personHomeWarehouseProduct.image;
+            if (req.file) {
+                const extension = path.extname(req.file.originalname);
+                const newFilename = `personHomeWarehouseProducts/${id}${extension}`;
+    
+                if (personHomeWarehouseProduct.image !== 'personHomeWarehouseProducts/default.jpg') {
+                    const oldPath = path.join(__dirname, '../../public', personHomeWarehouseProduct.image);
+                    try {
+                        await fs.promises.unlink(oldPath);
+                    } catch (err) {
+                        logger.error(`Error al eliminar la imagen anterior: ${err.message}`);
+                    }
+                }
+    
+                const newPath = path.join(__dirname, '../../public', newFilename);
+                await fs.promises.rename(req.file.path, newPath);
+                updatedImage = newFilename;
+            }
+    
+            // Actualizar el registro
+            const updatedFields = {
+                home_id, warehouse_id, product_id, status_id, unit_price, total_price,
+                quantity, purchase_date, expiration_date, purchase_place, brand, additional_notes,
+                maintenance_date, due_date, frequency, type, image: updatedImage
+            };
+    
+            // Elimina campos `undefined` para no sobrescribir valores existentes
+            Object.keys(updatedFields).forEach(key => {
+                if (updatedFields[key] === undefined) delete updatedFields[key];
+            });
+    
+            await personHomeWarehouseProduct.update(updatedFields, { transaction: t });
+    
+            // Confirmar la transacción
+            await t.commit();
+    
+            // Retornar el registro actualizado
+            const updatedRecord = await PersonHomeWarehouseProduct.findByPk(id, {
+                include: [
+                    { model: Person, as: 'person', attributes: ['id', 'name'] },
+                    { model: Home, as: 'home', attributes: ['id', 'name'] },
+                    { model: Warehouse, as: 'warehouse', attributes: ['id', 'title', 'description', 'status'] },
+                    { model: Product, as: 'product', attributes: ['id', 'name'], 
+                      include: [{ model: Category, as: 'category', attributes: ['name'] }]
+                    },
+                    { model: Status, as: 'status', attributes: ['id', 'name'] }
+                ]
+            });
+    
+            return res.status(200).json(updatedRecord);
+        } catch (error) {
+            await t.rollback();
+            logger.error(`Error en PersonHomeWarehouseProductsController->update: ${error.message}`);
+            return res.status(500).json({ error: 'ServerError', details: error.message });
+        }
+    },
+    /*async update(req, res) {
+        logger.info(`${req.user.name} - Inicia actualización de relación en person_home_warehouse_products`);
+        logger.info('datos recibidos al editar un producto en un almacen');
+        logger.info(JSON.stringify(req.body));
+
         // Validación de entrada
         const { error, value } = schema.validate(req.body);
         if (error) {
@@ -619,7 +781,7 @@ const PersonHomeWarehouseProductController = {
     
         let product;
         let filename;
-        if (product_id) {
+        if (product_id && product_id !== 0) {
             product = await Product.findByPk(product_id);
             if (!product) {
                 logger.error(`PersonHomeWarehouseProductsController->update: Producto no encontrado con ID ${product_id}`);
@@ -630,7 +792,7 @@ const PersonHomeWarehouseProductController = {
         }
 
         // Verificar si la categoría existe
-        if (category_id !== undefined) {
+        if (category_id && category_id !== 0) {
             const category = await Category.findByPk(category_id);
             if (!category) {
                 logger.error(`HomeWarehouseProductController->store: Categoría no encontrado con ID ${category_id}`);
@@ -776,7 +938,7 @@ const PersonHomeWarehouseProductController = {
             logger.error(`Error en PersonHomeWarehouseProductsController->update: ${errorMsg}`);
             return res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
-    },
+    },*/
 
     // Eliminar un producto de un almacen en un hogar
     async destroy(req, res) {
@@ -813,9 +975,25 @@ const PersonHomeWarehouseProductController = {
                 }
             }
 
+            const product = await Product.findByPk(personHomeWarehouseProduct.product_id);
+
+            if (product.image && product.image !== 'products/default.jpg') {
+                const oldImagePath = path.join(__dirname, '../../public', product.image);
+                try {
+                    await fs.promises.unlink(oldImagePath);
+                    logger.info(`Imagen anterior eliminada: ${oldImagePath}`);
+                } catch (error) {
+                    logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
+                }
+            }
+
+            
             // Eliminar el registro de la tabla
             await personHomeWarehouseProduct.destroy();
-            logger.info(`Registro eliminado de PersonHomeWarehouseProduct con ID ${req.body.id}`);
+            logger.info(`Registro eliminado de PersonHomeWarehouseProduct con ID ${req.body.id}`);            
+            logger.info(`Registro eliminado de Product con ID ${product.id}`);
+            // Eliminar el registro de la tabla
+            await product.destroy();
 
             // Responder con éxito
             res.status(200).json({ msg: 'PersonHomeWarehouseProductDeleted' });

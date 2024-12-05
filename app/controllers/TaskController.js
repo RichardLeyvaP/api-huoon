@@ -318,7 +318,8 @@ const TaskController = {
 
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva tarea`);
-    
+        logger.info('datos recibidos al crear una tarea');
+        logger.info(JSON.stringify(req.body));
         const personId = req.person.id;
         // Validación de los datos de entrada usando Joi
         const { error, value } = schema.validate(req.body);
@@ -563,6 +564,8 @@ const TaskController = {
     // Actualizar una tarea
     async update(req, res) {
         logger.info(`${req.user.name} - Actualiza la tarea con ID ${req.body.id}`);
+        logger.info('datos recibidos al editar una tarea');
+        logger.info(JSON.stringify(req.body));
         const personId = req.person.id;
         // Validación de los datos de entrada
         const { error, value } = schema.validate({ ...req.body });

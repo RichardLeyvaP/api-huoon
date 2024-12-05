@@ -1,267 +1,114 @@
-2024-11-01 09:21:20 info: Entrando a loguearse
-2024-11-01 09:21:34 info: yasmany - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:21:45 info: yasmany - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:24:26 info: Entrando a loguearse
-2024-11-01 09:25:36 info: Entrando a loguearse
-2024-11-01 09:25:54 info: yasmany - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:26:09 info: yasmany - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:26:09 info: 1 - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:26:42 info: yasmany - Entra a buscar las tareas de una fecha dada
-2024-11-01 09:50:46 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 09:51:35 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 09:56:57 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 09:58:56 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:01:09 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:02:30 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:08:31 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:13:31 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:14:47 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:22:50 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:22:50 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:22:50 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:22:50 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:41:55 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:41:55 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:41:55 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:41:55 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:41:55 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:41:55 error: Error en getPeople: HomePerson is not defined
-2024-11-01 10:41:55 error: Error al obtener categorías: Error al obtener personas
-2024-11-01 10:42:36 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:42:36 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:42:36 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:42:36 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:42:36 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:46:27 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:46:27 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:46:27 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:46:27 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:46:27 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:48:45 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:48:45 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:48:45 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:48:45 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:48:45 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:48:45 info: firstHome
-2024-11-01 10:48:45 info: [object SequelizeInstance:HomePerson]
-2024-11-01 10:48:45 info: firstHome
-2024-11-01 10:48:45 info: [object SequelizeInstance:HomePerson]
-2024-11-01 10:51:49 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:51:49 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:51:49 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:51:49 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:51:49 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:51:49 info: firstHome
-2024-11-01 10:51:49 info: {
-  "id": 1,
-  "home_id": 1,
-  "person_id": 1,
-  "role_id": 4,
-  "createdAt": "2024-11-01T10:45:35.000Z",
-  "updatedAt": "2024-11-01T10:45:35.000Z",
-  "role": {
-    "id": 4,
-    "name": "Miembro",
-    "description": "Miembro de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:53.000Z",
-    "updatedAt": "2024-10-30T13:33:53.000Z"
-  }
-}
-2024-11-01 10:51:49 info: firstHome
-2024-11-01 10:51:49 info: {
-  "id": 2,
-  "home_id": 1,
-  "person_id": 2,
-  "role_id": 3,
-  "createdAt": "2024-11-01T10:46:02.000Z",
-  "updatedAt": "2024-11-01T10:46:02.000Z",
-  "role": {
-    "id": 3,
-    "name": "Padre",
-    "description": "Padre de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:40.000Z",
-    "updatedAt": "2024-10-30T13:33:40.000Z"
-  }
-}
-2024-11-01 10:56:02 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:56:02 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:56:02 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:56:02 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:56:02 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:56:02 info: firstHome
-2024-11-01 10:56:02 info: {
-  "id": 1,
-  "home_id": 1,
-  "person_id": 1,
-  "role_id": 4,
-  "createdAt": "2024-11-01T10:45:35.000Z",
-  "updatedAt": "2024-11-01T10:45:35.000Z",
-  "role": {
-    "id": 4,
-    "name": "Miembro",
-    "description": "Miembro de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:53.000Z",
-    "updatedAt": "2024-10-30T13:33:53.000Z"
-  }
-}
-2024-11-01 10:56:02 info: firstHome
-2024-11-01 10:56:02 info: {
-  "id": 2,
-  "home_id": 1,
-  "person_id": 2,
-  "role_id": 3,
-  "createdAt": "2024-11-01T10:46:02.000Z",
-  "updatedAt": "2024-11-01T10:46:02.000Z",
-  "role": {
-    "id": 3,
-    "name": "Padre",
-    "description": "Padre de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:40.000Z",
-    "updatedAt": "2024-10-30T13:33:40.000Z"
-  }
-}
-2024-11-01 10:56:42 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:56:42 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:56:42 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:56:42 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:56:42 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:56:42 info: firstHome
-2024-11-01 10:56:42 info: {
-  "id": 1,
-  "home_id": 1,
-  "person_id": 1,
-  "role_id": 4,
-  "createdAt": "2024-11-01T10:45:35.000Z",
-  "updatedAt": "2024-11-01T10:45:35.000Z",
-  "role": {
-    "id": 4,
-    "name": "Miembro",
-    "description": "Miembro de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:53.000Z",
-    "updatedAt": "2024-10-30T13:33:53.000Z"
-  }
-}
-2024-11-01 10:56:42 info: firstHome
-2024-11-01 10:56:42 info: {
-  "id": 2,
-  "home_id": 1,
-  "person_id": 2,
-  "role_id": 3,
-  "createdAt": "2024-11-01T10:46:02.000Z",
-  "updatedAt": "2024-11-01T10:46:02.000Z",
-  "role": {
-    "id": 3,
-    "name": "Padre",
-    "description": "Padre de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:40.000Z",
-    "updatedAt": "2024-10-30T13:33:40.000Z"
-  }
-}
-2024-11-01 10:59:00 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-01 10:59:00 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 10:59:00 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 10:59:00 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 10:59:00 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 10:59:00 info: firstHome
-2024-11-01 10:59:00 info: {
-  "id": 1,
-  "home_id": 1,
-  "person_id": 1,
-  "role_id": 4,
-  "createdAt": "2024-11-01T10:45:35.000Z",
-  "updatedAt": "2024-11-01T10:45:35.000Z",
-  "role": {
-    "id": 4,
-    "name": "Miembro",
-    "description": "Miembro de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:53.000Z",
-    "updatedAt": "2024-10-30T13:33:53.000Z"
-  }
-}
-2024-11-01 10:59:00 info: firstHome
-2024-11-01 10:59:00 info: {
-  "id": 2,
-  "home_id": 1,
-  "person_id": 2,
-  "role_id": 3,
-  "createdAt": "2024-11-01T10:46:02.000Z",
-  "updatedAt": "2024-11-01T10:46:02.000Z",
-  "role": {
-    "id": 3,
-    "name": "Padre",
-    "description": "Padre de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:40.000Z",
-    "updatedAt": "2024-10-30T13:33:40.000Z"
-  }
-}
-2024-11-01 11:36:10 info: Registrando Usuario.
-2024-11-01 11:37:43 info: Registrando Usuario.
-2024-11-01 11:38:00 info: prueba2 - Entra a la ruta unificada de Tasks
-2024-11-01 11:38:00 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-01 11:38:00 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-01 11:38:00 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-01 11:38:00 info: Entra a Buscar Las personas en (category_status_priority)
-2024-11-01 11:38:00 info: firstHome
-2024-11-01 11:38:00 info: {
-  "id": 1,
-  "home_id": 1,
-  "person_id": 1,
-  "role_id": 4,
-  "createdAt": "2024-11-01T10:45:35.000Z",
-  "updatedAt": "2024-11-01T10:45:35.000Z",
-  "role": {
-    "id": 4,
-    "name": "Miembro",
-    "description": "Miembro de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:53.000Z",
-    "updatedAt": "2024-10-30T13:33:53.000Z"
-  }
-}
-2024-11-01 11:38:00 info: firstHome
-2024-11-01 11:38:00 info: {
-  "id": 2,
-  "home_id": 1,
-  "person_id": 2,
-  "role_id": 3,
-  "createdAt": "2024-11-01T10:46:02.000Z",
-  "updatedAt": "2024-11-01T10:46:02.000Z",
-  "role": {
-    "id": 3,
-    "name": "Padre",
-    "description": "Padre de familia",
-    "type": "Home",
-    "createdAt": "2024-10-30T13:33:40.000Z",
-    "updatedAt": "2024-10-30T13:33:40.000Z"
-  }
-}
-2024-11-01 11:38:00 info: firstHome
-2024-11-01 11:38:00 info: undefined
-2024-11-01 11:38:00 info: firstHome
-2024-11-01 11:38:00 info: undefined
-2024-11-06 12:18:01 info: Entrando a loguearse
-2024-11-06 12:18:28 info: Entrando a loguearse
-2024-11-06 12:18:44 info: Entrando a loguearse
-2024-11-06 12:19:10 info: Entrando a loguearse
-2024-11-06 12:19:47 info: Entrando a loguearse
-2024-11-06 14:33:36 error: Error de validación en WareHouseController->destroy: "title" is not allowed
-2024-11-06 14:55:25 info: yasmany - Edita un almacén
-2024-11-06 14:55:26 error: Error en WarehouseController->update: fieldsToUpdate is not defined
-2024-11-06 14:56:50 info: yasmany - Edita un almacén
-2024-11-06 14:56:50 error: Error en WarehouseController->update: category is not defined
-2024-11-06 14:57:09 info: yasmany - Edita un almacén
-2024-11-06 14:57:35 info: yasmany - Edita un almacén
-2024-11-06 15:02:34 info: yasmany - Edita un almacén
-2024-11-06 15:02:41 info: yasmany - Edita un almacén
-2024-11-06 15:03:08 info: yasmany - Crea un nuevo almacén
-2024-11-06 15:03:19 info: yasmany - Elimina un almacén
-2024-11-06 15:03:19 error: Error de validación en WareHouseController->destroy: "title" is not allowed
-2024-11-06 15:03:24 info: yasmany - Elimina un almacén
+2024-11-26 08:21:57 info: yasmany - Actualiza la tarea con ID 10
+2024-11-26 08:21:57 info: Agregando automáticamente al creador con personId: 1
+2024-11-26 08:21:57 info: Task actualizada exitosamente (ID: 10)
+2024-11-26 08:22:35 info: yasmany - Actualiza la tarea con ID 10
+2024-11-26 08:22:35 info: Agregando automáticamente al creador con personId: 1
+2024-11-26 08:22:35 info: Task actualizada exitosamente (ID: 10)
+2024-11-26 09:53:51 info: yasmany - Actualiza la contraseña del userID 8
+2024-11-26 09:54:09 info: yasmany - Actualiza la contraseña del userID 8
+2024-11-26 09:54:31 info: yasmany - Actualiza la contraseña del userID 8
+2024-11-26 09:56:37 info: yasmany - Actualiza la contraseña del userID 8
+2024-11-26 12:33:44 info: Entrando a loguearse
+2024-11-26 12:34:09 info: Entrando a loguearse
+2024-11-26 12:34:16 info: Entrando a loguearse
+2024-11-26 12:34:33 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
+2024-11-26 12:34:33 error: Error en PersonWarehouseController->getWarehouses: La columna 'Warehouse.state' en where clause es desconocida
+2024-11-26 12:35:14 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
+2024-11-26 12:35:14 error: Error en PersonWarehouseController->getWarehouses: Cannot read properties of undefined (reading '0')
+2024-11-26 12:37:46 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
+2024-11-26 12:39:49 info: Entrando a loguearse
+2024-11-26 12:40:01 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 12:42:59 info: Entrando a loguearse
+2024-11-26 12:43:15 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 12:44:36 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 12:52:19 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 12:56:01 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 13:05:14 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 13:05:14 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-26 13:08:05 info: yasmany - Entra a buscar los almacenes asociados a el
+2024-11-26 13:08:05 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-26 13:18:31 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-26 13:22:44 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-26 13:22:44 error: Error en PersonWarehouseController->getWarehouses: Sequelize is not defined
+2024-11-26 13:23:13 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-26 13:23:13 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-26 13:24:23 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-26 13:37:20 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-26 15:50:12 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-11-27 06:56:45 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-11-27 06:56:45 error: Error en WarehouseController->index: "due_date" must be a valid date
+2024-11-27 07:03:13 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-11-27 07:03:13 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 1
+2024-11-27 07:03:22 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-11-27 07:03:35 info: yasmany - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico
+2024-11-27 07:03:35 info: PersonHomeWarehouseController->store: Creando nuevo producto
+2024-11-27 08:57:32 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 09:13:54 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 09:15:27 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 10:04:20 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 10:09:17 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 10:09:17 error: Error en PersonWarehouseController->getWarehouses: warehousesMap is not defined
+2024-11-27 10:09:35 info: yasmany - Entra a buscar los almacenes asociados a él
+2024-11-27 16:04:25 info: Entrando a loguearse
+2024-11-27 16:04:40 info: Entrando a loguearse
+2024-11-27 16:04:44 info: Entrando a loguearse
+2024-11-27 16:05:09 info: Entrando a loguearse
+2024-11-27 16:05:13 info: Entrando a loguearse
+2024-11-27 16:05:27 info: Entrando a loguearse
+2024-11-27 16:05:35 info: Entrando a loguearse
+2024-11-27 16:05:35 error: Error al loguear usuario: Op is not defined
+2024-11-27 16:06:10 info: Entrando a loguearse
+2024-11-27 16:06:10 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
+2024-11-27 16:06:14 info: Entrando a loguearse
+2024-11-27 16:06:14 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
+2024-11-27 16:06:53 info: Entrando a loguearse
+2024-11-27 16:07:07 info: Entrando a loguearse
+2024-11-28 09:47:29 info: Entrando a loguearse
+2024-11-28 09:48:58 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-28 09:48:58 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-28 09:48:58 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-28 09:48:58 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-28 09:48:58 info: Entra a Buscar Los roles en (category_status_priority)
+2024-11-28 09:57:48 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 09:57:48 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-28 09:57:48 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-28 10:02:36 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 10:02:36 error: Error al obtener categorías: Error al obtener categorías
+2024-11-28 10:03:47 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 10:03:47 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-28 10:17:52 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 10:17:52 info: Entra a Buscar Las categories en (category_status_priority)
+2024-11-28 10:17:52 info: Entra a Buscar Los estados en (category_status_priority)
+2024-11-28 10:35:02 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 10:35:02 info: Entra a Buscar Las categorias de Product
+2024-11-28 10:35:02 info: Entra a Buscar Los estados de Product
+2024-11-28 10:40:23 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 10:40:23 info: Entra a Buscar Las categorias de Product
+2024-11-28 10:40:23 info: Entra a Buscar Los estados de Product
+2024-11-28 10:53:24 info: yasmany - Entra a la ruta unificada de Tasks
+2024-11-28 10:53:24 info: Entra a Buscar Las categorias de Task
+2024-11-28 10:53:24 info: Entra a Buscar Los estados de Task
+2024-11-28 10:53:24 info: Entra a Buscar Las prioridades en (category_status_priority)
+2024-11-28 10:53:24 info: Entra a Buscar Los roles de Task
+2024-11-28 11:02:29 info: yasmany - Entra a la ruta unificada de Homes
+2024-11-28 11:02:29 info: Entra a Buscar Los estados de home
+2024-11-28 11:02:29 info: Entra a Buscar Los tipos de hogar en (homeType_status_people)
+2024-11-28 11:02:29 info: Entra a Buscar Las personas en (homeType_status_people)
+2024-11-28 11:02:29 info: Entra a Buscar Los alamcenes en (homeType_status_people)
+2024-11-28 12:53:29 info: yasmany - Entra a la ruta unificada de Products
+2024-11-28 12:53:29 info: Entra a Buscar Las categorias de Product
+2024-11-28 12:53:29 info: Entra a Buscar Los estados de Product
+2024-11-28 16:26:53 info: yasmany - Inicia actualización de relación en person_home_warehouse_products
+2024-11-28 16:26:53 info: Datos recibidos al editar un producto en un almacén
+2024-11-28 16:26:53 info: {"id":3,"home_id":1,"warehouse_id":13,"product_id":9,"status_id":4,"quantity":20,"unit_price":"12.00","total_price":"240.00","purchase_place":"nueva dirección","brand":"nueva marca","additional_notes":"actualización de producto"}
+2024-12-05 10:22:01 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-05 10:22:01 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 13
+2024-12-05 10:22:28 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-05 10:22:52 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-05 10:24:56 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-05 10:58:44 info: irais891230 - Eliminando un producto de un almacen en un hogar
+2024-12-05 10:58:44 error: Error de validación en PersonHomeWarehouseProductsController->destroy: "home_id" is not allowed
+2024-12-05 10:58:51 info: irais891230 - Eliminando un producto de un almacen en un hogar
+2024-12-05 10:58:51 error: Error al eliminar la imagen anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\products\default.jpg'
+2024-12-05 10:58:51 info: Registro eliminado de PersonHomeWarehouseProduct con ID 1
+2024-12-05 10:58:51 info: Registro eliminado de Product con ID 2

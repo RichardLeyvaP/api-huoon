@@ -4,3 +4,55 @@
 2024-11-06 14:55:26 error: Error en WarehouseController->update: fieldsToUpdate is not defined
 2024-11-06 14:56:50 error: Error en WarehouseController->update: category is not defined
 2024-11-06 15:03:19 error: Error de validación en WareHouseController->destroy: "title" is not allowed
+2024-11-20 12:28:41 error: TaskController->index: La columna: 'start_date' en where clause es ambigua
+2024-11-20 12:38:31 error: TaskController->index: La columna 'tasks.start_date' en where clause es desconocida
+2024-11-20 14:12:15 error: TaskController->index: Role is not associated to Person!
+2024-11-20 14:44:41 error: Error de validación en TaskController->getTaskDate: "start_date" is required
+2024-11-21 09:43:54 error: Error de validación en TaskController->getTaskDate: "start_date" is required
+2024-11-21 10:57:43 error: Error al obtener categorías desde getCategories: res is not defined
+2024-11-21 10:57:43 error: Error al obtener categorías: Error al obtener categorías
+2024-11-21 11:15:06 error: Error al obtener categorías desde getCategories: i18n is not defined
+2024-11-21 11:15:06 error: Error al obtener categorías: Error al obtener categorías
+2024-11-21 15:23:34 error: Error al obtener categorías desde getCategories: res is not defined
+2024-11-21 15:23:34 error: Error al obtener categorías: Error al obtener categorías
+2024-11-21 15:27:20 error: Error al obtener categorías desde getCategories: res is not defined
+2024-11-21 15:27:20 error: Error al obtener categorías: Error al obtener categorías
+2024-11-21 15:36:29 error: Error al obtener categorías desde getCategories: res is not defined
+2024-11-21 15:36:29 error: Error al obtener categorías: Error al obtener categorías
+2024-11-21 15:46:16 error: Error al hacer logout: revokedTokens is not defined
+2024-11-21 15:48:33 error: Error al hacer logout: revokedTokens is not defined
+2024-11-21 15:48:59 error: Error al hacer logout: revokedTokens is not defined
+2024-11-21 15:53:54 error: Error al hacer logout: revokedTokens is not defined
+2024-11-21 16:07:53 error: Error al loguear usuario: Cannot read properties of undefined (reading 'secret')
+2024-11-21 16:09:46 error: Error al hacer logout: Cannot read properties of undefined (reading 'add')
+2024-11-21 16:13:07 error: Error al hacer logout: Cannot read properties of undefined (reading 'add')
+2024-11-21 16:17:47 error: Error al hacer logout: Cannot read properties of undefined (reading 'add')
+2024-11-21 16:25:42 error: Error al hacer logout: Cannot read properties of undefined (reading 'add')
+2024-11-21 16:27:24 error: Error al hacer logout: Cannot read properties of undefined (reading 'add')
+2024-11-22 09:50:00 error: Error al loguear usuario: Tabla 'auth.usertokens' no existe
+2024-11-22 09:50:53 error: Error al loguear usuario: La columna 'createdAt' en field list es desconocida
+2024-11-22 09:53:04 error: Error al loguear usuario: Incorrect datetime value: 'Invalid date' for column 'expires_at' at row 1
+2024-11-22 14:27:53 error: Error de validación en HomeController->store: "status_id" is not allowed
+2024-11-22 15:25:53 error: Error al obtener los mantenedores: TaskController is not defined
+2024-11-22 15:26:23 error: Error en getStatus: i18n is not defined
+2024-11-22 15:26:23 error: Error al obtener los mantenedores: Error al obtener estados
+2024-11-22 15:29:17 error: Error al obtener los mantenedores: HomeController.getHomeTypes is not a function
+2024-11-25 11:26:19 error: TaskController->update: WHERE parameter "id" has invalid "undefined" value
+2024-11-25 11:28:08 error: TaskController->update: WHERE parameter "id" has invalid "undefined" value
+2024-11-25 11:30:00 error: TaskController->update: WHERE parameter "id" has invalid "undefined" value
+2024-11-26 12:34:33 error: Error en PersonWarehouseController->getWarehouses: La columna 'Warehouse.state' en where clause es desconocida
+2024-11-26 12:35:14 error: Error en PersonWarehouseController->getWarehouses: Cannot read properties of undefined (reading '0')
+2024-11-26 13:05:14 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-26 13:08:05 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-26 13:22:44 error: Error en PersonWarehouseController->getWarehouses: Sequelize is not defined
+2024-11-26 13:23:13 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
+2024-11-27 06:56:45 error: Error en WarehouseController->index: "due_date" must be a valid date
+2024-11-27 07:03:13 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 1
+2024-11-27 10:09:17 error: Error en PersonWarehouseController->getWarehouses: warehousesMap is not defined
+2024-11-27 16:05:35 error: Error al loguear usuario: Op is not defined
+2024-11-27 16:06:10 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
+2024-11-27 16:06:14 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
+2024-11-28 10:02:36 error: Error al obtener categorías: Error al obtener categorías
+2024-12-05 10:22:01 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 13
+2024-12-05 10:58:44 error: Error de validación en PersonHomeWarehouseProductsController->destroy: "home_id" is not allowed
+2024-12-05 10:58:51 error: Error al eliminar la imagen anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\products\default.jpg'
