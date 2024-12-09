@@ -13,6 +13,7 @@ const upload = require('./middlewares/multer'); // Middleware de multer
 const multerCategory = require('./middlewares/multerCategory');
 const validateSchema = require('./middlewares/validateSchema');
 const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
+const { registerSchema, loginSchema, updatePasswordSchema } = require('./middlewares/validations/authValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -37,9 +38,9 @@ const HomePersonTaskController = require('./controllers/HomePersonTaskController
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
 //Login y register
-router.post('/login', AuthController.login);
-router.post('/login-apk', AuthController.loginApk);
-router.post('/register', AuthController.register);
+router.post('/login', validateSchema(loginSchema), AuthController.login);
+router.post('/login-apk', validateSchema(loginSchema), AuthController.loginApk);
+router.post('/register', validateSchema(registerSchema), AuthController.register);
 
 // Rutas de autenticación
 router.get('/login-google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -110,7 +111,7 @@ router.get('/images/:foldername/:filename', (req, res) => {
 router.use(auth);
 
 router.get('/logout', AuthController.logout);
-router.post('/update-password', AuthController.updatePassword);
+router.post('/update-password', validateSchema(updatePasswordSchema), AuthController.updatePassword);
 
 //Ruta Configurations
 router.get('/configuration-show', ConfigurationController.show);

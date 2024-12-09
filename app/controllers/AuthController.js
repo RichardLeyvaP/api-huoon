@@ -40,18 +40,6 @@ const schema = Joi.object({
     //login
     async login(req, res) {
         logger.info('Entrando a loguearse');
-        
-        // Validación de entrada
-        const schema = Joi.object({
-            email: Joi.string().required(),
-            password: Joi.string().required()
-        });
-        
-        const { error } = schema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-    
         try {
             const user = await User.findOne({
                 where: {
@@ -133,17 +121,6 @@ const schema = Joi.object({
     async loginApk(req, res) {
         logger.info('Entrando a loguearse desde la aplicación');
         
-        // Validación de entrada
-        const schema = Joi.object({
-            email: Joi.string().required(),
-            password: Joi.string().required()
-        });
-        
-        const { error } = schema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-    
         try {
             const user = await User.findOne({
                 where: {
@@ -226,11 +203,6 @@ const schema = Joi.object({
     async register(req, res){
         logger.info('Registrando Usuario.');
 
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en AuthController->register: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
         const t = await sequelize.transaction(); // Inicia una transacción
         try {
             // Generar un hashSync de la contraseña
@@ -597,15 +569,8 @@ const schema = Joi.object({
     async updatePassword(req, res) {
         logger.info(`${req.user.name} - Actualiza la contraseña del userID ${req.body.id}`);
         try {
-            // Validar la entrada con Joi
-            const { error, value } = updatePasswordSchema.validate(req.body, { abortEarly: false });
 
-            if (error) {
-                const errorMessages = error.details.map((detail) => detail.message);
-                return res.status(400).json({ errors: errorMessages });
-            }
-
-            const { id, currentPassword, newPassword } = value;
+            const { id, currentPassword, newPassword } = req.body;
     
             // Verificar que el usuario existe
             const user = await User.findByPk(id);
