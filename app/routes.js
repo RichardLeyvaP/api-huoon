@@ -11,6 +11,8 @@ const session = require('express-session');
 const auth = require('./middlewares/auth');
 const upload = require('./middlewares/multer'); // Middleware de multer
 const multerCategory = require('./middlewares/multerCategory');
+const validateSchema = require('./middlewares/validateSchema');
+const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -137,10 +139,10 @@ router.post('/rol-destroy', RoleController.destroy);
 
 //Rutas Categirias
 router.get('/category', CategoryController.index);
-router.post('/category', multerCategory('icon', 'categories'), CategoryController.store);
-router.post('/category-show', CategoryController.show);
-router.post('/category-update', multerCategory('icon', 'categories'), CategoryController.update);
-router.post('/category-destroy', CategoryController.destroy);
+router.post('/category', validateSchema(storeCategorySchema), multerCategory('icon', 'categories'), CategoryController.store);
+router.post('/category-show', validateSchema(idCategorySchema), CategoryController.show);
+router.post('/category-update', validateSchema(updateCategorySchema), multerCategory('icon', 'categories'), CategoryController.update);
+router.post('/category-destroy', validateSchema(idCategorySchema), CategoryController.destroy);
 
 //Rutas Prioridades
 router.get('/priority', PriorityController.index);

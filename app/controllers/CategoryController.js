@@ -4,23 +4,6 @@ const fs = require('fs');
 const { Category, sequelize } = require('../models');  // Importar el modelo Category
 const logger = require('../../config/logger'); // Importa el logger
 
-// Esquema de validación de Joi
-const schema = Joi.object({
-    name: Joi.string().max(255).optional(),
-    description: Joi.string().allow(null, ''),
-    color: Joi.string().allow(null, ''),
-    type: Joi.string().allow(null, ''), // Asegúrate de que este campo esté permitido
-    icon: Joi.alternatives().try(
-        Joi.string(),
-        Joi.object({
-            mimetype: Joi.string().valid('image/jpeg', 'image/png', 'image/jpg', 'image/gif').required(),
-            size: Joi.number().max(2048 * 1024).required()
-        })
-    ).allow(null),
-    parent_id: Joi.number().integer().allow(null),
-    id: Joi.number().optional(),
-});
-
 const CategoryController = {
     async index(req, res) {
         logger.info(`${req.user.name} - Entra a buscar las categorías`);
@@ -99,24 +82,16 @@ const CategoryController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva categoría`);
 
-        const { error, value } = schema.validate({
-            ...req.body,
-            icon: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : req.body.icon
-        });
-
-        if (error) {
-            logger.error(`Error de validación en CategoryController->show: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        const { name, description, color, type, icon, parent_id } = req.body;
         const t = await sequelize.transaction();
         try {
             const category = await Category.create({
-                name: value.name,
-                description: value.description,
-                color: value.color,
-                type: value.type,
+                name: name,
+                description: description,
+                color: color,
+                type: type,
                 state: 1,
-                parent_id: value.parent_id
+                parent_id: parent_id
             });
 
             // Manejo del archivo de icono (si se ha subido)
@@ -138,7 +113,7 @@ const CategoryController = {
                     throw new Error('Error al mover el icono'); // Esto permitirá que el catch lo maneje y haga rollback
                 }
             }  else {
-                category.icon = value.icon || "categories/default.jpg";
+                category.icon = icon || "categories/default.jpg";
                 await category.save({ transaction: t });
              }
              await t.commit();
@@ -208,15 +183,7 @@ const CategoryController = {
 
     async update(req, res) {
         logger.info(`${req.user.name} - Editando una categoría`);
-    
-        // Validación de los datos con Joi
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en CategoryController->update: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-    
+       
         try {
             // Buscar la categoría por ID
             const category = await Category.findByPk(req.body.id);
@@ -292,18 +259,6 @@ const CategoryController = {
     
     async destroy(req, res) {
         logger.info(`${req.user.name} - Eliminando una categoría`);
-    
-        // Validación de los datos con Joi
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-    
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en CategoryController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
     
         try {
             // Buscar la categoría por ID
