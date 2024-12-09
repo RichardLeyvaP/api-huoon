@@ -153,10 +153,10 @@ router.post('/priority-destroy', PriorityController.destroy);
 
 //Rutas CategoryPerson
 router.get('/category-person', CategoryPersonController.index);
-router.post('/category-person', multerCategory('icon', 'categories'),CategoryPersonController.store);
-router.post('/category-person-show', CategoryPersonController.show);
-router.post('/category-person-update', multerCategory('icon', 'categories'), CategoryPersonController.update);
-router.post('/category-person-destroy', CategoryPersonController.destroy);
+router.post('/category-person', validateSchema(storeCategorySchema), multerCategory('icon', 'categories'),CategoryPersonController.store);
+router.post('/category-person-show', validateSchema(idCategorySchema), CategoryPersonController.show);
+router.post('/category-person-update', validateSchema(updateCategorySchema), multerCategory('icon', 'categories'), CategoryPersonController.update);
+router.post('/category-person-destroy', validateSchema(idCategorySchema), CategoryPersonController.destroy);
 
 //Rutas CategoryPerson
 router.get('/home-type', HomeTypeController.index);

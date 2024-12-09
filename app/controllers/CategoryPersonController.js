@@ -1,26 +1,8 @@
-const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
 const { CategoryPerson, Category, Person, sequelize  } = require('../models');  // Importar el modelo Category
 const logger = require('../../config/logger'); // Importa el logger
  
-  // Esquema de validación de Joi
-    const schema = Joi.object({
-        name: Joi.string().max(255).optional(),
-        description: Joi.string().allow(null, ''),
-        color: Joi.string().allow(null, ''),
-        type: Joi.string().allow(null, ''), // Asegúrate de que este campo esté permitido
-        icon: Joi.alternatives().try(
-            Joi.string(),
-            Joi.object({
-                mimetype: Joi.string().valid('image/jpeg', 'image/png', 'image/jpg', 'image/gif').required(),
-                size: Joi.number().max(2048 * 1024).required()
-            })
-        ).allow(null),
-        parent_id: Joi.number().integer().allow(null),
-        id: Joi.number().optional(),
-    });
-
     const CategoryPersonController = {
     async index(req, res) {
         logger.info(`${req.user.name} - Entra a buscar las categorías asociadas`);
@@ -117,26 +99,19 @@ const logger = require('../../config/logger'); // Importa el logger
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva categoría asociada a la persona`);
         
-        // Validación de datos de entrada con Joi
-        const { error, value } = schema.validate({
-            ...req.body,
-            icon: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : req.body.icon
-        });
-        if (error) {
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }        
+        const { name, description, color, type, icon, parent_id } = req.body;        
         const t = await sequelize.transaction();
         try {
             let filename = 'categories/default.jpg'; // Imagen por defecto
             // Obtener la instancia completa de Person
-            const person = await Person.findByPk(req.user.person.id);
+            const person = await Person.findByPk(req.person.id);
             const category = await Category.create({
-                name: value.name,
-                description: value.description,
-                color: value.color,
-                type: value.type,
+                name: name,
+                description: description,
+                color: color,
+                type: type,
                 state: 0,
-                parent_id: value.parent_id || null,
+                parent_id: parent_id || null,
                 person_id: person.id,
             }, { transaction: t });
 
@@ -159,7 +134,7 @@ const logger = require('../../config/logger'); // Importa el logger
                     throw new Error('Error al mover el icono'); // Esto permitirá que el catch lo maneje y haga rollback
                 }
             }  else {
-                category.icon = value.icon || "categories/default.jpg";
+                category.icon = icon || "categories/default.jpg";
                 await category.save({ transaction: t });
              }
 
@@ -178,15 +153,6 @@ const logger = require('../../config/logger'); // Importa el logger
     async update(req, res) {
         logger.info(`${req.user.name} - Editando una categoría de la persona`);
 
-        // Validación de los datos con Joi
-        const { error } = schema.validate({
-            ...req.body,
-            icon: req.file ? { mimetype: req.file.mimetype, size: req.file.size } : req.body.icon
-        });
-
-        if (error) {
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
         const t = await sequelize.transaction();
 
         try {
@@ -203,7 +169,7 @@ const logger = require('../../config/logger'); // Importa el logger
             }
 
             // Lista de campos que pueden ser actualizados
-            const fieldsToUpdate = ['name', 'description', 'color', 'parent_id', 'type'];
+            const fieldsToUpdate = ['name', 'description', 'color', 'parent_id', 'type', 'state'];
 
             // Construir el objeto updatedData con los campos presentes en req.body
             const updatedData = Object.keys(req.body)
@@ -268,15 +234,6 @@ const logger = require('../../config/logger'); // Importa el logger
     async show(req, res) {
         logger.info(`${req.user.name} - Consultando una categoría específica`);
 
-        // Validar el parámetro ID en los parámetros de la ruta
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-        const { error } = schema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-
         try {
             const personId = req.person.id;
 
@@ -328,13 +285,7 @@ const logger = require('../../config/logger'); // Importa el logger
     async destroy(req, res) {
         logger.info(`${req.user.name} - Eliminando una categoría de la tabla category_person`);
      
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en CategoryPersonController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-        try {
+       try {
             // Buscar la categoría por ID en la tabla category_person
             const categoryPerson = await CategoryPerson.findByPk(req.body.id);
             if (!categoryPerson) {
