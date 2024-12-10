@@ -15,6 +15,10 @@ const validateSchema = require('./middlewares/validateSchema');
 const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
 const { registerSchema, loginSchema, updatePasswordSchema } = require('./middlewares/validations/authValidation');
 const { storeHomeSchema, updateHomeSchema, idHomeSchema } = require('./middlewares/validations/homeValidation');
+const { storeHomeTypeSchema, updateHomeTypeSchema, idHomeTypeSchema } = require('./middlewares/validations/homeTypeValidation');
+const { storePrioritySchema, updatePrioritySchema, idPrioritySchema } = require('./middlewares/validations/priorityValidation');
+const { storeRoleSchema, updateRoleSchema, idRoleSchema } = require('./middlewares/validations/roleValidation');
+const { storeStatusSchema, updateStatusSchema, idStatusSchema } = require('./middlewares/validations/statusValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -127,17 +131,17 @@ router.post('/person-destroy', PersonController.destroy);
 
 //Rutas Statuses
 router.get('/status', StatusController.index);
-router.post('/status', StatusController.store);
-router.post('/status-show', StatusController.show);
-router.put('/status', StatusController.update);
-router.post('/status-destroy', StatusController.destroy);
+router.post('/status', validateSchema(storeStatusSchema), StatusController.store);
+router.post('/status-show', validateSchema(idStatusSchema), StatusController.show);
+router.put('/status', validateSchema(updateStatusSchema), StatusController.update);
+router.post('/status-destroy', validateSchema(idStatusSchema), StatusController.destroy);
 
 //Rutas Roles
 router.get('/rol', RoleController.index);
-router.post('/rol', RoleController.store);
-router.post('/rol-show', RoleController.show);
-router.put('/rol', RoleController.update);
-router.post('/rol-destroy', RoleController.destroy);
+router.post('/rol', validateSchema(storeRoleSchema), RoleController.store);
+router.post('/rol-show', validateSchema(idRoleSchema), RoleController.show);
+router.put('/rol', validateSchema(updateRoleSchema), RoleController.update);
+router.post('/rol-destroy', validateSchema(idRoleSchema), RoleController.destroy);
 
 //Rutas Categirias
 router.get('/category', CategoryController.index);
@@ -148,10 +152,10 @@ router.post('/category-destroy', validateSchema(idCategorySchema), CategoryContr
 
 //Rutas Prioridades
 router.get('/priority', PriorityController.index);
-router.post('/priority', PriorityController.store);
-router.post('/priority-show', PriorityController.show);
-router.put('/priority', PriorityController.update);
-router.post('/priority-destroy', PriorityController.destroy);
+router.post('/priority', validateSchema(storePrioritySchema), PriorityController.store);
+router.post('/priority-show', validateSchema(idPrioritySchema), PriorityController.show);
+router.put('/priority', validateSchema(updatePrioritySchema), PriorityController.update);
+router.post('/priority-destroy', validateSchema(idPrioritySchema), PriorityController.destroy);
 
 //Rutas CategoryPerson
 router.get('/category-person', CategoryPersonController.index);
@@ -162,10 +166,10 @@ router.post('/category-person-destroy', validateSchema(idCategorySchema), Catego
 
 //Rutas CategoryPerson
 router.get('/home-type', HomeTypeController.index);
-router.post('/home-type', HomeTypeController.store);
-router.post('/home-type-show', HomeTypeController.show);
-router.put('/home-type', HomeTypeController.update);
-router.post('/home-type-destroy', HomeTypeController.destroy);
+router.post('/home-type', validateSchema(storeHomeTypeSchema), HomeTypeController.store);
+router.post('/home-type-show', validateSchema(idHomeTypeSchema), HomeTypeController.show);
+router.put('/home-type', validateSchema(updateHomeTypeSchema), HomeTypeController.update);
+router.post('/home-type-destroy', validateSchema(idHomeTypeSchema), HomeTypeController.destroy);
 
 //Rutas Home
 router.get('/home', HomeController.index);

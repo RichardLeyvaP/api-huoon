@@ -49,22 +49,15 @@ const PriorityController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva prioridad`);
 
-        const schema = Joi.object({
-            name: Joi.string().max(255).required(),
-            level: Joi.number().integer().required(),
-            color: Joi.string().required(),
-            description: Joi.string().allow(null, '')
-        });
-
-        const { error, value } = schema.validate(req.body);
-
-        if (error) {
-            logger.error(`Error de validación en PriorityController->store: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        const { name, level, color, description } = req.body;
 
         try {
-            const priority = await Priority.create(value);
+            const priority = await Priority.create({
+                name: name,
+                description: description,
+                level: level,
+                color: color,
+            });
             return res.status(201).json({ msg: 'PriorityStoreOk', priority });
         } catch (error) {
             const errorMsg = error.details
@@ -78,21 +71,6 @@ const PriorityController = {
 
     async update(req, res) {
         logger.info(`${req.user.name} - Editando una prioridad`);
-
-        const schema = Joi.object({
-            id: Joi.number().required(),
-            name: Joi.string().max(255).optional(),
-            level: Joi.number().integer().optional(),
-            color: Joi.string().optional(),
-            description: Joi.string().allow(null).optional()
-        });
-
-        const { error } = schema.validate(req.body);
-
-        if (error) {
-            logger.error(`Error de validación en PriorityController->update: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const priority = await Priority.findByPk(req.body.id);
@@ -127,17 +105,6 @@ const PriorityController = {
 
     async destroy(req, res) {
         logger.info(`${req.user.name} - Eliminando una prioridad`);
-
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-
-        const { error } = schema.validate(req.body);
-
-        if (error) {
-            logger.error(`Error de validación en PriorityController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const priority = await Priority.findByPk(req.body.id);

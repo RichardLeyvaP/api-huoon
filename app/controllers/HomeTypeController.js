@@ -1,15 +1,6 @@
-const Joi = require('joi');
 const { HomeType, sequelize } = require('../models'); // Importar el modelo HomeType
 const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
-
-// Esquema de validación de Joi
-const schema = Joi.object({
-    name: Joi.string().max(255).optional(),
-    description: Joi.string().allow(null, ''),
-    icon: Joi.string().allow(null, ''),
-    id: Joi.number().optional(),
-});
 
 const HomeTypeController = {
     // Obtener todos los tipos de hogar
@@ -41,14 +32,14 @@ const HomeTypeController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea un nuevo tipo de hogar`);
 
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en HomeTypeController->store: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        const { name, description, icon } = req.body;
 
         try {
-            const homeType = await HomeType.create(value);
+            const homeType = await HomeType.create({
+                name: name,
+                description: description,
+                icon: icon,
+            });
             res.status(201).json({ msg: 'HomeTypeCreated', homeType });
         } catch (error) {
             const errorMsg = error.details
@@ -84,12 +75,6 @@ const HomeTypeController = {
     async update(req, res) {
         logger.info(`${req.user.name} - Editando un tipo de hogar`);
 
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en HomeTypeController->update: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-
         try {
             const homeType = await HomeType.findByPk(req.body.id);
             if (!homeType) {
@@ -97,15 +82,19 @@ const HomeTypeController = {
                 return res.status(404).json({ msg: 'HomeTypeNotFound' });
             }
 
-            // Filtra solo los campos que están presentes en el cuerpo de la solicitud
-            const updatedFields = Object.keys(req.body).reduce((acc, key) => {
-                if (key !== 'id' && req.body[key] !== undefined) {
-                    acc[key] = req.body[key];
-                }
-                return acc;
-            }, {});
+            const fieldsToUpdate = ['name', 'icon', 'description'];
 
-            await homeType.update(updatedFields);
+            const updatedData = Object.keys(req.body)
+                .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)
+                .reduce((obj, key) => {
+                    obj[key] = req.body[key];
+                    return obj;
+                }, {});
+
+            if (Object.keys(updatedData).length > 0) {
+                await homeType.update(updatedData);
+                logger.info(`Tipo de hogar actualizado exitosamente: ${homeType.name} (ID: ${homeType.id})`);
+            }
 
             res.status(200).json({ msg: 'HomeTypeUpdated', homeType });
 
@@ -122,12 +111,6 @@ const HomeTypeController = {
     // Eliminar un tipo de hogar
     async destroy(req, res) {
         logger.info(`${req.user.name} - Eliminando un tipo de hogar`);
-
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en HomeTypeController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const homeType = await HomeType.findByPk(req.body.id);
