@@ -14,6 +14,7 @@ const multerCategory = require('./middlewares/multerCategory');
 const validateSchema = require('./middlewares/validateSchema');
 const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
 const { registerSchema, loginSchema, updatePasswordSchema } = require('./middlewares/validations/authValidation');
+const { storeHomeSchema, updateHomeSchema, idHomeSchema } = require('./middlewares/validations/homeValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -168,10 +169,10 @@ router.post('/home-type-destroy', HomeTypeController.destroy);
 
 //Rutas Home
 router.get('/home', HomeController.index);
-router.post('/home', multerCategory('image', 'homes'), HomeController.store);
-router.post('/home-show', HomeController.show);
-router.post('/home-update', multerCategory('image', 'homes'), HomeController.update);
-router.post('/home-destroy', HomeController.destroy);
+router.post('/home', validateSchema(storeHomeSchema), multerCategory('image', 'homes'), HomeController.store);
+router.post('/home-show', validateSchema(idHomeSchema), HomeController.show);
+router.post('/home-update', validateSchema(updateHomeSchema), multerCategory('image', 'homes'), HomeController.update);
+router.post('/home-destroy', validateSchema(idHomeSchema), HomeController.destroy);
 
 //Rutas HomePerson
 router.get('/home-person', HomePersonController.index);

@@ -1,23 +1,9 @@
-const Joi = require('joi');
 const path = require('path');
 const fs = require('fs');
 const { Home, HomeType, Status, Person, Warehouse, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
 const { StatusService, RoleService } = require('../services');
-
-// Esquema de validación de Joi
-const schema = Joi.object({
-    name: Joi.string().max(255).allow(null, ''),
-    address: Joi.string().allow(null, ''),
-    home_type_id: Joi.number().integer().optional(),
-    residents: Joi.number().integer().default(1).allow(null),
-    geo_location: Joi.string().allow(null, ''),
-    timezone: Joi.string().allow(null, ''),
-    status_id: Joi.number().integer().optional(),
-    image: Joi.string().allow(null, ''),
-    id: Joi.number().optional(),
-});
 
 const HomeController = {
     // Obtener todas las casas
@@ -75,23 +61,18 @@ const HomeController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva casa`);
 
-        const { error, value } = schema.validate(req.body);
-
-        if (error) {
-            logger.error(`Error de validación en HomeController->store: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        const {name, address, home_type_id, residents, geo_location, timezone, status_id, image} = req.body;
 
          // Verificar si el tipo de hogar existe
-         const homeType = await HomeType.findByPk(value.home_type_id);
+         const homeType = await HomeType.findByPk(home_type_id);
          if (!homeType) {
-             logger.error(`HomeController->store: Typo de Hogar no encontrado con ID ${value.home_type_id}`);
+             logger.error(`HomeController->store: Typo de Hogar no encontrado con ID ${home_type_id}`);
              return res.status(404).json({ msg: 'TypeHomeNotFound' });
          }
          // Verificar si el estado exista
-         const status = await Status.findByPk(value.status_id);
+         const status = await Status.findByPk(status_id);
          if (!status) {
-             logger.error(`HomeController->store: Estado no encontrado con ID ${value.status_id}`);
+             logger.error(`HomeController->store: Estado no encontrado con ID ${status_id}`);
              return res.status(404).json({ msg: 'StatusNotFound' });
          }
 
@@ -99,13 +80,13 @@ const HomeController = {
         try {
             let filename = 'homes/default.jpg'; // Imagen por defecto
             const home = await Home.create({
-                name: value.name,
-                address: value.address,
-                home_type_id: value.home_type_id,
-                residents: value.residents,
-                geo_location: value.geo_location,
-                timezone: value.timezone,
-                status_id: value.status_id,
+                name: name,
+                address: address,
+                home_type_id: home_type_id,
+                residents: residents,
+                geo_location: geo_location,
+                timezone: timezone,
+                status_id: status_id,
                 image: filename,
             }, { transaction: t });
 
@@ -192,25 +173,27 @@ const HomeController = {
     async update(req, res) {
         logger.info(`${req.user.name} - Actualiza el home con ID ${req.body.id}`);
 
-        const { error, value } = schema.validate({...req.body});
-
-        if (error) {
-            logger.error(`Error de validación en HomeController->update: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
+        if (req.body.status_id !== undefined) {
+            // Verificar si el estado exista
+         const status = await Status.findByPk(req.body.status_id);
+         if (!status) {
+             logger.error(`HomeController->update: Estado no encontrado con ID ${req.body.status_id}`);
+             return res.status(404).json({ msg: 'StatusNotFound' });
+         }
         }
 
-        if (status_id) {
+        if (req.body.home_type_id !== undefined ) {
             // Verificar si el estado exista
-         const status = await Status.findByPk(value.status_id);
-         if (!status) {
-             logger.error(`HomeController->update: Estado no encontrado con ID ${value.status_id}`);
-             return res.status(404).json({ msg: 'StatusNotFound' });
+         const homeType = await HomeType.findByPk(req.body.home_type_id);
+         if (!homeType) {
+             logger.error(`HomeController->update: Tipo de hogar no encontrado con ID ${req.body.home_type_id}`);
+             return res.status(404).json({ msg: 'HomeTypeNotFound' });
          }
         }
 
         const t = await sequelize.transaction();
         try {
-            const home = await Home.findByPk(value.id);
+            const home = await Home.findByPk(req.body.id);
 
             if (!home) {
                 return res.status(404).json({ msg: 'HomeNotFound' });
@@ -271,18 +254,6 @@ const HomeController = {
     // Eliminar una casa
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina home con ID ${req.body.id}`);
-
-        // Validación de los datos con Joi
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-    
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en HomeController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         const t = await sequelize.transaction();
         try {
