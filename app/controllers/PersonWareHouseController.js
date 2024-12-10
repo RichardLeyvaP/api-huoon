@@ -1,18 +1,7 @@
 const { Op, Sequelize } = require('sequelize');
-const Joi = require('joi');
 const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, sequelize } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
-
-const schema = Joi.object({
-    title: Joi.string(),
-    description: Joi.string().allow(null).empty('').optional(),
-    location: Joi.string().allow(null).empty('').optional(),
-    status: Joi.number().integer().valid(0, 1, 2).default(0).allow(null).empty('').optional(),
-    home_id: Joi.number().integer().allow(null).empty('').optional(), // ID del hogar requerido al crear o actualizar
-    id: Joi.number().integer().allow(null).empty('').optional(), // ID del hogar requerido al crear o actualizar
-    warehouse_id: Joi.number().integer().allow(null).empty('').optional() // ID del almacén requerido al crear o actualizar
-});
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
