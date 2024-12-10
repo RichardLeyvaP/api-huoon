@@ -19,6 +19,9 @@ const { storeHomeTypeSchema, updateHomeTypeSchema, idHomeTypeSchema } = require(
 const { storePrioritySchema, updatePrioritySchema, idPrioritySchema } = require('./middlewares/validations/priorityValidation');
 const { storeRoleSchema, updateRoleSchema, idRoleSchema } = require('./middlewares/validations/roleValidation');
 const { storeStatusSchema, updateStatusSchema, idStatusSchema } = require('./middlewares/validations/statusValidation');
+const { storeHomePersonSchema, updateHomePersonSchema, idHomePersonSchema, assignPeopleSchema } = require('./middlewares/validations/homePersonValidation');
+const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = require('./middlewares/validations/warehouseValidation');
+const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -180,11 +183,11 @@ router.post('/home-destroy', validateSchema(idHomeSchema), HomeController.destro
 
 //Rutas HomePerson
 router.get('/home-person', HomePersonController.index);
-router.post('/home-person', HomePersonController.store);
-router.post('/home-people', HomePersonController.assignPeopleToHome);//Asociar a un hogar un array de [person_id, rol_id]
-router.post('/home-person-show', HomePersonController.show);
-router.put('/home-person',  HomePersonController.update);
-router.post('/home-person-destroy', HomePersonController.destroy);
+router.post('/home-person', validateSchema(storeHomePersonSchema), HomePersonController.store);
+router.post('/home-people', validateSchema(assignPeopleSchema), HomePersonController.assignPeopleToHome);//Asociar a un hogar un array de [person_id, rol_id]
+router.post('/home-person-show', validateSchema(idHomePersonSchema), HomePersonController.show);
+router.put('/home-person',  validateSchema(updateHomePersonSchema), HomePersonController.update);
+router.post('/home-person-destroy', validateSchema(idHomePersonSchema), HomePersonController.destroy);
 
 //Rutas Tareas
 router.get('/task', TaskController.index);
@@ -206,10 +209,10 @@ router.post('/home-person-task-destroy', HomePersonTaskController.destroy);
 
 //Rutas Almacenes
 router.get('/warehouse', WarehouseController.index);
-router.post('/warehouse', WarehouseController.store);
-router.post('/warehouse-show', WarehouseController.show);
-router.put('/warehouse', WarehouseController.update);
-router.post('/warehouse-destroy', WarehouseController.destroy);
+router.post('/warehouse', validateSchema(storeWareHouseSchema), WarehouseController.store);
+router.post('/warehouse-show', validateSchema(idWareHouseSchema), WarehouseController.show);
+router.put('/warehouse', validateSchema(updateWareHouseSchema), WarehouseController.update);
+router.post('/warehouse-destroy', validateSchema(idWareHouseSchema), WarehouseController.destroy);
 router.post('/get-warehouse', WarehouseController.getWarehouses);//devolver los alamcenes predeterminados 
 
 //Rutas Almacenes
@@ -221,11 +224,11 @@ router.post('/home-warehouse-destroy', HomeWareHouseController.destroy);
 
 //Rutas Almacenes
 router.get('/person-warehouse', PersonWareHouseController.index);
-router.post('/person-warehouse', PersonWareHouseController.store);
-router.post('/person-warehouse-show', PersonWareHouseController.show);
-router.put('/person-warehouse', PersonWareHouseController.update);
-router.post('/person-warehouse-destroy', PersonWareHouseController.destroy);
-router.post('/person-warehouse-home', PersonWareHouseController.getWarehouses); //devolver los almaces de una persona en un hogar dado
+router.post('/person-warehouse', validateSchema(storePersonWareHouseSchema), PersonWareHouseController.store);
+router.post('/person-warehouse-show', validateSchema(idPersonWareHouseSchema), PersonWareHouseController.show);
+router.put('/person-warehouse', validateSchema(updatePersonWareHouseSchema), PersonWareHouseController.update);
+router.post('/person-warehouse-destroy', validateSchema(idPersonWareHouseSchema), PersonWareHouseController.destroy);
+router.post('/person-warehouse-home', validateSchema(getWarehouseSchema), PersonWareHouseController.getWarehouses); //devolver los almaces de una persona en un hogar dado
 
 //Rutas Productos
 router.get('/product', ProductController.index);

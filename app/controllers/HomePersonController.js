@@ -1,24 +1,5 @@
-const Joi = require('joi');
 const { HomePerson, Home, Person, Role, sequelize } = require('../models');
 const logger = require('../../config/logger');
-
-// Esquema de validación de Joi
-const schema = Joi.object({
-    home_id: Joi.number().required(),
-    person_id: Joi.number().required(),
-    role_id: Joi.number().optional(),
-    id: Joi.number().optional(),
-});
-
-const assignPeopleSchema = Joi.object({
-    home_id: Joi.number().required(),
-    people: Joi.array().items(
-        Joi.object({
-            person_id: Joi.number().required(),
-            role_id: Joi.number().required()
-        })
-    ).required()
-});
 
 const HomePersonController = {
     // Obtener todas las relaciones Home-Person
@@ -56,14 +37,14 @@ const HomePersonController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva relación Home-Person`);
 
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en HomePersonController->store: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        const { home_id, person_id, role_id } = req.body;
 
         try {
-            const homePerson = await HomePerson.create(value);
+            const homePerson = await HomePerson.create({
+                home_id: home_id,
+                person_id: person_id,
+                role_id: role_id
+            });
             res.status(201).json({ msg: 'HomePersonCreated', homePerson });
         } catch (error) {
             const errorMsg = error.message || 'Error desconocido';
@@ -75,18 +56,6 @@ const HomePersonController = {
     // Obtener una relación específica Home-Person por ID
     async show(req, res) {
         logger.info(`${req.user.name} - Busca la relación Home-Person con ID: ${req.body.id}`);
-
-        // Validación de los datos con Joi
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-    
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en HomePersonController->show: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const homePerson = await HomePerson.findByPk(req.body.id, {
@@ -121,12 +90,6 @@ const HomePersonController = {
     // Actualizar una relación Home-Person
     async update(req, res) {
         logger.info(`${req.user.name} - Editando una relación Home-Person`);
-
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`Error de validación en HomePersonController->update: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const homePerson = await HomePerson.findByPk(req.body.id);
@@ -165,15 +128,9 @@ const HomePersonController = {
     },
 
     async assignPeopleToHome(req, res) {
-        // Validar los datos de entrada con Joi
-        const { error, value } = assignPeopleSchema.validate(req.body);
-        
-        if (error) {
-            logger.error(`Error de validación en assignPeopleToHome: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
+        logger.info(`${req.user.name} - entra a asociar varias personas a un hogar`);
 
-        const { home_id, people } = value; // Extraer valores validados
+        const { home_id, people } = req.body; // Extraer valores validados
 
         try {
             const home = await Home.findByPk(home_id);

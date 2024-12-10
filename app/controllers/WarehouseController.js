@@ -1,17 +1,6 @@
-// controllers/WarehouseController.js
-const Joi = require('joi');
 const { Warehouse } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
-
-const schema = Joi.object({
-    title: Joi.string().required(),
-    description: Joi.string().allow(null, '').empty(''),
-    location: Joi.string().allow(null, '').empty(''),
-    status: Joi.number().integer().valid(0, 1).default(0),
-    id: Joi.number().optional(),
-});
-
 
 const WarehouseController =  {
     // Listar todos los almacenes
@@ -34,19 +23,15 @@ const WarehouseController =  {
     // Crear un nuevo almacén
     async store(req, res) {
         logger.info(`${req.user.name} - Crea un nuevo almacén`);
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            const errorMsg = error.details.map(detail => detail.message).join(', ');
-            logger.error('Error en WarehouseController->store: ' + errorMsg);
-            return res.status(400).json({ error: 'ValidationError', details: errorMsg });
-        }
 
+        const { title, description, location, status } = req.body;
+   
         try {
             const warehouse = await Warehouse.create({
-                title: value.title,
-                description: value.description,
-                location: value.location,
-                status: value.status
+                title: title,
+                description: description,
+                location: location,
+                status: status
             });
             res.status(201).json({ warehouse });
         } catch (error) {
@@ -61,17 +46,7 @@ const WarehouseController =  {
     // Ver detalles de un almacén específico
     async show(req, res) {
         logger.info(`${req.user.name} - Entra a buscar un almacén`);
-         // Validación de los datos con Joi
-         const schema = Joi.object({
-            id: Joi.number().required()
-        });
-    
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en WareHouseController->show: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
+   
         try {
             const warehouse = await Warehouse.findByPk(req.body.id, {
                 attributes: ['id', 'title', 'description', 'location', 'status']
@@ -93,12 +68,6 @@ const WarehouseController =  {
     // Actualizar un almacén
     async update(req, res) {
         logger.info(`${req.user.name} - Edita un almacén`);
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            const errorMsg = error.details.map(detail => detail.message).join(', ');
-            logger.error('Error en WarehouseController->update: ' + errorMsg);
-            return res.status(400).json({ error: 'ValidationError', details: errorMsg });
-        }
 
         try {
             const warehouse = await Warehouse.findByPk(req.body.id);
@@ -132,17 +101,6 @@ const WarehouseController =  {
     // Eliminar un almacén
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina un almacén`);
-
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-
-        const { error } = schema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en WareHouseController->destroy: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
 
         try {
             const warehouse = await Warehouse.findByPk(req.body.id);
