@@ -48,41 +48,13 @@ module.exports = (sequelize, DataTypes) => {
     type: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 'Sisyema',
+      defaultValue: 'Sistema',
     },
   }, {
     sequelize,
     modelName: 'Role',
     tableName: 'roles', // Nombre de la tabla
-    timestamps: true/*,
-    hooks: {
-      afterCreate: async (role, options) => {
-          try {
-              const userId = getUserId();              
-              logger.info('userId de hooks');
-              logger.info(userId);
-              await ActivityService.createActivityLog('Role', role.id, 'create', role.dataValues, userId);
-          } catch (error) {
-            logger.error('Error logging activity after create:', error);
-          }
-      },
-      afterUpdate: async (role, options) => {
-          try {
-              const userId = getUserId();
-              await ActivityService.createActivityLog('Role', role.id, 'update', role.dataValues, userId);
-          } catch (error) {
-            logger.error('Error logging activity after update:', error);
-          }
-      },
-      afterDestroy: async (role, options) => {
-          try {
-              const userId = getUserId();
-              await ActivityService.createActivityLog('Role', role.id, 'delete', role.dataValues, userId);
-          } catch (error) {
-              logger.error('Error logging activity after destroy:', error);
-          }
-      },
-  },*/
+    timestamps: true
 });
 
   return Role;
