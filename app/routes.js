@@ -22,6 +22,7 @@ const { storeStatusSchema, updateStatusSchema, idStatusSchema } = require('./mid
 const { storeHomePersonSchema, updateHomePersonSchema, idHomePersonSchema, assignPeopleSchema } = require('./middlewares/validations/homePersonValidation');
 const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = require('./middlewares/validations/warehouseValidation');
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
+const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -127,10 +128,10 @@ router.put('/configuration', ConfigurationController.update);
 
 //Rutas Personas
 router.get('/person', PersonController.index);
-router.post('/person-show', PersonController.show);
-router.post('/person', upload, PersonController.store);
-router.post('/person-update', upload, PersonController.update);
-router.post('/person-destroy', PersonController.destroy);
+router.post('/person-show', validateSchema(idPersonSchema), PersonController.show);
+router.post('/person', validateSchema(storePersonSchema), multerCategory('image', 'people'), PersonController.store);
+router.post('/person-update', validateSchema(updatePersonSchema), multerCategory('image', 'people'), PersonController.update);
+router.post('/person-destroy', validateSchema(idPersonSchema), PersonController.destroy);
 
 //Rutas Statuses
 router.get('/status', StatusController.index);
