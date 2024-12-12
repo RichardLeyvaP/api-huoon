@@ -23,6 +23,7 @@ const { storeHomePersonSchema, updateHomePersonSchema, idHomePersonSchema, assig
 const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = require('./middlewares/validations/warehouseValidation');
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
+const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -201,11 +202,11 @@ router.post('/task-destroy', TaskController.destroy);
 
 //Rutas PersonTask
 router.get('/home-person-task', HomePersonTaskController.index);
-router.post('/home-person-task', HomePersonTaskController.store);
-router.post('/task-people-home', HomePersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
-router.post('/home-person-task-show', HomePersonTaskController.show);
-router.put('/home-person-task',  HomePersonTaskController.update);
-router.post('/home-person-task-destroy', HomePersonTaskController.destroy);
+router.post('/home-person-task', validateSchema(storeHomePersonTaskSchema), HomePersonTaskController.store);
+router.post('/task-people-home', validateSchema(assignPeopleTaskSchema), HomePersonTaskController.assignPeopleToTask);//Asociar a un hogar un array de [person_id, rol_id]
+router.post('/home-person-task-show', validateSchema(idHomePersonTaskSchema), HomePersonTaskController.show);
+router.put('/home-person-task',  validateSchema(updateHomePersonTaskSchema), HomePersonTaskController.update);
+router.post('/home-person-task-destroy', validateSchema(idHomePersonTaskSchema), HomePersonTaskController.destroy);
 
 
 //Rutas Almacenes

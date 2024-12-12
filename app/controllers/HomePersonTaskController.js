@@ -4,7 +4,7 @@ const logger = require('../../config/logger');
 const ActivityLogService = require('../services/ActivityLogService');
 
 // Esquema de validación para PersonTask
-const schema = Joi.object({
+/*const schema = Joi.object({
     person_id: Joi.number().required(),
     task_id: Joi.number().required(),
     role_id: Joi.number().optional(),
@@ -21,7 +21,7 @@ const assignPeopleSchema = Joi.object({
             home_id: Joi.number().required()
         })
     ).required()
-});
+});*/
 
 const HomePersonTaskController = {
     // Obtener todas las relaciones Person-Task
@@ -60,14 +60,59 @@ const HomePersonTaskController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva relación Home-Person-Task`);
 
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            logger.error(`HomePersonTaskController->store - Error de validación: ${error.details.map(e => e.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
+        const { person_id, task_id, role_id, home_id } = req.body;
+
+        // Verificar si la persona existe
+        const person = await Person.findByPk(person_id);
+        if (!person) {
+            logger.error(`HomePersonTaskController->store: Persona no encontrada con ID ${person_id}`);
+            return res.status(400).json({ msg: 'PersonNotFound' });
+        }
+
+        // Verificar si la tarea existe
+        const task = await Task.findByPk(task_id);
+        if (!task) {
+            logger.error(`HomePersonTaskController->store: Tarea no encontrada con ID ${task_id}`);
+            return res.status(400).json({ msg: 'TaskNotFound' });
+        }
+
+        // Verificar si el rol existe (si role_id está presente)
+        const role = await Role.findByPk(role_id);
+        if (!role) {
+            logger.error(`HomePersonTaskController->store: Rol no encontrado con ID ${role_id}`);
+            return res.status(400).json({ msg: 'RoleNotFound' });
+        }    
+
+        // Verificar si el hogar existe (si home_id está presente)
+        const home = await Home.findByPk(home_id);
+        if (!home) {
+            logger.error(`HomePersonTaskController->store: Hogar no encontrado con ID ${home_id}`);
+            return res.status(400).json({ msg: 'HomeNotFound' });
         }
 
         try {
-            const homePersonTask = await HomePersonTask.create(value);
+            const homePersonTask = await HomePersonTask.create(req.body);
+
+            const associationsData = [];
+            associationsData.push({
+                person_id,
+                role_id,
+                home_id,
+                association_id: homePersonTask.id
+            });
+
+             // Registrar la tarea y las asociaciones en el log de actividades
+             const activityData = {
+                task,
+                associations: associationsData
+            };
+            await ActivityLogService.createActivityLog(
+                'TaskWithAssociations',
+                task.id,
+                'create',
+                req.user.id,
+                JSON.stringify(activityData)
+            );
             res.status(201).json({ msg: 'HomePersonTaskCreated', homePersonTask });
         } catch (error) {
             logger.error(`HomeHomePersonTaskController->store: ${error.message}`);
@@ -78,18 +123,7 @@ const HomePersonTaskController = {
     // Obtener una relación específica Person-Task por ID
     async show(req, res) {
         logger.info(`${req.user.name} - Busca la relación Home-Person-Task con ID: ${req.body.id}`);
-        
-        // Validación de los datos con Joi
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-
-        const { error } = schema.validate({ id: req.body.id });
-        if (error) {
-            logger.error(`HomePersonTaskController->show - Error de validación: ${error.details.map(e => e.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-
+   
         try {
             const homePersonTask = await HomePersonTask.findByPk(req.body.id, {
                 include: [
@@ -110,7 +144,7 @@ const HomePersonTaskController = {
                 roleId: homePersonTask.role?.id,
                 roleName: homePersonTask.role?.name
             };
-
+            
             res.status(200).json({ homePersonTask: mappedHomePersonTask });
         } catch (error) {
             logger.error(`HomePersonTaskController->show: ${error.message}`);
@@ -122,18 +156,64 @@ const HomePersonTaskController = {
     async update(req, res) {
         logger.info(`${req.user.name} - Actualiza una relación Home-Person-Task`);
 
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`HomePersonTaskController->update - Error de validación: ${error.details.map(e => e.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
+        const { person_id, task_id, role_id, home_id } = req.body;
+         // Verificar si la persona existe (si person_id está presente)
+        if (person_id) {
+            const person = await Person.findByPk(person_id);
+            if (!person) {
+                logger.error(`HomePersonTaskController->update: Persona no encontrada con ID ${person_id}`);
+                return res.status(404).json({ msg: 'PersonNotFound' });
+            }
+        }
+
+        // Verificar si la tarea existe (si task_id está presente)
+        if (task_id) {
+            const task = await Task.findByPk(task_id);
+            if (!task) {
+                logger.error(`HomePersonTaskController->update: Tarea no encontrada con ID ${task_id}`);
+                return res.status(404).json({ msg: 'TaskNotFound' });
+            }
+        }
+
+        // Verificar si el rol existe (si role_id está presente)
+        if (role_id) {
+            const role = await Role.findByPk(role_id);
+            if (!role) {
+                logger.error(`HomePersonTaskController->update: Rol no encontrado con ID ${role_id}`);
+                return res.status(404).json({ msg: 'RoleNotFound' });
+            }
+        }
+
+        // Verificar si el hogar existe (si home_id está presente)
+        if (home_id) {
+            const home = await Home.findByPk(home_id);
+            if (!home) {
+                logger.error(`HomePersonTaskController->update: Hogar no encontrado con ID ${home_id}`);
+                return res.status(404).json({ msg: 'HomeNotFound' });
+            }
         }
 
         try {
-            const homepersonTask = await HomePersonTask.findByPk(req.body.id);
-            if (!homepersonTask) return res.status(404).json({ msg: 'HomePersonTaskNotFound' });
+            const homePersonTask = await HomePersonTask.findByPk(req.body.id);
+            if (!homePersonTask) return res.status(404).json({ msg: 'HomePersonTaskNotFound' });
 
-            await homepersonTask.update(req.body);
-            res.status(200).json({ msg: 'HomePersonTaskUpdated', homepersonTask });
+            // Definir los campos que se pueden actualizar
+        const fieldsToUpdate = ['person_id', 'task_id', 'role_id', 'home_id'];
+
+        // Filtrar los campos que están presentes en req.body y que son válidos
+        const updatedData = Object.keys(req.body)
+            .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)
+            .reduce((obj, key) => {
+                obj[key] = req.body[key];
+                return obj;
+            }, {});
+
+        // Si hay datos para actualizar, realizamos la actualización
+        if (Object.keys(updatedData).length > 0) {
+            await homePersonTask.update(updatedData);
+            logger.info(`HomePersonTask actualizado exitosamente: ${homePersonTask.id}`);
+        }
+            res.status(200).json({ msg: 'HomePersonTaskUpdated', homePersonTask });
         } catch (error) {
             logger.error(`HomePersonTaskController->update: ${error.message}`);
             res.status(500).json({ error: 'ServerError', details: error.message });
@@ -143,17 +223,7 @@ const HomePersonTaskController = {
     // Eliminar una relación Person-Task
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina una relación Home-Person-Task`);
-        // Validación de los datos con Joi
-        const schema = Joi.object({
-            id: Joi.number().required()
-        });
-
-        const { error } = schema.validate(req.body);
-        if (error) {
-            logger.error(`HomePersonTaskController->destroy - Error de validación: ${error.details.map(e => e.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(err => err.message) });
-        }
-
+   
         try {
             const homepersonTask = await HomePersonTask.findByPk(req.body.id);
             if (!homepersonTask) return res.status(404).json({ msg: 'PersonTaskNotFound' });
@@ -167,15 +237,9 @@ const HomePersonTaskController = {
     },
 
     async assignPeopleToTask(req, res) {
-        // Validar los datos de entrada con Joi
-        const { error, value } = assignPeopleSchema.validate(req.body);
-    
-        if (error) {
-            logger.error(`Error de validación en assignPeopleToTask: ${error.details.map(err => err.message).join(', ')}`);
-            return res.status(400).json({ msg: error.details.map(detail => detail.message) });
-        }
-    
-        const { task_id, people } = value; // Extraer valores validados
+        logger.info(`${req.user.name} - Crea una nueva relación Home-People-Task`);
+     
+        const { task_id, people } = req.body; // Extraer valores validados
     
         // Iniciar transacción
         const t = await sequelize.transaction();
