@@ -2,6 +2,8 @@ const { Op, Sequelize } = require('sequelize');
 const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, sequelize } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
+const { PersonWareHouseRepository, HomeRepository } = require('../repositories');
+const WarehouseRepository = require('../repositories/WareHouseRepository');
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
@@ -10,23 +12,10 @@ const PersonWarehouseController = {
     
         try {
             // Obtener todas las asociaciones entre personas y almacenes con los datos de la tabla pivote
-            const personWarehouses = await PersonWarehouse.findAll({
-                include: [
-                    {
-                        model: Person,
-                        as: 'person', // Asociación con el modelo Person
-                        attributes: ['id', 'name'] // Ajusta los atributos de Person que quieres devolver
-                    },
-                    {
-                        model: Warehouse,
-                        as: 'warehouse', // Asociación con el modelo Warehouse
-                        attributes: ['id', 'title', 'description', 'location', 'status'] // Ajusta los atributos de Warehouse según sea necesario
-                    }
-                ]
-            });
+            const personWarehouses = await PersonWareHouseRepository.findAll();
     
             if (!personWarehouses.length) {
-                return res.status(404).json({ msg: 'No associations found', personWarehouses: personWarehouses });
+                return res.status(400).json({ msg: 'No associations found', personWarehouses: personWarehouses });
             }
     
             // Devuelve las asociaciones de personas y almacenes con los datos de la tabla pivote
@@ -60,7 +49,7 @@ const PersonWarehouseController = {
         const { home_id, warehouse_id, title, description, location, status } = req.body;
         const person_id = req.person.id;
         // Verificar si el hogar existe
-        const home = await Home.findByPk(home_id);
+        const home = await HomeRepository.findById(home_id);
         if (!home) {
             logger.error(`PersonWarehouseController->store: Hogar no encontrado con ID ${home_id}`);
             return res.status(404).json({ msg: 'HomeNotFound' });
@@ -84,7 +73,7 @@ const PersonWarehouseController = {
         // Buscar o crear el almacén según `warehouse_id`
         let warehouse;
         if (warehouse_id !== undefined) {
-            warehouse = await Warehouse.findByPk(warehouse_id);
+            warehouse = await WarehouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
                 return res.status(404).json({ msg: 'WarehouseNotFound' });
@@ -93,43 +82,11 @@ const PersonWarehouseController = {
         // Iniciar una transacción
         const t = await sequelize.transaction();
         try {        
-            if (!warehouse) {    
-                logger.info('PersonWarehouseController->store: Creando nuevo almacén');
-                warehouse = await Warehouse.create({
-                    title: title,
-                    description: description,
-                    location: location,
-                    status: 0 // Estado por defecto 0 para nuevos almacenes no asociados
-                }, { transaction: t });
-            }
-    
-            // Asociar el almacén a la persona dentro del hogar en `person_warehouse`
-            const [personWarehouse, created] = await PersonWarehouse.findOrCreate({
-                where: {
-                    person_id: person_id,
-                    warehouse_id: warehouse.id,
-                    home_id: home_id // Relacionamos con el hogar correcto
-                },
-                defaults: {
-                    title: title || warehouse.title,
-                    description: description || warehouse.description,
-                    location: location || warehouse.location,
-                    status: status !== undefined ? status : 0,
-                },
-                transaction: t
-            });
+            const personWareHouse = await PersonWareHouseRepository.create(req.body, warehouse, person_id, t);
             // Confirmar la transacción
             await t.commit();
     
-            // Obtener la relación actualizada desde `PersonWarehouse`
-            const updatedPersonWarehouse = await PersonWarehouse.findOne({
-                where: {
-                    home_id: home_id,
-                    person_id: person_id,
-                    warehouse_id: warehouse.id
-                }
-            });
-            res.status(201).json({ personWarehouse: updatedPersonWarehouse });
+            res.status(201).json({ personWarehouse: personWareHouse });
     
         } catch (error) {
             // Hacer rollback en caso de error
@@ -187,13 +144,13 @@ const PersonWarehouseController = {
              
         const {id, warehouse_id, home_id, title, description, location, status } = req.body;
 
-        const personWarehouse = await PersonWarehouse.findByPk(id);
+        const personWarehouse = await PersonWareHouseRepository.findById(id);
         if (!personWarehouse) {
             logger.error(`PersonWarehouseController->update: Almacén no encontrado con ID ${id}`);
             return res.status(204).json({ msg: 'HomeNotFound' });
         }
         // Verificar si el hogar existe
-        const home = await Home.findByPk(home_id);
+        const home = await HomeRepository.findById(home_id);
         if (!home) {
             logger.error(`PersonWarehouseController->update: Hogar no encontrado con ID ${home_id}`);
             return res.status(204).json({ msg: 'HomeNotFound' });
@@ -217,7 +174,7 @@ const PersonWarehouseController = {
 
         let warehouse;
         if (warehouse_id !== undefined) {
-            warehouse = await Warehouse.findByPk(warehouse_id);
+            warehouse = await WarehouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
                 return res.status(404).json({ msg: 'WarehouseNotFound' });
@@ -280,7 +237,7 @@ const PersonWarehouseController = {
         logger.info('datos recibidos al eliminar un almacen');
         logger.info(JSON.stringify(req.body));
 
-        const personWarehouse = await PersonWarehouse.findByPk(req.body.id);
+        const personWarehouse = await PersonWareHouseRepository.findById(req.body.id);
         if (!personWarehouse) {
             logger.error(`PersonWarehouseController->update: Almacén no encontrado con ID ${req.body.id}`);
             return res.status(204).json({ msg: 'PersonWareHouseNotFound' });
@@ -288,15 +245,15 @@ const PersonWarehouseController = {
         // Iniciar una nueva transacción para asegurar que todo se haga correctamente
         const t = await sequelize.transaction();
         try {    
-                const warehouse = await Warehouse.findByPk(personWarehouse.warehouse_id);
+                const warehouse = await WarehouseRepository.findById(personWarehouse.warehouse_id);
     
                 // Eliminar la relación entre la persona, el hogar y el almacén
-                await personWarehouse.destroy({ transaction: t });
+                const personWareHouseDelete = await PersonWareHouseRepository(personWarehouse, t);
                 
                 // Si el almacén tiene estado 0, también eliminarlo de la tabla `warehouses`
                 if (warehouse.status === 0) {
                     logger.info(`PersonWarehouseController->destroy: El almacén tiene estado 0, eliminando de la tabla warehouses`);
-                    await warehouse.destroy({ transaction: t });
+                    await WarehouseRepository.delete();
                 }
     
                 // Confirmar la transacción

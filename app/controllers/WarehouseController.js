@@ -39,7 +39,7 @@ const WarehouseController =  {
         logger.info(`${req.user.name} - Entra a buscar un almacén`);
    
         try {
-            const warehouse = await WarehouseRepository.findById(req.body.id);
+            const warehouse = await WareHouseRepository.findById(req.body.id);
 
             if (!warehouse) {
                 return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
@@ -59,7 +59,7 @@ const WarehouseController =  {
         logger.info(`${req.user.name} - Edita un almacén`);
 
         try {
-            const warehouse = await WarehouseRepository.findById(req.body.id);
+            const warehouse = await WareHouseRepository.findById(req.body.id);
             if (!warehouse) {
                 return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
             }
@@ -80,7 +80,7 @@ const WarehouseController =  {
         logger.info(`${req.user.name} - Elimina un almacén`);
 
         try {
-            const warehouse = await WarehouseRepository.findById(req.body.id);
+            const warehouse = await WareHouseRepository.findById(req.body.id);
             if (!warehouse) {
                 return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
             }
@@ -99,7 +99,7 @@ const WarehouseController =  {
     async getWarehouses(req, res) {
         logger.info('Entra a Buscar Los alamcenes en (WareHouseController-getWarehouses)');
         try {
-            const warehouses = await WarehouseRepository.findByStatus(id);
+            const warehouses = await WareHouseRepository.findByStatus(id);
     
             const warehouseMap = warehouses.map(warehouse => {
                 return {
