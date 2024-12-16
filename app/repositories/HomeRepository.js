@@ -1,7 +1,6 @@
 const { Op } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
-const i18n = require('../../config/i18n-config');
 const { Home, HomeType, Status } = require('../models');
 const logger = require('../../config/logger'); // Logger para seguimiento
 
