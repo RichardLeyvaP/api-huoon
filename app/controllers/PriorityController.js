@@ -1,19 +1,18 @@
-const Joi = require('joi');
-const { Priority } = require('../models'); // Importar el modelo Priority
 const logger = require('../../config/logger'); // Importa el logger
+const { PriorityRepository } = require('../repositories');
 
 const PriorityController = {
     async index(req, res) {
         logger.info(`${req.user.name} - Entra a buscar las prioridades`);
 
         try {
-            const priorities = await Priority.findAll();
+            const priorities = await PriorityRepository.findAll();
 
             if (!priorities.length) {
                 return res.status(204).json({ msg: 'PriorityNotFound' });
             }
 
-            res.status(200).json({ priorities });
+            res.status(200).json({ 'priorities': priorities });
         } catch (error) {
             const errorMsg = error.details
                 ? error.details.map(detail => detail.message).join(', ')
@@ -29,13 +28,13 @@ const PriorityController = {
         logger.info(`${req.user.name} - Entra a buscar la prioridad con ID: ${priorityId}`);
 
         try {
-            const priority = await Priority.findOne({ where: { id: priorityId } });
+            const priority = await PriorityRepository.findById(req.body.id);
 
             if (!priority) {
                 return res.status(404).json({ msg: 'PriorityNotFound' });
             }
 
-            res.status(200).json({ priority });
+            res.status(200).json({ 'priority': priority });
         } catch (error) {
             const errorMsg = error.details
                 ? error.details.map(detail => detail.message).join(', ')
@@ -49,15 +48,8 @@ const PriorityController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea una nueva prioridad`);
 
-        const { name, level, color, description } = req.body;
-
         try {
-            const priority = await Priority.create({
-                name: name,
-                description: description,
-                level: level,
-                color: color,
-            });
+            const priority = await PriorityRepository.create(req.body);
             return res.status(201).json({ msg: 'PriorityStoreOk', priority });
         } catch (error) {
             const errorMsg = error.details
@@ -73,27 +65,15 @@ const PriorityController = {
         logger.info(`${req.user.name} - Editando una prioridad`);
 
         try {
-            const priority = await Priority.findByPk(req.body.id);
+            const priority = await PriorityRepository.findById(req.body.id);
             if (!priority) {
                 logger.error(`PriorityController->update: Prioridad no encontrada con ID ${req.body.id}`);
                 return res.status(404).json({ msg: 'PriorityNotFound' });
             }
 
-            const fieldsToUpdate = ['name', 'level', 'color', 'description'];
+            const priorityUpdate = await PriorityRepository.update(priority, req.body);
 
-            const updatedData = Object.keys(req.body)
-                .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)
-                .reduce((obj, key) => {
-                    obj[key] = req.body[key];
-                    return obj;
-                }, {});
-
-            if (Object.keys(updatedData).length > 0) {
-                await priority.update(updatedData);
-                logger.info(`Prioridad actualizada exitosamente: ${priority.name} (ID: ${priority.id})`);
-            }
-
-            res.status(200).json({ msg: 'PriorityUpdated', priority });
+            res.status(200).json({ msg: 'PriorityUpdated', priorityUpdate });
         } catch (error) {
             const errorMsg = error.details
                 ? error.details.map(detail => detail.message).join(', ')
@@ -107,14 +87,14 @@ const PriorityController = {
         logger.info(`${req.user.name} - Eliminando una prioridad`);
 
         try {
-            const priority = await Priority.findByPk(req.body.id);
+            const priority = await PriorityRepository.findById(req.body.id);
             if (!priority) {
                 logger.error(`PriorityController->destroy: Prioridad no encontrada con ID ${req.body.id}`);
                 return res.status(404).json({ msg: 'PriorityNotFound' });
             }
-
-            await priority.destroy();
+            
             logger.info(`Prioridad eliminada exitosamente: ${priority.name} (ID: ${priority.id})`);
+            const priorityDelete = await PriorityRepository.delete(priority);
 
             res.status(200).json({ msg: 'PriorityDeleted' });
         } catch (error) {

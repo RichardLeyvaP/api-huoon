@@ -1,6 +1,7 @@
 const { HomeType, sequelize } = require('../models'); // Importar el modelo HomeType
 const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
+const { HomeTypeRepository } = require('../repositories');
 
 const HomeTypeController = {
     // Obtener todos los tipos de hogar
@@ -8,7 +9,7 @@ const HomeTypeController = {
         logger.info(`${req.user.name} - Entra a buscar los tipos de hogar`);
 
         try {
-            const homeTypes = await HomeType.findAll();
+            const homeTypes = await HomeTypeRepository.findAll();
             const homeTypesMap = homeTypes.map(homeType => {
                 return{
                     id: homeType.id,
@@ -32,14 +33,8 @@ const HomeTypeController = {
     async store(req, res) {
         logger.info(`${req.user.name} - Crea un nuevo tipo de hogar`);
 
-        const { name, description, icon } = req.body;
-
-        try {
-            const homeType = await HomeType.create({
-                name: name,
-                description: description,
-                icon: icon,
-            });
+         try {
+            const homeType = await HomeTypeRepository.create(req.body);
             res.status(201).json({ msg: 'HomeTypeCreated', homeType });
         } catch (error) {
             const errorMsg = error.details
@@ -56,9 +51,9 @@ const HomeTypeController = {
         logger.info(`${req.user.name} - Entra a buscar el tipo de hogar con ID: ${req.body.id}`);
 
         try {
-            const homeType = await HomeType.findByPk(req.body.id);
+            const homeType = await HomeTypeRepository.findById(req.body.id);
             if (!homeType) {
-                return res.status(404).json({ msg: 'HomeTypeNotFound' });
+                return res.status(400).json({ msg: 'HomeTypeNotFound' });
             }
             res.status(200).json({ 'homeTypes': [homeType] });
         } catch (error) {
@@ -76,27 +71,15 @@ const HomeTypeController = {
         logger.info(`${req.user.name} - Editando un tipo de hogar`);
 
         try {
-            const homeType = await HomeType.findByPk(req.body.id);
+            const homeType = await HomeTypeRepository.findById(req.body.id);
             if (!homeType) {
                 logger.error(`HomeTypeController->update: Tipo de hogar no encontrado con ID ${req.body.id}`);
-                return res.status(404).json({ msg: 'HomeTypeNotFound' });
+                return res.status(400).json({ msg: 'HomeTypeNotFound' });
             }
 
-            const fieldsToUpdate = ['name', 'icon', 'description'];
+            const homeTypeUodate = await HomeTypeRepository.update(homeType, req.body)
 
-            const updatedData = Object.keys(req.body)
-                .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)
-                .reduce((obj, key) => {
-                    obj[key] = req.body[key];
-                    return obj;
-                }, {});
-
-            if (Object.keys(updatedData).length > 0) {
-                await homeType.update(updatedData);
-                logger.info(`Tipo de hogar actualizado exitosamente: ${homeType.name} (ID: ${homeType.id})`);
-            }
-
-            res.status(200).json({ msg: 'HomeTypeUpdated', homeType });
+            res.status(200).json({ msg: 'HomeTypeUpdated', homeTypeUodate });
 
         } catch (error) {
             const errorMsg = error.details
@@ -113,13 +96,13 @@ const HomeTypeController = {
         logger.info(`${req.user.name} - Eliminando un tipo de hogar`);
 
         try {
-            const homeType = await HomeType.findByPk(req.body.id);
+            const homeType = await HomeTypeRepository.findById(req.body.id);
             if (!homeType) {
                 logger.error(`HomeTypeController->destroy: Tipo de hogar no encontrado con ID ${req.body.id}`);
                 return res.status(404).json({ msg: 'HomeTypeNotFound' });
             }
 
-            await homeType.destroy();
+            const homeTypeDelete = await HomeTypeRepository.delete(homeType);
             res.status(200).json({ msg: 'HomeTypeDeleted' });
 
         } catch (error) {

@@ -1,9 +1,8 @@
-const path = require('path');
-const fs = require('fs');
-const { Home, HomeType, Status, Person, Warehouse, sequelize } = require('../models');  // Importar el modelo Home
+const { Person, sequelize } = require('../models');  // Importar el modelo Home
 const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
 const { StatusService, RoleService } = require('../services');
+const { HomeRepository, HomeTypeRepository, StatusRepository, WareHouseRepository } = require('../repositories');
 
 const HomeController = {
     // Obtener todas las casas
@@ -11,18 +10,7 @@ const HomeController = {
         logger.info(`${req.user.name} - Entra a buscar las casas`);
 
         try {
-            const homes = await Home.findAll({
-                attributes: ['id', 'name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status_id', 'image'],
-                include: [{
-                    model: HomeType,
-                    as: 'homeType',
-                    attributes: ['id', 'name'],
-                },{
-                    model: Status,
-                    as: 'status',
-                    attributes: ['id', 'name'],
-                }],
-            });
+            const homes = await HomeRepository.findAll();
 
             if (!homes.length) {
                 return res.status(204).json({ msg: 'HomesNotFound' });
@@ -64,13 +52,13 @@ const HomeController = {
         const {name, address, home_type_id, residents, geo_location, timezone, status_id, image} = req.body;
 
          // Verificar si el tipo de hogar existe
-         const homeType = await HomeType.findByPk(home_type_id);
+         const homeType = await HomeTypeRepository.findById(home_type_id);
          if (!homeType) {
              logger.error(`HomeController->store: Typo de Hogar no encontrado con ID ${home_type_id}`);
              return res.status(404).json({ msg: 'TypeHomeNotFound' });
          }
          // Verificar si el estado exista
-         const status = await Status.findByPk(status_id);
+         const status = await StatusRepository.findById(status_id);
          if (!status) {
              logger.error(`HomeController->store: Estado no encontrado con ID ${status_id}`);
              return res.status(404).json({ msg: 'StatusNotFound' });
@@ -78,37 +66,8 @@ const HomeController = {
 
         const t = await sequelize.transaction();
         try {
-            let filename = 'homes/default.jpg'; // Imagen por defecto
-            const home = await Home.create({
-                name: name,
-                address: address,
-                home_type_id: home_type_id,
-                residents: residents,
-                geo_location: geo_location,
-                timezone: timezone,
-                status_id: status_id,
-                image: filename,
-            }, { transaction: t });
-
-            // Manejo del archivo de icono (si se ha subido)
-            if (req.file) {
-                const extension = path.extname(req.file.originalname);
-                const newFilename = `homes/${home.id}${extension}`;
-                
-                try {
-                    // Mover el archivo a la carpeta pública
-                    const oldPath = req.file.path;
-                    const newPath = path.join(__dirname, '..', '..', 'public', newFilename);
             
-                    await fs.promises.rename(oldPath, newPath); // Usa await para esperar hasta que se mueva
-            
-                    // Actualizar el registro con la ruta del archivo
-                    await home.update({ image: newFilename }, { transaction: t });
-                } catch (err) {
-                    logger.error('Error al mover la imagen: ' + err.message);
-                    throw new Error('Error al mover la imagen'); // Esto permitirá que el catch lo maneje y haga rollback
-                }
-            }
+            const home = await HomeRepository.create(req.body, req.file, t);
             await t.commit();
             res.status(201).json({ home });
         } catch (error) {
@@ -127,18 +86,7 @@ const HomeController = {
         const id = req.body.id; // Asegúrate de convertir a número
         
         try {
-            const home = await Home.findOne({
-                where: { id },
-                include: [{
-                    model: HomeType,
-                    as: 'homeType',
-                    attributes: ['id', 'name'],
-                },{
-                    model: Status,
-                    as: 'status',
-                    attributes: ['id', 'name'],
-                }],
-            });
+            const home = await HomeRepository.findById(req.body.id);
     
             if (!home) {
                 return res.status(404).json({ msg: 'HomeNotFound' });
@@ -173,18 +121,25 @@ const HomeController = {
     async update(req, res) {
         logger.info(`${req.user.name} - Actualiza el home con ID ${req.body.id}`);
 
-        if (req.body.status_id !== undefined) {
+        const home = await HomeRepository.findById(req.body.id);
+
+         if (!home) {
+            logger.error(`HomeController->update: Hogar no encontrado con ID ${req.body.id}`);
+            return res.status(404).json({ msg: 'HomeNotFound' });
+        }
+
+        if (req.body.status_id) {
             // Verificar si el estado exista
-         const status = await Status.findByPk(req.body.status_id);
+         const status = await StatusRepository.update(req.body.status_id);
          if (!status) {
              logger.error(`HomeController->update: Estado no encontrado con ID ${req.body.status_id}`);
              return res.status(404).json({ msg: 'StatusNotFound' });
          }
         }
 
-        if (req.body.home_type_id !== undefined ) {
+        if (req.body.home_type_id) {
             // Verificar si el estado exista
-         const homeType = await HomeType.findByPk(req.body.home_type_id);
+         const homeType = await HomeTypeRepository.findById(req.body.home_type_id);
          if (!homeType) {
              logger.error(`HomeController->update: Tipo de hogar no encontrado con ID ${req.body.home_type_id}`);
              return res.status(404).json({ msg: 'HomeTypeNotFound' });
@@ -193,53 +148,11 @@ const HomeController = {
 
         const t = await sequelize.transaction();
         try {
-            const home = await Home.findByPk(req.body.id);
-
-            if (!home) {
-                return res.status(404).json({ msg: 'HomeNotFound' });
-            }
-             // Lista de campos que pueden ser actualizados
-             const fieldsToUpdate = ['name', 'address', 'home_type_id', 'residents', 'geo_location', 'timezone', 'status_id'];
-           // Filtrar los campos presentes en req.body y construir el objeto updatedData
-           const updatedData = Object.keys(req.body)
-           .filter(key => fieldsToUpdate.includes(key) && req.body[key] !== undefined)
-           .reduce((obj, key) => {
-               obj[key] = req.body[key];
-               return obj;
-           }, {});
-
-           // Procesar la imagen si se sube una nueva
-           if (req.file) {
-               // Si se envía un archivo nuevo
-               const extension = path.extname(req.file.originalname);
-               const newFilename = `homes/${home.id}${extension}`;
-
-               // Eliminar la imagen anterior si existe y no es el predeterminado
-               if (home.image && home.image !== 'homes/default.jpg') {
-                   const oldIconPath = path.join(__dirname, '../../public', home.image);
-                   try {
-                       await fs.promises.unlink(oldIconPath);
-                       logger.info(`Imagen anterior eliminado: ${oldIconPath}`);
-                   } catch (error) {
-                       logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
-                   }
-               }
-
-               // Mover el nuevo archivo a la carpeta pública
-               const newPath = path.join(__dirname, '../../public', newFilename);
-               await fs.promises.rename(req.file.path, newPath);
-
-               // Guardar la ruta completa de la nueva imagen en la base de datos
-               updatedData.image = `${newFilename}`;
-           }
-           // Actualizar solo si hay datos que cambiar
-           if (Object.keys(updatedData).length > 0) {
-               await home.update(updatedData);
-               logger.info(`Home actualizado exitosamente (ID: ${home.id})`);
-           }
+            
+             const homeUpdate = await HomeRepository.update(home, req.body, req.file, t);
 
             await t.commit();
-            res.status(200).json({ home });
+            res.status(200).json({ 'home': homeUpdate });
         } catch (error) {
             await t.rollback();
             const errorMsg = error.details
@@ -255,29 +168,17 @@ const HomeController = {
     async destroy(req, res) {
         logger.info(`${req.user.name} - Elimina home con ID ${req.body.id}`);
 
-        const t = await sequelize.transaction();
         try {
-            const home = await Home.findByPk(req.body.id);
+            const home = await HomeRepository.findById(req.body.id);
 
             if (!home) {
                 return res.status(404).json({ msg: 'HomeNotFound' });
             }
 
-            // Eliminar la imagen anterior si existe y no es el predeterminado
-            if (home.image && home.image !== 'homes/default.jpg') {
-                const oldIconPath = path.join(__dirname, '../../public', home.image);
-                try {
-                    await fs.promises.unlink(oldIconPath);
-                    logger.info(`Imagen anterior eliminado: ${oldIconPath}`);
-                } catch (error) {
-                    logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
-                }
-            }
-            await home.destroy({ transaction: t });
-            await t.commit();
+           const homeDelete = await HomeRepository.delete(req.body.id);
+
             res.status(200).json({ msg: 'HomeDeleted' });
         } catch (error) {
-            await t.rollback();
             const errorMsg = error.details
             ? error.details.map(detail => detail.message).join(', ')
             : error.message || 'Error desconocido';
@@ -293,7 +194,7 @@ const HomeController = {
 
         try {
            const statuses = await StatusService.getStatus("Home");
-           const roles = await RoleService.getStatus("Home");
+           const roles = await RoleService.getRoles("Home");
            const hometypes = await HomeController.getHomeTypes();
            const people = await HomeController.getPeople();
            const warehouses = await HomeController.getWarehouses();
@@ -314,16 +215,14 @@ const HomeController = {
     async getWarehouses() {
         logger.info('Entra a Buscar Los alamcenes en (homeType_status_people)');
         try {
-            const warehouses = await Warehouse.findAll({
-                where: { status: 1 }
-            });
+            const warehouses = await WareHouseRepository.findByStatus(1);
     
             return warehouses.map(warehouse => {
                 return {
                     id: warehouse.id,
-                    nameWarehouses:  i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.title`) : warehouse.title,
-                    descriptionWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.description`) : warehouse.description,
-                    locationWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.location`) : warehouse.location
+                    nameWarehouses:  i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.title`) : warehouse.title,
+                    descriptionWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.description`) : warehouse.description,
+                    locationWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.location`) : warehouse.location
                 };
             });
         } catch (error) {
@@ -335,7 +234,7 @@ const HomeController = {
     async getHomeTypes() {
         logger.info('Entra a Buscar Los tipos de hogar en (homeType_status_people)');
         try {
-            const homeTypes = await HomeType.findAll();
+            const homeTypes = await HomeTypeRepository.findAll();
             return homeTypes.map(homeType => {
                 return{
                     id: homeType.id,
