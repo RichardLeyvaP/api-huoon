@@ -24,6 +24,7 @@ const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = requi
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
+const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema } = require('./middlewares/validations/taskValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -193,11 +194,11 @@ router.post('/home-person-destroy', validateSchema(idHomePersonSchema), HomePers
 
 //Rutas Tareas
 router.get('/task', TaskController.index);
-router.post('/task-date-apk', TaskController.getTaskDate);
-router.post('/task', multerCategory('attachments', 'tasks'), TaskController.store);
-router.post('/task-show', TaskController.show);
-router.post('/task-update', multerCategory('attachments', 'tasks'), TaskController.update);
-router.post('/task-destroy', TaskController.destroy);
+router.post('/task-date-apk',  validateSchema(getDateTaskSchema), TaskController.getTaskDate);
+router.post('/task', validateSchema(storeTaskSchema), multerCategory('attachments', 'tasks'), TaskController.store);
+router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
+router.post('/task-update', validateSchema(updateTaskSchema), multerCategory('attachments', 'tasks'), TaskController.update);
+router.post('/task-destroy', validateSchema(idTaskSchema), TaskController.destroy);
 
 
 //Rutas PersonTask
@@ -258,7 +259,7 @@ router.post('/person-home-warehouse-product-destroy', PersonHomeWarehouseProduct
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
-router.post('/category-status-priority-apk', TaskController.category_status_priority);
+router.post('/category-status-priority-apk', validateSchema(idHomeSchema), TaskController.category_status_priority);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 
 
