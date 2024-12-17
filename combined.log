@@ -1,114 +1,24 @@
-2024-11-26 08:21:57 info: yasmany - Actualiza la tarea con ID 10
-2024-11-26 08:21:57 info: Agregando automáticamente al creador con personId: 1
-2024-11-26 08:21:57 info: Task actualizada exitosamente (ID: 10)
-2024-11-26 08:22:35 info: yasmany - Actualiza la tarea con ID 10
-2024-11-26 08:22:35 info: Agregando automáticamente al creador con personId: 1
-2024-11-26 08:22:35 info: Task actualizada exitosamente (ID: 10)
-2024-11-26 09:53:51 info: yasmany - Actualiza la contraseña del userID 8
-2024-11-26 09:54:09 info: yasmany - Actualiza la contraseña del userID 8
-2024-11-26 09:54:31 info: yasmany - Actualiza la contraseña del userID 8
-2024-11-26 09:56:37 info: yasmany - Actualiza la contraseña del userID 8
-2024-11-26 12:33:44 info: Entrando a loguearse
-2024-11-26 12:34:09 info: Entrando a loguearse
-2024-11-26 12:34:16 info: Entrando a loguearse
-2024-11-26 12:34:33 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
-2024-11-26 12:34:33 error: Error en PersonWarehouseController->getWarehouses: La columna 'Warehouse.state' en where clause es desconocida
-2024-11-26 12:35:14 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
-2024-11-26 12:35:14 error: Error en PersonWarehouseController->getWarehouses: Cannot read properties of undefined (reading '0')
-2024-11-26 12:37:46 info: Yasmany Sánchez Martínez - Entra a buscar los almacenes asociados a el
-2024-11-26 12:39:49 info: Entrando a loguearse
-2024-11-26 12:40:01 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 12:42:59 info: Entrando a loguearse
-2024-11-26 12:43:15 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 12:44:36 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 12:52:19 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 12:56:01 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 13:05:14 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 13:05:14 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
-2024-11-26 13:08:05 info: yasmany - Entra a buscar los almacenes asociados a el
-2024-11-26 13:08:05 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
-2024-11-26 13:18:31 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-26 13:22:44 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-26 13:22:44 error: Error en PersonWarehouseController->getWarehouses: Sequelize is not defined
-2024-11-26 13:23:13 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-26 13:23:13 error: Error en PersonWarehouseController->getWarehouses: La columna 'people.person_id' en where clause es desconocida
-2024-11-26 13:24:23 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-26 13:37:20 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-26 15:50:12 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-11-27 06:56:45 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-11-27 06:56:45 error: Error en WarehouseController->index: "due_date" must be a valid date
-2024-11-27 07:03:13 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-11-27 07:03:13 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 1
-2024-11-27 07:03:22 info: yasmany - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-11-27 07:03:35 info: yasmany - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico
-2024-11-27 07:03:35 info: PersonHomeWarehouseController->store: Creando nuevo producto
-2024-11-27 08:57:32 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 09:13:54 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 09:15:27 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 10:04:20 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 10:09:17 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 10:09:17 error: Error en PersonWarehouseController->getWarehouses: warehousesMap is not defined
-2024-11-27 10:09:35 info: yasmany - Entra a buscar los almacenes asociados a él
-2024-11-27 16:04:25 info: Entrando a loguearse
-2024-11-27 16:04:40 info: Entrando a loguearse
-2024-11-27 16:04:44 info: Entrando a loguearse
-2024-11-27 16:05:09 info: Entrando a loguearse
-2024-11-27 16:05:13 info: Entrando a loguearse
-2024-11-27 16:05:27 info: Entrando a loguearse
-2024-11-27 16:05:35 info: Entrando a loguearse
-2024-11-27 16:05:35 error: Error al loguear usuario: Op is not defined
-2024-11-27 16:06:10 info: Entrando a loguearse
-2024-11-27 16:06:10 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
-2024-11-27 16:06:14 info: Entrando a loguearse
-2024-11-27 16:06:14 error: Error al loguear usuario: La columna 'User.user' en where clause es desconocida
-2024-11-27 16:06:53 info: Entrando a loguearse
-2024-11-27 16:07:07 info: Entrando a loguearse
-2024-11-28 09:47:29 info: Entrando a loguearse
-2024-11-28 09:48:58 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-28 09:48:58 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-28 09:48:58 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-28 09:48:58 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-28 09:48:58 info: Entra a Buscar Los roles en (category_status_priority)
-2024-11-28 09:57:48 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 09:57:48 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-28 09:57:48 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-28 10:02:36 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 10:02:36 error: Error al obtener categorías: Error al obtener categorías
-2024-11-28 10:03:47 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 10:03:47 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-28 10:17:52 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 10:17:52 info: Entra a Buscar Las categories en (category_status_priority)
-2024-11-28 10:17:52 info: Entra a Buscar Los estados en (category_status_priority)
-2024-11-28 10:35:02 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 10:35:02 info: Entra a Buscar Las categorias de Product
-2024-11-28 10:35:02 info: Entra a Buscar Los estados de Product
-2024-11-28 10:40:23 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 10:40:23 info: Entra a Buscar Las categorias de Product
-2024-11-28 10:40:23 info: Entra a Buscar Los estados de Product
-2024-11-28 10:53:24 info: yasmany - Entra a la ruta unificada de Tasks
-2024-11-28 10:53:24 info: Entra a Buscar Las categorias de Task
-2024-11-28 10:53:24 info: Entra a Buscar Los estados de Task
-2024-11-28 10:53:24 info: Entra a Buscar Las prioridades en (category_status_priority)
-2024-11-28 10:53:24 info: Entra a Buscar Los roles de Task
-2024-11-28 11:02:29 info: yasmany - Entra a la ruta unificada de Homes
-2024-11-28 11:02:29 info: Entra a Buscar Los estados de home
-2024-11-28 11:02:29 info: Entra a Buscar Los tipos de hogar en (homeType_status_people)
-2024-11-28 11:02:29 info: Entra a Buscar Las personas en (homeType_status_people)
-2024-11-28 11:02:29 info: Entra a Buscar Los alamcenes en (homeType_status_people)
-2024-11-28 12:53:29 info: yasmany - Entra a la ruta unificada de Products
-2024-11-28 12:53:29 info: Entra a Buscar Las categorias de Product
-2024-11-28 12:53:29 info: Entra a Buscar Los estados de Product
-2024-11-28 16:26:53 info: yasmany - Inicia actualización de relación en person_home_warehouse_products
-2024-11-28 16:26:53 info: Datos recibidos al editar un producto en un almacén
-2024-11-28 16:26:53 info: {"id":3,"home_id":1,"warehouse_id":13,"product_id":9,"status_id":4,"quantity":20,"unit_price":"12.00","total_price":"240.00","purchase_place":"nueva dirección","brand":"nueva marca","additional_notes":"actualización de producto"}
-2024-12-05 10:22:01 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-12-05 10:22:01 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 13
-2024-12-05 10:22:28 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-12-05 10:22:52 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-12-05 10:24:56 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
-2024-12-05 10:58:44 info: irais891230 - Eliminando un producto de un almacen en un hogar
-2024-12-05 10:58:44 error: Error de validación en PersonHomeWarehouseProductsController->destroy: "home_id" is not allowed
-2024-12-05 10:58:51 info: irais891230 - Eliminando un producto de un almacen en un hogar
-2024-12-05 10:58:51 error: Error al eliminar la imagen anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\products\default.jpg'
-2024-12-05 10:58:51 info: Registro eliminado de PersonHomeWarehouseProduct con ID 1
-2024-12-05 10:58:51 info: Registro eliminado de Product con ID 2
+2024-12-16 15:14:26 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-16 15:14:26 info: Datos recibidos al editar un producto en un almacén
+2024-12-16 15:14:26 info: {"id":29,"purchase_place":"Supermercado Local editado","name":"Producto de Ejemplo editado"}
+2024-12-16 15:14:26 error: Error en PersonHomeWarehouseProductsController->update: Cannot read properties of undefined (reading 'update')
+2024-12-16 15:15:57 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-16 15:15:57 info: Datos recibidos al editar un producto en un almacén
+2024-12-16 15:15:57 info: {"id":29,"purchase_place":"Supermercado Local editado","name":"Producto de Ejemplo editado"}
+2024-12-16 15:15:57 info: Producto actualizado exitosamente: Producto de Ejemplo editado (ID: 37)
+2024-12-16 15:15:57 info: Task actualizada exitosamente (ID: 29)
+2024-12-16 15:16:29 info: prueba2 - Consulta del producto específico en un almacén para el hogar de una persona
+2024-12-16 15:20:30 info: prueba2 - Eliminando un producto de un almacen en un hogar
+2024-12-16 15:20:30 error: PersonHomeWarehouseProductsController->destroy: req is not defined
+2024-12-16 15:21:46 info: prueba2 - Eliminando un producto de un almacen en un hogar
+2024-12-16 15:21:46 error: PersonHomeWarehouseProductsController->destroy: Producto no encontrado con ID 29
+2024-12-16 15:40:01 error: Validation error in POST /api/person-home-warehouse-product-destroy - Errors: "home_id" is not allowed, "warehouse_id" is not allowed, "status_id" is not allowed, "unit_price" is not allowed, "total_price" is not allowed, "quantity" is not allowed, "purchase_date" is not allowed, "purchase_place" is not allowed, "expiration_date" is not allowed, "brand" is not allowed, "additional_notes" is not allowed, "maintenance_date" is not allowed, "due_date" is not allowed, "frequency" is not allowed, "type" is not allowed, "category_id" is not allowed, "name" is not allowed
+2024-12-16 15:40:06 error: Validation error in POST /api/person-home-warehouse-product - Errors: "id" is not allowed
+2024-12-16 15:40:12 info: prueba2 - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico
+2024-12-16 15:40:12 info: datos recibidos al crear un producto
+2024-12-16 15:40:12 info: {"home_id":1,"warehouse_id":3,"status_id":5,"unit_price":15.75,"total_price":315,"quantity":20,"purchase_date":"2024-12-01","purchase_place":"Supermercado Local editado","expiration_date":"2025-01-15","brand":"MarcaEjemplo","additional_notes":"Mantener en un lugar fresco y seco.","maintenance_date":"2025-01-10","due_date":"2025-06-30","frequency":"mensual","type":"producto alimenticio","category_id":8,"name":"Producto de Ejemplo editado"}
+2024-12-16 15:40:12 info: PersonHomeWarehouseController->store: Creando nuevo producto
+2024-12-16 15:49:38 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-16 15:49:38 info: Datos recibidos al editar un producto en un almacén
+2024-12-16 15:49:38 info: {"id":30,"name":"Producto de Ejemplo editado"}
+2024-12-16 15:49:39 info: Producto actualizado exitosamente (ID: 38)

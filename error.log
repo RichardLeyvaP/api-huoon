@@ -56,3 +56,126 @@
 2024-12-05 10:22:01 error: PersonHomeWarehouseController->homeWarehouseProducts: Almacén no encontrado con ID 13
 2024-12-05 10:58:44 error: Error de validación en PersonHomeWarehouseProductsController->destroy: "home_id" is not allowed
 2024-12-05 10:58:51 error: Error al eliminar la imagen anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\products\default.jpg'
+2024-12-09 09:59:47 error: Validation error in POST /api/category - Errors: "name" is not allowed to be empty
+2024-12-09 10:00:28 error: CategoryController->store: value is not defined
+2024-12-09 10:05:55 error: Validation error in POST /api/category-show - Errors: "id" is required, "name" is not allowed, "description" is not allowed, "color" is not allowed, "type" is not allowed, "icon" is not allowed
+2024-12-09 10:06:30 error: Validation error in POST /api/category-show - Errors: "id" is required, "name" is not allowed, "description" is not allowed, "color" is not allowed, "type" is not allowed, "icon" is not allowed
+2024-12-09 10:06:47 error: Validation error in POST /api/category-update - Errors: "id" is required
+2024-12-09 10:06:55 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\dsfsfsfsdf'
+2024-12-09 10:07:06 error: Validation error in POST /api/category-destroy - Errors: "name" is not allowed, "description" is not allowed, "color" is not allowed, "type" is not allowed, "icon" is not allowed
+2024-12-09 10:07:22 error: Validation error in POST /api/category-destroy - Errors: "id" is required
+2024-12-09 10:07:29 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\dsfsfsfsdf'
+2024-12-09 19:03:36 error: Validation error in POST /api/home-update - Errors: "id" is required
+2024-12-09 19:11:07 error: HomeController->update: Estado no encontrado con ID 54645
+2024-12-09 19:11:11 error: HomeController->update: Tipo de hogar no encontrado con ID 2234
+2024-12-09 19:11:22 error: Validation error in POST /api/home-show - Errors: "name" is not allowed, "address" is not allowed, "home_type_id" is not allowed, "residents" is not allowed, "geo_location" is not allowed, "timezone" is not allowed, "status_id" is not allowed
+2024-12-09 19:11:49 error: Validation error in POST /api/home-destroy - Errors: "id" is required
+2024-12-09 19:32:50 error: Validation error in POST /api/home-type - Errors: "name" is not allowed to be empty
+2024-12-09 19:33:01 error: Validation error in POST /api/home-type - Errors: "name" is required
+2024-12-09 19:33:44 error: Validation error in PUT /api/home-type - Errors: "id" is required
+2024-12-09 19:34:01 error: Validation error in POST /api/home-type-show - Errors: "name" is not allowed, "description" is not allowed, "icon" is not allowed
+2024-12-09 19:35:24 error: HomeTypeController->destroy: Tipo de hogar no encontrado con ID 20
+2024-12-09 19:47:01 error: Validation error in POST /api/priority-show - Errors: "id" is required, "name" is not allowed, "description" is not allowed, "level" is not allowed, "color" is not allowed
+2024-12-09 19:47:49 error: Validation error in PUT /api/priority - Errors: "id" is required
+2024-12-09 19:48:05 error: Validation error in POST /api/priority-destroy - Errors: "id" is required
+2024-12-09 19:58:14 error: Validation error in POST /api/rol - Errors: "type" must be a number
+2024-12-09 19:58:56 error: Validation error in PUT /api/rol - Errors: "id" is required
+2024-12-09 19:59:27 error: Validation error in POST /api/rol-show - Errors: "name" is not allowed, "description" is not allowed, "type" is not allowed
+2024-12-09 20:08:38 error: Validation error in POST /api/status - Errors: "name" is required
+2024-12-09 20:08:59 error: Validation error in POST /api/status-show - Errors: "name" is not allowed, "description" is not allowed, "icon" is not allowed, "color" is not allowed, "type" is not allowed
+2024-12-09 20:10:13 error: Validation error in POST /api/status-destroy - Errors: "name" is not allowed, "description" is not allowed, "icon" is not allowed, "color" is not allowed, "type" is not allowed
+2024-12-09 20:37:29 error: Validation error in POST /api/home-person-show - Errors: "home_id" is not allowed, "person_id" is not allowed, "role_id" is not allowed
+2024-12-09 20:37:55 error: Validation error in POST /api/home-person-show - Errors: "home_id" is not allowed, "person_id" is not allowed, "role_id" is not allowed
+2024-12-09 20:38:29 error: Validation error in POST /api/home-person-destroy - Errors: "home_id" is not allowed, "person_id" is not allowed, "role_id" is not allowed
+2024-12-09 20:40:34 error: assignPeopleToHome: No se encontró un rol con ID 2134
+2024-12-09 20:40:34 error: HomePersonController->assignPeopleToHome: Cannot set headers after they are sent to the client
+2024-12-09 21:16:54 error: Validation error in POST /api/warehouse-show - Errors: "id" is required, "title" is not allowed, "description" is not allowed, "location" is not allowed
+2024-12-09 21:17:04 error: Validation error in POST /api/warehouse-show - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed
+2024-12-09 21:17:52 error: Validation error in POST /api/warehouse-destroy - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed
+2024-12-09 21:37:21 error: Error en WarehouseController->show: The argument passed to findOne must be an options object, use findByPk if you wish to pass a single primary key value
+2024-12-09 21:37:55 error: Error en WarehouseController->show: The argument passed to findOne must be an options object, use findByPk if you wish to pass a single primary key value
+2024-12-09 21:44:20 error: PersonWarehouseController->store: Almacén no encontrado con ID 234234
+2024-12-09 21:45:13 error: Validation error in POST /api/person-warehouse-destroy - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed, "home_id" is not allowed, "warehouse_id" is not allowed
+2024-12-09 21:45:36 error: Validation error in POST /api/person-warehouse-home - Errors: "id" is not allowed, "title" is not allowed, "description" is not allowed, "location" is not allowed, "warehouse_id" is not allowed
+2024-12-09 21:50:54 error: Error en PersonWarehouseController->destroy: Cannot read properties of null (reading 'person_id')
+2024-12-09 21:53:26 error: Error en PersonWarehouseController->destroy: Cannot read properties of null (reading 'person_id')
+2024-12-09 21:55:40 error: Error en PersonWarehouseController->destroy: Cannot read properties of null (reading 'warehouse_id')
+2024-12-09 22:00:40 error: PersonWarehouseController->update: Almacén no encontrado con ID undefined
+2024-12-11 09:49:49 error: Error en PersonController->store: product is not defined
+2024-12-11 09:50:40 error: Error en PersonController->store: Cannot read properties of undefined (reading 'id')
+2024-12-11 09:53:04 error: Validation error in POST /api/person-show - Errors: "id" is required, "name" is not allowed, "password" is not allowed, "language" is not allowed, "birth_date" is not allowed, "age" is not allowed, "gender" is not allowed, "email" is not allowed, "phone" is not allowed, "address" is not allowed
+2024-12-11 09:59:38 error: Validation error in POST /api/person-update - Errors: "language" is not allowed
+2024-12-11 10:04:38 error: PeopleController->update: Persona no encontrada con ID 100
+2024-12-12 15:23:56 error: HomeHomePersonTaskController->store: value is not defined
+2024-12-12 15:25:06 error: Validation error in POST /api/home-person-task-show - Errors: "person_id" is not allowed, "task_id" is not allowed, "role_id" is not allowed, "home_id" is not allowed
+2024-12-12 15:25:51 error: Validation error in POST /api/home-person-task-show - Errors: "person_id" is not allowed, "task_id" is not allowed, "role_id" is not allowed, "home_id" is not allowed
+2024-12-12 15:30:11 error: Validation error in POST /api/home-person-task - Errors: "id" is not allowed
+2024-12-12 15:30:16 error: HomeHomePersonTaskController->store: personTaskAssociation is not defined
+2024-12-12 15:34:03 error: Validation error in POST /api/home-person-task-show - Errors: "person_id" is not allowed, "task_id" is not allowed, "role_id" is not allowed, "home_id" is not allowed
+2024-12-12 15:38:15 error: assignPeopleToTask - Errores: Falta asociación para persona 20, rol 5, o hogar 3
+2024-12-15 09:40:54 error: HomeController->index: HomeType is associated to Home using an alias. You've included an alias (home_type), but it does not match the alias(es) defined in your association (homeType).
+2024-12-15 10:17:24 error: Error al obtener los mantenedores: RoleService.getStatus is not a function
+2024-12-15 10:19:19 error: Error en getStatus: La columna 'HomeType.type' en where clause es desconocida
+2024-12-15 10:19:19 error: Error en getStatus: Error al obtener estados
+2024-12-15 10:19:19 error: Error al obtener los mantenedores: Error al obtener estados
+2024-12-15 10:24:38 error: Error en getWarehouses: Cannot read properties of undefined (reading 'findByStatus')
+2024-12-15 10:24:38 error: Error al obtener los mantenedores: Error al obtener los almacenes
+2024-12-16 10:38:05 error: Error en PersonController->store: req is not defined
+2024-12-16 10:43:49 error: Validation error in POST /api/person-show - Errors: "name" is not allowed, "user" is not allowed, "password" is not allowed, "language" is not allowed, "birth_date" is not allowed, "age" is not allowed, "gender" is not allowed, "email" is not allowed, "phone" is not allowed, "address" is not allowed
+2024-12-16 10:44:32 error: PeopleController->update: Error al actualizar la persona: logger is not defined
+2024-12-16 10:45:13 error: PeopleController->update: Error al actualizar la persona: body is not defined
+2024-12-16 10:46:52 error: Error en PersonRepository->update: You attempted to save an instance with no primary key, this is not allowed since it would result in a global update
+2024-12-16 10:46:52 error: PeopleController->update: Error al actualizar la persona: You attempted to save an instance with no primary key, this is not allowed since it would result in a global update
+2024-12-16 10:48:15 error: Error en PersonRepository->update: You attempted to save an instance with no primary key, this is not allowed since it would result in a global update
+2024-12-16 10:48:15 error: PeopleController->update: Error al actualizar la persona: You attempted to save an instance with no primary key, this is not allowed since it would result in a global update
+2024-12-16 11:12:45 error: TaskController->index: Cannot read properties of undefined (reading 'length')
+2024-12-16 11:16:01 error: TaskRepository->mapChildren
+2024-12-16 11:16:58 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:18:26 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:19:30 error: TaskRepository->mapChildren
+2024-12-16 11:26:53 error: Validation error in POST /api/task-date-apk - Errors: "start_date" is required, "star_date" is not allowed
+2024-12-16 12:00:00 error: TaskController->index: HomePersonTask.findAll(...).map is not a function
+2024-12-16 12:20:33 error: Error en TaskRepository->store: The "path" argument must be of type string. Received undefined
+2024-12-16 12:20:33 error: TaskController->store: The "path" argument must be of type string. Received undefined
+2024-12-16 12:55:21 error: TaskController->update: taskUpdate is not defined
+2024-12-16 13:13:02 error: Validation error in POST /api/task-destroy - Errors: "title" is not allowed, "description" is not allowed
+2024-12-16 13:13:08 error: TaskController->destroy: t is not defined
+2024-12-16 14:04:08 error: Error en PersonHomeWarehouseController->homeWarehouseProducts: Cannot read properties of undefined (reading 'findById')
+2024-12-16 14:27:13 error: Error en TaskRepository->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:27:13 error: Error en PersonHomeWarehouseProductController->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:28:18 error: PersonHomeWarehouseController->store: Producto no encontrado con ID 
+2024-12-16 14:29:44 error: PersonHomeWarehouseController->store: Producto no encontrado con ID null
+2024-12-16 14:31:35 error: PersonHomeWarehouseController->store: Producto no encontrado con ID null
+2024-12-16 14:34:38 error: PersonHomeWarehouseController->store: Producto no encontrado con ID null
+2024-12-16 14:36:08 error: Error en TaskRepository->store: notNull Violation: PersonHomeWarehouseProduct.product_id cannot be null
+2024-12-16 14:36:08 error: Error en PersonHomeWarehouseProductController->store: notNull Violation: PersonHomeWarehouseProduct.product_id cannot be null
+2024-12-16 14:36:36 error: Error en TaskRepository->store: Incorrect integer value: '' for column 'product_id' at row 1
+2024-12-16 14:36:36 error: Error en PersonHomeWarehouseProductController->store: Incorrect integer value: '' for column 'product_id' at row 1
+2024-12-16 14:36:43 error: Error en TaskRepository->store: Cannot add or update a child row: a foreign key constraint fails (`auth`.`person_home_warehouse_products`, CONSTRAINT `person_home_warehouse_products_ibfk_4` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE)
+2024-12-16 14:36:43 error: Error en PersonHomeWarehouseProductController->store: Cannot add or update a child row: a foreign key constraint fails (`auth`.`person_home_warehouse_products`, CONSTRAINT `person_home_warehouse_products_ibfk_4` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE)
+2024-12-16 14:36:56 error: Error en TaskRepository->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:36:56 error: Error en PersonHomeWarehouseProductController->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:37:23 error: Error en TaskRepository->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:37:23 error: Error en PersonHomeWarehouseProductController->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:41:14 error: Error en TaskRepository->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:41:14 error: Error en PersonHomeWarehouseProductController->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:43:35 error: Error en PersonProductRepository->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:43:35 error: Error en PersonHomeWarehouseProductController->store: WHERE parameter "product_id" has invalid "undefined" value
+2024-12-16 14:48:14 error: Validation error in POST /api/person-home-warehouse-product - Errors: "status_id" is required, "name" is required, "unit_price" is required, "quantity" is required
+2024-12-16 14:54:35 error: Error en PersonHomeWarehouseController->show: Cannot read properties of undefined (reading 'name')
+2024-12-16 15:11:44 error: Error en PersonHomeWarehouseProductsController->update: Cannot read properties of undefined (reading 'update')
+2024-12-16 15:14:26 error: Error en PersonHomeWarehouseProductsController->update: Cannot read properties of undefined (reading 'update')
+2024-12-16 15:20:30 error: PersonHomeWarehouseProductsController->destroy: req is not defined
+2024-12-16 15:21:46 error: PersonHomeWarehouseProductsController->destroy: Producto no encontrado con ID 29
+2024-12-16 15:40:01 error: Validation error in POST /api/person-home-warehouse-product-destroy - Errors: "home_id" is not allowed, "warehouse_id" is not allowed, "status_id" is not allowed, "unit_price" is not allowed, "total_price" is not allowed, "quantity" is not allowed, "purchase_date" is not allowed, "purchase_place" is not allowed, "expiration_date" is not allowed, "brand" is not allowed, "additional_notes" is not allowed, "maintenance_date" is not allowed, "due_date" is not allowed, "frequency" is not allowed, "type" is not allowed, "category_id" is not allowed, "name" is not allowed
+2024-12-16 15:40:06 error: Validation error in POST /api/person-home-warehouse-product - Errors: "id" is not allowed

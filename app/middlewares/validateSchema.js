@@ -5,10 +5,9 @@ const validateSchema = (schema) => {
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
       logger.error(
-        `Validation error in ${req.method} ${req.originalUrl} - Errors: ${error.details
+        `Validation error in ${req.method} ${req.originalUrl} - Body: ${JSON.stringify(req.body)} - Errors: ${error.details
           .map((err) => err.message)
-          .join(", ")}`
-      );
+          .join(", ")}`);
 
       return res.status(400).json({
         message: "Error de validación",

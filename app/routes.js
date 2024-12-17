@@ -25,6 +25,8 @@ const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHou
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
 const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema } = require('./middlewares/validations/taskValidation');
+const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema } = require('./middlewares/validations/personwarehouseproductValidation');
+const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -235,10 +237,10 @@ router.post('/person-warehouse-home', validateSchema(getWarehouseSchema), Person
 
 //Rutas Productos
 router.get('/product', ProductController.index);
-router.post('/product', multerCategory('image', 'products'), ProductController.store);
-router.post('/product-show', ProductController.show);
-router.post('/product-update', multerCategory('image', 'products'), ProductController.update);
-router.post('/product-destroy', ProductController.destroy);
+router.post('/product', validateSchema(storeProductSchema), multerCategory('image', 'products'), ProductController.store);
+router.post('/product-show', validateSchema(idProductSchema), ProductController.show);
+router.post('/product-update', validateSchema(updateProductSchema), multerCategory('image', 'products'), ProductController.update);
+router.post('/product-destroy', validateSchema(idProductSchema), ProductController.destroy);
 
 //Rutas Productos en almacenes del hogar
 router.get('/home-warehouse-product', HomeWarehouseProductController.index);
@@ -250,11 +252,11 @@ router.post('/home-warehouse-product-destroy', HomeWarehouseProductController.de
 
 //Rutas Productos en almacenes de la persona en el hogar
 router.get('/person-home-warehouse-product', PersonHomeWarehouseProductController.index);
-router.post('/person-home-warehouse-product', multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.store);
-router.post('/person-home-warehouse-product-show', PersonHomeWarehouseProductController.show);
-router.post('/person-home-warehouse-products', PersonHomeWarehouseProductController.personHomeWarehouseProducts);//Devolver los productos de un almacén en un hogar
-router.post('/person-home-warehouse-product-update', multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.update);
-router.post('/person-home-warehouse-product-destroy', PersonHomeWarehouseProductController.destroy);
+router.post('/person-home-warehouse-product', validateSchema(storePersonProductSchema), multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.store);
+router.post('/person-home-warehouse-product-show', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.show);
+router.post('/person-home-warehouse-products', validateSchema(getPersonHomeProductSchema), PersonHomeWarehouseProductController.personHomeWarehouseProducts);//Devolver los productos de un almacén en un hogar
+router.post('/person-home-warehouse-product-update', validateSchema(updatePersonProductSchema) , multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.update);
+router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
 
 
 //Rutas Unificadas
