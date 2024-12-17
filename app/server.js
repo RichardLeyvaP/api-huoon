@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const i18n = require('../config/i18n-config');  // Importar la configuración de i18n
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const cors = require('cors');
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_OAUTH_ID,
@@ -69,6 +70,8 @@ app.use(session({
 }));
 //settings
 const PORT = process.env.PORT || 8000;
+
+app.use(cors()); // Habilita CORS para todos los orígenes
 
 //Middlewares
 app.use(express.json());
