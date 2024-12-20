@@ -12,7 +12,7 @@ const storeCategorySchema = Joi.object({
             size: Joi.number().max(2048 * 1024).required()
         })
     ).allow(null, '').optional(),
-    parent_id: Joi.number().integer().allow(null, '').optional(),
+    parent_id: Joi.number().integer().allow(null, '').optional().empty(null)
 });
 
 const updateCategorySchema = Joi.object({
@@ -27,7 +27,7 @@ const updateCategorySchema = Joi.object({
             size: Joi.number().max(2048 * 1024).required()
         })
     ).allow(null, '').optional(),
-    parent_id: Joi.number().integer().allow(null, '').optional(),
+    parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
     id: Joi.number().required(),
 });
 

@@ -2,8 +2,7 @@ const { Op, Sequelize } = require('sequelize');
 const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, sequelize } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
-const { PersonWareHouseRepository, HomeRepository } = require('../repositories');
-const WarehouseRepository = require('../repositories/WareHouseRepository');
+const { PersonWareHouseRepository, HomeRepository, WareHouseRepository } = require('../repositories');
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
@@ -73,7 +72,7 @@ const PersonWarehouseController = {
         // Buscar o crear el almacén según `warehouse_id`
         let warehouse;
         if (warehouse_id !== undefined) {
-            warehouse = await WarehouseRepository.findById(warehouse_id);
+            warehouse = await WareHouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
                 return res.status(404).json({ msg: 'WarehouseNotFound' });
@@ -106,9 +105,7 @@ const PersonWarehouseController = {
     
         try {
            
-            const personWarehouse = await PersonWarehouse.findByPk(req.body.id, {
-                attributes: ['id', 'warehouse_id', 'title', 'description', 'location', 'status'], // Datos relevantes
-            });
+            const personWarehouse = await PersonWareHouseRepository.findById(req.body.id);
     
             // Si no se encuentra la relación, se devuelve un error 404
             if (!personWarehouse) {
@@ -174,7 +171,7 @@ const PersonWarehouseController = {
 
         let warehouse;
         if (warehouse_id !== undefined) {
-            warehouse = await WarehouseRepository.findById(warehouse_id);
+            warehouse = await WareHouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
                 return res.status(404).json({ msg: 'WarehouseNotFound' });
@@ -243,26 +240,21 @@ const PersonWarehouseController = {
             return res.status(204).json({ msg: 'PersonWareHouseNotFound' });
         }
         // Iniciar una nueva transacción para asegurar que todo se haga correctamente
-        const t = await sequelize.transaction();
         try {    
-                const warehouse = await WarehouseRepository.findById(personWarehouse.warehouse_id);
+                const warehouse = await WareHouseRepository.findById(personWarehouse.warehouse_id);
     
                 // Eliminar la relación entre la persona, el hogar y el almacén
-                const personWareHouseDelete = await PersonWareHouseRepository(personWarehouse, t);
+                const personWareHouseDelete = await PersonWareHouseRepository.delete(personWarehouse);
                 
                 // Si el almacén tiene estado 0, también eliminarlo de la tabla `warehouses`
                 if (warehouse.status === 0) {
                     logger.info(`PersonWarehouseController->destroy: El almacén tiene estado 0, eliminando de la tabla warehouses`);
-                    await WarehouseRepository.delete();
+                    await WareHouseRepository.delete(warehouse);
                 }
-    
-                // Confirmar la transacción
-                await t.commit();
     
                 // Responder con éxito
                 res.status(200).json({ msg: 'AssociationRemoved', details: 'La relación entre la persona, el hogar y el almacén ha sido eliminada' });
         } catch (error) {
-            await t.rollback();
             // Manejo de errores generales
             const errorMsg = error.details
                 ? error.details.map(detail => detail.message).join(', ')
@@ -318,7 +310,7 @@ const PersonWarehouseController = {
                     }
                 ]
             },
-            attributes: ['id', 'warehouse_id', 'title', 'description', 'location', 'status'], // Incluye los datos relevantes
+            attributes: ['id', 'warehouse_id', 'title', 'description', 'location', 'status', 'person_id'], // Incluye los datos relevantes
             include: [
                 {
                     model: Warehouse,

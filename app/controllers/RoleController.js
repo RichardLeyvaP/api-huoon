@@ -22,9 +22,11 @@ module.exports = {
     // Crear un nuevo rol
     async store(req, res) {
         logger.info(`${req.user.name} - Creando un nuevo rol`);
+        logger.info('datos recibidos al crear un rol');
+        logger.info(JSON.stringify(req.body));
 
         try {
-            const role = await RoleRepository.create(req.body);
+            let role = await RoleRepository.create(req.body);
             res.status(201).json({ msg: 'RoleCreated', role });
         } catch (error) {
             logger.error('Error en RoleController->store: ' + error.message);
@@ -55,14 +57,16 @@ module.exports = {
     // Actualizar un rol
     async update(req, res) {
         logger.info(`${req.user.name} - Editando un rol`);
+        logger.info('datos recibidos al editar un rol');
+        logger.info(JSON.stringify(req.body));
 
         try {
-            const role = await RoleRepository.findById(req.body.id);
+            let role = await RoleRepository.findById(req.body.id);
             if (!role) {
                 return res.status(400).json({ msg: 'RoleNotFound' });
             }
 
-            const roleUpdate = await RoleRepository.update(Role, req.bpdy);
+            let roleUpdate = await RoleRepository.update(role, req.body);
             
             res.status(200).json({ msg: 'RoleUpdated', roleUpdate });
         } catch (error) {

@@ -12,6 +12,7 @@ module.exports = {
             // Mapear los resultados solo si es necesario
             const mappedStatus = status.map(status => {
                 return {
+                    id: status.id,
                     name: status.name,
                     description: status.description,
                     icon: status.icon,

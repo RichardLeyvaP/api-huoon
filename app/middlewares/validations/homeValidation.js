@@ -31,18 +31,28 @@ const updateHomeSchema = Joi.object({
     geo_location: Joi.string().allow(null).empty('').optional(),
     timezone: Joi.string().allow(null).empty('').optional(),
     status_id: Joi.number().integer().allow(null).empty('').optional(),
-    image: Joi.string()
-        .pattern(/\.(jpg|jpeg|png|gif)$/i)  // Validar formato de imagen
-        .allow(null).empty('').optional()                         // Hace que sea opcional
+    image: Joi.any()
         .custom((value, helpers) => {
-            const maxSize = 500 * 1024;     // 500 KB en bytes
-            if (value && value.length > maxSize) {
-                return helpers.message('El campo image debe ser una imagen válida de máximo 500 KB');
+            if (value) {
+                // Validar tipo MIME
+                const validMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                const fileType = value.type;
+
+                if (!validMimeTypes.includes(fileType)) {
+                    return helpers.message('El archivo debe ser una imagen válida (jpg, jpeg, png, gif)');
+                }
+
+                // Validar tamaño (500 KB)
+                const maxSize = 500 * 1024;  // 500 KB
+                if (value.size > maxSize) {
+                    return helpers.message('El archivo debe ser una imagen válida de máximo 500 KB');
+                }
             }
             return value;
         })
+        .allow(null).optional() // Permite que sea nulo u opcional
         .messages({
-            'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
+            'any.required': 'El campo image es obligatorio.',
         }),
     id: Joi.number().required(),
 });

@@ -47,8 +47,10 @@ const ProductController = require('./controllers/ProductController');
 const HomeWarehouseProductController = require('./controllers/HomeWarehouseProductController');
 const PersonHomeWarehouseProductController = require('./controllers/PersonHomeWarehouseProductController');
 const HomePersonTaskController = require('./controllers/HomePersonTaskController');
+const OpenAIController = require('./controllers/OpenAIController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
+router.post('/ask-ai', OpenAIController.getAIResponse);
 
 //Login y register
 router.post('/login', validateSchema(loginSchema), AuthController.login);
@@ -106,12 +108,16 @@ router.get('/facebook-callback', (req, res, next) => {
 router.get('/images/:foldername/:filename', (req, res) => {
     const { foldername, filename } = req.params;
     const imagePath = path.join(__dirname, '../public', foldername, filename);
+
+    // Verifica si el archivo existe
     if (!fs.existsSync(imagePath)) {
         return res.status(404).send('Imagen no encontrada');
     }
 
-    // Usa mime-types para obtener el tipo MIME
+    // Obtén el tipo MIME del archivo
     const fileType = mime.lookup(imagePath) || 'application/octet-stream';
+
+    // Lee el archivo y envíalo en la respuesta
     fs.readFile(imagePath, (err, file) => {
         if (err) {
             return res.status(500).send('Error al leer la imagen');
@@ -145,17 +151,17 @@ router.put('/status', validateSchema(updateStatusSchema), StatusController.updat
 router.post('/status-destroy', validateSchema(idStatusSchema), StatusController.destroy);
 
 //Rutas Roles
-router.get('/rol', RoleController.index);
-router.post('/rol', validateSchema(storeRoleSchema), RoleController.store);
-router.post('/rol-show', validateSchema(idRoleSchema), RoleController.show);
-router.put('/rol', validateSchema(updateRoleSchema), RoleController.update);
-router.post('/rol-destroy', validateSchema(idRoleSchema), RoleController.destroy);
+router.get('/role', RoleController.index);
+router.post('/role', validateSchema(storeRoleSchema), RoleController.store);
+router.post('/role-show', validateSchema(idRoleSchema), RoleController.show);
+router.put('/role', validateSchema(updateRoleSchema), RoleController.update);
+router.post('/role-destroy', validateSchema(idRoleSchema), RoleController.destroy);
 
 //Rutas Categirias
 router.get('/category', CategoryController.index);
-router.post('/category', validateSchema(storeCategorySchema), multerCategory('icon', 'categories'), CategoryController.store);
+router.post('/category', multerCategory('icon', 'categories'), validateSchema(storeCategorySchema), CategoryController.store);
 router.post('/category-show', validateSchema(idCategorySchema), CategoryController.show);
-router.post('/category-update', validateSchema(updateCategorySchema), multerCategory('icon', 'categories'), CategoryController.update);
+router.post('/category-update', multerCategory('icon', 'categories'), validateSchema(updateCategorySchema), CategoryController.update);
 router.post('/category-destroy', validateSchema(idCategorySchema), CategoryController.destroy);
 
 //Rutas Prioridades

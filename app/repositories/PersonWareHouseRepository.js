@@ -99,9 +99,9 @@ const PersonWareHouseRepository = {
   },
 
   // Eliminar un almacén
-  async delete(personWarehouse, t) {
+  async delete(personWarehouse) {
     try {
-      return await personWarehouse.destroy({transaction: t});
+      return await personWarehouse.destroy();
     } catch (err) {
       logger.error(`Error al eliminar PersonWarehouse: ${err.message}`);
       throw new Error('Error al eliminar el almacén');

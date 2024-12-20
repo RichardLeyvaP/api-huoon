@@ -56,16 +56,16 @@ const schema = Joi.object({
                 ]
             });
             if (!user) {
-                return res.status(401).json({ msg: 'Credenciales inválidas' });
+                return res.status(400).json({ msg: 'Credenciales inválidas' });
             }
             // Verificar si el campo password es nulo o vacío
             if (!user.password || user.password === '') {
-                return res.status(401).json({ msg: 'Credenciales inválidas' });
+                return res.status(400).json({ msg: 'Credenciales inválidas' });
             }
     
             const isMatch = await bcrypt.compare(req.body.password, user.password);
             if (!isMatch) {
-                return res.status(401).json({ msg: 'Credenciales inválidas' });
+                return res.status(400).json({ msg: 'Credenciales inválidas' });
             }
             
             // Extraemos los datos de 'person' del usuario
@@ -110,7 +110,8 @@ const schema = Joi.object({
                 token: token,
                 personId: user.person.id,
                 personName: user.person.name,
-                personEmail: user.person.email
+                personEmail: user.person.email,
+                personImage: user.person.image
             });
         } catch (err) {
             logger.error('Error al loguear usuario: ' + err.message);
@@ -191,7 +192,8 @@ const schema = Joi.object({
                 token: token,
                 personId: user.person.id,
                 personName: user.person.name,
-                personEmail: user.person.email
+                personEmail: user.person.email,
+                personImage: user.person.image
             });
         } catch (err) {
             logger.error('Error al loguear usuario: ' + err.message);
@@ -266,7 +268,8 @@ const schema = Joi.object({
                 token: token,
                 personId: userNew.person.id,
                 personName: userNew.person.name,
-                personEmail: userNew.person.email
+                personEmail: userNew.person.email,
+                personImage: person.image
             });
         } catch (err) {
             // Revertir la transacción en caso de error
@@ -383,7 +386,8 @@ const schema = Joi.object({
             token: token,
             personId: userNew.person.id,
             personName: userNew.person.name,
-            personEmail: userNew.person.email
+            personEmail: userNew.person.email,
+            personImage: person.image
         });
     
         } catch (error) {
@@ -499,7 +503,8 @@ const schema = Joi.object({
                 token: token,
                 personId: userNew.person.id,
                 personName: userNew.person.name,
-                personEmail: userNew.person.email
+                personEmail: userNew.person.email,
+                personImage: person.image
             });
     
         } catch (error) {
@@ -576,7 +581,7 @@ const schema = Joi.object({
             const user = await User.findByPk(id);
     
             if (!user) {
-                return res.status(404).json({ msg: 'Usuario no encontrado' });
+                return res.status(400).json({ msg: 'Usuario no encontrado' });
             }
     
             // Verificar si el usuario está vinculado a un proveedor externo
@@ -586,7 +591,7 @@ const schema = Joi.object({
                     const passwordMatch = bcrypt.compareSync(currentPassword, user.password);
     
                     if (!passwordMatch) {
-                        return res.status(401).json({ msg: 'La contraseña actual no es correcta.' });
+                        return res.status(400).json({ msg: 'La contraseña actual no es correcta.' });
                     }
                 }
             } else {
@@ -594,7 +599,7 @@ const schema = Joi.object({
                 const passwordMatch = bcrypt.compareSync(currentPassword, user.password);
     
                 if (!passwordMatch) {
-                    return res.status(401).json({ msg: 'La contraseña actual no es correcta.' });
+                    return res.status(400).json({ msg: 'La contraseña actual no es correcta.' });
                 }
             }
     

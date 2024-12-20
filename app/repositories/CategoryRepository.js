@@ -1,15 +1,19 @@
 const { Op } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
-const { Category } = require('../models');
+const { Category, sequelize } = require('../models');
 const logger = require('../../config/logger'); // Logger para seguimiento
 
 const CategoryRepository = {
   // Obtener todas las categorías jerárquicas
   async findAll() {
     const categories = await Category.findAll({
-      where: { parent_id: null },
+      //where: { parent_id: null },
       include: [
+        {
+          model: Category,
+          as: 'parent', // Incluir el padre de la categoría
+        },
         {
           model: Category,
           as: 'children',
@@ -30,6 +34,7 @@ const CategoryRepository = {
         description: category.description,
         color: category.color,
         icon: category.icon,
+        type: category.type,
         parent_id: category.parent_id,
         parent: category.parent ? await this.mapParent(category.parent) : null,
         children: await this.mapChildren(category.children),
@@ -38,7 +43,7 @@ const CategoryRepository = {
   },
 
   async findById(id) {
-    const category = await Category.findOne({
+    return await Category.findOne({
       where: { id },
       include: [
         {
@@ -57,20 +62,8 @@ const CategoryRepository = {
         },
       ],
     });
-
-    if (!category) return null;
-
-    return {
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      color: category.color,
-      icon: category.icon,
-      parent_id: category.parent_id,
-      parent: category.parent ? await this.mapParent(category.parent) : null,
-      children: await this.mapChildren(category.children),
-    };
   },
+  
 
   async mapParent(parent) {
     return {
@@ -79,6 +72,7 @@ const CategoryRepository = {
       description: parent.description,
       color: parent.color,
       icon: parent.icon,
+      typr: parent.type,
       parent_id: parent.parent_id,
       parent: parent.parent ? await this.mapParent(parent.parent) : null,
     };
@@ -92,6 +86,7 @@ const CategoryRepository = {
         description: child.description,
         color: child.color,
         icon: child.icon,
+        type: child.type,
         parent_id: child.parent_id,
         children: await this.mapChildren(child.children),
       }))
@@ -106,8 +101,11 @@ const CategoryRepository = {
 
   // Crear una nueva categoría con manejo de imágenes
   async create(body, file) {
-    const { name, description, color, type, icon, parent_id } = body;
-    
+    let { name, description, color, type, icon, parent_id } = body;
+    // Validar y corregir parent_id si es inválido o vacío
+    if (parent_id === '' || parent_id === null || !Number.isInteger(Number(parent_id))) {
+        parent_id = null; // Asignar null si el valor no es un entero válido
+    }
     // Inicia la transacción
     const t = await sequelize.transaction();
     try {
@@ -144,7 +142,7 @@ const CategoryRepository = {
     } catch (error) {
         await t.rollback();
         logger.error(`Error al crear la categoría: ${error.message}`);
-        throw new Error('Error al crear la categoría');
+        throw new Error(error.message);
     }
   },
 
@@ -152,6 +150,11 @@ const CategoryRepository = {
   async update(category, body, file) {
     const { name, description, color, type, icon, parent_id } = body;
     const fieldsToUpdate = ['name', 'description', 'color', 'type', 'parent_id'];
+
+        // Validar y corregir parent_id si es inválido o vacío
+      if (parent_id === '' || parent_id === null || !Number.isInteger(Number(parent_id))) {
+          body.parent_id = null; // Asignar null si el valor no es un entero válido
+      }
 
     const updatedData = Object.keys(body)
         .filter((key) => fieldsToUpdate.includes(key) && body[key] !== undefined)
@@ -170,10 +173,10 @@ const CategoryRepository = {
             const oldIconPath = path.join(__dirname, '../../public', category.icon);
             
             try {
-                // Solo eliminar si el archivo realmente existe
-                await fs.promises.access(oldIconPath, fs.constants.F_OK);
-                await fs.promises.unlink(oldIconPath); // Eliminar el archivo
+              if (fs.existsSync(oldIconPath)) {
+                await fs.promises.unlink(oldIconPath);
                 logger.info(`Icono anterior eliminado: ${oldIconPath}`);
+            }
             } catch (error) {
                 if (error.code === 'ENOENT') {
                     logger.warn(`El icono anterior no existe: ${oldIconPath}`);
@@ -194,13 +197,13 @@ const CategoryRepository = {
             const oldIconPath = path.join(__dirname, '../../public', category.icon);
             
             try {
-                // Verificar si el archivo existe antes de intentar eliminarlo
-                await fs.promises.access(oldIconPath, fs.constants.F_OK);
+              if (fs.existsSync(oldIconPath)) {
                 await fs.promises.unlink(oldIconPath);
                 logger.info(`Icono anterior eliminado: ${oldIconPath}`);
+            }
             } catch (error) {
                 if (error.code === 'ENOENT') {
-                    logger.warn(`El icono anterior no existe: ${oldIconPath}`);
+                    logger.warning(`El icono anterior no existe: ${oldIconPath}`);
                 } else {
                     logger.error(`Error al eliminar el icono anterior: ${error.message}`);
                     throw new Error('Error al eliminar el icono anterior');
@@ -220,20 +223,18 @@ const CategoryRepository = {
 
   // Eliminar una categoría con manejo de imágenes
   async delete(category) {
-    if (category.image && category.image !== 'categories/default.jpg') {
-        const imagePath = path.join(__dirname, '../../public', category.image);
+    if (category.icon && category.icon !== 'categories/default.jpg') {
+        const imagePath = path.join(__dirname, '../../public', category.icon);
         
         try {
-            // Verificar si la imagen existe antes de eliminarla
-            await fs.promises.access(imagePath, fs.constants.F_OK);
-            
-            // Eliminar el archivo de imagen
+          if (fs.existsSync(imagePath)) {
             await fs.promises.unlink(imagePath);
-            logger.info(`Imagen eliminada exitosamente: ${imagePath}`);
+            logger.info(`Icono anterior eliminado: ${imagePath}`);
+        }
         } catch (err) {
             if (err.code === 'ENOENT') {
                 // Si el archivo no existe, solo mostrar advertencia
-                logger.warn(`La imagen no existe: ${imagePath}`);
+                logger.warning(`El icono no existe: ${imagePath}`);
             } else {
                 // Si hubo otro error, registrar el error
                 logger.error(`Error eliminando la imagen: ${err.message}`);
@@ -241,12 +242,9 @@ const CategoryRepository = {
             }
         }
     }
-
-    // Eliminar la categoría de la base de datos
-    await category.destroy();
     logger.info(`Categoría eliminada exitosamente: ${category.id}`);
-
-    return category;
+    // Eliminar la categoría de la base de datos
+    return await category.destroy();
   },
 };
 

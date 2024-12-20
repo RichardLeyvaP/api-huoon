@@ -49,6 +49,7 @@ const logger = require('../../config/logger'); // Importa el logger
                             color: category.color,
                             icon: category.icon,
                             state: category.state,
+                            type: category.type,
                             parent_id: category.parent_id,
                             children: await CategoryPersonController.mapChildren(category.children || [], personId),
                         };
@@ -89,6 +90,7 @@ const logger = require('../../config/logger'); // Importa el logger
                     color: child.color,
                     icon: child.icon,
                     state: child.state,
+                    type: child.type,
                     parent_id: child.parent_id,
                     children: await CategoryPersonController.mapChildren(child.children || [], personId) // Recursividad
                 };

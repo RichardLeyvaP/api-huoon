@@ -28,7 +28,7 @@ const RoleRepository = {
   // Crear un nuevo rol
   async create(body) {
     const { name, description, type } = body;
-    type = type ? type : "Sistema"
+    //type = type ? type : "Sistema"
     try {
       return await Role.create({
         name,
