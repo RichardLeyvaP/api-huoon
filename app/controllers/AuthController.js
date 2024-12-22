@@ -378,7 +378,8 @@ const schema = Joi.object({
         // Confirma la transacción
         await transaction.commit();
         // Respuesta en formato JSON
-        res.status(201).json({
+
+        const userData = {
             id: userNew.id,
             userName: userNew.name,
             email: userNew.email,
@@ -388,11 +389,16 @@ const schema = Joi.object({
             personName: userNew.person.name,
             personEmail: userNew.person.email,
             personImage: person.image
-        });
+        };
+        
+        const userDataString = encodeURIComponent(JSON.stringify(userData));
+        return res.redirect(`http://localhost:3000?user=${userDataString}`);
     
         } catch (error) {
-            await transaction.rollback();
-            console.error('Error en googleCallback:', error);
+            if (!transaction.finished) {
+                await transaction.rollback();
+            }
+            logger.error('Error en googleCallback:', error);
             return res.status(500).json({ error: 'ServerError' });
         }
     },   

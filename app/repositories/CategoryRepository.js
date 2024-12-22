@@ -1,7 +1,6 @@
 const { Op } = require('sequelize');
-const path = require('path');
-const fs = require('fs');
 const { Category, sequelize } = require('../models');
+const ImageService = require('../services/ImageService');
 const logger = require('../../config/logger'); // Logger para seguimiento
 
 const CategoryRepository = {
@@ -124,13 +123,9 @@ const CategoryRepository = {
 
         // Manejar el archivo de icono (si existe)
         if (file) {
-            const extension = path.extname(file.originalname);
-            const newFilename = `categories/${category.id}${extension}`;
-            
-            const newPath = path.join(__dirname, '..', '..', 'public', newFilename);
-            await fs.promises.rename(file.path, newPath); // Mover el archivo
-
-            await category.update({ icon: newFilename }, { transaction: t });
+            const newFilename = ImageService.generateFilename('categories', category.id, file.originalname);
+            category.icon = await ImageService.moveFile(file, newFilename);
+            await category.update({ icon: category.icon }, { transaction: t});
         } else {
             category.icon = icon || 'categories/default.jpg';
             await category.save({ transaction: t });
@@ -165,50 +160,15 @@ const CategoryRepository = {
 
     // Verificar si se va a actualizar el icono
     if (file) {
-        const extension = path.extname(file.originalname);
-        const newFilename = `categories/${category.id}${extension}`;
-
-        // Verificar si el icono anterior existe antes de eliminarlo
-        if (category.icon && category.icon !== 'categories/default.jpg') {
-            const oldIconPath = path.join(__dirname, '../../public', category.icon);
-            
-            try {
-              if (fs.existsSync(oldIconPath)) {
-                await fs.promises.unlink(oldIconPath);
-                logger.info(`Icono anterior eliminado: ${oldIconPath}`);
-            }
-            } catch (error) {
-                if (error.code === 'ENOENT') {
-                    logger.warn(`El icono anterior no existe: ${oldIconPath}`);
-                } else {
-                    logger.error(`Error al eliminar el icono anterior: ${error.message}`);
-                    throw new Error('Error al eliminar el icono anterior');
-                }
-            }
-        }
-
-        // Mover el nuevo archivo a la carpeta pública
-        const newPath = path.join(__dirname, '../../public', newFilename);
-        await fs.promises.rename(file.path, newPath);
-        updatedData.icon = newFilename;
+      if (category.icon && category.icon !== 'categories/default.jpg') {
+        await ImageService.deleteFile(category.icon);
+      }
+      const newFilename = ImageService.generateFilename('categories', category.id, file.originalname);
+      updatedData.icon = await ImageService.moveFile(file, newFilename);
     } else if (icon && typeof icon === 'string') {
         // Si el icono es una URL o nombre, actualizarlo
         if (category.icon && category.icon !== 'categories/default.jpg') {
-            const oldIconPath = path.join(__dirname, '../../public', category.icon);
-            
-            try {
-              if (fs.existsSync(oldIconPath)) {
-                await fs.promises.unlink(oldIconPath);
-                logger.info(`Icono anterior eliminado: ${oldIconPath}`);
-            }
-            } catch (error) {
-                if (error.code === 'ENOENT') {
-                    logger.warning(`El icono anterior no existe: ${oldIconPath}`);
-                } else {
-                    logger.error(`Error al eliminar el icono anterior: ${error.message}`);
-                    throw new Error('Error al eliminar el icono anterior');
-                }
-            }
+            await ImageService.deleteFile(category.icon);
         }
         updatedData.icon = icon;
     }
@@ -224,23 +184,7 @@ const CategoryRepository = {
   // Eliminar una categoría con manejo de imágenes
   async delete(category) {
     if (category.icon && category.icon !== 'categories/default.jpg') {
-        const imagePath = path.join(__dirname, '../../public', category.icon);
-        
-        try {
-          if (fs.existsSync(imagePath)) {
-            await fs.promises.unlink(imagePath);
-            logger.info(`Icono anterior eliminado: ${imagePath}`);
-        }
-        } catch (err) {
-            if (err.code === 'ENOENT') {
-                // Si el archivo no existe, solo mostrar advertencia
-                logger.warning(`El icono no existe: ${imagePath}`);
-            } else {
-                // Si hubo otro error, registrar el error
-                logger.error(`Error eliminando la imagen: ${err.message}`);
-                throw new Error(`Error al eliminar la imagen: ${err.message}`);
-            }
-        }
+      await ImageService.deleteFile(category.icon);
     }
     logger.info(`Categoría eliminada exitosamente: ${category.id}`);
     // Eliminar la categoría de la base de datos

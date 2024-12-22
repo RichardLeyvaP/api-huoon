@@ -74,7 +74,7 @@ router.get('/google-callback', (req, res, next) => {
       console.log('Datos en la ruta:', user);
       // Llama a tu función en el controlador aquí
       try {
-        await AuthController.googleCallback(req, res, user);
+        await AuthController.googleCallback(req, res, user);y
       } catch (error) {
         logger.error('Error al llamar a googleCallback:', error);
         return res.status(500).json({ error: 'Error en el procesamiento de la respuesta' });

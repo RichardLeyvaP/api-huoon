@@ -74,6 +74,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cors({
   //origin: 'http://localhost:8080',  // Asegúrate de permitir tu dominio frontend
   allowedHeaders: ['Authorization', 'Content-Type'],  // Asegúrate de que 'Authorization' esté permitido
+  credentials: true
 })); // Habilita CORS para todos los orígenes
 
 //Middlewares
