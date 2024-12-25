@@ -1,8 +1,8 @@
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, sequelize } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
-const { PersonWareHouseRepository, HomeRepository, WareHouseRepository } = require('../repositories');
+const { PersonWareHouseRepository, HomeRepository, WareHouseRepository, PersonRepository } = require('../repositories');
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
@@ -55,14 +55,7 @@ const PersonWarehouseController = {
         }
 
         // Verificar si la persona existe y pertenece al hogar
-        const person = await Person.findByPk(person_id, {
-            include: [{
-                model: HomePerson,
-                as: 'homePeople',
-                where: { home_id: home_id },  // Filtra por el home_id que buscas
-                required: true  // Esto asegura que solo se devuelvan personas que tengan esa relación
-            }]
-        });
+        const person = await PersonRepository.getPersonHouse(person_id, home_id);
         
         if (!person) {
             logger.error(`PersonWarehouseController->store: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
@@ -71,7 +64,7 @@ const PersonWarehouseController = {
 
         // Buscar o crear el almacén según `warehouse_id`
         let warehouse;
-        if (warehouse_id !== undefined) {
+        if (warehouse_id) {
             warehouse = await WareHouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
@@ -134,6 +127,7 @@ const PersonWarehouseController = {
         }
     },
 
+
     async update(req, res) {
         logger.info(`${req.user.name} - Entra a actualizar la relación entre persona, almacén y hogar específico`);
         logger.info('datos recibidos al editar un almacen');
@@ -141,36 +135,39 @@ const PersonWarehouseController = {
              
         const {id, warehouse_id, home_id, title, description, location, status } = req.body;
 
-        const personWarehouse = await PersonWareHouseRepository.findById(id);
+        let personWarehouse = await PersonWareHouseRepository.findById(id);
         if (!personWarehouse) {
             logger.error(`PersonWarehouseController->update: Almacén no encontrado con ID ${id}`);
             return res.status(204).json({ msg: 'HomeNotFound' });
-        }
-        // Verificar si el hogar existe
-        const home = await HomeRepository.findById(home_id);
-        if (!home) {
-            logger.error(`PersonWarehouseController->update: Hogar no encontrado con ID ${home_id}`);
-            return res.status(204).json({ msg: 'HomeNotFound' });
+        } 
+        
+        const person_id = req.person.id;
+        const isOwner = personWarehouse.person_id === person_id;
+        if (!isOwner && personWarehouse.status !== 1) {
+            await t.commit();
+            logger.warn(`Usuario ${person_id} intentó editar una relación que no le pertenece ni tiene status 1`);
+            return res.status(403).json({ msg: 'Forbidden: Insufficient permissions to edit this record' });
         }
 
-        const person_id = req.person.id;
-         // Verificar si la persona existe y pertenece al hogar
-         const person = await Person.findByPk(person_id, {
-            include: [{
-                model: HomePerson,
-                as: 'homePeople',
-                where: { home_id: home_id },  // Filtra por el home_id que buscas
-                required: true  // Esto asegura que solo se devuelvan personas que tengan esa relación
-            }]
-        });
+        if (home_id) {
+            // Verificar si el hogar existe
+            const home = await HomeRepository.findById(home_id);
+            if (!home) {
+                logger.error(`PersonWarehouseController->update: Hogar no encontrado con ID ${home_id}`);
+                return res.status(204).json({ msg: 'HomeNotFound' });
+            }
+
+             // Verificar si la persona existe y pertenece al hogar
+         const person = await PersonRepository.getPersonHouse(person_id, home_id);
         
         if (!person) {
             logger.error(`PersonWarehouseController->update: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
             return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
         }    
-
+            
+        }
         let warehouse;
-        if (warehouse_id !== undefined) {
+        if (warehouse_id) {
             warehouse = await WareHouseRepository.findById(warehouse_id);
             if (!warehouse) {
                 logger.error(`PersonWarehouseController->store: Almacén no encontrado con ID ${warehouse_id}`);
@@ -181,45 +178,16 @@ const PersonWarehouseController = {
         const t = await sequelize.transaction(); // Iniciar una nueva transacción
     
         try {
-               
-            // Validar si la relación ya existe
-            if (personWarehouse) {
-                const isOwner = personWarehouse.person_id === person_id;
-    
-                // Validar permisos
-                if (!isOwner && personWarehouse.status !== 1) {
-                    logger.warn(`Usuario ${person_id} intentó editar una relación que no le pertenece ni tiene status 1`);
-                    await t.rollback();
-                    return res.status(403).json({ msg: 'Forbidden: Insufficient permissions to edit this record' });
-                }
-    
-                // Actualizar campos permitidos
-                const updatedData = Object.keys(req.body)
-                    .filter(key => ['title', 'description', 'location', 'status'].includes(key) && req.body[key] !== undefined)
-                    .reduce((obj, key) => {
-                        obj[key] = req.body[key];
-                        return obj;
-                    }, {});
-    
-                if (Object.keys(updatedData).length > 0) {
-                    await personWarehouse.update(updatedData, { transaction: t });
-                    logger.info(`Relación actualizada entre hogar ID ${home_id} y almacén ID ${warehouse_id}`);
-                }
+                const personWareHouseUpdated = await PersonWareHouseRepository.update(personWarehouse, req.body, t);
     
                 // Confirmar la transacción
                 await t.commit();
-    
-                // Retornar el registro actualizado
-                return res.status(200).json({ personWarehouse });
-            } else {
-                // Si no existe la relación y no es el propietario, no crear una nueva
-                logger.error(`No se encontró relación y no se permite crear una nueva para el usuario ${person_id}`);
-                await t.rollback();
-                return res.status(404).json({ msg: 'PersonWarehouseNotFound' });
-            }
+                return res.status(200).json({ 'personWarehouse': personWareHouseUpdated });
         } catch (error) {
             // Si ocurre un error, hacer rollback de la transacción
-            await t.rollback();
+            if (!t.finished) {
+                await t.rollback();
+            }
             const errorMsg = error.details
                 ? error.details.map(detail => detail.message).join(', ')
                 : error.message || 'Error desconocido';
@@ -272,53 +240,22 @@ const PersonWarehouseController = {
     
         try {
             // Verificar si el hogar existe
-            const home = await Home.findByPk(home_id);
+            const home = await HomeRepository.findById(home_id);
             if (!home) {
                 logger.error(`PersonWarehouseController->getWarehouses: Hogar no encontrado con ID ${home_id}`);
-                return res.status(404).json({ msg: 'HomeNotFound' });
+                return res.status(204).json({ msg: 'HomeNotFound' });
             }
     
             // Verificar si la persona existe
-            const person = await Person.findByPk(personId, {
-                include: [{
-                    model: HomePerson,
-                    as: 'homePeople',
-                    where: { home_id: home_id },  // Filtra por el home_id que buscas
-                    required: true  // Esto asegura que solo se devuelvan personas que tengan esa relación
-                }]
-            });
+            const person = await PersonRepository.getPersonHouse(personId, home_id);
             if (!person) {
                 logger.error(`PersonWarehouseController->getWarehouses: La persona con ID ${personId} no está asociada con el hogar con ID ${home_id}`);
-                return res.status(404).json({ msg: 'PersonNotFound' });
+                return res.status(204).json({ msg: 'PersonNotFound' });
             }
     
             // Obtener los almacenes que tienen status 1 o 0 relacionados con la persona o el hogar
             // Consulta para obtener directamente desde PersonWarehouse
-        const personWarehouses = await PersonWarehouse.findAll({
-            where: {
-                home_id, // Relacionado al hogar
-                [Op.or]: [
-                    // Relación directa con la persona y el hogar (todos los estados)
-                    {
-                        person_id: personId,
-                        status: { [Op.in]: [0, 1, 2] }
-                    },
-                    // Relación indirecta (otra persona), pero con status 1 o 2
-                    {
-                        person_id: { [Op.ne]: personId },
-                        status: { [Op.in]: [1, 2] }
-                    }
-                ]
-            },
-            attributes: ['id', 'warehouse_id', 'title', 'description', 'location', 'status', 'person_id'], // Incluye los datos relevantes
-            include: [
-                {
-                    model: Warehouse,
-                    as: 'warehouse', // Relación con Warehouse para obtener información adicional si es necesario
-                    attributes: [] // Si no necesitas datos de Warehouse, omítelos
-                }
-            ]
-        });
+        const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, personId);
 
         // Formatear resultados para el cliente
         const result = personWarehouses.map((pw) => ({
@@ -340,7 +277,51 @@ const PersonWarehouseController = {
             logger.error('Error en PersonWarehouseController->getWarehouses: ' + errorMsg);
             res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
-    }   
+    },
+    
+    async selectWarehouses(req, res) {
+        logger.info(`${req.user.name} - Entra a buscar los almacenes asociados a él`);
+    
+        const personId = req.person.id;
+        const { home_id } = req.body; // Suponemos que `home_id` se pasa en el cuerpo de la solicitud
+    
+        try {
+            // Verificar si el hogar existe
+            const home = await HomeRepository.findById(home_id);
+            if (!home) {
+                logger.error(`PersonWarehouseController->getWarehouses: Hogar no encontrado con ID ${home_id}`);
+                return res.status(204).json({ msg: 'HomeNotFound' });
+            }
+    
+            // Verificar si la persona existe
+            const person = await PersonRepository.getPersonHouse(personId, home_id);
+            if (!person) {
+                logger.error(`PersonWarehouseController->selectWarehouses: La persona con ID ${personId} no está asociada con el hogar con ID ${home_id}`);
+                return res.status(204).json({ msg: 'PersonNotFound' });
+            }
+    
+            // Obtener los almacenes que tienen status 1 o 0 relacionados con la persona o el hogar
+            // Consulta para obtener directamente desde PersonWarehouse
+        const warehouses = await PersonWareHouseRepository.selectWarehouses(personId, home_id);
+
+        // Formatear resultados para el cliente
+        const result = warehouses.map((warehouse) => ({
+           id: warehouse.id,
+            name:  i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.title`) : warehouse.title,
+            description: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.description`) : warehouse.description,
+            location: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.location`) : warehouse.location
+        }));
+    
+            return res.status(200).json({ warehouses: result });
+    
+        } catch (error) {
+            const errorMsg = error.details
+                ? error.details.map(detail => detail.message).join(', ')
+                : error.message || 'Error desconocido';
+            logger.error('Error en PersonWarehouseController->selectWarehouses: ' + errorMsg);
+            res.status(500).json({ error: 'ServerError', details: errorMsg });
+        }
+    }  
 }
 
 module.exports = PersonWarehouseController;

@@ -82,10 +82,14 @@ const getDateTaskSchema = Joi.object({
     start_date: Joi.date().required(),
     home_id: Joi.number().integer().required(),
 });
+const home_idTaskSchema = Joi.object({
+    home_id: Joi.number().required()
+});
 
 module.exports = {
     storeTaskSchema,
     updateTaskSchema,
     idTaskSchema,
-    getDateTaskSchema
+    getDateTaskSchema,
+    home_idTaskSchema
 };

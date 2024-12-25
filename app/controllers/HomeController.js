@@ -220,9 +220,9 @@ const HomeController = {
             return warehouses.map(warehouse => {
                 return {
                     id: warehouse.id,
-                    nameWarehouses:  i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.title`) : warehouse.title,
-                    descriptionWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.description`) : warehouse.description,
-                    locationWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`status.${warehouse.title}.location`) : warehouse.location
+                    nameWarehouses:  i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.title`) : warehouse.title,
+                    descriptionWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.description`) : warehouse.description,
+                    locationWarehouses: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.location`) : warehouse.location
                 };
             });
         } catch (error) {

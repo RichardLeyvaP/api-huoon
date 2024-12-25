@@ -24,7 +24,7 @@ const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = requi
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
-const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema } = require('./middlewares/validations/taskValidation');
+const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema } = require('./middlewares/validations/taskValidation');
 const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema } = require('./middlewares/validations/personwarehouseproductValidation');
 const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
 
@@ -240,6 +240,7 @@ router.post('/person-warehouse-show', validateSchema(idPersonWareHouseSchema), P
 router.put('/person-warehouse', validateSchema(updatePersonWareHouseSchema), PersonWareHouseController.update);
 router.post('/person-warehouse-destroy', validateSchema(idPersonWareHouseSchema), PersonWareHouseController.destroy);
 router.post('/person-warehouse-home', validateSchema(getWarehouseSchema), PersonWareHouseController.getWarehouses); //devolver los almaces de una persona en un hogar dado
+router.post('/person-warehouse-home-select', validateSchema(getWarehouseSchema), PersonWareHouseController.selectWarehouses); //devolver los almaces de una persona en un hogar dado
 
 //Rutas Productos
 router.get('/product', ProductController.index);
@@ -267,7 +268,7 @@ router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonPro
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
-router.post('/category-status-priority-apk', validateSchema(idHomeSchema), TaskController.category_status_priority);
+router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 
 
