@@ -42,7 +42,7 @@ const WarehouseController =  {
             const warehouse = await WareHouseRepository.findById(req.body.id);
 
             if (!warehouse) {
-                return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
+                return res.status(204).json({ error: 'NotFoundError', details: 'Warehouse not found' });
             }
             res.status(200).json({ 'warehouses': warehouse });
         } catch (error) {
@@ -61,7 +61,7 @@ const WarehouseController =  {
         try {
             const warehouse = await WareHouseRepository.findById(req.body.id);
             if (!warehouse) {
-                return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
+                return res.status(204).json({ error: 'NotFoundError', details: 'Warehouse not found' });
             }
 
             const warehouseUpdate = await WareHouseRepository.update(warehouse, req.body);
@@ -82,7 +82,7 @@ const WarehouseController =  {
         try {
             const warehouse = await WareHouseRepository.findById(req.body.id);
             if (!warehouse) {
-                return res.status(404).json({ error: 'NotFoundError', details: 'Warehouse not found' });
+                return res.status(204).json({ error: 'NotFoundError', details: 'Warehouse not found' });
             }
 
             const warehouseDelete = await WareHouseRepository.delete(warehouse);

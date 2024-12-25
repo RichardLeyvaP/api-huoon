@@ -50,7 +50,6 @@ const HomePersonTaskController = require('./controllers/HomePersonTaskController
 const OpenAIController = require('./controllers/OpenAIController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
-router.post('/ask-ai', OpenAIController.getAIResponse);
 
 //Login y register
 router.post('/login', validateSchema(loginSchema), AuthController.login);
@@ -74,7 +73,7 @@ router.get('/google-callback', (req, res, next) => {
       console.log('Datos en la ruta:', user);
       // Llama a tu función en el controlador aquí
       try {
-        await AuthController.googleCallback(req, res, user);y
+        await AuthController.googleCallback(req, res, user);
       } catch (error) {
         logger.error('Error al llamar a googleCallback:', error);
         return res.status(500).json({ error: 'Error en el procesamiento de la respuesta' });
@@ -131,6 +130,7 @@ router.use(auth);
 
 router.get('/logout', AuthController.logout);
 router.post('/update-password', validateSchema(updatePasswordSchema), AuthController.updatePassword);
+router.post('/ask-ai', OpenAIController.getAIResponse);
 
 //Ruta Configurations
 router.get('/configuration-show', ConfigurationController.show);
@@ -224,7 +224,7 @@ router.post('/warehouse', validateSchema(storeWareHouseSchema), WarehouseControl
 router.post('/warehouse-show', validateSchema(idWareHouseSchema), WarehouseController.show);
 router.put('/warehouse', validateSchema(updateWareHouseSchema), WarehouseController.update);
 router.post('/warehouse-destroy', validateSchema(idWareHouseSchema), WarehouseController.destroy);
-router.post('/get-warehouse', WarehouseController.getWarehouses);//devolver los alamcenes predeterminados 
+router.post('/get-warehouse', WarehouseController.getWarehouses);//devolver los alamcenes predeterminados y asociados a la persona
 
 //Rutas Almacenes
 router.get('/home-warehouse', HomeWareHouseController.index);

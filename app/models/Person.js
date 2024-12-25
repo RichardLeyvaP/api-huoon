@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.HomePersonTask,
         foreignKey: 'person_id',
         otherKey: 'task_id',
-        as: 'tasks',
+        as: 'assignedPeople',
         });
 
         Person.belongsToMany(models.Warehouse, {
@@ -44,9 +44,10 @@ module.exports = (sequelize, DataTypes) => {
           otherKey: 'warehouse_id',
           as: 'warehouses',
           });
-        Person.hasMany(models.HomePersonTask, { foreignKey: 'person_id', as: 'homePersonTasks' });
-        Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople' });
-        Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts' });
+        Person.hasMany(models.HomePersonTask, { foreignKey: 'person_id', as: 'homePersonTasks', onDelete: 'CASCADE' });
+        Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople', onDelete: 'CASCADE' });
+        Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts', onDelete: 'CASCADE' });
+        Person.hasMany(models.Task, { foreignKey: 'person_id', as: 'tasks', onDelete: 'CASCADE' });
     }
 
     /**

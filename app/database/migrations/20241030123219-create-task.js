@@ -61,6 +61,24 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
+      person_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'people',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
+      home_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'homes',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
       recurrence: {
         type: Sequelize.STRING,
         allowNull: true,

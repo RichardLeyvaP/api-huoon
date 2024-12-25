@@ -6,9 +6,10 @@ const storeTaskSchema = Joi.object({
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
     priority_id: Joi.number().integer().required(),
-    parent_id: Joi.number().integer().optional().allow(null),
+    parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
     status_id: Joi.number().integer().required(),
     category_id: Joi.number().integer().required(),
+    home_id: Joi.number().integer().required(),
     recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
     estimated_time: Joi.number().integer().optional().allow(null),
     comments: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
@@ -42,9 +43,10 @@ const updateTaskSchema = Joi.object({
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
     priority_id: Joi.number().integer().optional(),
-    parent_id: Joi.number().integer().optional().allow(null),
+    parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
     status_id: Joi.number().integer().optional(),
     category_id: Joi.number().integer().optional(),
+    home_id: Joi.number().integer().optional(),
     recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
     estimated_time: Joi.number().integer().optional().allow(null),
     comments: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
@@ -77,7 +79,8 @@ const idTaskSchema = Joi.object({
 });
 
 const getDateTaskSchema = Joi.object({
-    start_date: Joi.date().required()
+    start_date: Joi.date().required(),
+    home_id: Joi.number().integer().required(),
 });
 
 module.exports = {

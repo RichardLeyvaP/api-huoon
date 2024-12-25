@@ -30,7 +30,8 @@ async getAIResponse(req, res) {
         { role: 'system', content: issue },
         ...userConversations[userId]  // Pasar el historial de la conversación
       ],
-      max_tokens: 300
+      max_tokens: 1000,
+      temperature: 0.7 // Ajustar para más creatividad
     });
   
     // Obtener la respuesta de OpenAI

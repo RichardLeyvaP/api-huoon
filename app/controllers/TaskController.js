@@ -41,8 +41,8 @@ const TaskController = {
                     attachments: task.attachments,
                     geoLocation: task.geo_location,
                     parentId: task.parent_id,
-                    people: await TaskRepository.peopleTask(task),
-                    children: await TaskRepository.mapChildren(task.children), // Espera el mapeo de hijos
+                    people: await TaskRepository.peopleTask(task, req.person.id),
+                    children: await TaskRepository.mapChildren(task.children, req.person.id), // Espera el mapeo de hijos
                 };
             }));
 
@@ -63,7 +63,7 @@ const TaskController = {
         try {
             const personId = req.person.id;
             // Obtener solo las tareas principales (sin padre) directamente en la consulta
-            const tasks = await TaskRepository.findAllDate(req.body.start_date, personId);
+            const tasks = await TaskRepository.findAllDate(req.body.start_date, personId, req.body.home_id);
 
             if (!tasks.length) {
                 return res.status(204).json({ msg: 'TaskNotFound', tasks: tasks });
@@ -89,8 +89,8 @@ const TaskController = {
                     geoLocation: task.geo_location,
                     parentId: task.parent_id,
                     // Personas relacionadas con la tarea
-                    people: await TaskRepository.peopleTask(task),
-                    children: await TaskRepository.mapChildren(task.children) // Espera el mapeo de hijos
+                    people: await TaskRepository.peopleTask(task, personId),
+                    children: await TaskRepository.mapChildren(task.children, personId) // Espera el mapeo de hijos
                 };
             }));
 
@@ -100,7 +100,7 @@ const TaskController = {
                 ? error.details.map(detail => detail.message).join(', ')
                 : error.message || 'Error desconocido';
 
-            logger.error('TaskController->index: ' + errorMsg);
+            logger.error('TaskController->getTaskDate: ' + errorMsg);
             res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
     },
@@ -172,7 +172,7 @@ const TaskController = {
 
             
 
-        // Agregar el creador si no está incluido
+        /*// Agregar el creador si no está incluido
         if (!personIds.includes(personId)) {
             logger.info(`Agregando automáticamente al creador con personId: ${personId}`);
 
@@ -192,14 +192,14 @@ const TaskController = {
                     home_id: defaultHomeId
                 }
             ];
-        }
+        }*/
         }
     
         // Iniciar la transacción
         const t = await sequelize.transaction();
         try {
 
-            const task = await TaskRepository.create(req.body, req.file, t);
+            const task = await TaskRepository.create(req.body, req.file, personId,t);
             
             // Llamada a ActivityLogService para registrar la creación
             await ActivityLogService.createActivityLog('Task', task.id, 'create', req.user.id, JSON.stringify(task));
@@ -285,8 +285,8 @@ const TaskController = {
                 attachments: task.attachments,
                 geoLocation: task.geo_location,
                 parentId: task.parent_id,
-                people: await TaskRepository.peopleTask(task),
-                children: await TaskRepository.mapChildren(task.children)
+                people: await TaskRepository.peopleTask(task, req.person.id),
+                children: await TaskRepository.mapChildren(task.children, req.person.id)
             };
 
             // Respuesta JSON con los datos de la tarea
@@ -325,6 +325,7 @@ const TaskController = {
 
         // Verificar existencia de personas, roles y hogares antes de crear la tarea
         if (req.body.people && req.body.people.length > 0) {
+            req.body.people = req.body.people.filter(person => person.role_id !== 0);
             const personIds = req.body.people.map(person => person.person_id);
             const roleIds = req.body.people.map(person => person.role_id);
             const homeIds = req.body.people.map(person => person.home_id);
@@ -345,28 +346,6 @@ const TaskController = {
                 logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
                             Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
                 return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
-            }
-
-            // Agregar el creador si no está incluido
-            if (!personIds.includes(personId)) {
-                logger.info(`Agregando automáticamente al creador con personId: ${personId}`);
-
-                // Buscar el rol "Creador"
-                const creatorRole = await Role.findOne({ where: { name: 'Creador' } });
-                if (!creatorRole) {
-                    logger.error('No se encontró el rol "Creador" en la base de datos.');
-                    return res.status(500).json({ msg: 'RoleNotFound' });
-                }
-
-                const defaultHomeId = req.body.people?.[0]?.home_id || null; // Usar un home_id del array o null
-                req.body.people = [
-                    ...(req.body.people || []),
-                    {
-                        person_id: personId,
-                        role_id: creatorRole.id,
-                        home_id: defaultHomeId
-                    }
-                ];
             }
         }
     

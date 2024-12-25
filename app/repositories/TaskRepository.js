@@ -1,7 +1,8 @@
-const { Op } = require('sequelize');
+const { Op, fn, col, literal } = require('sequelize');
 const path = require('path');
 const fs = require('fs');
 const { Task, Priority, Status, Category, Person, HomePersonTask, Role, Home, HomePerson, sequelize } = require('../models');  // Importar el modelo Home
+const ImageService = require('../services/ImageService');
 const logger = require('../../config/logger'); // Importa el logger
 
 class TaskRepository {
@@ -61,7 +62,7 @@ class TaskRepository {
         });
     }
 
-    async mapChildren(children) {
+    async mapChildren(children, personId) {
         try {
             return await Promise.all(children.map(async (child) => {
                     return {
@@ -83,9 +84,9 @@ class TaskRepository {
                     geoLocation: child.geo_location,
                     parentId: child.parent_id,
                     // Personas relacionadas con la tarea hija
-                    people: this.peopleTask(child) || [],
+                    people: await this.peopleTask(child, personId) || [],
                     // Llama recursivamente a mapChildren para obtener hijos de este hijo
-                    children: child.children ? this.mapChildren(child.children) : [],
+                    children: child.children ? await this.mapChildren(child.children, personId) : [],
                     
                 };
             }));
@@ -121,41 +122,81 @@ class TaskRepository {
         });
     }
 
-    async findAllDate(start_date, personId) {
-        return await Task.findAll({
-            where: sequelize.where(
-                sequelize.fn('DATE', sequelize.col('Task.start_date')), // Convertir start_date a solo fecha
-                start_date // Comparar solo la parte de la fecha
-            ),
-            include: [
-                { model: Priority, as: 'priority' },
-                { model: Status, as: 'status' },
-                { model: Category, as: 'category' },
+    async findAllDate(start_date, personId, homeId) {
+       return await Task.findAll({
+        where: {
+            [Op.and]: [
+                sequelize.where(
+                    sequelize.fn('DATE', sequelize.col('Task.start_date')),
+                    start_date // Comparar solo la parte de la fecha
+                ),
                 {
-                    model: Task,
-                    as: 'children',
-                    include: [ // Incluye relaciones en las tareas hijas
-                        { model: Priority, as: 'priority' },
-                        { model: Status, as: 'status' },
-                        { model: Category, as: 'category' },
-                        {
-                            model: HomePersonTask,
-                            as: 'homePersonTasks',
-                            where: { person_id: personId }, // Relación directa con la persona
-                        },
+                    [Op.or]: [
+                        { person_id: personId }, // Relación directa con la persona
+                        sequelize.literal(`EXISTS (
+                            SELECT 1
+                            FROM home_person_task
+                            WHERE home_person_task.task_id = Task.id
+                            AND home_person_task.person_id = ${personId}
+                        )`)
                     ]
                 },
-                 // Filtrar tareas relacionadas con una persona específica
-        {
-            model: HomePersonTask,
-            as: 'homePersonTasks', 
-            where: { person_id: personId }, // Filtro para recuperar tareas relacionadas con la persona
-                },
+                { home_id: homeId } // Filtrar por el hogar dado
             ]
-        });
+        },
+        include: [
+            {
+                model: HomePersonTask,
+                as: 'homePersonTasks',
+                required: false // Permite tareas sin relación en home_person_task
+            },
+            {
+                model: Task,
+                as: 'children', // Relación para tareas hijas
+                include: [
+                    {
+                        model: HomePersonTask,
+                        as: 'homePersonTasks',
+                        required: false, // Permite tareas hijas sin relación en home_person_task
+                        where: {
+                            person_id: personId // Filtrar por la persona en las tareas hijas
+                        }
+                    },
+                    { model: Priority, as: 'priority' },
+                    { model: Status, as: 'status' },
+                    { model: Category, as: 'category' },
+                    {
+                        model: Person, // Incluir la persona relacionada
+                        as: 'person',
+                        required: false // Puede no tener relación
+                    },
+                    {
+                        model: Home, // Incluir el hogar relacionado
+                        as: 'home',
+                        required: false // Puede no tener relación
+                    }
+                ],
+                required: false // Incluir aunque no haya hijos
+            },
+            { model: Priority, as: 'priority' },
+            { model: Status, as: 'status' },
+            { model: Category, as: 'category' },
+            {
+                model: Person, // Incluir la persona relacionada
+                as: 'person',
+                required: false // Puede no tener relación
+            },
+            {
+                model: Home, // Incluir el hogar relacionado
+                as: 'home',
+                required: false // Puede no tener relación
+            }
+        ]
+    });
+        
     }
 
-    async peopleTask(task){
+    async peopleTask(task, personId){
         const homePersonTasks = await HomePersonTask.findAll({
             where: { task_id: task.id },
             include: [
@@ -175,16 +216,48 @@ class TaskRepository {
         });
 
         // Devolver las personas mapeadas
-        return homePersonTasks.map(homePersonTask => ({
-            id: homePersonTask.person.id,
+        let people = homePersonTasks.map(homePersonTask => ({
+            id: homePersonTask.person_id,
             name: homePersonTask.person.name,
             image: homePersonTask.person.image,
-            roleId: homePersonTask.role.id,
+            roleId: homePersonTask.role_id,
             roleName: homePersonTask.role.name
         }));
+        // Verificar si la persona que hace la consulta tiene relación directa con la tarea
+    const personAlreadyIncluded = people.some(person => person.id === personId);
+    // Si la persona no está relacionada, se agrega solo como "Creador"
+    if (!personAlreadyIncluded && task.person_id === personId) {
+        const person = await Person.findByPk(personId); // Obtener los detalles de la persona
+        if (person) {
+            people.push({
+                id: task.person_id,
+                name: person.name,
+                image: person.image,
+                roleId: 0,
+                roleName: 'Creador'
+            });
+        }
+    }
+    /*if (task.person_id === personId) {
+        const alreadyIncluded = people.some(person => person.id === personId);
+        if (!alreadyIncluded) {
+            const creator = await Person.findByPk(personId); // Obtener detalles del creador
+            if (creator) {
+                people.push({
+                    id: creator.id,
+                    name: creator.name,
+                    image: creator.image,
+                    roleId: 0,
+                    roleName: 'Creador'
+                });
+            }
+        }
+    }*/
+
+    return people;
     }
 
-    async create(body, file, t) {
+    async create(body, file, personId, t) {
     
         try {
          // Crear la tarea
@@ -196,6 +269,8 @@ class TaskRepository {
             priority_id: body.priority_id,
             status_id: body.status_id,
             category_id: body.category_id,
+            home_id: body.home_id,
+            person_id: personId,
             recurrence: body.recurrence,
             estimated_time: body.estimated_time,
             comments: body.comments,
@@ -206,22 +281,9 @@ class TaskRepository {
             
         // Si se ha subido un archivo, procesarlo y actualizar la tarea
         if (file) {
-            const extension = path.extname(file.originalname);
-            const newFilename = `tasks/${task.id}${extension}`;
-            
-            // Ruta de archivo de origen y destino
-            const oldPath = file.path;
-            const newPath = path.join(__dirname, '..', '..', 'public', newFilename);
-            try {
-                await fs.promises.rename(oldPath, newPath);
-                
-                // Actualizar el campo de attachments en la tarea
-                await task.update({ attachments: newFilename }, { transaction: t });
-                
-            } catch (fileError) {
-                logger.error('Error al mover la imagen: ' + fileError.message);
-                throw new Error('Error al mover la imagen');
-            }
+            const newFilename = ImageService.generateFilename('tasks', task.id, file.originalname);
+            task.image = await ImageService.moveFile(file, newFilename);
+            await task.update({ image: task.image }, { transaction: t});
         }
         return task;
     } catch (err) {
@@ -249,7 +311,12 @@ class TaskRepository {
 
         // Procesar la imagen si se sube una nueva
         if (file) {
-            const extension = path.extname(file.originalname);
+            if (task.image && task.image !== 'categories/default.jpg') {
+                await ImageService.deleteFile(task.image);
+              }
+              const newFilename = ImageService.generateFilename('categories', task.id, file.originalname);
+              updatedData.image = await ImageService.moveFile(file, newFilename);
+            /*const extension = path.extname(file.originalname);
             const newFilename = `tasks/${task.id}${extension}`;
 
             // Eliminar la imagen anterior si no es la predeterminada
@@ -268,7 +335,7 @@ class TaskRepository {
             await fs.promises.rename(req.file.path, newPath);
 
             // Guardar la nueva ruta de la imagen en updatedData
-            updatedData.attachments = `${newFilename}`;
+            updatedData.attachments = `${newFilename}`;*/
         }
         
         // Actualizar la tarea solo si hay datos para cambiar

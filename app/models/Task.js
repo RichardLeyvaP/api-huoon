@@ -14,7 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Task.belongsTo(models.Priority, { foreignKey: 'priority_id', as: 'priority', onDelete: 'CASCADE' });
       Task.belongsTo(models.Status, { foreignKey: 'status_id', as: 'status', onDelete: 'CASCADE' });
       Task.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category', onDelete: 'CASCADE' });
-       // Una tarea puede tener muchas subtareas (relación de uno a muchos)
+      Task.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
+      Task.belongsTo(models.Home, { foreignKey: 'home_id', as: 'home' }); 
+      // Una tarea puede tener muchas subtareas (relación de uno a muchos)
        Task.hasMany(models.Task, {
         foreignKey: 'parent_id',
         as: 'children',  // Alias para acceder a las subtareas
