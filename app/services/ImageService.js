@@ -17,6 +17,19 @@ const ImageService = {
     }
   },
 
+  async copyFile(file, destination) {
+    const newPath = path.join(__dirname, '..', '..', 'public', destination);
+  
+    try {
+      await fs.promises.copyFile(file.path, newPath);
+      logger.info(`Imagen copiada exitosamente a: ${newPath}`);
+      return destination;
+    } catch (err) {
+      logger.error(`Error al copiar la imagen: ${err.message}`);
+      throw new Error('Error al copiar la imagen');
+    }
+  },
+
   // Eliminar archivo si existe
   async deleteFile(filepath) {
     const fullPath = path.join(__dirname, '..', '..', 'public', filepath);

@@ -259,10 +259,10 @@ router.post('/home-warehouse-product-destroy', HomeWarehouseProductController.de
 
 //Rutas Productos en almacenes de la persona en el hogar
 router.get('/person-home-warehouse-product', PersonHomeWarehouseProductController.index);
-router.post('/person-home-warehouse-product', validateSchema(storePersonProductSchema), multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.store);
+router.post('/person-home-warehouse-product', multerCategory('image', 'personProducts'), validateSchema(storePersonProductSchema), PersonHomeWarehouseProductController.store);
 router.post('/person-home-warehouse-product-show', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.show);
 router.post('/person-home-warehouse-products', validateSchema(getPersonHomeProductSchema), PersonHomeWarehouseProductController.personHomeWarehouseProducts);//Devolver los productos de un almacén en un hogar
-router.post('/person-home-warehouse-product-update', validateSchema(updatePersonProductSchema) , multerCategory('image', 'personHomeWarehouseProducts'), PersonHomeWarehouseProductController.update);
+router.post('/person-home-warehouse-product-update', multerCategory('image', 'personProducts'), validateSchema(updatePersonProductSchema), PersonHomeWarehouseProductController.update);
 router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
 
 

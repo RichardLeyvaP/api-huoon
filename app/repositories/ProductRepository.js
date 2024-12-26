@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { Product, Category } = require('../models');
 const logger = require('../../config/logger'); // Logger para seguimiento
+const ImageService = require('../services/ImageService');
 
 const ProductRepository = {
   // Obtener todos los productos
@@ -44,19 +45,9 @@ const ProductRepository = {
 
     // Manejar archivo si se proporciona
     if (file) {
-      const extension = path.extname(file.originalname);
-      const newFilename = `products/${product.id}${extension}`;
-
-      try {
-        await fs.promises.rename(
-          file.path,
-          path.join(__dirname, '..', '..', 'public', newFilename)
-        );
-        await product.update({ image: newFilename }, {transaction: t});
-      } catch (err) {
-        logger.error(`Error al mover la imagen: ${err.message}`);
-        throw err;
-      }
+      const newFilename = ImageService.generateFilename('products', product.id, file.originalname);
+      product.image = await ImageService.copyFile(file, newFilename);
+      await product.update({ image: product.image }, { transaction: t});
     }
 
     return product;
@@ -76,20 +67,11 @@ const ProductRepository = {
     try {
       // Manejar el archivo si se proporciona
       if (file) {
-        const extension = path.extname(file.originalname);
-        const newFilename = `products/${product.id}${extension}`;
-
-        // Eliminar imagen anterior si no es la predeterminada
-        if (product.image && product.image !== 'products/default.jpg') {
-          const oldPath = path.join(__dirname, '../../public', product.image);
-          await fs.promises.unlink(oldPath).catch(err =>
-            logger.error(`Error eliminando la imagen anterior: ${err.message}`)
-          );
+        if (product.icon && product.image !== 'products/default.jpg') {
+          await ImageService.deleteFile(product.image);
         }
-
-        const newPath = path.join(__dirname, '../../public', newFilename);
-        await fs.promises.rename(file.path, newPath);
-        updatedData.image = newFilename;
+        const newFilename = ImageService.generateFilename('products', product.id, file.originalname);
+        updatedData.image = await ImageService.copyFile(file, newFilename);
       }
 
       // Actualizar los datos en la base de datos si hay cambios
@@ -108,8 +90,7 @@ const ProductRepository = {
   // Eliminar un producto
   async delete(product) {
     if (product.image && product.image !== 'products/default.jpg') {
-      const imagePath = path.join(__dirname, '../../public', product.image);
-      await fs.promises.unlink(imagePath).catch(err => logger.error(`Error eliminando la imagen: ${err.message}`));
+      await ImageService.deleteFile(product.image);
     }
 
     return await product.destroy();
