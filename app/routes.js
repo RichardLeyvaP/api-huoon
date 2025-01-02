@@ -131,6 +131,7 @@ router.use(auth);
 router.get('/logout', AuthController.logout);
 router.post('/update-password', validateSchema(updatePasswordSchema), AuthController.updatePassword);
 router.post('/ask-ai', OpenAIController.getAIResponse);
+router.post('/ask-ai-module', OpenAIController.AiInteraction);
 
 //Ruta Configurations
 router.get('/configuration-show', ConfigurationController.show);
@@ -203,9 +204,9 @@ router.post('/home-person-destroy', validateSchema(idHomePersonSchema), HomePers
 //Rutas Tareas
 router.get('/task', TaskController.index);
 router.post('/task-date-apk',  validateSchema(getDateTaskSchema), TaskController.getTaskDate);
-router.post('/task', validateSchema(storeTaskSchema), multerCategory('attachments', 'tasks'), TaskController.store);
+router.post('/task', multerCategory('attachments', 'tasks'), validateSchema(storeTaskSchema),TaskController.store);
 router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
-router.post('/task-update', validateSchema(updateTaskSchema), multerCategory('attachments', 'tasks'), TaskController.update);
+router.post('/task-update', multerCategory('attachments', 'tasks'), validateSchema(updateTaskSchema), TaskController.update);
 router.post('/task-destroy', validateSchema(idTaskSchema), TaskController.destroy);
 
 

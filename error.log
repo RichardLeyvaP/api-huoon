@@ -179,3 +179,189 @@
 2024-12-16 15:21:46 error: PersonHomeWarehouseProductsController->destroy: Producto no encontrado con ID 29
 2024-12-16 15:40:01 error: Validation error in POST /api/person-home-warehouse-product-destroy - Errors: "home_id" is not allowed, "warehouse_id" is not allowed, "status_id" is not allowed, "unit_price" is not allowed, "total_price" is not allowed, "quantity" is not allowed, "purchase_date" is not allowed, "purchase_place" is not allowed, "expiration_date" is not allowed, "brand" is not allowed, "additional_notes" is not allowed, "maintenance_date" is not allowed, "due_date" is not allowed, "frequency" is not allowed, "type" is not allowed, "category_id" is not allowed, "name" is not allowed
 2024-12-16 15:40:06 error: Validation error in POST /api/person-home-warehouse-product - Errors: "id" is not allowed
+2024-12-18 14:01:36 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:06:39 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:07:44 error: Error al loguear usuario: WHERE parameter "email" has invalid "undefined" value
+2024-12-18 14:09:45 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:10:51 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:14:58 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:15:19 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:15:21 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:16:48 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:26:57 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:33:43 error: Validation error in POST /api/login - Body: [] - Errors: "value" must be of type object
+2024-12-18 14:49:29 error: Validation error in POST /api/login - Body: {"name":"prueba front","email":"prueba.front@prueba.com","password":"aaaa123"} - Errors: "name" is not allowed
+2024-12-19 09:27:53 error: Validation error in POST /api/status - Body: [] - Errors: "value" must be of type object
+2024-12-19 09:28:42 error: Validation error in POST /api/status - Body: {"name":"adsada","color":"1654da","icono":"asdasd","description":"asdasdasdasd","type":"Product"} - Errors: "icono" is not allowed
+2024-12-19 09:30:48 error: Validation error in POST /api/status - Body: {"name":"zczxc","color":"czxczz","icono":"zxczxczx","description":"zczxczxc","type":"Product"} - Errors: "icono" is not allowed
+2024-12-19 09:31:45 error: Validation error in POST /api/status - Body: {"name":"xcvxcv","color":"xcvxcv","icono":"xcvxcv","description":"xcvxcvxcvxcv","type":"Task"} - Errors: "icono" is not allowed
+2024-12-19 09:32:08 error: Validation error in POST /api/status - Body: {"name":"zxczxc","color":"zxczxz","icono":"zxczxczxc","description":"zxczczxczxc","type":"Product"} - Errors: "icono" is not allowed
+2024-12-19 09:33:34 error: Validation error in POST /api/status - Body: {"name":"czxczx","color":"zczxcz","icono":"zczczczc","description":"zczczxczxczczxczxcx","type":"Product"} - Errors: "icono" is not allowed
+2024-12-19 09:36:25 error: Validation error in PUT /api/status - Body: {"name":"zxczc","color":"ffffff","icon":"mdi-home","description":"ffffffffffffffffffff","type":"Home"} - Errors: "id" is required
+2024-12-19 09:38:00 error: Validation error in PUT /api/status - Body: {"name":"sdfsdf","color":"ffffff","icon":"mdi-home","description":"czxczxczxc","type":"Home"} - Errors: "id" is required
+2024-12-19 09:38:59 error: Validation error in PUT /api/status - Body: {"name":"zxczc","color":"zxczxcz","icon":"zxczxczxc","description":"zczczxczxczx","type":"Home"} - Errors: "id" is required
+2024-12-19 10:29:18 error: Error en RoleController->store: Assignment to constant variable.
+2024-12-19 10:32:09 error: Error en RoleController->store: Assignment to constant variable.
+2024-12-19 10:38:06 error: Error en RoleController->store: Assignment to constant variable.
+2024-12-19 10:45:49 error: RoleController->update: Error al actualizar el rol: Role is not defined
+2024-12-19 10:46:43 error: RoleController->update: Error al actualizar el rol: Cannot convert undefined or null to object
+2024-12-19 10:52:08 error: Validation error in POST /api/role - Body: {"name":"addsad","description":"sdasdadasd","type":"Task","id":6} - Errors: "id" is not allowed
+2024-12-19 10:55:29 error: RoleController->update: Error al actualizar el rol: Cannot convert undefined or null to object
+2024-12-19 10:56:21 error: RoleController->update: Error al actualizar el rol: Cannot convert undefined or null to object
+2024-12-19 10:57:56 error: RoleController->update: Error al actualizar el rol: Cannot convert undefined or null to object
+2024-12-19 10:58:28 error: RoleController->update: Error al actualizar el rol: Cannot convert undefined or null to object
+2024-12-19 12:31:03 error: Validation error in POST /api/priority - Body: {"name":"sadasdsad","color":"asdsasdasd","level":"adasdasd","description":"adasdadasd"} - Errors: "level" must be a number
+2024-12-19 12:35:11 error: Validation error in POST /api/priority - Body: {"name":"","color":"","level":"4","description":""} - Errors: "name" is not allowed to be empty
+2024-12-19 14:40:07 error: Validation error in POST /api/category - Body: {} - Errors: "name" is required
+2024-12-19 14:41:41 error: Validation error in POST /api/category - Body: {"name":"sdadasd","color":"undefined","icon":"undefined","description":"undefined","type":"undefined","image":""} - Errors: "image" is not allowed
+2024-12-19 14:57:40 error: StatusController->update: Estado no encontrado con ID 14
+2024-12-19 16:05:22 error: OpenAIController->getAIResponse: Hubo un error al obtener la respuesta de OpenAI: 403 Country, region, or territory not supported
+2024-12-19 16:17:42 error: OpenAIController->getAIResponse: Hubo un error al obtener la respuesta de OpenAI: 403 Country, region, or territory not supported
+2024-12-19 21:58:32 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\sdfsdfsdf'
+2024-12-19 21:58:47 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\aaaaaaaa'
+2024-12-19 22:02:03 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\categories\15.jpg'
+2024-12-19 22:16:42 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\aaaa'
+2024-12-19 22:19:51 error: Error al eliminar el icono anterior: ENOENT: no such file or directory, unlink 'D:\Dev Klint\Huoon\api-huoon\public\categories\15.jpg'
+2024-12-19 22:25:16 error: Validation error in POST /api/category-update - Body: {"id":"","name":"sfsfsdf","color":"sfsdfsdf","description":"fsdfsdfsdfs","type":"Product"} - Errors: "id" must be a number
+2024-12-19 22:28:20 error: Validation error in POST /api/category - Body: {"name":"xcvvxcv","parent_id":"Mercado","color":"xvxcvxcv","description":"xcvxcvxcvxcvxcv","type":"Product"} - Errors: "parent_id" must be a number
+2024-12-19 22:39:34 error: CategoryController->update: Error al actualizar la categoría: category.update is not a function
+2024-12-19 22:42:21 error: CategoryController->update: Error al actualizar la categoría: category.update is not a function
+2024-12-19 22:50:47 error: Validation error in POST /api/category-update - Body: {"id":"","parent_id":"3","name":"xzcxzczxc","color":"zczxczxc","description":"zcxzczxczxc","type":"Product"} - Errors: "id" must be a number
+2024-12-19 22:54:39 error: Validation error in POST /api/category-update - Body: {"id":"","parent_id":"2","name":"zczczc","color":"zczczxc","description":"zczxczczxc","type":"Product"} - Errors: "id" must be a number
+2024-12-19 22:55:47 error: Error eliminando la imagen: validator is not defined
+2024-12-19 22:55:47 error: CategoryController->destroy: Error al eliminar la categoría: Error al eliminar la imagen: validator is not defined
+2024-12-20 10:43:39 error: Validation error in POST /api/category - Body: {"name":"xzczczx","parent_id":"null","color":"zcxzcxzc","description":"zxczxcxzc","type":"Product"} - Errors: "parent_id" must be a number
+2024-12-20 10:44:46 error: CategoryController->store: Categoría no encontrada con ID 
+2024-12-20 10:48:48 error: CategoryController->store: Categoría no encontrada con ID 
+2024-12-20 10:53:21 error: CategoryController->store: sequelize is not defined
+2024-12-20 10:54:28 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 10:54:28 error: CategoryController->store: Error al crear la categoría
+2024-12-20 10:55:23 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 10:55:23 error: CategoryController->store: Error al crear la categoría
+2024-12-20 11:00:30 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:00:30 error: CategoryController->store: Error al crear la categoría
+2024-12-20 11:01:43 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:01:43 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:02:33 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:02:33 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:05:37 error: Validation error in POST /api/category - Body: {"name":"sdfdsfsd","parent_id":"null","color":"fsdfdsf","description":"sdfsdfsdfsd","type":"Task"} - Errors: "parent_id" must be one of [number, ]
+2024-12-20 11:08:34 error: Validation error in POST /api/category - Body: {"name":"sfsdfsdf","parent_id":"null","color":"sfsdfsdf","description":"sfsdfsdfsd","type":"Task"} - Errors: "parent_id" must be a number
+2024-12-20 11:14:52 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:14:52 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:16:03 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:16:03 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:26:11 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:26:11 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:27:12 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:27:12 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:28:56 error: Error al crear la categoría: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:28:56 error: CategoryController->store: Incorrect integer value: '' for column 'parent_id' at row 1
+2024-12-20 11:31:15 error: CategoryController->store: Assignment to constant variable.
+2024-12-20 11:33:59 error: Validation error in POST /api/category-update - Body: {"id":"19","parent_id":"null","name":"aaaa","color":"aaaa","icon":"","description":"aaaaa","type":"Task"} - Errors: "parent_id" must be a number
+2024-12-20 11:35:14 error: Validation error in POST /api/category-update - Body: {"id":"19","parent_id":"null","name":"aaa","color":"aaaa","icon":"","description":"aaaa","type":"Task"} - Errors: "parent_id" must be a number
+2024-12-21 05:33:20 error: Error al crear la categoría: ImageService is not defined
+2024-12-21 05:33:20 error: CategoryController->store: ImageService is not defined
+2024-12-21 05:33:38 error: Error al crear la categoría: ImageService is not defined
+2024-12-21 05:33:38 error: CategoryController->store: ImageService is not defined
+2024-12-22 07:32:22 error: TaskController->index: Cannot read properties of undefined (reading 'and')
+2024-12-22 07:35:03 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'and')
+2024-12-22 07:36:52 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'and')
+2024-12-22 07:38:15 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'where')
+2024-12-22 07:39:19 error: TaskController->getTaskDate: Invalid value { home_id: 1 }
+2024-12-22 07:40:29 error: TaskController->getTaskDate: Algo está equivocado en su sintax cerca '2024-11-26 1) HAVING 
+                    EXISTS (
+                        SELEC' en la linea 1
+2024-12-22 07:41:28 error: TaskController->getTaskDate: Invalid value { home_id: 1 }
+2024-12-22 07:49:18 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'and')
+2024-12-22 07:50:18 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'and')
+2024-12-22 07:50:50 error: TaskController->getTaskDate: Tabla 'auth.home_person_tasks' no existe
+2024-12-22 07:51:14 error: TaskController->getTaskDate: Tabla 'auth.home_person_tasks' no existe
+2024-12-22 07:51:40 error: TaskController->getTaskDate: La columna 'tasks.id' en where clause es desconocida
+2024-12-22 07:52:16 error: TaskController->getTaskDate: La columna 'tasks.person_id' en having clause es desconocida
+2024-12-22 07:52:28 error: TaskRepository->mapChildren
+2024-12-22 07:52:28 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-22 07:52:28 error: TaskRepository->mapChildren
+2024-12-22 07:56:04 error: TaskRepository->mapChildren
+2024-12-22 07:56:04 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-22 07:56:04 error: TaskRepository->mapChildren
+2024-12-22 07:57:47 error: TaskRepository->mapChildren
+2024-12-22 07:57:47 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-22 07:57:47 error: TaskRepository->mapChildren
+2024-12-22 07:59:12 error: TaskRepository->mapChildren
+2024-12-22 07:59:12 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-22 07:59:12 error: TaskRepository->mapChildren
+2024-12-22 08:00:50 error: TaskRepository->mapChildren
+2024-12-22 08:00:50 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-22 08:00:50 error: TaskRepository->mapChildren
+2024-12-22 08:32:38 error: Validation error in POST /api/task - Body: {"title":"Comprar suministros","description":"Comprar alimentos y materiales de limpieza para el hogar.","start_date":"2024-12-25 10:00:00","end_date":"2024-12-26 10:00:00","priority_id":2,"status_id":1,"category_id":3,"home_id":4,"person_id":1,"recurrence":"weekly","estimated_time":120,"comments":"Revisar las ofertas en el supermercado local.","geo_location":"40.712776, -74.005974","people":[{"person_id":5,"role_id":2,"home_id":1},{"person_id":6,"role_id":3,"home_id":1}]} - Errors: "person_id" is not allowed
+2024-12-22 08:34:51 error: Validation error in POST /api/task-date-apk - Body: {"start_date":"2024-12-25"} - Errors: "home_id" is required
+2024-12-23 13:55:48 error: Validation error in POST /api/warehouse - Body: {"name":"dasdasd","description":"asdasdasd","location":"dsaasdasd"} - Errors: "title" is required, "name" is not allowed
+2024-12-23 13:55:58 error: Validation error in POST /api/warehouse - Body: {"name":"asdsad","description":"asdsasdasd","location":"asdasds"} - Errors: "title" is required, "name" is not allowed
+2024-12-23 17:27:46 error: TaskController->getTaskDate: La columna 'tasks.id' en where clause es desconocida
+2024-12-24 08:12:50 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'and')
+2024-12-24 08:29:29 error: TaskRepository->mapChildren
+2024-12-24 08:29:29 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'map')
+2024-12-24 08:35:36 error: TaskController->getTaskDate: La columna 'children->homePersonTasks.person_id' en on clause es desconocida
+2024-12-24 09:03:21 error: TaskController->getTaskDate: req is not defined
+2024-12-24 09:07:42 error: TaskController->getTaskDate: Cannot read properties of undefined (reading 'name')
+2024-12-25 09:23:08 error: Error en PersonWarehouseController->getWarehouses: PersonWarehouse is not associated to Warehouse!
+2024-12-25 09:28:18 error: Error en PersonWarehouseController->selectWarehouses: people is not defined
+2024-12-25 09:29:35 error: Error en PersonWarehouseController->selectWarehouses: PersonWarehouse is not associated to Warehouse!
+2024-12-25 09:32:18 error: Error en PersonWarehouseController->selectWarehouses: PersonWarehouse is associated to Warehouse using an alias. You must use the 'as' keyword to specify the alias within your include statement.
+2024-12-25 09:32:39 error: Error en PersonWarehouseController->selectWarehouses: personWarehouses is not defined
+2024-12-25 09:38:15 error: Validation error in POST /api/category-status-priority-apk - Body: {"home_id":1} - Errors: "id" is required, "home_id" is not allowed
+2024-12-25 10:07:00 error: PersonWarehouseController->store: Almacén no encontrado con ID 
+2024-12-25 10:08:04 error: Validation error in POST /api/person-warehouse-home-select - Body: {"home_id":1,"title":"fsdfsdfsdf","description":"sdfsdfsdfdsfdsfds","location":"sdfsdfsdfdsf","warehouse_id":""} - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed, "warehouse_id" is not allowed
+2024-12-25 10:08:09 error: Validation error in POST /api/person-warehouse-home-select - Body: {"home_id":1,"title":"fsdfsdfsdf","description":"sdfsdfsdfdsfdsfds","location":"sdfsdfsdfdsf","warehouse_id":""} - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed, "warehouse_id" is not allowed
+2024-12-25 10:08:48 error: Validation error in POST /api/person-warehouse-home - Body: {"home_id":1,"title":"sdffdsfds","description":"sdfsdfsdfsdfsdf","location":"sdfsfsdf","warehouse_id":""} - Errors: "title" is not allowed, "description" is not allowed, "location" is not allowed, "warehouse_id" is not allowed
+2024-12-25 10:11:39 error: PersonWarehouseController->update: Hogar no encontrado con ID undefined
+2024-12-25 10:34:33 error: Error al editar PersonWarehouse: commit has been called on this transaction(a1192469-53d7-4014-a4bf-9433b6346e13), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+2024-12-25 10:38:00 error: Error al editar PersonWarehouse: commit has been called on this transaction(689955f4-f39a-4a5a-889d-d51ec55cedaf), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+2024-12-25 10:39:34 error: Error al editar PersonWarehouse: commit has been called on this transaction(b652e142-70eb-44b9-8ddc-31cb297dc6d9), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+2024-12-25 10:40:43 error: Error al editar PersonWarehouse: commit has been called on this transaction(5e62b80f-e2c6-46f0-b011-af59756b81e2), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+2024-12-25 10:45:16 error: Error al editar PersonWarehouse: commit has been called on this transaction(6873e54a-528c-4739-b87e-d1203d8b01c2), you can no longer use it. (The rejected query is attached as the 'sql' property of this error)
+2024-12-25 11:48:39 error: Validation error in POST /api/warehouse - Body: {"search":"","page":1} - Errors: "title" is required, "search" is not allowed, "page" is not allowed
+2024-12-25 11:52:53 error: Validation error in POST /api/warehouse - Body: {"search":"","page":1,"title":"fzxfxfxz","description":"zxfzxfzxfz","location":"xfzxfzf"} - Errors: "search" is not allowed, "page" is not allowed
+2024-12-26 12:35:57 error: Validation error in POST /api/person-home-warehouse-product - Body: {"warehouse_id":"3","name":"fsdfsdf","brand":"sdfdsdf","unit_price":"10000","quantity":"5","additional_notes":"sfsdfsdfsdfsdf","status_id":"4","id":""} - Errors: "home_id" is required, "id" is not allowed
+2024-12-26 12:37:41 error: Error en PersonHomeWarehouseProductController->store: notNull Violation: El campo category_id es obligatorio
+2024-12-26 12:37:55 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 34
+2024-12-26 12:37:55 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 34
+2024-12-26 12:49:41 error: Error en PersonProductRepository->store: req is not defined
+2024-12-26 12:49:41 error: Error en PersonHomeWarehouseProductController->store: req is not defined
+2024-12-26 13:01:36 error: Error al mover la imagen: ENOENT: no such file or directory, rename 'D:\Dev Klint\Huoon\api-huoon\public\personHomeWarehouseProducts\image-1735236096585.png' -> 'D:\Dev Klint\Huoon\api-huoon\public\personHomeWarehouseProducts\34.png'
+2024-12-26 13:01:36 error: Error en PersonProductRepository->store: Error al mover la imagen
+2024-12-26 13:01:36 error: Error en PersonHomeWarehouseProductController->store: Error al mover la imagen
+2024-12-26 13:08:20 error: Error al mover la imagen: ENOENT: no such file or directory, rename 'D:\Dev Klint\Huoon\api-huoon\public\personProducts\image-1735236500678.png' -> 'D:\Dev Klint\Huoon\api-huoon\public\personProducts\35.png'
+2024-12-26 13:08:20 error: Error en PersonProductRepository->store: Error al mover la imagen
+2024-12-26 13:08:20 error: Error en PersonHomeWarehouseProductController->store: Error al mover la imagen
+2024-12-26 13:15:27 error: Error al mover la imagen: ENOENT: no such file or directory, rename 'D:\Dev Klint\Huoon\api-huoon\public\personProducts\image-1735236927617.png' -> 'D:\Dev Klint\Huoon\api-huoon\public\personProducts\36.png'
+2024-12-26 13:15:27 error: Error en PersonProductRepository->store: Error al mover la imagen
+2024-12-26 13:15:27 error: Error en PersonHomeWarehouseProductController->store: Error al mover la imagen
+2024-12-26 13:21:39 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"sfsdfsdf","brand":"sdfsdfd","unit_price":"2000","quantity":"12","expiration_date":"2024-12-31","additional_notes":"sdfsdfd","status_id":"4","category_id":"8","home_id":"1"} - Errors: "warehouse_id" is required
+2024-12-26 13:29:20 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:29:20 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:31:51 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:31:51 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:31:53 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":15} - Errors: "home_id" is required
+2024-12-26 13:31:53 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":15} - Errors: "home_id" is required
+2024-12-26 13:31:54 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:31:54 error: Validation error in POST /api/person-home-warehouse-products - Body: {"warehouse_id":3} - Errors: "home_id" is required
+2024-12-26 13:59:55 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","brand":"nike editada","home_id":"1"} - Errors: "warehouse_id" is required, "status_id" is required, "unit_price" is required, "quantity" is required
+2024-12-26 14:10:46 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","category_id":"8","status_id":"4","brand":"nike editado","home_id":"1"} - Errors: "warehouse_id" is required, "unit_price" is required, "quantity" is required
+2024-12-26 14:13:52 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","quantity":"3","expiration_date":"2024-12-31","brand":"nike editado","additional_notes":"zapato editado","home_id":"1"} - Errors: "warehouse_id" is required, "status_id" is required, "unit_price" is required
+2024-12-26 14:38:56 error: Validation error in POST /api/person-home-warehouse-product-destroy - Body: {} - Errors: "id" is required
+2024-12-26 14:39:33 error: Validation error in POST /api/person-home-warehouse-product-destroy - Body: {} - Errors: "id" is required
+2025-01-02 11:04:29 error: Validation error in POST /api/login - Body: {"email":"yasmany","password":"12345","branch_id":""} - Errors: "branch_id" is not allowed
+2025-01-02 12:00:03 error: Validation error in POST /api/category-status-priority-apk - Body: {} - Errors: "home_id" is required
+2025-01-02 12:28:07 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 8
+2025-01-02 12:28:07 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 8
+2025-01-02 13:34:34 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:38 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:41 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:46 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:35:02 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:35:08 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:28 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:29 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:31 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:35 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required

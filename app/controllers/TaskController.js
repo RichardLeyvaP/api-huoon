@@ -169,30 +169,6 @@ const TaskController = {
                             Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
                 return res.status(400).json({ msg: 'Datos no encontrados para algunas asociaciones.' });
             }
-
-            
-
-        /*// Agregar el creador si no está incluido
-        if (!personIds.includes(personId)) {
-            logger.info(`Agregando automáticamente al creador con personId: ${personId}`);
-
-            // Buscar el rol "Creador"
-            const creatorRole = await Role.findOne({ where: { name: 'Creador' } });
-            if (!creatorRole) {
-                logger.error('No se encontró el rol "Creador" en la base de datos.');
-                return res.status(500).json({ msg: 'RoleNotFound' });
-            }
-
-            const defaultHomeId = req.body.people?.[0]?.home_id || null; // Usar un home_id del array o null
-            req.body.people = [
-                ...(req.body.people || []),
-                {
-                    person_id: personId,
-                    role_id: creatorRole.id,
-                    home_id: defaultHomeId
-                }
-            ];
-        }*/
         }
     
         // Iniciar la transacción

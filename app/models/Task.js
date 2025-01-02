@@ -83,7 +83,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: true,
     },
+    home_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
     status_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+    person_id: {
       type: DataTypes.BIGINT,
       allowNull: false,
     },

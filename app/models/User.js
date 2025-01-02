@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user_id', // Clave foránea en la tabla Person
         as: 'person'           // Alias para acceder a la persona del usuario
       });
+
+      User.hasMany(models.AiInteraction, {
+        foreignKey: 'user_id',   // Clave foránea en la tabla Configuration
+        as: 'ais'     // Alias para acceder a las configuraciones del usuario
+      });
     }
   }
   User.init({

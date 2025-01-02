@@ -1,24 +1,542 @@
-2024-12-16 15:14:26 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
-2024-12-16 15:14:26 info: Datos recibidos al editar un producto en un almacén
-2024-12-16 15:14:26 info: {"id":29,"purchase_place":"Supermercado Local editado","name":"Producto de Ejemplo editado"}
-2024-12-16 15:14:26 error: Error en PersonHomeWarehouseProductsController->update: Cannot read properties of undefined (reading 'update')
-2024-12-16 15:15:57 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
-2024-12-16 15:15:57 info: Datos recibidos al editar un producto en un almacén
-2024-12-16 15:15:57 info: {"id":29,"purchase_place":"Supermercado Local editado","name":"Producto de Ejemplo editado"}
-2024-12-16 15:15:57 info: Producto actualizado exitosamente: Producto de Ejemplo editado (ID: 37)
-2024-12-16 15:15:57 info: Task actualizada exitosamente (ID: 29)
-2024-12-16 15:16:29 info: prueba2 - Consulta del producto específico en un almacén para el hogar de una persona
-2024-12-16 15:20:30 info: prueba2 - Eliminando un producto de un almacen en un hogar
-2024-12-16 15:20:30 error: PersonHomeWarehouseProductsController->destroy: req is not defined
-2024-12-16 15:21:46 info: prueba2 - Eliminando un producto de un almacen en un hogar
-2024-12-16 15:21:46 error: PersonHomeWarehouseProductsController->destroy: Producto no encontrado con ID 29
-2024-12-16 15:40:01 error: Validation error in POST /api/person-home-warehouse-product-destroy - Errors: "home_id" is not allowed, "warehouse_id" is not allowed, "status_id" is not allowed, "unit_price" is not allowed, "total_price" is not allowed, "quantity" is not allowed, "purchase_date" is not allowed, "purchase_place" is not allowed, "expiration_date" is not allowed, "brand" is not allowed, "additional_notes" is not allowed, "maintenance_date" is not allowed, "due_date" is not allowed, "frequency" is not allowed, "type" is not allowed, "category_id" is not allowed, "name" is not allowed
-2024-12-16 15:40:06 error: Validation error in POST /api/person-home-warehouse-product - Errors: "id" is not allowed
-2024-12-16 15:40:12 info: prueba2 - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico
-2024-12-16 15:40:12 info: datos recibidos al crear un producto
-2024-12-16 15:40:12 info: {"home_id":1,"warehouse_id":3,"status_id":5,"unit_price":15.75,"total_price":315,"quantity":20,"purchase_date":"2024-12-01","purchase_place":"Supermercado Local editado","expiration_date":"2025-01-15","brand":"MarcaEjemplo","additional_notes":"Mantener en un lugar fresco y seco.","maintenance_date":"2025-01-10","due_date":"2025-06-30","frequency":"mensual","type":"producto alimenticio","category_id":8,"name":"Producto de Ejemplo editado"}
-2024-12-16 15:40:12 info: PersonHomeWarehouseController->store: Creando nuevo producto
-2024-12-16 15:49:38 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
-2024-12-16 15:49:38 info: Datos recibidos al editar un producto en un almacén
-2024-12-16 15:49:38 info: {"id":30,"name":"Producto de Ejemplo editado"}
-2024-12-16 15:49:39 info: Producto actualizado exitosamente (ID: 38)
+2024-12-26 13:50:41 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:50:41 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:50:45 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:50:45 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:50:45 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:50:45 info: Entra a Buscar Los estados de Product
+2024-12-26 13:54:17 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 13:54:17 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:54:19 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 13:54:19 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:54:19 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:54:24 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:54:24 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:54:24 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:54:24 info: Entra a Buscar Los estados de Product
+2024-12-26 13:56:49 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 13:56:50 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:56:50 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:57:01 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:57:01 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:57:01 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:57:01 info: Entra a Buscar Los estados de Product
+2024-12-26 13:58:27 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:58:27 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:58:27 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:58:27 info: Entra a Buscar Los estados de Product
+2024-12-26 13:58:53 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 13:58:53 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:58:55 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 13:58:55 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:58:55 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:58:59 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:58:59 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:58:59 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:58:59 info: Entra a Buscar Los estados de Product
+2024-12-26 13:59:22 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 13:59:22 info: Entra a Buscar Las categorias de Product
+2024-12-26 13:59:22 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 13:59:22 info: Entra a Buscar Los estados de Product
+2024-12-26 13:59:55 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","brand":"nike editada","home_id":"1"} - Errors: "warehouse_id" is required, "status_id" is required, "unit_price" is required, "quantity" is required
+2024-12-26 14:01:48 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:01:48 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:01:48 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:01:50 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:01:50 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:01:50 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:01:50 info: Entra a Buscar Los estados de Product
+2024-12-26 14:10:46 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","category_id":"8","status_id":"4","brand":"nike editado","home_id":"1"} - Errors: "warehouse_id" is required, "unit_price" is required, "quantity" is required
+2024-12-26 14:13:25 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:13:25 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:13:25 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:13:25 info: Entra a Buscar Los estados de Product
+2024-12-26 14:13:52 error: Validation error in POST /api/person-home-warehouse-product - Body: {"name":"zapato de no editado","quantity":"3","expiration_date":"2024-12-31","brand":"nike editado","additional_notes":"zapato editado","home_id":"1"} - Errors: "warehouse_id" is required, "status_id" is required, "unit_price" is required
+2024-12-26 14:14:35 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:14:35 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:35 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:40 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:14:40 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:40 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:41 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:14:41 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:41 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:45 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:14:45 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:14:45 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:14:45 info: Entra a Buscar Los estados de Product
+2024-12-26 14:14:59 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-26 14:14:59 info: Datos recibidos al editar un producto en un almacén
+2024-12-26 14:14:59 info: {"name":"zapato de no editado","brand":"nike editado","id":"28"}
+2024-12-26 14:14:59 info: Imagen copiada exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\products\29.jpg
+2024-12-26 14:14:59 info: Producto actualizado exitosamente (ID: 29)
+2024-12-26 14:14:59 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\personProducts\28.jpg
+2024-12-26 14:14:59 info: Producto actualizada exitosamente (ID: 28)
+2024-12-26 14:15:00 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:15:00 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:00 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:03 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:03 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:15:03 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:15:03 info: Entra a Buscar Los estados de Product
+2024-12-26 14:15:21 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-26 14:15:21 info: Datos recibidos al editar un producto en un almacén
+2024-12-26 14:15:21 info: {"category_id":"8","status_id":"4","quantity":"3","expiration_date":"2024-12-31","id":"28"}
+2024-12-26 14:15:21 info: Producto actualizado exitosamente (ID: 29)
+2024-12-26 14:15:21 info: Producto actualizada exitosamente (ID: 28)
+2024-12-26 14:15:22 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:15:22 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:22 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:24 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:15:24 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:15:24 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:15:24 info: Entra a Buscar Los estados de Product
+2024-12-26 14:29:31 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:29:31 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:29:31 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:37:13 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:37:13 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:37:13 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:05 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:38:06 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:06 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:44 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:44 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:45 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:38:45 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:45 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:38:56 error: Validation error in POST /api/person-home-warehouse-product-destroy - Body: {} - Errors: "id" is required
+2024-12-26 14:39:33 error: Validation error in POST /api/person-home-warehouse-product-destroy - Body: {} - Errors: "id" is required
+2024-12-26 14:40:40 info: prueba2 - Eliminando un producto de un almacen en un hogar
+2024-12-26 14:40:40 info: Archivo eliminado exitosamente: D:\Dev Klint\Huoon\api-huoon\public\personProducts\37.png
+2024-12-26 14:40:40 info: Archivo eliminado exitosamente: D:\Dev Klint\Huoon\api-huoon\public\products\38.png
+2024-12-26 14:40:40 info: Registro eliminado de PersonHomeWarehouseProduct con ID 37
+2024-12-26 14:40:40 info: Registro eliminado de Product con ID 38
+2024-12-26 14:40:40 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:40:40 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:40:40 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:46 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:46 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:47 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:47 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:56 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:41:56 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:41:56 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:41:56 info: Entra a Buscar Los estados de Product
+2024-12-26 14:42:10 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:10 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:11 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:11 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:24 info: prueba2 - Entra a la ruta unificada de Products
+2024-12-26 14:42:24 info: Entra a Buscar Las categorias de Product
+2024-12-26 14:42:24 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:24 info: Entra a Buscar Los estados de Product
+2024-12-26 14:42:39 info: prueba2 - Inicia actualización de relación en person_home_warehouse_products
+2024-12-26 14:42:39 info: Datos recibidos al editar un producto en un almacén
+2024-12-26 14:42:39 info: {"additional_notes":"hola editada","id":"29"}
+2024-12-26 14:42:39 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\personProducts\29.jpg
+2024-12-26 14:42:39 info: Producto actualizada exitosamente (ID: 29)
+2024-12-26 14:42:39 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:42:39 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:42:39 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:43:18 info: prueba2 - Eliminando un producto de un almacen en un hogar
+2024-12-26 14:43:18 info: Archivo eliminado exitosamente: D:\Dev Klint\Huoon\api-huoon\public\personProducts\29.jpg
+2024-12-26 14:43:18 info: Registro eliminado de PersonHomeWarehouseProduct con ID 29
+2024-12-26 14:43:18 info: Registro eliminado de Product con ID 30
+2024-12-26 14:43:18 info: prueba2 - Entra a buscar los almacenes asociados a él
+2024-12-26 14:43:18 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2024-12-26 14:43:18 info: prueba2 - Consulta de los productos en un almacén específicode una persona en el hogar
+2025-01-02 10:31:28 info: Entrando a loguearse
+2025-01-02 10:33:14 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:35:24 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:17 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:19 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:22 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:25 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:27 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:31 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:35 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:40 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:44 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:55 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:56 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:41:59 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:44:03 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:44:04 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:44:32 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 10:58:42 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:00:24 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:00:35 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:04:29 error: Validation error in POST /api/login - Body: {"email":"yasmany","password":"12345","branch_id":""} - Errors: "branch_id" is not allowed
+2025-01-02 11:40:10 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:40:12 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:45:07 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:45:47 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:45:47 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:05 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:43 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:45 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:47 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:52 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:46:54 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:03 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:03 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:07 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:11 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:14 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:35 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:47:37 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:09 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:09 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:21 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:24 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:34 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:46 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:48 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:48:59 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:00 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:12 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:21 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:23 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:33 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:49:37 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:59:33 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:59:36 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 11:59:59 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:00:03 error: Validation error in POST /api/category-status-priority-apk - Body: {} - Errors: "home_id" is required
+2025-01-02 12:01:27 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:01:30 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:01:30 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:01:30 info: Entra a Buscar Los estados de Task
+2025-01-02 12:01:30 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:01:30 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:01:30 info: Entra a Buscar Los roles de Task
+2025-01-02 12:09:09 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:09:10 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:09:10 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:09:10 info: Entra a Buscar Los estados de Task
+2025-01-02 12:09:10 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:09:10 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:09:10 info: Entra a Buscar Los roles de Task
+2025-01-02 12:10:32 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:10:34 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:10:36 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:10:36 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:10:36 info: Entra a Buscar Los estados de Task
+2025-01-02 12:10:36 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:10:36 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:10:36 info: Entra a Buscar Los roles de Task
+2025-01-02 12:11:59 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:12:04 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:12:05 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:12:05 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:12:05 info: Entra a Buscar Los estados de Task
+2025-01-02 12:12:05 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:12:05 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:12:05 info: Entra a Buscar Los roles de Task
+2025-01-02 12:12:58 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:12:58 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:12:58 info: Entra a Buscar Los estados de Task
+2025-01-02 12:12:58 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:12:58 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:12:58 info: Entra a Buscar Los roles de Task
+2025-01-02 12:13:04 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:13:06 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:13:09 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:13:09 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:13:09 info: Entra a Buscar Los estados de Task
+2025-01-02 12:13:09 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:13:09 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:13:09 info: Entra a Buscar Los roles de Task
+2025-01-02 12:15:04 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:15:05 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:15:05 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:15:05 info: Entra a Buscar Los estados de Task
+2025-01-02 12:15:05 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:15:05 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:15:05 info: Entra a Buscar Los roles de Task
+2025-01-02 12:23:07 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:23:07 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:23:07 info: Entra a Buscar Los estados de Task
+2025-01-02 12:23:07 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:23:07 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:23:07 info: Entra a Buscar Los roles de Task
+2025-01-02 12:25:22 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:25:22 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:25:22 info: Entra a Buscar Los estados de Task
+2025-01-02 12:25:22 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:25:23 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:25:23 info: Entra a Buscar Los roles de Task
+2025-01-02 12:28:07 info: irais891230 - Entra a buscar los almacenes asociados a él
+2025-01-02 12:28:07 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2025-01-02 12:28:07 info: irais891230 - Consulta de los productos en un almacén específicode una persona en el hogar
+2025-01-02 12:28:07 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 8
+2025-01-02 12:28:07 error: PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: 1, warehouse_id: 8
+2025-01-02 12:28:09 info: irais891230 - Entra a la ruta unificada de Products
+2025-01-02 12:28:09 info: Entra a Buscar Las categorias de Product
+2025-01-02 12:28:09 info: Entra a Buscar Los estados de Product
+2025-01-02 12:35:27 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:35:29 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:35:29 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:35:29 info: Entra a Buscar Los estados de Task
+2025-01-02 12:35:29 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:35:29 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:35:29 info: Entra a Buscar Los roles de Task
+2025-01-02 12:35:50 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 12:35:56 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 12:35:56 info: Entra a Buscar Las categorias de Task
+2025-01-02 12:35:56 info: Entra a Buscar Los estados de Task
+2025-01-02 12:35:56 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 12:35:56 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 12:35:56 info: Entra a Buscar Los roles de Task
+2025-01-02 13:00:40 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:00:42 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:00:52 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:01:37 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:01:53 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:02:30 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:02:37 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:02:37 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:02:37 info: Entra a Buscar Los estados de Task
+2025-01-02 13:02:37 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:02:37 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:02:37 info: Entra a Buscar Los roles de Task
+2025-01-02 13:05:30 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:06:03 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:06:03 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:06:39 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:06:39 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:06:45 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:06:45 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:06:45 info: Entra a Buscar Los estados de Task
+2025-01-02 13:06:45 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:06:45 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:06:45 info: Entra a Buscar Los roles de Task
+2025-01-02 13:08:30 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:08:54 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:08:54 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:08:54 info: Entra a Buscar Los estados de Task
+2025-01-02 13:08:54 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:08:54 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:08:54 info: Entra a Buscar Los roles de Task
+2025-01-02 13:14:07 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:14:17 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:14:35 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:15:02 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:15:02 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:15:02 info: Entra a Buscar Los estados de Task
+2025-01-02 13:15:02 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:15:02 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:15:02 info: Entra a Buscar Los roles de Task
+2025-01-02 13:15:27 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:15:27 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:15:27 info: Entra a Buscar Los estados de Task
+2025-01-02 13:15:27 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:15:27 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:15:27 info: Entra a Buscar Los roles de Task
+2025-01-02 13:15:47 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:15:52 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:15:52 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:15:52 info: Entra a Buscar Los estados de Task
+2025-01-02 13:15:52 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:15:52 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:15:52 info: Entra a Buscar Los roles de Task
+2025-01-02 13:22:21 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:22:21 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:22:21 info: Entra a Buscar Los estados de Task
+2025-01-02 13:22:21 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:22:21 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:22:21 info: Entra a Buscar Los roles de Task
+2025-01-02 13:22:43 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:22:45 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:22:45 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:22:45 info: Entra a Buscar Los estados de Task
+2025-01-02 13:22:45 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:22:45 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:22:45 info: Entra a Buscar Los roles de Task
+2025-01-02 13:32:33 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:32:37 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:32:46 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:32:46 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:32:47 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:32:52 info: irais891230 - Accediendo a la lista de roles
+2025-01-02 13:33:00 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:33:00 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:33:00 info: Entra a Buscar Los estados de Task
+2025-01-02 13:33:00 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:33:00 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:33:00 info: Entra a Buscar Los roles de Task
+2025-01-02 13:34:34 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:38 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:41 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:34:46 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:35:02 error: Validation error in POST /api/task-date-apk - Body: {} - Errors: "start_date" is required, "home_id" is required
+2025-01-02 13:35:08 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:28 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:29 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:31 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:35 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 13:35:55 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:35:55 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:36:09 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:36:09 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:36:09 info: Entra a Buscar Los estados de Task
+2025-01-02 13:36:09 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:36:09 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:36:09 info: Entra a Buscar Los roles de Task
+2025-01-02 13:39:46 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:39:46 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:39:46 info: Entra a Buscar Los estados de Task
+2025-01-02 13:39:46 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:39:46 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:39:46 info: Entra a Buscar Los roles de Task
+2025-01-02 13:40:04 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:40:04 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:40:26 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:40:26 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:40:26 info: Entra a Buscar Los estados de Task
+2025-01-02 13:40:26 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:40:26 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:40:26 info: Entra a Buscar Los roles de Task
+2025-01-02 13:43:14 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 13:43:14 info: Entra a Buscar Las categorias de Task
+2025-01-02 13:43:14 info: Entra a Buscar Los estados de Task
+2025-01-02 13:43:14 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 13:43:14 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 13:43:14 info: Entra a Buscar Los roles de Task
+2025-01-02 13:52:20 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:52:21 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:53:43 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:53:47 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:53:52 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:04 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:06 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:11 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:13 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:24 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:29 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:36 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:39 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:47 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:47 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 13:57:50 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:11:55 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:13:22 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:13:30 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:13:30 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:13:31 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:13:33 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:17:02 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:17:06 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:17:14 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:17:17 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:17:22 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:17:22 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:17:22 info: Entra a Buscar Los estados de Task
+2025-01-02 14:17:22 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:17:22 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:17:22 info: Entra a Buscar Los roles de Task
+2025-01-02 14:19:10 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:19:12 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:19:14 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:19:14 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:19:14 info: Entra a Buscar Los estados de Task
+2025-01-02 14:19:14 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:19:14 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:19:14 info: Entra a Buscar Los roles de Task
+2025-01-02 14:24:19 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:24:19 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:24:19 info: Entra a Buscar Los estados de Task
+2025-01-02 14:24:19 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:24:19 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:24:19 info: Entra a Buscar Los roles de Task
+2025-01-02 14:24:24 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:24:32 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:24:36 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:24:36 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:24:36 info: Entra a Buscar Los estados de Task
+2025-01-02 14:24:36 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:24:36 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:24:36 info: Entra a Buscar Los roles de Task
+2025-01-02 14:25:43 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:25:43 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:25:43 info: Entra a Buscar Los estados de Task
+2025-01-02 14:25:43 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:25:43 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:25:43 info: Entra a Buscar Los roles de Task
+2025-01-02 14:40:14 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:40:31 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:40:34 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:40:34 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:40:34 info: Entra a Buscar Los estados de Task
+2025-01-02 14:40:34 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:40:34 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:40:34 info: Entra a Buscar Los roles de Task
+2025-01-02 14:41:50 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:41:52 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:41:53 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:41:53 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:41:53 info: Entra a Buscar Los estados de Task
+2025-01-02 14:41:53 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:41:53 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:41:53 info: Entra a Buscar Los roles de Task
+2025-01-02 14:42:51 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:43:01 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:43:01 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:43:01 info: Entra a Buscar Los estados de Task
+2025-01-02 14:43:01 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:43:01 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:43:01 info: Entra a Buscar Los roles de Task
+2025-01-02 14:44:00 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:44:09 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:44:13 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:44:13 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:44:13 info: Entra a Buscar Los estados de Task
+2025-01-02 14:44:13 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:44:13 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:44:13 info: Entra a Buscar Los roles de Task
+2025-01-02 14:44:39 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:44:40 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:44:52 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:44:52 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:44:52 info: Entra a Buscar Los estados de Task
+2025-01-02 14:44:52 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:44:52 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:44:52 info: Entra a Buscar Los roles de Task
+2025-01-02 14:44:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:44:55 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:44:55 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:44:55 info: Entra a Buscar Los estados de Task
+2025-01-02 14:44:55 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:44:55 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:44:55 info: Entra a Buscar Los roles de Task
+2025-01-02 14:45:35 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:45:39 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:45:39 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:45:39 info: Entra a Buscar Los estados de Task
+2025-01-02 14:45:39 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:45:39 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:45:39 info: Entra a Buscar Los roles de Task
+2025-01-02 14:46:05 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:46:22 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:46:22 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:46:22 info: Entra a Buscar Los estados de Task
+2025-01-02 14:46:22 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:46:22 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:46:22 info: Entra a Buscar Los roles de Task
+2025-01-02 14:47:27 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:47:27 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:47:27 info: Entra a Buscar Los estados de Task
+2025-01-02 14:47:27 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:47:27 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:47:27 info: Entra a Buscar Los roles de Task
+2025-01-02 14:48:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:48:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:49:13 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:49:13 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:49:14 info: irais891230 - Entra a buscar las tareas de una fecha dada
+2025-01-02 14:49:25 info: irais891230 - Entra a la ruta unificada de Tasks
+2025-01-02 14:49:25 info: Entra a Buscar Las categorias de Task
+2025-01-02 14:49:25 info: Entra a Buscar Los estados de Task
+2025-01-02 14:49:25 info: Entra a Buscar Las prioridades en (category_status_priority)
+2025-01-02 14:49:25 info: Entra a Buscar Las personas en (category_status_priority)
+2025-01-02 14:49:25 info: Entra a Buscar Los roles de Task
