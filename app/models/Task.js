@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       Task.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
       Task.belongsTo(models.Home, { foreignKey: 'home_id', as: 'home' }); 
       // Una tarea puede tener muchas subtareas (relación de uno a muchos)
-       Task.hasMany(models.Task, {
+      Task.hasMany(models.Task, {
         foreignKey: 'parent_id',
         as: 'children',  // Alias para acceder a las subtareas
         onDelete: 'CASCADE',
@@ -29,27 +29,28 @@ module.exports = (sequelize, DataTypes) => {
         as: 'parent',  // Alias para acceder a la tarea padre
       });
 
-       // Relación many-to-many con Person
-       Task.belongsToMany(models.Person, {
+      // Relación many-to-many con Person
+      Task.belongsToMany(models.Person, {
         through: models.HomePersonTask,
         foreignKey: 'task_id',
         otherKey: 'person_id',
         as: 'people',
-        });
-        Task.hasMany(models.HomePersonTask, { foreignKey: 'task_id', as: 'homePersonTasks' });
+      });
+      Task.hasMany(models.HomePersonTask, { foreignKey: 'task_id', as: 'homePersonTasks' });
     }
 
     // Método para obtener la información de las personas
-  getPeople() {
-    return this.homePersonTasks.map(personTask => ({
+    getPeople() {
+      return this.homePersonTasks.map(personTask => ({
         id: personTask.person_id,
         name: personTask.person.name,
         image: personTask.person.image,
         roleId: personTask.role_id,
         roleName: personTask.role ? personTask.role.name : null
-    }));
-}
+      }));
+    }
   }
+
   Task.init({
     id: {
       type: DataTypes.INTEGER,
@@ -74,6 +75,18 @@ module.exports = (sequelize, DataTypes) => {
     end_date: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    start_time: {
+      type: DataTypes.STRING,  // Tipo TIME para almacenar la hora de inicio
+      allowNull: true,       // El campo es opcional
+    },
+    end_time: {
+      type: DataTypes.STRING,  // Tipo TIME para almacenar la hora de finalización
+      allowNull: true,       // El campo es opcional
+    },
+    type: {
+      type: DataTypes.STRING,  // Tipo STRING para almacenar el tipo de tarea
+      allowNull: true,         // El campo es opcional
     },
     priority_id: {
       type: DataTypes.BIGINT,

@@ -109,6 +109,9 @@
     },
     "Anual": {
       "name": "Anual"
+    },
+    "No se repite": {
+      "name": "Não se repete"
     }
   },
   "homeType":{
@@ -158,5 +161,13 @@
       "description": "Produtos para a cozinha",
       "location": "Entrando na casa à esquerda"
     }
+  },
+  "typetask": {
+  "Tarea": {
+    "name": "Tarefa"
+  },
+  "Evento": {
+    "name": "Evento"
   }
+}
 }

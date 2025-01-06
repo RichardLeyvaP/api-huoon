@@ -25,6 +25,18 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
+      start_time: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo start_time puede ser nulo
+      },
+      end_time: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo end_time puede ser nulo
+      },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo type puede ser nulo
+      },
       priority_id: {
         type: Sequelize.BIGINT,
         allowNull: false,

@@ -70,19 +70,33 @@ class TaskRepository {
                     title: child.title,
                     description: child.description,
                     startDate: child.start_date,
+                    start_date: child.start_date,
                     endDate: child.end_date,
+                    end_date: child.end_date,
+                    startTime: child.start_time,
+                    start_time: child.start_time,
+                    endTime: child.end_time,
+                    end_time: child.end_time,
+                    type: child.type,
                     priorityId: child.priority_id,
+                    priority_id: child.priority_id,
                     colorPriority: child.priority?.color,
                     statusId: child.status_id,
+                    status_id: child.status_id,
                     categoryId: child.category_id,
+                    category_id: child.category_id,
                     nameCategory: child.category?.name,
                     iconCategory: child.category?.icon,
                     recurrence: child.recurrence,
                     estimatedTime: child.estimated_time,
+                    estimated_time: child.estimated_time,
                     comments: child.comments,
                     attachments: child.attachments,
                     geoLocation: child.geo_location,
+                    geo_location: child.geo_location,
                     parentId: child.parent_id,
+                    parent_id: child.parent_id,
+                    home_id: child.home_id,
                     // Personas relacionadas con la tarea hija
                     people: await this.peopleTask(child, personId) || [],
                     // Llama recursivamente a mapChildren para obtener hijos de este hijo
@@ -266,6 +280,9 @@ class TaskRepository {
             description: body.description,
             start_date: body.start_date,
             end_date: body.end_date,
+            start_time: body.start_time,
+            end_time: body.end_time,
+            type: body.type,
             priority_id: body.priority_id,
             status_id: body.status_id,
             category_id: body.category_id,
@@ -282,8 +299,8 @@ class TaskRepository {
         // Si se ha subido un archivo, procesarlo y actualizar la tarea
         if (file) {
             const newFilename = ImageService.generateFilename('tasks', task.id, file.originalname);
-            task.image = await ImageService.moveFile(file, newFilename);
-            await task.update({ image: task.image }, { transaction: t});
+            task.attachments = await ImageService.moveFile(file, newFilename);
+            await task.update({ attachments: task.attachments }, { transaction: t});
         }
         return task;
     } catch (err) {
@@ -297,7 +314,7 @@ class TaskRepository {
         const fieldsToUpdate = [
             'title', 'description', 'priority_id', 'status_id', 'category_id', 
             'start_date', 'end_date', 'recurrence', 'estimated_time', 
-            'comments', 'geo_location', 'parent_id'
+            'comments', 'geo_location', 'parent_id', 'start_time', 'end_time', 'type'
         ];
         try{
 
@@ -311,31 +328,11 @@ class TaskRepository {
 
         // Procesar la imagen si se sube una nueva
         if (file) {
-            if (task.image && task.image !== 'categories/default.jpg') {
-                await ImageService.deleteFile(task.image);
-              }
-              const newFilename = ImageService.generateFilename('categories', task.id, file.originalname);
-              updatedData.image = await ImageService.moveFile(file, newFilename);
-            /*const extension = path.extname(file.originalname);
-            const newFilename = `tasks/${task.id}${extension}`;
-
-            // Eliminar la imagen anterior si no es la predeterminada
             if (task.attachments && task.attachments !== 'tasks/default.jpg') {
-                const oldIconPath = path.join(__dirname, '../../public', task.attachments);
-                try {
-                    await fs.promises.unlink(oldIconPath);
-                    logger.info(`Imagen anterior eliminada: ${oldIconPath}`);
-                } catch (error) {
-                    logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
-                }
-            }
-
-            // Mover el nuevo archivo a la carpeta pública
-            const newPath = path.join(__dirname, '../../public', newFilename);
-            await fs.promises.rename(req.file.path, newPath);
-
-            // Guardar la nueva ruta de la imagen en updatedData
-            updatedData.attachments = `${newFilename}`;*/
+                await ImageService.deleteFile(task.attachments);
+              }
+              const newFilename = ImageService.generateFilename('tasks', task.id, file.originalname);
+              updatedData.attachments = await ImageService.moveFile(file, newFilename);
         }
         
         // Actualizar la tarea solo si hay datos para cambiar
@@ -352,8 +349,8 @@ class TaskRepository {
     }
 
     async delete(task, t) {
-        if (task.image && task.image !== 'tasks/default.jpg') {
-            const imagePath = path.join(__dirname, '../../public', task.image);
+        if (task.attachments && task.attachments !== 'tasks/default.jpg') {
+            const imagePath = path.join(__dirname, '../../public', task.attachments);
             await fs.promises.unlink(imagePath).catch(err => logger.error(`Error eliminando la imagen: ${err.message}`));
           }
       

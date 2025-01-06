@@ -109,6 +109,9 @@
     },
     "Anual": {
       "name": "Yearly"
+    },
+    "No se repite": {
+      "name": "It doesn't repeat"
     }
   },
   "homeType":{
@@ -157,6 +160,14 @@
       "title": "Pantry",
       "description": "Kitchen products",
       "location": "Entering the house to the left"
+    }
+  },
+  "typetask": {
+    "Tarea": {
+      "name": "Task"
+    },
+    "Evento": {
+      "name": "Event"
     }
   }
   

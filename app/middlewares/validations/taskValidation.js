@@ -5,6 +5,9 @@ const storeTaskSchema = Joi.object({
     description: Joi.string().optional().allow(null, '').empty('').default(null),
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
+    start_time: Joi.string().optional().pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/).allow(null), // Formato 24 horas
+    end_time: Joi.string().optional().pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/).allow(null), // Formato 24 horas
+    type: Joi.string().optional().allow(null, '').empty(null),
     priority_id: Joi.number().integer().required(),
     parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
     status_id: Joi.number().integer().required(),
@@ -42,6 +45,9 @@ const updateTaskSchema = Joi.object({
     description: Joi.string().optional().allow(null, '').empty('').default(null),
     start_date: Joi.date().optional(),
     end_date: Joi.date().optional(),
+    start_time: Joi.string().optional().pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/).allow(null), // Formato 24 horas
+    end_time: Joi.string().optional().pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/).allow(null), // Formato 24 horas
+    type: Joi.string().optional().allow(null, '').empty(null),
     priority_id: Joi.number().integer().optional(),
     parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
     status_id: Joi.number().integer().optional(),
