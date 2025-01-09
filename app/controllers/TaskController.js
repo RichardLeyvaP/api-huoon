@@ -713,7 +713,10 @@ const TaskController = {
           imagePerson: person.image,
           roleId: firstHome ? firstHome.role_id : 0, // Accede a role_id
           roleName:
-            firstHome && firstHome.role ? firstHome.role.name : "Sin Rol", // Accede a role.name
+            firstHome && firstHome.role ? (i18n.__(`roles.${firstHome.role.name}.name`) !==
+            `roles.${firstHome.role.name}.name`
+              ? i18n.__(`roles.${firstHome.role.name}.name`)
+              : firstHome.role.name) : "Sin Rol", // Accede a role.name
         };
       });
     } catch (error) {
