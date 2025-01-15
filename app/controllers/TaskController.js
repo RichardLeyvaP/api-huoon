@@ -684,6 +684,7 @@ const TaskController = {
       throw new Error("Error al obtener prioridades");
     }
   },
+  
   async getPeople(home_id) {
     logger.info("Entra a Buscar Las personas en (category_status_priority)");
     try {

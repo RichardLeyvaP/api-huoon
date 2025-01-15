@@ -148,6 +148,10 @@
     "Colaborador": {
       "name": "Colaborador",
       "description": "Colaborador da tarefa"
+    },    
+    "Creador": {
+      "name": "Criador",
+      "description": "Task Criador"
     }
   },
   "warehouse": {
