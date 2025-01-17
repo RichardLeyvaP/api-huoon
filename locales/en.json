@@ -173,6 +173,14 @@
     "Evento": {
       "name": "Event"
     }
+  },
+  "finances": {
+    "Personal": {
+      "name": "Personal"
+    },
+    "Hogar": {
+      "name": "Home"
+    }
   }
   
 }

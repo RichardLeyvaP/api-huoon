@@ -27,6 +27,7 @@ const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskS
 const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema } = require('./middlewares/validations/taskValidation');
 const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema } = require('./middlewares/validations/personwarehouseproductValidation');
 const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
+const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSchema } = require('./middlewares/validations/financeValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -48,6 +49,7 @@ const HomeWarehouseProductController = require('./controllers/HomeWarehouseProdu
 const PersonHomeWarehouseProductController = require('./controllers/PersonHomeWarehouseProductController');
 const HomePersonTaskController = require('./controllers/HomePersonTaskController');
 const OpenAIController = require('./controllers/OpenAIController');
+const FinanceController = require('./controllers/FinanceController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -266,6 +268,13 @@ router.post('/person-home-warehouse-products', validateSchema(getPersonHomeProdu
 router.post('/person-home-warehouse-product-update', multerCategory('image', 'personProducts'), validateSchema(updatePersonProductSchema), PersonHomeWarehouseProductController.update);
 router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
 
+//Rutas Finanzas
+router.get('/finance', FinanceController.index);
+router.post('/get-type-finance', validateSchema(getFinanceSchema), FinanceController.getTypeFinances);
+router.post('/finance', multerCategory('image', 'finances'), validateSchema(storeFinanceSchema), FinanceController.store);
+router.post('/finance-show', validateSchema(idFinanceSchema), FinanceController.show);
+router.post('/finance-update', multerCategory('image', 'products'), validateSchema(updateFinanceSchema), FinanceController.update);
+router.post('/finance-destroy', validateSchema(idFinanceSchema), FinanceController.destroy);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);

@@ -5,3 +5,4 @@ node_modules/
 
 # Ignorar imágenes en la carpeta public
 public/
+app/database/migrations/20241225140028-add-person-home-ids-to-tasks.js

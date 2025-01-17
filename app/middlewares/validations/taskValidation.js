@@ -89,7 +89,8 @@ const getDateTaskSchema = Joi.object({
     home_id: Joi.number().integer().required(),
 });
 const home_idTaskSchema = Joi.object({
-    home_id: Joi.number().required()
+    home_id: Joi.number().required(),
+    type: Joi.string().required(),
 });
 
 module.exports = {

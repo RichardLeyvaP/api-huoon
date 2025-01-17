@@ -365,3 +365,58 @@
 2025-01-02 13:35:29 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
 2025-01-02 13:35:31 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
 2025-01-02 13:35:35 error: Validation error in POST /api/task-date-apk - Body: {"home_id":1} - Errors: "start_date" is required
+2025-01-02 19:40:56 error: Validation error in POST /api/category-status-priority-apk - Body: {} - Errors: "home_id" is required
+2025-01-02 19:42:50 error: Validation error in POST /api/category-status-priority-apk - Body: {} - Errors: "home_id" is required
+2025-01-02 19:59:16 error: Validation error in POST /api/task - Body: {"title":"tertretre","description":"tertregftrytrytry","start_date":"2025-01-01","end_date":"2025-01-31","status_id":"2","category_id":"3","geo_location":"rtytryrtytrytry","home_id":"1"} - Errors: "priority_id" is required
+2025-01-02 20:22:41 error: Validation error in POST /api/task-update - Body: {"title":"pruena front","description":"prueba descripcion","start_date":"2025-01-02T01:11:32.000Z","end_date":"2025-01-30T00:00:00.000Z","priority_id":"3","status_id":"1","category_id":"4","recurrence":"Semanal","attachments":"tasks/64.jpg","geo_location":"dfgdfgdfgdfgdfg","parent_id":"null","id":"64"} - Errors: "parent_id" must be a number
+2025-01-02 20:57:37 error: Validation error in POST /api/task - Body: {"title":"hchhhd","description":"ghfhgfdtstrsrts","start_date":"Thu Jan 02 2025 20:57:37 GMT-0500 (hora estándar de Cuba)","end_date":"2025-01-31","parent_id":"","recurrence":"Mensual","attachments":"null","geo_location":"mvkjfufu","home_id":"1"} - Errors: "priority_id" is required, "status_id" is required, "category_id" is required, El campo image debe ser una imagen válida (jpg, jpeg, png, gif)
+2025-01-02 21:00:42 error: Validation error in POST /api/task-update - Body: {"title":"fsdfsdfsdf","description":"464654645645654","status_id":"1","category_id":"4","recurrence":"Mensual","geo_location":"sfsdfdsf","priority_id":"2","id":""} - Errors: "id" must be a number
+2025-01-02 21:02:56 error: Validation error in POST /api/task - Body: {"title":"fsdfdsfsdf","description":"242423423","status_id":"1","category_id":"4","recurrence":"Semanal","geo_location":"ertertert","priority_id":"2","home_id":"1","start_date":"Thu Jan 02 2025 21:02:55 GMT-0500 (hora estándar de Cuba)","end_date":"Thu Jan 02 2025 21:02:55 GMT-0500 (hora estándar de Cuba)","people":"[object Object]"} - Errors: "people" must be an array
+2025-01-03 07:07:00 error: Validation error in POST /api/task - Body: {"title":"sfsdfsdfsd","description":"234234234sfsdfsdfsdfsf","start_date":"2025-01-02","status_id":"1","category_id":"4","recurrence":"Semanal","geo_location":"sdfdsfsdfsdf","priority_id":"2","home_id":"1","end_date":"Fri Jan 03 2025 07:07:00 GMT-0500 (hora estándar de Cuba)","people":"[object Object],[object Object]"} - Errors: "people" must be an array
+2025-01-03 07:12:26 error: Validation error in POST /api/task - Body: {"title":"fsdfsdf","description":"sdfsdfsdfdsf","start_date":"2025-01-02","status_id":"2","category_id":"3","recurrence":"Mensual","geo_location":"sdfsdfsdfsdf","people":"[{\"home_id\":1,\"person_id\":\"4-6\",\"role_id\":6},{\"home_id\":1,\"person_id\":\"1-5\",\"role_id\":5}]","priority_id":"3","home_id":"1","end_date":"Fri Jan 03 2025 07:12:26 GMT-0500 (hora estándar de Cuba)"} - Errors: "people" must be an array
+2025-01-03 07:26:58 error: Validation error in POST /api/task - Body: {"title":"sdfsdf","description":"sdfdsfdsfdsf","start_date":"2025-01-02","status_id":"1","category_id":"3","recurrence":"Diaria","geo_location":"sdfdsfdsf","people":[{"home_id":"1","person_id":"4-5","role_id":"5"},{"home_id":"1","person_id":"1-6","role_id":"6"}],"priority_id":"1","home_id":"1","end_date":"2025-01-03T12:26:58.244Z"} - Errors: "people[0].person_id" must be a number, "people[1].person_id" must be a number
+2025-01-03 07:28:57 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 1, Roles: 5, Hogares: 1
+2025-01-03 13:51:35 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 1, Roles: 5, Hogares: 1
+2025-01-03 14:05:08 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 1, Roles: 5, Hogares: 1
+2025-01-03 14:11:07 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 1, Roles: 5, Hogares: 1
+2025-01-03 14:22:25 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                        Personas: 5, Roles: 6, Hogares: 1
+2025-01-03 14:34:31 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 4, Roles: 6, Hogares: 1
+2025-01-03 14:39:25 error: Error en TaskRepository->store: Incorrect time value: '01:30 AM' for column 'start_time' at row 1
+2025-01-03 14:39:25 error: TaskController->store: Incorrect time value: '01:30 AM' for column 'start_time' at row 1
+2025-01-03 16:15:15 error: Validation error in POST /api/task-update - Body: {"people":[{"home_id":"1","person_id":"NaN","role_id":"0"},{"home_id":"1","person_id":"2","role_id":"5"}],"id":"1"} - Errors: "people[0].person_id" must be a number
+2025-01-03 16:20:48 error: Validation error in POST /api/task-update - Body: {"people":[{"home_id":"1","person_id":"NaN","role_id":"0"},{"home_id":"1","person_id":"2","role_id":"5"}],"id":"1"} - Errors: "people[0].person_id" must be a number
+2025-01-03 16:26:38 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 4,2, Roles: 0,5, Hogares: 1,1
+2025-01-03 16:37:46 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: 4,2, Roles: 0,5, Hogares: 1,1
+2025-01-03 16:42:04 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: , Roles: 0, Hogares: 
+2025-01-03 16:45:20 error: No se encontraron personas, roles o hogares con los siguientes IDs: 
+                            Personas: , Roles: 0, Hogares: 
+2025-01-09 12:08:00 error: TaskController->getTaskDate: i18n is not defined
+2025-01-15 09:42:21 error: Validation error in POST /api/finance-show?branch_id=21&business_id=&enrollment_id=&type=Sucursal - Body: {"home_id":1,"spent":150.5,"income":500,"date":"2025-01-15","description":"Pago mensual de servicios","type":"Home","method":"Efectivo"} - Errors: "id" es un campo obligatorio, "home_id" is not allowed, "spent" is not allowed, "income" is not allowed, "date" is not allowed, "description" is not allowed, "type" is not allowed, "method" is not allowed
+2025-01-15 09:42:50 error: Validation error in POST /api/finance - Body: {"home_id":1,"spent":150.5,"income":500,"date":"2025-01-15","description":"Pago mensual de servicios","type":"Home","method":"Efectivo"} - Errors: "person_id" es un campo obligatorio
+2025-01-15 09:48:28 error: PersonWarehouseController->update: La persona con ID undefined no está asociada con el hogar con ID 1
+2025-01-15 09:49:17 error: FinanceController->destroy: finance.destroy is not a function
+2025-01-15 15:33:17 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:37:28 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:39:32 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:41:15 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:42:06 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:43:31 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:46:55 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 15:50:57 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 17:01:21 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
+2025-01-15 17:23:00 error: Validation error in POST /api/get-home-finance - Body: {} - Errors: "home_id" is required
+2025-01-15 17:48:17 error: Validation error in POST /api/get-home-finance - Body: {"home_id":1} - Errors: "type" is required
+2025-01-15 17:48:21 error: Validation error in POST /api/get-home-finance - Body: {"home_id":1,"type":1} - Errors: "type" must be a string
+2025-01-15 17:48:28 error: FinanceController->index: Hogar is not defined
+2025-01-15 17:51:15 error: FinanceController->index: Hogar is not defined
+2025-01-15 17:52:52 error: FinanceController->index: Hogar is not defined
+2025-01-17 13:09:15 error: FinanceController->index: Op is not defined
