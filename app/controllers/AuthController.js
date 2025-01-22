@@ -72,7 +72,8 @@ const schema = Joi.object({
             const person = user.person ? {
                 id: user.person.id,
                 name: user.person.name,
-                email: user.person.email
+                email: user.person.email,
+                image: user.person.image
             } : null;
 
             // Construimos el objeto del usuario con la estructura deseada
@@ -153,7 +154,8 @@ const schema = Joi.object({
             const person = user.person ? {
                 id: user.person.id,
                 name: user.person.name,
-                email: user.person.email
+                email: user.person.email,
+                image: user.person.image
             } : null;
 
             // Construimos el objeto del usuario con la estructura deseada

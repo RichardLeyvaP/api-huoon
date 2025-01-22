@@ -37,6 +37,8 @@ const FinanceController = {
               : finance.type,
           method: finance.method,
           image: finance.image,
+          finance: finance.income ? 'Ingreso' : 'Gasto',
+          idType: finance.type
         };
       });
 
@@ -98,6 +100,8 @@ const FinanceController = {
               : finance.type,
           method: finance.method,
           image: finance.image,
+          finance: finance.income ? 'Ingreso' : 'Gasto',
+          idType: finance.type
         };
       });
 
@@ -195,6 +199,8 @@ const FinanceController = {
               : finance.type,
         method: finance.method,
         image: finance.image,
+        finance: finance.income ? 'Ingreso' : 'Gasto',
+        idType: finance.type
       };
 
       res.status(200).json({ finance: mappedFinance });
