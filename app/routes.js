@@ -176,9 +176,9 @@ router.post('/priority-destroy', validateSchema(idPrioritySchema), PriorityContr
 
 //Rutas CategoryPerson
 router.get('/category-person', CategoryPersonController.index);
-router.post('/category-person', validateSchema(storeCategorySchema), multerCategory('icon', 'categories'),CategoryPersonController.store);
+router.post('/category-person', multerCategory('icon', 'categories'), validateSchema(storeCategorySchema),CategoryPersonController.store);
 router.post('/category-person-show', validateSchema(idCategorySchema), CategoryPersonController.show);
-router.post('/category-person-update', validateSchema(updateCategorySchema), multerCategory('icon', 'categories'), CategoryPersonController.update);
+router.post('/category-person-update', multerCategory('icon', 'categories'), validateSchema(updateCategorySchema),CategoryPersonController.update);
 router.post('/category-person-destroy', validateSchema(idCategorySchema), CategoryPersonController.destroy);
 
 //Rutas CategoryPerson
@@ -247,9 +247,9 @@ router.post('/person-warehouse-home-select', validateSchema(getWarehouseSchema),
 
 //Rutas Productos
 router.get('/product', ProductController.index);
-router.post('/product', validateSchema(storeProductSchema), multerCategory('image', 'products'), ProductController.store);
+router.post('/product', multerCategory('image', 'products'), validateSchema(storeProductSchema), ProductController.store);
 router.post('/product-show', validateSchema(idProductSchema), ProductController.show);
-router.post('/product-update', validateSchema(updateProductSchema), multerCategory('image', 'products'), ProductController.update);
+router.post('/product-update', multerCategory('image', 'products'), validateSchema(updateProductSchema), ProductController.update);
 router.post('/product-destroy', validateSchema(idProductSchema), ProductController.destroy);
 
 //Rutas Productos en almacenes del hogar
