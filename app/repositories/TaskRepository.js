@@ -435,12 +435,7 @@ class TaskRepository {
 
   async delete(task, t) {
     if (task.attachments && task.attachments !== "tasks/default.jpg") {
-      const imagePath = path.join(__dirname, "../../public", task.attachments);
-      await fs.promises
-        .unlink(imagePath)
-        .catch((err) =>
-          logger.error(`Error eliminando la imagen: ${err.message}`)
-        );
+      await ImageService.deleteFile(task.attachments);
     }
 
     return await task.destroy({ transaction: t });

@@ -43,9 +43,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Home.hasMany(models.HomeWarehouseProduct, { foreignKey: 'home_id', as: 'homeWarehousesProducts', onDelete: 'CASCADE' });
   Home.hasMany(models.HomePersonTask, { foreignKey: 'home_id', as: 'homePersonTasks', onDelete: 'CASCADE' });
+  Home.hasMany(models.HomePerson, { foreignKey: 'home_id', as: 'homePersons', onDelete: 'CASCADE' });
   Home.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'home_id', as: 'homePersonWarehouseProducts', onDelete: 'CASCADE' });
   Home.hasMany(models.Task, { foreignKey: 'home_id', as: 'tasks', onDelete: 'CASCADE' });
   Home.hasMany(models.Finance, { foreignKey: 'home_id', as: 'finances', onDelete: 'CASCADE' });
+  Home.belongsTo(models.Person, { as: 'person', foreignKey: 'person_id' }); // Relación directa
     }
   }
   Home.init({
@@ -75,6 +77,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       references: {
         model: 'Status', // Nombre de la tabla de usuarios (asegúrate de que esté bien)
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
+      allowNull: false,
+    },
+    person_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'people', // Nombre de la tabla de usuarios (asegúrate de que esté bien)
         key: 'id'
       },
       onDelete: 'CASCADE',

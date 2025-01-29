@@ -34,6 +34,15 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
+      person_id: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+        references: {
+          model: 'people', // nombre de la tabla de referencia
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+      },
       residents: {
         type: Sequelize.INTEGER,
         allowNull: true,

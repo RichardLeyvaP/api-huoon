@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         through: 'home_person',
         foreignKey: 'person_id',
         otherKey: 'home_id',
-        as: 'homes',  // Alias para la relación
+        as: 'homePersons',  // Alias para la relación
       });
 
        // Relación belongsToMany con Task a través de PersonTask
@@ -49,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts', onDelete: 'CASCADE' });
         Person.hasMany(models.Task, { foreignKey: 'person_id', as: 'tasks', onDelete: 'CASCADE' });
         Person.hasMany(models.Finance, { foreignKey: 'person_id', as: 'finances', onDelete: 'CASCADE' });
+        Person.hasMany(models.Home, { foreignKey: 'person_id', as: 'homes', onDelete: 'CASCADE' });
     }
 
     /**
@@ -107,6 +108,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     address: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    image: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

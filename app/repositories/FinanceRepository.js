@@ -24,8 +24,8 @@ class FinanceRepository {
       }
       else{
         whereConditions[Op.or] = [
-            { person_id: id },      // Si el person_id es igual al parámetro
-            { home_id: home_id }    // O si el home_id es igual al parámetro
+            { home_id: home_id, type: 'Hogar' },  // Si home_id es igual al parámetro y type es 'Hogar'
+            { person_id: id, type: 'Personal' }  // Si person_id es igual al parámetro y type es 'Personal'
         ];
       }
         return await Finance.findAll({

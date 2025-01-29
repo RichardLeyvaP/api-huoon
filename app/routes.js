@@ -190,9 +190,10 @@ router.post('/home-type-destroy', validateSchema(idHomeTypeSchema), HomeTypeCont
 
 //Rutas Home
 router.get('/home', HomeController.index);
-router.post('/home', validateSchema(storeHomeSchema), multerCategory('image', 'homes'), HomeController.store);
+router.post('/person-homes', HomeController.getHomes);
+router.post('/home', multerCategory('image', 'homes'), validateSchema(storeHomeSchema), HomeController.store);
 router.post('/home-show', validateSchema(idHomeSchema), HomeController.show);
-router.post('/home-update', validateSchema(updateHomeSchema), multerCategory('image', 'homes'), HomeController.update);
+router.post('/home-update', multerCategory('image', 'homes'), validateSchema(updateHomeSchema), HomeController.update);
 router.post('/home-destroy', validateSchema(idHomeSchema), HomeController.destroy);
 
 //Rutas HomePerson
