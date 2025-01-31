@@ -43,7 +43,8 @@ module.exports = {
             supportContactEmail: config.supportContactEmail,
             lastSyncTime: config.lastSyncTime, // Formato ISO 8601
             fontSize: config.fontSize,
-            cantHome: cantHome.length
+            cantHome: cantHome.length,
+            home: config.home ? config.home : cantHome.first().id
         };
 
             // Devolver la configuración actualizada
@@ -105,6 +106,7 @@ module.exports = {
             supportContactEmail: req.body.supportContactEmail || userConfig.supportContactEmail || defaultConfig.supportContactEmail,
             lastSyncTime: req.body.lastSyncTime || userConfig.lastSyncTime || defaultConfig.lastSyncTime,
             fontSize: req.body.fontSize || userConfig.fontSize || defaultConfig.fontSize,
+            fontSize: req.body.home,
         };
 
         // Actualizar la configuración

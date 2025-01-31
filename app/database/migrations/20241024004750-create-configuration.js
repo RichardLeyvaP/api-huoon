@@ -84,6 +84,9 @@ module.exports = {
       isDefault: {
         type: Sequelize.BOOLEAN
       },
+      home: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
