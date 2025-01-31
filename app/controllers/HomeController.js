@@ -64,11 +64,17 @@ const HomeController = {
       // Mapear las tareas
       const mappedHomes = await Promise.all(
         homes.map(async (home) => {
+          const personRole = home.homePersons.find(
+            (hp) => hp.person_id === personId
+          )?.role?.name || "Creador";
           return {
             id: home.id,
             statusId: home.status_id,
             status_id: home.status_id,
             name: home.name,
+            nameRole: i18n.__(`roles.${personRole}.name`) !== `roles.${personRole}.name`
+                            ? i18n.__(`roles.${personRole}.name`)
+                            : personRole, // Agregar el rol de la persona en el hogar
             address: home.address,
             homeTypeId: home.home_type_id,
             home_type_id: home.home_type_id,

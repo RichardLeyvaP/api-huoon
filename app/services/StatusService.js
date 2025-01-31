@@ -16,8 +16,12 @@ class StatusService {
         return statuses.map(status => {
             return {
                 id: status.id,
-                nameStatus:  i18n.__(`status.${status.name}.name`),
-                descriptionStatus: i18n.__(`status.${status.name}.description`),
+                nameStatus:  i18n.__(`status.${status.name}.name`) !==
+                            `status.${status.name}.name`
+                              ? i18n.__(`status.${status.name}.name`) : status.name,
+                descriptionStatus: i18n.__(`status.${status.name}.description`) !==
+                `status.${status.name}.description`
+                  ? i18n.__(`status.${status.name}.description`) : status.description,
                 colorStatus: status.color,
                 iconStatus: status.icon
             };

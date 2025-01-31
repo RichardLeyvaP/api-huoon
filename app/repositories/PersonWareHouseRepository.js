@@ -30,50 +30,66 @@ const PersonWareHouseRepository = {
     });
   },
 
-  async selectWarehouses(homeId, personId) {
+  /*async selectWarehouses(homeId, personId) {
     const warehouses = await Warehouse.findAll({
       where: {
-        status: 1,
+          // No limitamos el status aquí porque lo vamos a manejar con los filtros de la relación
       },
-      include: {
-        model: PersonWarehouse,
-        as: "personWarehouses",
-        where: {
-          home_id: homeId,
-          person_id: personId, // Especifica el filtro por person_id
-        },
-        required: false, // Esto asegura que busque solo los warehouses que NO tienen una relación en person_warehouse
-      },
-    });
+      include: [
+          {
+              model: PersonWarehouse,
+              as: "personWarehouses",
+              required: false, // LEFT JOIN para incluir almacenes que no tienen relación
+              where: {
+                  home_id: homeId, // Relacionado con el hogar
+                  [Op.or]: [
+                      { person_id: personId }, // Si el almacén tiene relación con la persona
+                      {
+                          person_id: { [Op.ne]: personId }, // Si no tiene relación con la persona
+                          status: [1,2], // Solo incluir si el status es 1 (para los que no tienen relación)
+                      },
+                  ],
+              },
+          },
+      ],
+  });
 
-    return warehouses;
-  },
+  return warehouses;
+  },*/
 
   async gettWarehouses(home_id, personId) {
     const warehouses = await PersonWarehouse.findAll({
       where: {
-          home_id, // Relacionado al hogar
-          [Op.or]: [
-              // Relación directa con la persona y el hogar (todos los estados)
-              {
-                  person_id: personId,
-                  status: { [Op.in]: [0, 1, 2] }
-              },
-              // Relación indirecta (otra persona), pero con status 1 o 2
-              {
-                  person_id: { [Op.ne]: personId },
-                  status: { [Op.in]: [1, 2] }
-              }
-          ]
-      },
-      attributes: ['id', 'warehouse_id', 'title', 'description', 'location', 'status', 'person_id'], // Incluye los datos relevantes
-      include: [
+        home_id, // Relacionado al hogar
+        [Op.or]: [
+          // Relación directa con la persona y el hogar (todos los estados)
           {
-              model: Warehouse,
-              as: 'warehouse', // Relación con Warehouse para obtener información adicional si es necesario
-              attributes: [] // Si no necesitas datos de Warehouse, omítelos
-          }
-      ]
+            person_id: personId,
+            status: { [Op.in]: [0, 1, 2] },
+          },
+          // Relación indirecta (otra persona), pero con status 1 o 2
+          {
+            person_id: { [Op.ne]: personId },
+            status: { [Op.in]: [1, 2] },
+          },
+        ],
+      },
+      attributes: [
+        "id",
+        "warehouse_id",
+        "title",
+        "description",
+        "location",
+        "status",
+        "person_id",
+      ], // Incluye los datos relevantes
+      include: [
+        {
+          model: Warehouse,
+          as: "warehouse", // Relación con Warehouse para obtener información adicional si es necesario
+          attributes: [], // Si no necesitas datos de Warehouse, omítelos
+        },
+      ],
     });
 
     return warehouses;

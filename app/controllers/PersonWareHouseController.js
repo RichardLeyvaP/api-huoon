@@ -302,14 +302,15 @@ const PersonWarehouseController = {
     
             // Obtener los almacenes que tienen status 1 o 0 relacionados con la persona o el hogar
             // Consulta para obtener directamente desde PersonWarehouse
-        const warehouses = await PersonWareHouseRepository.selectWarehouses(personId, home_id);
+        const warehouses = await WareHouseRepository.findByStatus(1);
 
         // Formatear resultados para el cliente
         const result = warehouses.map((warehouse) => ({
            id: warehouse.id,
-            name:  i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.title`) : warehouse.title,
-            description: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.description`) : warehouse.description,
-            location: i18n.__(`warehouse.${warehouse.title}.title`) === `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.location`) : warehouse.location
+           warehouse_id: warehouse.id,
+            title:  i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.title`) : warehouse.title,
+            description: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.description`) : warehouse.description,
+            location: i18n.__(`warehouse.${warehouse.title}.title`) !== `warehouse.${warehouse.title}.title` ? i18n.__(`warehouse.${warehouse.title}.location`) : warehouse.location
         }));
     
             return res.status(200).json({ warehouses: result });

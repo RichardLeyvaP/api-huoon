@@ -281,17 +281,7 @@ const PersonHomeWarehouseProductController = {
     // Verificar si el producto existe o crear uno nuevo
     let product;
     let filename;
-    if (product_id && product_id !== undefined) {
-      product = await Product.findByPk(product_id);
-      if (!product) {
-        logger.error(
-          `PersonHomeWarehouseController->store: Producto no encontrado con ID ${product_id}`
-        );
-        return res.status(204).json({ msg: "ProductNotFound" });
-      } else {
-        filename = product.image;
-      }
-    }
+    c
 
     // Verificar si la categoría existe
     if (category_id && category_id !== 0) {

@@ -1,6 +1,7 @@
 const { Configuration, User } = require('../models'); // Importa los modelos de Configuration y User
 const logger = require('../../config/logger');
 const { config } = require('dotenv');
+const { HomeRepository } = require('../repositories');
 module.exports = {    
     async show(req, res) 
     {
@@ -15,6 +16,9 @@ module.exports = {
             config = await Configuration.findOne({ where: { isDefault: true } });
         }
 
+        const personId = req.person.id;
+
+        const cantHome = await HomeRepository.findAllHomes(personId);
         // Construir la respuesta
         const userConfig = {
             userId: config.user_id,
@@ -39,6 +43,7 @@ module.exports = {
             supportContactEmail: config.supportContactEmail,
             lastSyncTime: config.lastSyncTime, // Formato ISO 8601
             fontSize: config.fontSize,
+            cantHome: cantHome.length
         };
 
             // Devolver la configuración actualizada

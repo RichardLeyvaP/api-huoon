@@ -13,7 +13,7 @@ const upload = require('./middlewares/multer'); // Middleware de multer
 const multerCategory = require('./middlewares/multerCategory');
 const validateSchema = require('./middlewares/validateSchema');
 const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
-const { registerSchema, loginSchema, updatePasswordSchema } = require('./middlewares/validations/authValidation');
+const { registerSchema, loginSchema, updatePasswordSchema, googgleApkSchema } = require('./middlewares/validations/authValidation');
 const { storeHomeSchema, updateHomeSchema, idHomeSchema } = require('./middlewares/validations/homeValidation');
 const { storeHomeTypeSchema, updateHomeTypeSchema, idHomeTypeSchema } = require('./middlewares/validations/homeTypeValidation');
 const { storePrioritySchema, updatePrioritySchema, idPrioritySchema } = require('./middlewares/validations/priorityValidation');
@@ -82,6 +82,8 @@ router.get('/google-callback', (req, res, next) => {
       }
     })(req, res, next);
 });
+
+router.post('/google-callback-apk', validateSchema(googgleApkSchema), AuthController.googleCallbackAPK)
 //router.get('/login-google', AuthController.loginWithGoogle);
 router.get('/facebook-callback', (req, res, next) => {
     passport.authenticate('facebook', { session: false }, async (err, user, info) => {

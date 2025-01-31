@@ -13,8 +13,12 @@ const HomeTypeController = {
             const homeTypesMap = homeTypes.map(homeType => {
                 return{
                     id: homeType.id,
-                    name: i18n.__(`homeType.${homeType.name}.name`),
-                    description: i18n.__(`homeType.${homeType.name}.description`),
+                    name: i18n.__(`homeType.${homeType.name}.name`) !== `homeType.${homeType.name}.name`
+                                    ? i18n.__(`homeType.${homeType.name}.name`)
+                                    : homeType.name,
+                    description: i18n.__(`homeType.${homeType.name}.description`) !== `homeType.${homeType.name}.description`
+                    ? i18n.__(`homeType.${homeType.name}.description`)
+                    : homeType.description,
                     icon: homeType.icon
                 }
             });
