@@ -1,6 +1,7 @@
+const { Op } = require("sequelize");
 const path = require('path');
 const fs = require('fs');
-const { Person, User, HomePerson, sequelize } = require('../models');
+const { Person, User, HomePerson, Home, sequelize } = require('../models');
 const logger = require('../../config/logger'); // Logger para seguimiento
 
 class PersonRepository {
@@ -32,12 +33,26 @@ class PersonRepository {
 
     async getPersonHouse(personId, home_id) {
         return await Person.findByPk(personId, {
-            include: [{
-                model: HomePerson,
-                as: 'homePeople',
-                where: { home_id: home_id },  // Filtra por el home_id que buscas
-                required: true  // Esto asegura que solo se devuelvan personas que tengan esa relación
-            }]
+            include: [
+                {
+                    model: HomePerson,
+                    as: 'homePeople',
+                    where: { home_id: home_id },
+                    required: false  // No es obligatorio que la persona esté en HomePerson
+                },
+                {
+                    model: Home,
+                    as: 'homes',
+                    where: { person_id: personId, id: home_id },
+                    required: false  // No es obligatorio que la persona esté en Home
+                }
+            ],
+            where: {
+                [Op.or]: [
+                    { '$homePeople.home_id$': home_id },  // Verifica la relación a través de HomePerson
+                    { '$homes.person_id$': personId }  // Verifica la relación directa a través de Home
+                ]
+            }
         });
     }
 

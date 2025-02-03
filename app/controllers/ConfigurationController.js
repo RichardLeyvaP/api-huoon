@@ -19,6 +19,7 @@ module.exports = {
         const personId = req.person.id;
 
         const cantHome = await HomeRepository.findAllHomes(personId);
+        
         // Construir la respuesta
         const userConfig = {
             userId: config.user_id,
@@ -44,7 +45,7 @@ module.exports = {
             lastSyncTime: config.lastSyncTime, // Formato ISO 8601
             fontSize: config.fontSize,
             cantHome: cantHome.length,
-            home: config.home ? config.home : cantHome.first().id
+            home: config.home ? config.home : (cantHome.length ? cantHome[0].id : null)
         };
 
             // Devolver la configuración actualizada
@@ -59,7 +60,9 @@ module.exports = {
 
     async update(req, res) 
     {
-        logger.info(`${req.user.name} - Accediendo a actualizar la configuración`)
+        logger.info(`${req.user.name} - Accediendo a actualizar la configuración`);
+        logger.info("datos recibidos al editar la configuracion");
+        logger.info(JSON.stringify(req.body));
         try {
             const user = req.user; // Supone que tienes el ID del usuario en `req.user`.
         // Obtener la configuración por defecto del sistema
@@ -106,7 +109,7 @@ module.exports = {
             supportContactEmail: req.body.supportContactEmail || userConfig.supportContactEmail || defaultConfig.supportContactEmail,
             lastSyncTime: req.body.lastSyncTime || userConfig.lastSyncTime || defaultConfig.lastSyncTime,
             fontSize: req.body.fontSize || userConfig.fontSize || defaultConfig.fontSize,
-            fontSize: req.body.home,
+            home: req.body.home,
         };
 
         // Actualizar la configuración

@@ -20,9 +20,9 @@ const {
   WareHouseRepository,
   StatusRepository,
   CategoryRepository,
+  PersonRepository,
+  ProductRepository
 } = require("../repositories");
-const WarehouseRepository = require("../repositories/WareHouseRepository");
-const ProductRepository = require("../repositories/ProductRepository");
 
 const PersonHomeWarehouseProductController = {
   // Listar todos los productos por personas y almacenes
@@ -112,17 +112,7 @@ const PersonHomeWarehouseProductController = {
         return res.status(204).json({ msg: "HomeNotFound" });
       }
 
-      // Verificar si la persona está asociada con el hogar
-      const person = await Person.findByPk(person_id, {
-        include: [
-          {
-            model: HomePerson,
-            as: "homePeople",
-            where: { home_id: home_id }, // Filtra por el home_id que buscas
-            required: true, // Esto asegura que solo se devuelvan personas que tengan esa relación
-          },
-        ],
-      });
+      const person = await PersonRepository.getPersonHouse(person_id, home_id);
 
       if (!person) {
         logger.error(

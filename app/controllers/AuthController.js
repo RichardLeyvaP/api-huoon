@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const Joi = require("joi");
-const { User, Person, UserToken, sequelize } = require("../models"); // Importamos sequelize desde db
+const { User, Person, UserToken, Configuration, sequelize } = require("../models"); // Importamos sequelize desde db
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
@@ -54,6 +54,10 @@ const AuthController = {
             model: Person,
             as: "person",
           },
+          {
+            model: Configuration,
+            as: 'configurations'
+          }
         ],
       });
       if (!user) {
@@ -78,6 +82,8 @@ const AuthController = {
             image: user.person.image,
           }
         : null;
+        let home = [];
+        home = user.configurations ? user.configurations[0].home : null;
 
       // Construimos el objeto del usuario con la estructura deseada
       const userNew = {
@@ -111,6 +117,7 @@ const AuthController = {
         userName: user.name,
         email: user.email,
         language: user.language,
+        home: home,
         token: token,
         personId: user.person.id,
         personName: user.person.name,
@@ -318,6 +325,7 @@ const AuthController = {
         userName: userNew.name,
         email: userNew.email,
         language: userNew.language,
+        home: null,
         token: token,
         personId: userNew.person.id,
         personName: userNew.person.name,
@@ -343,7 +351,7 @@ const AuthController = {
           external_id: id,
           external_auth: "google",
         },
-        include: [{ model: Person, as: "person" }]
+        include: [{ model: Person, as: "person" },{ model: Configuration, as: 'configurations' }]
       });
       let person = []; // Definimos `person` aquí para que esté accesible en todo el bloque
       let imageUpdateNeeded = false;
@@ -446,11 +454,15 @@ const AuthController = {
         await AuthController.handleImageUpdate(imageUpdateData);
       }
 
+      let home = [];
+        home = user.configurations ? user.configurations[0].home : null;
+
       const userData = {
         id: userNew.id,
         userName: userNew.name,
         email: userNew.email,
         language: userNew.language,
+        home: home,
         token: token,
         personId: userNew.person.id,
         personName: userNew.person.name,

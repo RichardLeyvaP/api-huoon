@@ -90,6 +90,14 @@ const TaskController = {
     ); // Registro de la acción
 
     try {
+      if (
+        req.body.home_id === undefined &&
+        req.body.home_id === 0 &&
+        req.body.home_id === null
+      ) {
+        logger.info('No esta asociadoa  ningun hogar');
+        return res.status(204).json({ msg: "TaskNotFound", tasks: [] });
+      }
       const personId = req.person.id;
       // Obtener solo las tareas principales (sin padre) directamente en la consulta
       const tasks = await TaskRepository.findAllDate(
@@ -197,18 +205,24 @@ const TaskController = {
     }
     let filteredPeople = [];
     if (req.body.people && req.body.people.length > 0) {
-        // Filtrar las personas con role_id != 0
-        filteredPeople = req.body.people.filter(person => parseInt(person.role_id) !== 0);
-      
-        // Si no quedan personas después del filtrado, devolver un error
-        if (filteredPeople.length === 0) {
-          return res.status(400).json({ msg: "No se han proporcionado personas válidas." });
-        }
+      // Filtrar las personas con role_id != 0
+      filteredPeople = req.body.people.filter(
+        (person) => parseInt(person.role_id) !== 0
+      );
 
-      const personIds = filteredPeople.map((person) => parseInt(person.person_id));
+      // Si no quedan personas después del filtrado, devolver un error
+      if (filteredPeople.length === 0) {
+        return res
+          .status(400)
+          .json({ msg: "No se han proporcionado personas válidas." });
+      }
+
+      const personIds = filteredPeople.map((person) =>
+        parseInt(person.person_id)
+      );
       const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
       const homeIds = filteredPeople.map((person) => parseInt(person.home_id));
-      
+
       // Verificar personas, roles y hogares
       const [persons, roles, homes] = await Promise.all([
         Person.findAll({ where: { id: personIds } }),
@@ -384,21 +398,27 @@ const TaskController = {
 
     let filteredPeople = [];
     if (req.body.people && req.body.people.length > 0) {
-        // Filtrar las personas con role_id != 0
-        filteredPeople = req.body.people.filter(person => parseInt(person.role_id) !== 0);
-      
-        // Si no quedan personas después del filtrado, devolver un error
-        if (filteredPeople.length === 0) {
-          return res.status(400).json({ msg: "No se han proporcionado personas válidas." });
-        }
+      // Filtrar las personas con role_id != 0
+      filteredPeople = req.body.people.filter(
+        (person) => parseInt(person.role_id) !== 0
+      );
 
-        logger.info("datos filteredPeople");
-        logger.info(JSON.stringify(filteredPeople));
+      // Si no quedan personas después del filtrado, devolver un error
+      if (filteredPeople.length === 0) {
+        return res
+          .status(400)
+          .json({ msg: "No se han proporcionado personas válidas." });
+      }
 
-      const personIds = filteredPeople.map((person) => parseInt(person.person_id));
+      logger.info("datos filteredPeople");
+      logger.info(JSON.stringify(filteredPeople));
+
+      const personIds = filteredPeople.map((person) =>
+        parseInt(person.person_id)
+      );
       const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
       const homeIds = filteredPeople.map((person) => parseInt(person.home_id));
-      
+
       // Verificar personas, roles y hogares
       const [persons, roles, homes] = await Promise.all([
         Person.findAll({ where: { id: personIds } }),
@@ -684,7 +704,7 @@ const TaskController = {
       throw new Error("Error al obtener prioridades");
     }
   },
-  
+
   async getPeople(home_id) {
     logger.info("Entra a Buscar Las personas en (category_status_priority)");
     try {
@@ -714,10 +734,12 @@ const TaskController = {
           imagePerson: person.image,
           roleId: firstHome ? firstHome.role_id : 0, // Accede a role_id
           roleName:
-            firstHome && firstHome.role ? (i18n.__(`roles.${firstHome.role.name}.name`) !==
-            `roles.${firstHome.role.name}.name`
-              ? i18n.__(`roles.${firstHome.role.name}.name`)
-              : firstHome.role.name) : "Sin Rol", // Accede a role.name
+            firstHome && firstHome.role
+              ? i18n.__(`roles.${firstHome.role.name}.name`) !==
+                `roles.${firstHome.role.name}.name`
+                ? i18n.__(`roles.${firstHome.role.name}.name`)
+                : firstHome.role.name
+              : "Sin Rol", // Accede a role.name
         };
       });
     } catch (error) {

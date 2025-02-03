@@ -130,7 +130,7 @@ const HomeRepository = {
           name: person.name,
           image: person.image,
           roleId: 0,
-          role_d: 0,
+          role_id: 0,
           roleName:
             i18n.__(`roles.${"Creador"}.name`) !== `roles.${"Creador"}.name`
               ? i18n.__(`roles.${"Creador"}.name`) // Traducción del rol si está disponible

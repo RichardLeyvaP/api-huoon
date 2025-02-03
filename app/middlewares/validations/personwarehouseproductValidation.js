@@ -77,8 +77,11 @@ const idPersonProductSchema = Joi.object({
 });
 
 const getPersonHomeProductSchema = Joi.object({
-    warehouse_id: Joi.date().required(),
-    home_id: Joi.date().required(),
+    warehouse_id: Joi.alternatives().try(
+        Joi.number(),
+        Joi.string().allow(null).empty('').optional()
+    ).required(),
+    home_id: Joi.number().required(),
 });
 
 module.exports = {
