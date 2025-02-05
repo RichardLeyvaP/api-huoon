@@ -45,7 +45,8 @@ module.exports = {
             lastSyncTime: config.lastSyncTime, // Formato ISO 8601
             fontSize: config.fontSize,
             cantHome: cantHome.length,
-            home: config.home ? config.home : (cantHome.length ? cantHome[0].id : null)
+            home: config.home ? config.home : (cantHome.length ? cantHome[0].id : null),
+            tokenNotification: config.tokenNotification
         };
 
             // Devolver la configuración actualizada
@@ -110,6 +111,7 @@ module.exports = {
             lastSyncTime: req.body.lastSyncTime || userConfig.lastSyncTime || defaultConfig.lastSyncTime,
             fontSize: req.body.fontSize || userConfig.fontSize || defaultConfig.fontSize,
             home: req.body.home,
+            tokenNotification : req.body.tokenNotification
         };
 
         // Actualizar la configuración

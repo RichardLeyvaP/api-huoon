@@ -87,6 +87,9 @@ module.exports = {
       home: {
         type: Sequelize.INTEGER
       },
+      tokenNotification: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

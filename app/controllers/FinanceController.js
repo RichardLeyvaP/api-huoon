@@ -149,10 +149,11 @@ const FinanceController = {
 
     if (!person) {
       logger.error(
-        `PersonWarehouseController->store: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
+        `FinanceController->store: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
       );
       return res.status(404).json({ msg: "PersonNotAssociatedWithHome" });
     }
+    
 
     const t = await sequelize.transaction();
     try {

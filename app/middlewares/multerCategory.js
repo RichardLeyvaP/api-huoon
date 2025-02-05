@@ -35,7 +35,7 @@ const multerCategory = (fieldName, foldername) => {
         limits: { fileSize: 500 * 1024 }, // Límite de tamaño: 500 KB
         fileFilter: function (req, file, cb) {
             // Validar tipo de archivo
-            const filetypes = /jpeg|jpg|png/;
+            const filetypes = /jpg|jpeg|png|gif|pdf|doc|docx|txt/;
             const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
             const mimetype = filetypes.test(file.mimetype);
 
@@ -54,6 +54,12 @@ const multerCategory = (fieldName, foldername) => {
                 // Si `image` es un string, omite el procesamiento
                 return next();
             }
+
+            if (req.body.archive && typeof req.body.archive === 'string') {
+                // Si `image` es un string, omite el procesamiento
+                return next();
+            }
+
 
             // Procesar archivo si no es un string
             upload(req, res, (err) => {

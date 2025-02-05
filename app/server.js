@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+const admin = require('firebase-admin');
 const { sequelize } = require("./models/index");
+const serviceAccount = require('../config/serviceAccountKey.json');
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
@@ -96,6 +98,10 @@ app.use(
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 // Middleware para gestionar el idioma
 app.use(cookieParser());

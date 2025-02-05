@@ -13,6 +13,8 @@ const PersonProductRepository = require('./PersonProductRepository');
 const ProductRepository = require('./ProductRepository');
 const AiInteractionRepository = require('./AiInteractionRepository');
 const FinanceRepository = require('./FinanceRepository');
+const NotificationRepository = require('./NotificationRepository');
+const FileRepository = require('./FileRepository');
 
 module.exports = {
     CategoryRepository,
@@ -29,5 +31,7 @@ module.exports = {
     PersonProductRepository,
     ProductRepository,
     AiInteractionRepository,
-    FinanceRepository
+    FinanceRepository,
+    NotificationRepository,
+    FileRepository
 };

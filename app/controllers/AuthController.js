@@ -474,7 +474,7 @@ const AuthController = {
       return res.redirect(`http://huoon.wezen.cl?user=${userDataString}`);
     } catch (error) {
       if (!t.finished) {
-        await transaction.rollback();
+        await t.rollback();
       }
       logger.error("Error en googleCallback:", error);
       return res.status(500).json({ error: "ServerError" });
