@@ -30,7 +30,44 @@ const multerCategory = (fieldName, foldername) => {
     });
 
     // Configuración de Multer
+    // Mapeo de extensiones a MIME types permitidos
+    const mimeTypes = {
+        'jpg': ['image/jpeg'],
+        'jpeg': ['image/jpeg'],
+        'png': ['image/png'],
+        'gif': ['image/gif'],
+        'pdf': ['application/pdf', 'application/octet-stream'], // Permitir octet-stream para PDFs
+        'doc': ['application/msword'],
+        'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        'txt': ['text/plain']
+    };
+
     const upload = multer({
+        storage: storage,
+        limits: { fileSize: 2 * 1024 * 1024 },
+        fileFilter: function (req, file, cb) {
+            const ext = path.extname(file.originalname).toLowerCase().slice(1);
+            const allowedExts = Object.keys(mimeTypes);
+
+            // Verificar extensión permitida
+            if (!allowedExts.includes(ext)) {
+                return cb(new Error(
+                    `Extensiones permitidas: ${allowedExts.join(', ')}`
+                ));
+            }
+
+            // Verificar MIME type correspondiente a la extensión
+            const allowedMimes = mimeTypes[ext];
+            if (allowedMimes.includes(file.mimetype)) {
+                cb(null, true);
+            } else {
+                cb(new Error(
+                    `Tipo MIME no válido para ${ext}. Tipos permitidos: ${allowedMimes.join(', ')}`
+                ));
+            }
+        }
+    }).single(fieldName);
+    /*const upload = multer({
         storage: storage,
         limits: { fileSize: 500 * 1024 }, // Límite de tamaño: 500 KB
         fileFilter: function (req, file, cb) {
@@ -45,7 +82,7 @@ const multerCategory = (fieldName, foldername) => {
                 cb(new Error('Error: Solo se permiten imágenes (jpeg, jpg, png)'));
             }
         }
-    }).single(fieldName);
+    }).single(fieldName);*/
 
     // Middleware personalizado
     return async (req, res, next) => {

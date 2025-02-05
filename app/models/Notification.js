@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class File extends Model {
+  class Notification extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,69 +9,64 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // Relación con la tabla de personas
-      File.belongsTo(models.Person, {
-        foreignKey: "person_id",
-        as: "person",
+      Notification.belongsTo(models.User, {
+        foreignKey: "user_id",
+        as: "user",
       });
 
       // Relación con la tabla de hogares
-      File.belongsTo(models.Home, {
+      Notification.belongsTo(models.Home, {
         foreignKey: "home_id",
         as: "home",
       });
     }
   }
-  File.init(
+  Notification.init(
     {
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,   // Indica que 'id' es la clave primaria
-        autoIncrement: true // Esto hace que el campo 'id' sea auto-incrementable
+        primaryKey: true, // Indica que 'id' es la clave primaria
+        autoIncrement: true, // Esto hace que el campo 'id' sea auto-incrementable
       },
       home_id: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      person_id: {
+      user_id: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      date: { // Nuevo campo
-        type: DataTypes.DATEONLY,
-        allowNull: false,
+      title: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       description: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      type: {
+      data: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      route: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      archive: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      size: {
-        type: DataTypes.BIGINT,
-        allowNull: true
-      },
-      personal: {
+      status: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        defaultValue: 0,
+      },
+      firebaseId: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {
       sequelize,
-      modelName: "File",
-      tableName: "files", // Nombre de la tabla en la base de datos
-      timestamps: true, // Habilita createdAt y updatedAt
+      modelName: "Notification",
+      tableName: "notifications",
+      timestamps: true,
     }
   );
-  return File;
+  return Notification;
 };

@@ -26,6 +26,7 @@ const storeHomeSchema = Joi.object({
       Joi.object({
         person_id: Joi.number().required(),
         role_id: Joi.number().required(),
+        roleName: Joi.string().allow(null).empty("").optional(),
       })
     )
     .optional(),
@@ -57,6 +58,7 @@ const updateHomeSchema = Joi.object({
       Joi.object({
         person_id: Joi.number().required(),
         role_id: Joi.number().required(),
+        roleName: Joi.string().allow(null).empty("").optional(),
       })
     )
     .optional(),

@@ -291,6 +291,9 @@ router.post('/file-show', validateSchema(idFileSchema), FileController.show);
 router.post('/file-update', multerCategory('archive', 'files'), validateSchema(updateFileSchema), FileController.update);
 router.post('/file-destroy', validateSchema(idFileSchema), FileController.destroy);
 
+//Ruta Notificaciones
+router.post('/get-user-notifications', NotificationController.getUserNotifications);
+
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);

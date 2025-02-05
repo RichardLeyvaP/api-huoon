@@ -7,6 +7,8 @@ const {
   HomeTypeRepository,
   StatusRepository,
   WareHouseRepository,
+  UserRepository,
+  NotificationRepository,
 } = require("../repositories");
 
 const HomeController = {
@@ -64,17 +66,18 @@ const HomeController = {
       // Mapear las tareas
       const mappedHomes = await Promise.all(
         homes.map(async (home) => {
-          const personRole = home.homePersons.find(
-            (hp) => hp.person_id === personId
-          )?.role?.name || "Creador";
+          const personRole =
+            home.homePersons.find((hp) => hp.person_id === personId)?.role
+              ?.name || "Creador";
           return {
             id: home.id,
             statusId: home.status_id,
             status_id: home.status_id,
             name: home.name,
-            nameRole: i18n.__(`roles.${personRole}.name`) !== `roles.${personRole}.name`
-                            ? i18n.__(`roles.${personRole}.name`)
-                            : personRole, // Agregar el rol de la persona en el hogar
+            nameRole:
+              i18n.__(`roles.${personRole}.name`) !== `roles.${personRole}.name`
+                ? i18n.__(`roles.${personRole}.name`)
+                : personRole, // Agregar el rol de la persona en el hogar
             address: home.address,
             homeTypeId: home.home_type_id,
             home_type_id: home.home_type_id,
@@ -119,7 +122,8 @@ const HomeController = {
       image,
       people,
     } = req.body;
-
+    let tokensData = [];
+    let userTokensData = [];
     const personId = req.person.id;
     req.body.person_id = personId;
     // Verificar si el tipo de hogar existe
@@ -178,8 +182,21 @@ const HomeController = {
           .status(400)
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
       }
-    }
 
+      const { tokens, userTokens } =
+        await UserRepository.getUserNotificationTokensByPersons(
+          personIds,
+          people
+        );
+      tokensData = tokens;
+      userTokensData = userTokens;
+      logger.info(JSON.stringify(userTokensData));
+      logger.info(JSON.stringify('userTokensData'));
+      logger.info(JSON.stringify(userTokens));
+      logger.info(JSON.stringify('userTokens'));
+    }
+    
+    let notifications = {};
     const t = await sequelize.transaction();
     try {
       const home = await HomeRepository.create(req.body, req.file, t);
@@ -197,8 +214,64 @@ const HomeController = {
             { transaction: t }
           );
         }
+        //logica de notificaciones
+        if (tokensData.length) {
+          // Iterar sobre cada usuario y enviar notificación personalizada
+         notifications = userTokensData.map((user) => ({
+            token: [user.firebaseId],
+            notification: {
+              title: `Fuiste asociado al hogar ${home.name}`,
+              body: `Asignado como ${user.roleName}`,
+            },
+            data: {
+              route: "/getHome",
+              home_id: String(home.id), // Convertir a string
+              nameHome: String(home.name),
+              role_id: String(user.role_id), // Convertir a string
+              roleName: String(user.roleName),
+            },
+          }));
+
+
+          const notificationsToCreate = userTokensData
+            .map((user) => {
+              const notification = notifications.find(
+                (n) => n.token[0] === user.firebaseId
+              );
+              if (notification) {
+                return {
+                  home_id: home.id,
+                  user_id: user.user_id,
+                  title: `Fuiste asociado al hogar ${home.name}`,
+                  description: `Asignado como ${user.roleName}`,
+                  data: notification.data, // Usamos el valor procesado
+                  route: "/getHome",
+                  firebaseId: user.firebaseId,
+                };
+              }
+              return null; // Retornar null si no se encuentra la notificación
+            })
+            .filter((notification) => notification !== null); // Filtrar los elementos null
+
+            const results = await Promise.allSettled(
+              notificationsToCreate.map(async (notification) => {
+                try {
+                  const result = await NotificationRepository.create(notification, t);
+                } catch (error) {
+                  logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
+                }
+              })
+            );
+        }
       }
       await t.commit();
+      if (notifications.length){
+        // Enviar todas las notificaciones en paralelo
+        const firebaseResults =
+          await NotificationRepository.sendNotificationMultiCast(
+            notifications
+          );
+      }
       res.status(201).json({ home });
     } catch (error) {
       await t.rollback();
