@@ -131,18 +131,8 @@ class UserRepository {
         const tokenArray = [];
         const userTokenArray = [];
     
-        /*users.forEach((user) => {
-          if (user.configuration && user.configuration.tokenNotification) {
-            tokenArray.push(user.configuration.tokenNotification);
-            userTokenArray.push({
-              user_id: user.id,
-              firebaseId: user.configuration.tokenNotification
-            });
-          }
-        });*/
-
         users.forEach((user) => {
-            if (user.configurations && user.configurations[0].tokenNotification) {
+          if (user.configurations?.length > 0 && user.configurations[0]?.tokenNotification) {
               // Buscar el rol correspondiente en el array de `people`
               const personRole = people.find(
                 (person) => parseInt(person.person_id) === user.person.id
@@ -152,6 +142,7 @@ class UserRepository {
                 tokenArray.push(user.configurations[0].tokenNotification);
                 userTokenArray.push({
                   user_id: user.id,
+                  person_id: user.person.id,
                   firebaseId: user.configurations[0].tokenNotification,
                   role_id: personRole.role_id,
                   roleName: personRole.roleName, // Tomamos el nombre del rol directamente

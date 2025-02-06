@@ -14,6 +14,8 @@ const logger = require("../../config/logger"); // Logger para seguimiento
 const i18n = require("../../config/i18n-config");
 const e = require("express");
 const ImageService = require("../services/ImageService");
+const UserRepository = require("./UserRepository");
+const NotificationRepository = require("./NotificationRepository");
 
 const HomeRepository = {
   // Obtener todas las casas
@@ -91,16 +93,16 @@ const HomeRepository = {
       where: { home_id: home.id },
       include: [
         {
-            model: Role,
-            as: 'role',
-            attributes: ['id', 'name']
+          model: Role,
+          as: "role",
+          attributes: ["id", "name"],
         },
         {
-            model: Person,
-            as: 'person',
-            attributes: ['id', 'name', 'email', 'image']
-        }
-    ]
+          model: Person,
+          as: "person",
+          attributes: ["id", "name", "email", "image"],
+        },
+      ],
     });
 
     // Devolver las personas mapeadas
@@ -116,7 +118,7 @@ const HomeRepository = {
           ? i18n.__(`roles.${homePerson.role.name}.name`) // Traducción del rol si está disponible
           : homePerson.role.name,
     }));
-    
+
     // Verificar si la persona que hace la consulta tiene relación directa con la tarea
     const personAlreadyIncluded = people.some(
       (person) => person.id === personId
@@ -172,6 +174,40 @@ const HomeRepository = {
     });
   },
 
+  async getHomePeople(homeId) {
+    try {
+      // Realizar la consulta a la base de datos
+      const homePeople = await HomePerson.findAll({
+        where: { home_id: homeId },
+        include: [
+          {
+            model: Role,
+            attributes: ["name"], // Suponiendo que el nombre del rol está en la columna 'name'
+            as: "role", // Alias de la relación
+          },
+        ],
+      });
+
+      // Formatear la respuesta
+      const formattedResponse = homePeople.map((person) => ({
+        person_id: person.person_id,
+        role_id: person.role_id,
+        roleName: person.role ? person.role.name : null, // Obtener el nombre del rol
+      }));
+      // Crear un array solo con los person_id
+      const personIds = homePeople.map((person) => person.person_id);
+
+      // Devolver ambos resultados
+      return {
+        people: formattedResponse, // [[person_id: 5, role_id: 4, roleName: "prueba"], ...]
+        personIds: personIds, // [5, 6, ...]
+      };
+    } catch (error) {
+      logger.error("Error al obtener los registros de home_person:", error);
+      throw error;
+    }
+  },
+
   // Crear una nueva casa con manejo de imágenes
   async create(body, file, t) {
     const {
@@ -182,7 +218,7 @@ const HomeRepository = {
       residents,
       home_type_id,
       status_id,
-      person_id
+      person_id,
     } = body;
     const home = await Home.create(
       {
@@ -207,10 +243,7 @@ const HomeRepository = {
         file.originalname
       );
       home.image = await ImageService.moveFile(file, newFilename);
-      await home.update(
-        { image: home.image },
-        { transaction: t }
-      );
+      await home.update({ image: home.image }, { transaction: t });
     }
     return home;
   },
@@ -226,7 +259,7 @@ const HomeRepository = {
       "home_type_id",
       "status_id",
       "image",
-      "person_id"
+      "person_id",
     ];
 
     const updatedData = Object.keys(body)
@@ -247,10 +280,7 @@ const HomeRepository = {
           home.id,
           file.originalname
         );
-        updatedData.image = await ImageService.moveFile(
-          file,
-          newFilename
-        );
+        updatedData.image = await ImageService.moveFile(file, newFilename);
       }
 
       // Actualizar los datos en la base de datos si hay cambios
@@ -266,7 +296,7 @@ const HomeRepository = {
     }
   },
 
-  async syncHomePeople(homeId, peopleArray, t) {
+  async syncHomePeople(homeId, peopleArray, t, home = null) {
     // Obtener las asociaciones actuales para la tarea especificada
     const currentAssociations = await HomePerson.findAll({
       where: { home_id: homeId },
@@ -279,7 +309,7 @@ const HomeRepository = {
 
     // Crear un mapa del nuevo conjunto de datos (key: person_id-home_id)
     const newMap = peopleArray.reduce((map, person) => {
-      map[`${person.person_id}-${person.home_id}`] = person;
+      map[`${person.person_id}-${homeId}`] = person;
       return map;
     }, {});
 
@@ -287,6 +317,15 @@ const HomeRepository = {
     const toUpdate = [];
     const toDelete = [];
     const actions = []; // Array para registrar las acciones realizadas
+    const notifications = [];
+
+    // Obtener tokens de los usuarios involucrados
+    const personIds = peopleArray.map((p) => p.person_id);
+    const { tokens, userTokens } =
+      await UserRepository.getUserNotificationTokensByPersons(
+        personIds,
+        peopleArray
+      );
 
     // Recorremos las nuevas asociaciones para determinar si agregar o actualizar
     Object.keys(newMap).forEach((key) => {
@@ -294,13 +333,32 @@ const HomeRepository = {
 
       // Verificar si ya existe una relación para esta combinación
       const current = currentMap[key];
-
       if (!current) {
         // Si la asociación no existe en la base de datos, agregarla
         toAdd.push({
           home_id: homeId,
           ...incoming,
         });
+        // Notificación de agregado
+        const userAdd = userTokens.find(
+          (u) => u.person_id === parseInt(incoming.person_id)
+        );
+
+        if (userAdd) {
+          notifications.push({
+            token: [userAdd.firebaseId],
+            notification: {
+              title: `Fuiste agregado al hogar ${home}`,
+              body: `Tu rol: ${userAdd.roleName}`,
+            },
+            data: {
+              route: "/getHome",
+              home_id: String(homeId),
+              role_id: String(userAdd.role_id),
+              roleName: String(userAdd.roleName),
+            },
+          });
+        }
       } else {
         // Si la asociación existe pero el rol ha cambiado, la actualizamos
         if (current.role_id !== incoming.role_id) {
@@ -308,6 +366,26 @@ const HomeRepository = {
             id: current.id, // Usamos el id de la relación actual
             role_id: incoming.role_id,
           });
+          // Notificación de actualizado
+          const user = userTokens.find(
+            (u) => u.person_id === parseInt(incoming.person_id)
+          );
+
+          if (user) {
+            notifications.push({
+              token: [user.firebaseId],
+              notification: {
+                title: `Tu rol en el hogar ${home} fue actualizado`,
+                body: `Nuevo rol: ${user.roleName}`,
+              },
+              data: {
+                route: "/getHome",
+                home_id: String(homeId),
+                role_id: String(user.role_id),
+                roleName: String(user.roleName),
+              },
+            });
+          }
         }
       }
     });
@@ -317,6 +395,25 @@ const HomeRepository = {
       const key = `${current.person_id}-${current.home_id}`;
       if (!newMap[key]) {
         toDelete.push(current.id);
+        // Notificación de eliminación
+        const user = userTokens.find(
+          (u) => u.person_id === parseInt(current.person_id)
+        );
+        if (user) {
+          notifications.push({
+            token: [user.firebaseId],
+            notification: {
+              title: `Fuiste eliminado del hogar ${home}`,
+              body: `Ya no perteneces a este hogar.`,
+            },
+            data: {
+              route: "/getHome",
+              home_id: String(homeId),
+              role_id: String(user.role_id),
+              roleName: String(user.roleName),
+            },
+          });
+        }
       }
     });
 
@@ -342,6 +439,44 @@ const HomeRepository = {
     if (toAdd.length > 0) {
       await HomePerson.bulkCreate(toAdd, { transaction: t });
       actions.push({ action: "added", ids: toAdd.map((a) => a.id) });
+    }
+
+    if (notifications.length) {
+      const notificationsToCreate = userTokens
+        .map((user) => {
+          const notification = notifications.find(
+            (n) => n.token[0] === user.firebaseId
+          );
+          if (notification) {
+            return {
+              home_id: homeId,
+              user_id: user.user_id,
+              title: notification.notification.title,
+              description: notification.notification.body,
+              data: notification.data, // Usamos el valor procesado
+              route: "/getHome",
+              firebaseId: notification.token[0],
+            };
+          }
+          return null; // Retornar null si no se encuentra la notificación
+        })
+        .filter((notification) => notification !== null); // Filtrar los elementos null
+
+      const results = await Promise.allSettled(
+        notifications.map(async (notification) => {
+          try {
+            const result = await NotificationRepository.create(notification, t);
+          } catch (error) {
+            logger.error(
+              `Error al crear notificación para user_id ${notification.user_id}:`,
+              error
+            );
+          }
+        })
+      );
+
+      const firebaseResults =
+        await NotificationRepository.sendNotificationMultiCast(notifications);
     }
 
     // Devolver detalles de las operaciones realizadas

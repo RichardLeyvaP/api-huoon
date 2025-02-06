@@ -24,7 +24,7 @@ const NotificationRepository = {
     }
   },
 
-  async create(body, t){
+  async create(body, t = null){
     logger.info('Creando notificación con los siguientes datos:', JSON.stringify(body, null, 2)); // Serializa body para logging
 
     const { home_id, user_id, title, description, data, route, status, firebaseId } = body;

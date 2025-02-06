@@ -217,7 +217,7 @@ const HomeController = {
             token: [user.firebaseId],
             notification: {
               title: `Fuiste asociado al hogar ${home.name}`,
-              body: `Asignado como ${user.roleName}`,
+              body: `Tu Rol ${user.roleName}`,
             },
             data: {
               route: "/getHome",
@@ -239,7 +239,7 @@ const HomeController = {
                   home_id: home.id,
                   user_id: user.user_id,
                   title: `Fuiste asociado al hogar ${home.name}`,
-                  description: `Asignado como ${user.roleName}`,
+                  description: `Tu rol ${user.roleName}`,
                   data: notification.data, // Usamos el valor procesado
                   route: "/getHome",
                   firebaseId: user.firebaseId,
@@ -393,7 +393,6 @@ const HomeController = {
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
       }
     }
-
     const t = await sequelize.transaction();
     try {
       const homeUpdate = await HomeRepository.update(
@@ -407,7 +406,7 @@ const HomeController = {
       // Sincronizar asociaciones
       if (filteredPeople.length > 0) {
         const { toAdd, toUpdate, toDelete } =
-          await HomeRepository.syncHomePeople(req.body.id, filteredPeople, t);
+          await HomeRepository.syncHomePeople(req.body.id, filteredPeople, t, home.name);
         associationsData =
           toAdd.length || toUpdate.length || toDelete.length
             ? { added: toAdd, updated: toUpdate, deleted: toDelete }
@@ -437,7 +436,67 @@ const HomeController = {
       if (!home) {
         return res.status(404).json({ msg: "HomeNotFound" });
       }
+      
+      const { people, personIds} = await HomeRepository.getHomePeople(req.body.id);
 
+      const { tokens, userTokens } = await UserRepository.getUserNotificationTokensByPersons(personIds, people);
+      let notifications = [];
+      if (tokens.length) {
+        // Iterar sobre cada usuario y enviar notificación personalizada
+       notifications = userTokens.map((user) => ({
+          token: [user.firebaseId],
+          notification: {
+            title: `El hogar ${home.name} fue eliminado`,
+            body: `Tu Rol ${user.roleName}`,
+          },
+          data: {
+            route: "/getHome",
+            home_id: String(home.id), // Convertir a string
+            nameHome: String(home.name),
+            role_id: String(user.role_id), // Convertir a string
+            roleName: String(user.roleName),
+          },
+        }));
+
+
+        const notificationsToCreate = userTokens
+          .map((user) => {
+            const notification = notifications.find(
+              (n) => n.token[0] === user.firebaseId
+            );
+            if (notification) {
+              return {
+                home_id: home.id,
+                user_id: user.user_id,
+                title: `El hogar ${home.name} fue eliminado`,
+                description: `Tu rol ${user.roleName}`,
+                data: notification.data, // Usamos el valor procesado
+                route: "/getHome",
+                firebaseId: user.firebaseId,
+              };
+            }
+            return null; // Retornar null si no se encuentra la notificación
+          })
+          .filter((notification) => notification !== null); // Filtrar los elementos null
+
+          const results = await Promise.allSettled(
+            notificationsToCreate.map(async (notification) => {
+              try {
+                const result = await NotificationRepository.create(notification);
+              } catch (error) {
+                logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
+              }
+            })
+          );
+      }
+
+      if (notifications.length){
+        // Enviar todas las notificaciones en paralelo
+        const firebaseResults =
+          await NotificationRepository.sendNotificationMultiCast(
+            notifications
+          );
+      }
       const homeDelete = await HomeRepository.delete(home);
 
       res.status(200).json({ msg: "HomeDeleted" });
