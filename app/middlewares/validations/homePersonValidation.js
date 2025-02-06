@@ -4,6 +4,7 @@ const storeHomePersonSchema = Joi.object({
     home_id: Joi.number().required(),
     person_id: Joi.number().required(),
     role_id: Joi.number().required(),
+    roleName: Joi.string().allow(null).empty("").optional(),
 });
 
 const updateHomePersonSchema = Joi.object({

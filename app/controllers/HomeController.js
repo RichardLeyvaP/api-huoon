@@ -190,10 +190,6 @@ const HomeController = {
         );
       tokensData = tokens;
       userTokensData = userTokens;
-      logger.info(JSON.stringify(userTokensData));
-      logger.info(JSON.stringify('userTokensData'));
-      logger.info(JSON.stringify(userTokens));
-      logger.info(JSON.stringify('userTokens'));
     }
     
     let notifications = {};
