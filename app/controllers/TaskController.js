@@ -26,6 +26,8 @@ const {
   TaskRepository,
   HomeRepository,
   PriorityRepository,
+  UserRepository,
+  NotificationRepository,
 } = require("../repositories");
 
 const TaskController = {
@@ -95,7 +97,7 @@ const TaskController = {
         req.body.home_id === 0 &&
         req.body.home_id === null
       ) {
-        logger.info('No esta asociadoa  ningun hogar');
+        logger.info("No esta asociadoa  ningun hogar");
         return res.status(204).json({ msg: "TaskNotFound", tasks: [] });
       }
       const personId = req.person.id;
@@ -194,6 +196,8 @@ const TaskController = {
     logger.info("datos recibidos al crear una tarea");
     logger.info(JSON.stringify(req.body));
     const personId = req.person.id;
+    let tokensData = [];
+    let userTokensData = [];
     if (req.body.parent_id) {
       parent = await TaskRepository.findById(req.body.parent_id);
       if (!parent) {
@@ -247,7 +251,22 @@ const TaskController = {
           .status(400)
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
       }
+
+      const { tokens, userTokens } =
+        await UserRepository.getUserNotificationTokensByPersons(
+          personIds,
+          filteredPeople
+        );
+      tokensData = tokens;
+      userTokensData = userTokens;
+
+      logger.info(JSON.stringify('tokens'));
+      logger.info(JSON.stringify(tokens));
+      logger.info(JSON.stringify('userTokens'));
+      logger.info(JSON.stringify(userTokens));
     }
+
+    let notifications = {};
 
     // Iniciar la transacción
     const t = await sequelize.transaction();
@@ -300,8 +319,64 @@ const TaskController = {
         JSON.stringify(activityData),
         { transaction: t } // Aquí pasas la transacción
       );
+    if (tokensData.length) {
+        // Iterar sobre cada usuario y enviar notificación personalizada
+       notifications = userTokensData.map((user) => ({
+          token: [user.firebaseId],
+          notification: {
+            title: `Fuiste asociado a la tarea ${task.title}`,
+            body: `Tu Rol ${user.roleName}`,
+          },
+          data: {
+            route: "/getTask",
+            home_id: String(task.home_id), // Convertir a string
+            nameHome: String(task.title),
+            role_id: String(user.role_id), // Convertir a string
+            roleName: String(user.roleName),
+            task_id: String(task.id),
+          },
+        }));
+
+
+        const notificationsToCreate = userTokensData
+          .map((user) => {
+            const notification = notifications.find(
+              (n) => n.token[0] === user.firebaseId
+            );
+            if (notification) {
+              return {
+                home_id: task.home_id,
+                user_id: user.user_id,
+                title: `Fuiste asociado a la tarea ${task.title}`,
+                description: `Tu rol ${user.roleName}`,
+                data: notification.data, // Usamos el valor procesado
+                route: "/geTask",
+                firebaseId: user.firebaseId,
+              };
+            }
+            return null; // Retornar null si no se encuentra la notificación
+          })
+          .filter((notification) => notification !== null); // Filtrar los elementos null
+
+          const results = await Promise.allSettled(
+            notificationsToCreate.map(async (notification) => {
+              try {
+                const result = await NotificationRepository.create(notification, t);
+              } catch (error) {
+                logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
+              }
+            })
+          );
+      }
       // Confirmar la transacción
       await t.commit();
+      if (notifications.length){
+        // Enviar todas las notificaciones en paralelo
+        const firebaseResults =
+          await NotificationRepository.sendNotificationMultiCast(
+            notifications
+          );
+      }
       res.status(201).json({ task });
     } catch (error) {
       // Revertir la transacción si ocurre un error
@@ -404,11 +479,11 @@ const TaskController = {
       );
 
       // Si no quedan personas después del filtrado, devolver un error
-      if (filteredPeople.length === 0) {
+      /*if (filteredPeople.length === 0) {
         return res
           .status(400)
           .json({ msg: "No se han proporcionado personas válidas." });
-      }
+      }*/
 
       logger.info("datos filteredPeople");
       logger.info(JSON.stringify(filteredPeople));
@@ -456,14 +531,14 @@ const TaskController = {
 
       let associationsData = [];
       // Sincronizar asociaciones
-      if (filteredPeople.length > 0) {
+      //if (filteredPeople.length > 0) {
         const { toAdd, toUpdate, toDelete } =
-          await TaskRepository.syncTaskPeople(req.body.id, filteredPeople, t);
+          await TaskRepository.syncTaskPeople(req.body.id, filteredPeople, t, task);
         associationsData =
           toAdd.length || toUpdate.length || toDelete.length
             ? { added: toAdd, updated: toUpdate, deleted: toDelete }
             : null;
-      }
+      //}
 
       // Registrar la tarea y las asociaciones en el log de actividades
       const activityData = {
@@ -584,6 +659,75 @@ const TaskController = {
 
     if (!task) {
       return res.status(400).json({ msg: "TaskNotFound" });
+    }
+
+    const { people, personIds } = await TaskRepository.getTaskPeople(
+      req.body.id
+    );
+
+    const { tokens, userTokens } =
+      await UserRepository.getUserNotificationTokensByPersons(
+        personIds,
+        people
+      );
+
+    let notifications = [];
+    if (tokens.length) {
+      // Iterar sobre cada usuario y enviar notificación personalizada
+      notifications = userTokens.map((user) => ({
+        token: [user.firebaseId],
+        notification: {
+          title: `La tarea ${task.title} fue eliminada`,
+          body: `Tu Rol ${user.roleName}`,
+        },
+        data: {
+          route: "/getHome",
+          home_id: String(task.home_id), // Convertir a string
+          nametask: String(task.name),
+          role_id: String(user.role_id), // Convertir a string
+          roleName: String(user.roleName),
+          task_id: String(task.id),
+        },
+      }));
+
+      const notificationsToCreate = userTokens
+        .map((user) => {
+          const notification = notifications.find(
+            (n) => n.token[0] === user.firebaseId
+          );
+          if (notification) {
+            return {
+              home_id: task.home_id,
+              user_id: user.user_id,
+              title: `La tarea ${task.title} fue eliminada`,
+              description: `Tu rol ${user.roleName}`,
+              data: notification.data, // Usamos el valor procesado
+              route: "/getHome",
+              firebaseId: user.firebaseId,
+            };
+          }
+          return null; // Retornar null si no se encuentra la notificación
+        })
+        .filter((notification) => notification !== null); // Filtrar los elementos null
+
+      const results = await Promise.allSettled(
+        notificationsToCreate.map(async (notification) => {
+          try {
+            const result = await NotificationRepository.create(notification);
+          } catch (error) {
+            logger.error(
+              `Error al crear notificación para user_id ${notification.user_id}:`,
+              error
+            );
+          }
+        })
+      );
+    }
+
+    if (notifications.length) {
+      // Enviar todas las notificaciones en paralelo
+      const firebaseResults =
+        await NotificationRepository.sendNotificationMultiCast(notifications);
     }
 
     const t = await sequelize.transaction();

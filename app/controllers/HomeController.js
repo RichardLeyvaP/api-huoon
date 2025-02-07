@@ -186,7 +186,7 @@ const HomeController = {
       const { tokens, userTokens } =
         await UserRepository.getUserNotificationTokensByPersons(
           personIds,
-          people
+          filteredPeople
         );
       tokensData = tokens;
       userTokensData = userTokens;
@@ -362,11 +362,11 @@ const HomeController = {
       );
 
       // Si no quedan personas después del filtrado, devolver un error
-      if (filteredPeople.length === 0) {
+      /*if (filteredPeople.length === 0) {
         return res
           .status(400)
           .json({ msg: "No se han proporcionado personas válidas." });
-      }
+      }*/
       const personIds = filteredPeople.map((person) =>
         parseInt(person.person_id)
       );
@@ -404,14 +404,14 @@ const HomeController = {
 
       let associationsData = [];
       // Sincronizar asociaciones
-      if (filteredPeople.length > 0) {
+      //if (filteredPeople.length > 0) {
         const { toAdd, toUpdate, toDelete } =
           await HomeRepository.syncHomePeople(req.body.id, filteredPeople, t, home.name);
         associationsData =
           toAdd.length || toUpdate.length || toDelete.length
             ? { added: toAdd, updated: toUpdate, deleted: toDelete }
             : null;
-      }
+      //}
 
       await t.commit();
       res.status(200).json({ home: homeUpdate });

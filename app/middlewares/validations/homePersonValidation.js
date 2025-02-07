@@ -19,7 +19,8 @@ const assignPeopleSchema = Joi.object({
     people: Joi.array().items(
         Joi.object({
             person_id: Joi.number().required(),
-            role_id: Joi.number().required()
+            role_id: Joi.number().required(),
+            roleName: Joi.string().allow(null).empty("").optional(),
         })
     ).required()
 });

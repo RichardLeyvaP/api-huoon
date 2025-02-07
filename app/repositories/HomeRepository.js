@@ -463,7 +463,7 @@ const HomeRepository = {
         .filter((notification) => notification !== null); // Filtrar los elementos null
 
       const results = await Promise.allSettled(
-        notifications.map(async (notification) => {
+        notificationsToCreate.map(async (notification) => {
           try {
             const result = await NotificationRepository.create(notification, t);
           } catch (error) {

@@ -16,6 +16,8 @@ const {
 const i18n = require("../../config/i18n-config");
 const ImageService = require("../services/ImageService");
 const logger = require("../../config/logger"); // Importa el logger
+const UserRepository = require("./UserRepository");
+const NotificationRepository = require("./NotificationRepository");
 
 class TaskRepository {
   async findAll() {
@@ -222,6 +224,40 @@ class TaskRepository {
         },
       ],
     });
+  }
+
+  async getTaskPeople(taskId) {
+    try {
+      // Realizar la consulta a la base de datos
+      const homePersonTask = await HomePersonTask.findAll({
+        where: { task_id: taskId },
+        include: [
+          {
+            model: Role,
+            attributes: ["name"], // Suponiendo que el nombre del rol está en la columna 'name'
+            as: "role", // Alias de la relación
+          },
+        ],
+      });
+
+      // Formatear la respuesta
+      const formattedResponse = homePersonTask.map((person) => ({
+        person_id: person.person_id,
+        role_id: person.role_id,
+        roleName: person.role ? person.role.name : null, // Obtener el nombre del rol
+      }));
+      // Crear un array solo con los person_id
+      const personIds = homePersonTask.map((person) => person.person_id);
+
+      // Devolver ambos resultados
+      return {
+        people: formattedResponse, // [[person_id: 5, role_id: 4, roleName: "prueba"], ...]
+        personIds: personIds, // [5, 6, ...]
+      };
+    } catch (error) {
+      logger.error("Error al obtener los registros de home_person:", error);
+      throw error;
+    }
   }
 
   async peopleTask(task, personId) {
@@ -441,7 +477,7 @@ class TaskRepository {
     return await task.destroy({ transaction: t });
   }
 
-  async syncTaskPeople(taskId, peopleArray, t) {
+  async syncTaskPeople(taskId, peopleArray, t, task = []) {
     // Obtener las asociaciones actuales para la tarea especificada
     const currentAssociations = await HomePersonTask.findAll({
       where: { task_id: taskId },
@@ -462,7 +498,15 @@ class TaskRepository {
     const toUpdate = [];
     const toDelete = [];
     const actions = []; // Array para registrar las acciones realizadas
+    const notifications = [];
 
+    // Obtener tokens de los usuarios involucrados
+        const personIds = peopleArray.map((p) => p.person_id);
+        const { tokens, userTokens } =
+          await UserRepository.getUserNotificationTokensByPersons(
+            personIds,
+            peopleArray
+          );
     // Recorremos las nuevas asociaciones para determinar si agregar o actualizar
     Object.keys(newMap).forEach((key) => {
       const incoming = newMap[key];
@@ -476,6 +520,27 @@ class TaskRepository {
           task_id: taskId,
           ...incoming,
         });
+         // Notificación de agregado
+         const userAdd = userTokens.find(
+          (u) => u.person_id === parseInt(incoming.person_id)
+        );
+
+        if (userAdd) {
+          notifications.push({
+            token: [userAdd.firebaseId],
+            notification: {
+              title: `Fuiste asociado con la tarea ${task.title}`,
+              body: `Tu rol: ${userAdd.roleName}`,
+            },
+            data: {
+              route: "/getTask",
+              home_id: String(task.home_id),
+              role_id: String(userAdd.role_id),
+              roleName: String(userAdd.roleName),
+              task_id: String(taskId)
+            },
+          });
+        }
       } else {
         // Si la asociación existe pero el rol ha cambiado, la actualizamos
         if (current.role_id !== incoming.role_id) {
@@ -483,6 +548,27 @@ class TaskRepository {
             id: current.id, // Usamos el id de la relación actual
             role_id: incoming.role_id,
           });
+          // Notificación de actualizado
+          const user = userTokens.find(
+            (u) => u.person_id === parseInt(incoming.person_id)
+          );
+
+          if (user) {
+            notifications.push({
+              token: [user.firebaseId],
+              notification: {
+                title: `Tu Rol en la tarea ${task.title} fue actualizado`,
+                body: `Nuevo rol: ${user.roleName}`,
+              },
+              data: {
+                route: "/getTask",
+                home_id: String(task.home_id),
+                role_id: String(user.role_id),
+                roleName: String(user.roleName),
+                task_id: String(taskId)
+              },
+            });
+          }
         }
       }
     });
@@ -492,6 +578,26 @@ class TaskRepository {
       const key = `${current.person_id}-${current.home_id}`;
       if (!newMap[key]) {
         toDelete.push(current.id);
+        // Notificación de eliminación
+        const user = userTokens.find(
+          (u) => u.person_id === parseInt(current.person_id)
+        );
+        if (user) {
+          notifications.push({
+            token: [user.firebaseId],
+            notification: {
+              title: `Fuiste desasociado de la tarea ${task.title}`,
+              body: `Ya no estas relacionado con esta tarea.`,
+            },
+            data: {
+              route: "/getTask",
+              home_id: String(task.home_id),
+              role_id: String(user.role_id),
+              roleName: String(user.roleName),
+              task_id: String(taskId)
+            },
+          });
+        }
       }
     });
 
@@ -518,7 +624,43 @@ class TaskRepository {
       await HomePersonTask.bulkCreate(toAdd, { transaction: t });
       actions.push({ action: "added", ids: toAdd.map((a) => a.id) });
     }
+    if (notifications.length) {
+      const notificationsToCreate = userTokens
+        .map((user) => {
+          const notification = notifications.find(
+            (n) => n.token[0] === user.firebaseId
+          );
+          if (notification) {
+            return {
+              home_id: task.home_id,
+              user_id: user.user_id,
+              title: notification.notification.title,
+              description: notification.notification.body,
+              data: notification.data, // Usamos el valor procesado
+              route: "/getTask",
+              firebaseId: notification.token[0],
+            };
+          }
+          return null; // Retornar null si no se encuentra la notificación
+        })
+        .filter((notification) => notification !== null); // Filtrar los elementos null
 
+      const results = await Promise.allSettled(
+        notificationsToCreate.map(async (notification) => {
+          try {
+            const result = await NotificationRepository.create(notification, t);
+          } catch (error) {
+            logger.error(
+              `Error al crear notificación para user_id ${notification.user_id}:`,
+              error
+            );
+          }
+        })
+      );
+
+      const firebaseResults =
+        await NotificationRepository.sendNotificationMultiCast(notifications);
+    }
     // Devolver detalles de las operaciones realizadas
     return { toAdd, toUpdate, toDelete, actions };
   }

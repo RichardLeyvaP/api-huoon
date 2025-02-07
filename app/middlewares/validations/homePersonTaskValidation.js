@@ -5,6 +5,7 @@ const storeHomePersonTaskSchema = Joi.object({
     person_id: Joi.number().required(),
     role_id: Joi.number().required(),
     task_id: Joi.number().required(),
+    roleName: Joi.string().allow(null).empty("").optional(),
 });
 
 const updateHomePersonTaskSchema = Joi.object({
@@ -21,7 +22,8 @@ const assignPeopleTaskSchema = Joi.object({
         Joi.object({
             person_id: Joi.number().required(),
             role_id: Joi.number().required(),
-            home_id: Joi.number().required()
+            home_id: Joi.number().required(),
+            roleName: Joi.string().allow(null).empty("").optional(),
         })
     ).required()
 });
