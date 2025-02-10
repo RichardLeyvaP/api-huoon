@@ -29,6 +29,7 @@ const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSche
 const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
 const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSchema } = require('./middlewares/validations/financeValidation');
 const { storeFileSchema, updateFileSchema, idFileSchema, typeFileSchema } = require('./middlewares/validations/fileValidation');
+const { getNotificationsSchema } = require('./middlewares/validations/notificationValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -292,7 +293,7 @@ router.post('/file-update', multerCategory('archive', 'files'), validateSchema(u
 router.post('/file-destroy', validateSchema(idFileSchema), FileController.destroy);
 
 //Ruta Notificaciones
-router.post('/get-user-notifications', NotificationController.getUserNotifications);
+router.post('/get-user-notifications', validateSchema(getNotificationsSchema), NotificationController.getUserNotifications);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);

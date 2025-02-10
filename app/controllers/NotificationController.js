@@ -1,17 +1,20 @@
 const logger = require("../../config/logger");
-const { NotificationRepository, UserRepository, HomeRepository } = require("../repositories");
+const {
+  NotificationRepository,
+  UserRepository,
+  HomeRepository,
+} = require("../repositories");
 
 const NotificationController = {
   async sendNotification(req, res) {
     try {
-
       const home = await HomeRepository.findById(req.body.home_id);
-    if (!home) {
-      logger.error(
-        `FileController->store: Hogar no encontrado con ID ${home_id}`
-      );
-      return res.status(404).json({ msg: "HomeNotFound" });
-    }
+      if (!home) {
+        logger.error(
+          `FileController->store: Hogar no encontrado con ID ${home_id}`
+        );
+        return res.status(404).json({ msg: "HomeNotFound" });
+      }
       //logger.info(`${req.user.name} - Entra a enviar notificación`);
       const { tokens, userTokens } =
         await UserRepository.getUserNotificationTokens();
@@ -92,6 +95,21 @@ const NotificationController = {
   async getUserNotifications(req, res) {
     logger.info(`${req.user.name} - Buscando las notificaciones`);
     try {
+      const userId = req.user.id; // ID del usuario autenticado
+      const { limit = 5, cursor } = req.body;
+
+      const { notifications, hasMore, nextCursor } =
+        await NotificationRepository.getUserNotifications(userId, limit, cursor);
+
+      res.json({
+        notifications,
+        hasMore,
+        nextCursor,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Error fetching notifications" });
+    }
+    /*try {
       const userId = req.user.id; // Obtener el ID del usuario autenticado
   
       const notifications = await NotificationRepository.getUserNotifications(userId);
@@ -101,8 +119,8 @@ const NotificationController = {
       const errorMsg = error.details?.map(detail => detail.message).join(", ") || error.message;
       logger.error("NotificationController->getUserNotifications: " + errorMsg);
       res.status(500).json({ error: "ServerError", details: errorMsg });
-    }
-  }
+    }*/
+  },
 };
 
 module.exports = NotificationController;
