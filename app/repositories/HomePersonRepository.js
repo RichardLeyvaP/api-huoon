@@ -139,6 +139,7 @@ const HomePersonRepository = {
             personId: homePerson.person_id, // ID de la persona
             person_id: homePerson.person_id, // ID de la persona
             personName: homePerson.person.name, // Nombre de la persona
+            personImage: homePerson.person.image,
             roleId: homePerson.role_id, // ID del rol
             role_id: homePerson.role_id, // ID del rol
             roleName: homePerson.role.name, // Nombre del rol

@@ -28,6 +28,7 @@ const {
   PriorityRepository,
   UserRepository,
   NotificationRepository,
+  StatusRepository,
 } = require("../repositories");
 
 const TaskController = {
@@ -274,6 +275,7 @@ const TaskController = {
     logger.info("datos recibidos al crear una tarea");
     logger.info(JSON.stringify(req.body));
     const personId = req.person.id;
+    const personName = req.person.name;
     let tokensData = [];
     let userTokensData = [];
     if (req.body.parent_id) {
@@ -285,6 +287,21 @@ const TaskController = {
         return res.status(404).json({ msg: "ParentNotFound" });
       }
     }
+
+    const type = "Task";
+    const name = "Pendiente" 
+
+    const status = await StatusRepository.findByTypeAndName(type, name);
+
+    if (!status) {
+      // Si no se encuentra, devolver un mensaje de error
+      return res.status(404).json({
+        message: `No se encontró un estado con type: ${type} y name: ${name}`,
+      });
+    }
+
+    // Si se encuentra, asignar el id del estado a req.body.status_id
+    req.body.status_id = status.id;
     let filteredPeople = [];
     if (req.body.people && req.body.people.length > 0) {
       // Filtrar las personas con role_id != 0
@@ -337,11 +354,6 @@ const TaskController = {
         );
       tokensData = tokens;
       userTokensData = userTokens;
-
-      logger.info(JSON.stringify('tokens'));
-      logger.info(JSON.stringify(tokens));
-      logger.info(JSON.stringify('userTokens'));
-      logger.info(JSON.stringify(userTokens));
     }
 
     let notifications = {};
@@ -402,11 +414,11 @@ const TaskController = {
        notifications = userTokensData.map((user) => ({
           token: [user.firebaseId],
           notification: {
-            title: `Fuiste asociado a la tarea ${task.title}`,
+            title: `${personName} creó la tarea ${task.title} en la que apareces con el rol`,
             body: `Tu Rol ${user.roleName}`,
           },
           data: {
-            route: "/getTask",
+            route: "/HomePrincipal",
             home_id: String(task.home_id), // Convertir a string
             nameHome: String(task.title),
             role_id: String(user.role_id), // Convertir a string
@@ -425,10 +437,10 @@ const TaskController = {
               return {
                 home_id: task.home_id,
                 user_id: user.user_id,
-                title: `Fuiste asociado a la tarea ${task.title}`,
+                title: `${personName} creó la tarea ${task.title} en la que apareces con el rol`,
                 description: `Tu rol ${user.roleName}`,
                 data: notification.data, // Usamos el valor procesado
-                route: "/geTask",
+                route: "/HomePrincipal",
                 firebaseId: user.firebaseId,
               };
             }

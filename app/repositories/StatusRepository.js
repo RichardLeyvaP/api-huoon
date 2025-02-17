@@ -17,6 +17,16 @@ const StatusRepository = {
     });
   },
 
+  async findByTypeAndName(type, name) {
+    return await Status.findOne({
+      where: {
+        type, // Filtrar por type
+        name, // Filtrar por name
+      },
+      attributes: ['id', 'name', 'description', 'color', 'icon', 'type'], // Seleccionar los atributos deseados
+    });
+  },
+
   // Verificar si existe un estado con un nombre específico (excluyendo un ID opcional)
   async existsByName(name, excludeId = null) {
     const whereCondition = excludeId

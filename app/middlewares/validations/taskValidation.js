@@ -10,7 +10,7 @@ const storeTaskSchema = Joi.object({
     type: Joi.string().optional().allow(null, '').empty(null),
     priority_id: Joi.number().integer().required(),
     parent_id: Joi.number().integer().allow(null, '').optional().empty(null),
-    status_id: Joi.number().integer().required(),
+    status_id: Joi.number().integer().optional(),
     category_id: Joi.number().integer().required(),
     home_id: Joi.number().integer().required(),
     recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
