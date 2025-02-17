@@ -103,15 +103,18 @@ const HomeRepository = {
           attributes: ["id", "name", "email", "image"],
         },
       ],
+      order: [["points", "DESC"]], // Ordenar por puntos de mayor a menor
     });
 
     // Devolver las personas mapeadas
     let people = homePersons.map((homePerson) => ({
       id: homePerson.person_id,
+      homePersonId: homePerson.id,
       name: homePerson.person.name,
       image: homePerson.person.image,
       roleId: homePerson.role_id,
       role_id: homePerson.role_id,
+      points: homePerson.points,
       roleName:
         i18n.__(`roles.${homePerson.role.name}.name`) !==
         `roles.${homePerson.role.name}.name`
@@ -129,10 +132,12 @@ const HomeRepository = {
       if (person) {
         people.push({
           id: home.person_id,
+          homePersonId: 0,
           name: person.name,
           image: person.image,
           roleId: 0,
           role_id: 0,
+          points: 0,
           roleName:
             i18n.__(`roles.${"Creador"}.name`) !== `roles.${"Creador"}.name`
               ? i18n.__(`roles.${"Creador"}.name`) // Traducción del rol si está disponible
@@ -491,6 +496,20 @@ const HomeRepository = {
 
     return await home.destroy();
   },
+
+  async findByIds(ids) {
+    try {
+      const homes = await Home.findAll({
+        where: {
+          id: ids,
+        },
+      });
+      return homes;
+    } catch (error) {
+      logger.error(`Error al buscar hogares por IDs: ${error.message}`);
+      throw error;
+    }
+  }
 };
 
 module.exports = HomeRepository;

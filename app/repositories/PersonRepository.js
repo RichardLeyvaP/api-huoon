@@ -140,6 +140,20 @@ class PersonRepository {
       
           return await person.destroy();
     }
+
+    async findByIds(ids) {
+        try {
+          const persons = await Person.findAll({
+            where: {
+              id: ids,
+            },
+          });
+          return persons;
+        } catch (error) {
+          logger.error(`Error al buscar personas por IDs: ${error.message}`);
+          throw error;
+        }
+      }
 }
 
 module.exports = new PersonRepository();

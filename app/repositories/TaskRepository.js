@@ -226,6 +226,75 @@ class TaskRepository {
     });
   }
 
+  async findAllDateWeb(start_date, personId, homeId) {
+    return await Task.findAll({
+      where: {
+        [Op.and]: [
+          {
+            [Op.or]: [
+              { person_id: personId }, // Relación directa con la persona
+              sequelize.literal(`EXISTS (
+                            SELECT 1
+                            FROM home_person_task
+                            WHERE home_person_task.task_id = Task.id
+                            AND home_person_task.person_id = ${personId}
+                        )`),
+            ],
+          },
+          { home_id: homeId }, // Filtrar por el hogar dado
+        ],
+      },
+      include: [
+        {
+          model: HomePersonTask,
+          as: "homePersonTasks",
+          required: false, // Permite tareas sin relación en home_person_task
+        },
+        {
+          model: Task,
+          as: "children", // Relación para tareas hijas
+          include: [
+            {
+              model: HomePersonTask,
+              as: "homePersonTasks",
+              required: false, // Permite tareas hijas sin relación en home_person_task
+              where: {
+                person_id: personId, // Filtrar por la persona en las tareas hijas
+              },
+            },
+            { model: Priority, as: "priority" },
+            { model: Status, as: "status" },
+            { model: Category, as: "category" },
+            {
+              model: Person, // Incluir la persona relacionada
+              as: "person",
+              required: false, // Puede no tener relación
+            },
+            {
+              model: Home, // Incluir el hogar relacionado
+              as: "home",
+              required: false, // Puede no tener relación
+            },
+          ],
+          required: false, // Incluir aunque no haya hijos
+        },
+        { model: Priority, as: "priority" },
+        { model: Status, as: "status" },
+        { model: Category, as: "category" },
+        {
+          model: Person, // Incluir la persona relacionada
+          as: "person",
+          required: false, // Puede no tener relación
+        },
+        {
+          model: Home, // Incluir el hogar relacionado
+          as: "home",
+          required: false, // Puede no tener relación
+        },
+      ],
+    });
+  }
+
   async getTaskPeople(taskId) {
     try {
       // Realizar la consulta a la base de datos

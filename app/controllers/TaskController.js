@@ -164,6 +164,84 @@ const TaskController = {
     }
   },
 
+  async getTaskDateWeb(req, res) {
+    logger.info(
+      `${req.user.name} - Entra a buscar las tareas de una fecha dada`
+    ); // Registro de la acción
+
+    try {
+      if (
+        req.body.home_id === undefined &&
+        req.body.home_id === 0 &&
+        req.body.home_id === null
+      ) {
+        logger.info("No esta asociadoa  ningun hogar");
+        return res.status(204).json({ msg: "TaskNotFound", tasks: [] });
+      }
+      const personId = req.person.id;
+      // Obtener solo las tareas principales (sin padre) directamente en la consulta
+      const tasks = await TaskRepository.findAllDateWeb(
+        req.body.start_date,
+        personId,
+        req.body.home_id
+      );
+
+      if (!tasks.length) {
+        return res.status(204).json({ msg: "TaskNotFound", tasks: tasks });
+      }
+      // Mapear las tareas
+      const mappedTasks = await Promise.all(
+        tasks.map(async (task) => {
+          return {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            startDate: task.start_date,
+            start_date: task.start_date,
+            endDate: task.end_date,
+            end_date: task.end_date,
+            startTime: task.start_time,
+            start_time: task.start_time,
+            endTime: task.end_time,
+            end_time: task.end_time,
+            type: task.type,
+            priorityId: task.priority_id,
+            priority_id: task.priority_id,
+            colorPriority: task.priority?.color,
+            statusId: task.status_id,
+            status_id: task.status_id,
+            categoryId: task.category_id,
+            category_id: task.category_id,
+            nameCategory: task.category?.name,
+            iconCategory: task.category?.icon,
+            recurrence: task.recurrence,
+            estimatedTime: task.estimated_time,
+            estimated_time: task.estimated_time,
+            comments: task.comments,
+            attachments: task.attachments,
+            geoLocation: task.geo_location,
+            geo_location: task.geo_location,
+            parentId: task.parent_id,
+            parent_id: task.parent_id,
+            home_id: task.home_id,
+            // Personas relacionadas con la tarea
+            people: await TaskRepository.peopleTask(task, personId),
+            children: await TaskRepository.mapChildren(task.children, personId), // Espera el mapeo de hijos
+          };
+        })
+      );
+
+      return res.status(200).json({ tasks: mappedTasks }); // Tareas encontradas
+    } catch (error) {
+      const errorMsg = error.details
+        ? error.details.map((detail) => detail.message).join(", ")
+        : error.message || "Error desconocido";
+
+      logger.error("TaskController->getTaskDate: " + errorMsg);
+      res.status(500).json({ error: "ServerError", details: errorMsg });
+    }
+  },
+
   // Función para mapear un padre
   /*mapParent(parent) {
         try {

@@ -45,6 +45,15 @@ module.exports = {
         onDelete: 'CASCADE',
         allowNull: false
       },
+      points: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0, // Puedes establecer un valor predeterminado si lo deseas
+        allowNull: true, // O true, dependiendo de tus necesidades 
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

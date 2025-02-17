@@ -12,6 +12,7 @@ const updateHomePersonSchema = Joi.object({
     person_id: Joi.number().required(),
     role_id: Joi.number().optional(),
     id: Joi.number().required(),
+    points: Joi.number().optional()
 });
 
 const assignPeopleSchema = Joi.object({

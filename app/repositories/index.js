@@ -15,6 +15,7 @@ const AiInteractionRepository = require('./AiInteractionRepository');
 const FinanceRepository = require('./FinanceRepository');
 const NotificationRepository = require('./NotificationRepository');
 const FileRepository = require('./FileRepository');
+const HomePersonRepository = require('./HomePersonRepository');
 
 module.exports = {
     CategoryRepository,
@@ -33,5 +34,6 @@ module.exports = {
     AiInteractionRepository,
     FinanceRepository,
     NotificationRepository,
-    FileRepository
+    FileRepository,
+    HomePersonRepository
 };

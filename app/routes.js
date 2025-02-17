@@ -205,6 +205,7 @@ router.post('/home-destroy', validateSchema(idHomeSchema), HomeController.destro
 
 //Rutas HomePerson
 router.get('/home-person', HomePersonController.index);
+router.post('/get-home-persons', validateSchema(getWarehouseSchema), HomePersonController.index_home);
 router.post('/home-person', validateSchema(storeHomePersonSchema), HomePersonController.store);
 router.post('/home-people', validateSchema(assignPeopleSchema), HomePersonController.assignPeopleToHome);//Asociar a un hogar un array de [person_id, rol_id]
 router.post('/home-person-show', validateSchema(idHomePersonSchema), HomePersonController.show);
@@ -214,6 +215,7 @@ router.post('/home-person-destroy', validateSchema(idHomePersonSchema), HomePers
 //Rutas Tareas
 router.get('/task', TaskController.index);
 router.post('/task-date-apk',  validateSchema(getDateTaskSchema), TaskController.getTaskDate);
+router.post('/task-date-web',  validateSchema(getDateTaskSchema), TaskController.getTaskDateWeb);
 router.post('/task', multerCategory('attachments', 'tasks'), validateSchema(storeTaskSchema),TaskController.store);
 router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
 router.post('/task-update', multerCategory('attachments', 'tasks'), validateSchema(updateTaskSchema), TaskController.update);
