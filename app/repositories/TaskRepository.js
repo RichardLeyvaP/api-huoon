@@ -347,6 +347,7 @@ class TaskRepository {
         // Devolver las personas mapeadas
         let people = homePersonTasks.map(homePersonTask => ({
             id: homePersonTask.person_id,
+            homePersonTaskId: homePersonTask.id,
             name: homePersonTask.person.name,
             image: homePersonTask.person.image,
             roleId: homePersonTask.role_id,
@@ -374,62 +375,6 @@ class TaskRepository {
     }   
 
     return people;
-    /*const homePersonTasks = await Person.findAll({
-        include: [
-            {
-                model: HomePersonTask, // Relación con HomePersonTask para verificar si está asociado a la tarea
-                as: "homePersonTasks",
-                where: { task_id: task.id }, // Filtrar por la tarea asociada
-                required: true, // Permite que no todas las personas tengan relación con la tarea
-                include: [
-                    {
-                        model: Role, // Incluir el modelo de Role relacionado con la tarea
-                        as: 'role',
-                    },
-                    {
-                        model: Person, // Incluir la relación con la persona
-                        as: 'person',
-                    }
-                ]
-            }
-        ],
-    });
-    // Ahora mapeamos las personas con el rol correcto
-    return homePersonTasks.map((person) => {
-      // Obtenemos el primer HomePerson (ya que es un array)
-      const homePerson = person.homePeople[0]; // Primero se toma el rol del hogar
-      const homePersonTask = person.homePersonTasks[0]; // Luego se toma el rol de la tarea
-
-      let roleId = 0;
-      let roleName = "Sin Rol";
-
-      // Si la persona tiene un rol en la tarea, se utiliza ese rol
-      if (homePersonTask && homePersonTask.role) {
-        roleId = homePersonTask.role.id;
-        roleName = homePersonTask.role.name;
-      }
-      // Si no tiene un rol en la tarea, se usa el rol del hogar
-      else if (person.id === personId) {
-        roleId = 0;
-        roleName = 'Creador';
-      }
-      else{
-        roleId = homePerson.role.id;
-        roleName = homePerson.role.name;
-      }
-
-      return {
-        id: person.id,
-        name: person.name,
-        image: person.image,
-        roleId: roleId, // ID del rol
-        select: homePersonTask || person.id === personId ? 1 : 0, // ID del rol
-        roleName:
-          i18n.__(`roles.${roleName}.name`) !== `roles.${roleName}.name`
-            ? i18n.__(`roles.${roleName}.name`) // Traducción del rol si está disponible
-            : roleName, // Si no hay traducción, usar el nombre original del rol
-      };
-    });*/
   }
 
   async create(body, file, personId, t) {
