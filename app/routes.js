@@ -24,7 +24,7 @@ const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = requi
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
-const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema } = require('./middlewares/validations/taskValidation');
+const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema, updatePointsAndTasksSchema } = require('./middlewares/validations/taskValidation');
 const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema } = require('./middlewares/validations/personwarehouseproductValidation');
 const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
 const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSchema } = require('./middlewares/validations/financeValidation');
@@ -219,6 +219,7 @@ router.post('/task-date-web',  validateSchema(getDateTaskSchema), TaskController
 router.post('/task', multerCategory('attachments', 'tasks'), validateSchema(storeTaskSchema),TaskController.store);
 router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
 router.post('/task-update', multerCategory('attachments', 'tasks'), validateSchema(updateTaskSchema), TaskController.update);
+router.post('/task-update-points', validateSchema(updatePointsAndTasksSchema), TaskController.updatePointsAndTasks);
 router.post('/task-destroy', validateSchema(idTaskSchema), TaskController.destroy);
 
 

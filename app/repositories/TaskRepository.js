@@ -19,7 +19,7 @@ const logger = require("../../config/logger"); // Importa el logger
 const UserRepository = require("./UserRepository");
 const NotificationRepository = require("./NotificationRepository");
 
-class TaskRepository {
+const TaskRepository = {
   async findAll() {
     return await Task.findAll({
       where: { parent_id: null },
@@ -74,7 +74,7 @@ class TaskRepository {
         },
       ],
     });
-  }
+  },
 
   async mapChildren(children, personId) {
     try {
@@ -125,7 +125,7 @@ class TaskRepository {
       logger.error("TaskRepository->mapChildren", error.message);
       throw error; // Manejo del error para debug
     }
-  }
+  },
 
   async findById(id) {
     return await Task.findByPk(id, {
@@ -151,7 +151,7 @@ class TaskRepository {
         },
       ],
     });
-  }
+  },
 
   async findAllDate(start_date, personId, homeId) {
     return await Task.findAll({
@@ -224,24 +224,19 @@ class TaskRepository {
         },
       ],
     });
-  }
+  },
 
   async findAllDateWeb(start_date, personId, homeId) {
     return await Task.findAll({
       where: {
         [Op.and]: [
+          { home_id: homeId }, // Filtra por home_id
           {
             [Op.or]: [
-              { person_id: personId }, // Relación directa con la persona
-              sequelize.literal(`EXISTS (
-                            SELECT 1
-                            FROM home_person_task
-                            WHERE home_person_task.task_id = Task.id
-                            AND home_person_task.person_id = ${personId}
-                        )`),
+              { person_id: personId }, // Filtra por person_id en la tabla Task
+              { '$homePersonTasks.person_id$': personId }, // Filtra por person_id en la tabla HomePersonTask
             ],
           },
-          { home_id: homeId }, // Filtrar por el hogar dado
         ],
       },
       include: [
@@ -293,7 +288,7 @@ class TaskRepository {
         },
       ],
     });
-  }
+  },
 
   async getTaskPeople(taskId) {
     try {
@@ -327,55 +322,61 @@ class TaskRepository {
       logger.error("Error al obtener los registros de home_person:", error);
       throw error;
     }
-  }
+  },
 
   async peopleTask(task, personId) {
     const homePersonTasks = await HomePersonTask.findAll({
-            where: { task_id: task.id },
-            include: [
-                {
-                    model: Role,
-                    as: 'role',
-                },
-                {
-                    model: Person,
-                    as: 'person',
-                }
-            ]
-        });
+      where: { task_id: task.id },
+      include: [
+        {
+          model: Role,
+          as: "role",
+        },
+        {
+          model: Person,
+          as: "person",
+        },
+      ],
+    });
 
-        // Devolver las personas mapeadas
-        let people = homePersonTasks.map(homePersonTask => ({
-            id: homePersonTask.person_id,
-            homePersonTaskId: homePersonTask.id,
-            name: homePersonTask.person.name,
-            image: homePersonTask.person.image,
-            roleId: homePersonTask.role_id,
-            roleName: homePersonTask.role.name,
-            roleName: i18n.__(`roles.${homePersonTask.role.name}.name`) !== `roles.${homePersonTask.role.name}.name`
-            ? i18n.__(`roles.${homePersonTask.role.name}.name`) // Traducción del rol si está disponible
-            : homePersonTask.role.name,
-        }));
-        // Verificar si la persona que hace la consulta tiene relación directa con la tarea
-    const personAlreadyIncluded = people.some(person => person.id === personId);
+    // Devolver las personas mapeadas
+    let people = homePersonTasks.map((homePersonTask) => ({
+      id: homePersonTask.person_id,
+      homePersonTaskId: homePersonTask.id,
+      name: homePersonTask.person.name,
+      image: homePersonTask.person.image,
+      roleId: homePersonTask.role_id,
+      roleName: homePersonTask.role.name,
+      roleName:
+        i18n.__(`roles.${homePersonTask.role.name}.name`) !==
+        `roles.${homePersonTask.role.name}.name`
+          ? i18n.__(`roles.${homePersonTask.role.name}.name`) // Traducción del rol si está disponible
+          : homePersonTask.role.name,
+    }));
+    // Verificar si la persona que hace la consulta tiene relación directa con la tarea
+    const personAlreadyIncluded = people.some(
+      (person) => person.id === personId
+    );
     // Si la persona no está relacionada, se agrega solo como "Creador"
     if (!personAlreadyIncluded && task.person_id === personId) {
-        const person = await Person.findByPk(personId); // Obtener los detalles de la persona
-        if (person) {
-            people.push({
-                id: task.person_id,
-                name: person.name,
-                image: person.image,
-                roleId: 0,
-                roleName: i18n.__(`roles.${'Creador'}.name`) !== `roles.${'Creador'}.name`
-                ? i18n.__(`roles.${'Creador'}.name`) // Traducción del rol si está disponible
-                : 'Creador'
-            });
-        }
-    }   
+      const person = await Person.findByPk(personId); // Obtener los detalles de la persona
+      if (person) {
+        people.push({
+          id: task.person_id,
+          name: person.name,
+          image: person.image,
+          roleId: 0,
+          homePersonTaskId: 0,
+          roleName:
+            i18n.__(`roles.${"Creador"}.name`) !== `roles.${"Creador"}.name`
+              ? i18n.__(`roles.${"Creador"}.name`) // Traducción del rol si está disponible
+              : "Creador",
+        });
+      }
+    }
 
     return people;
-  }
+  },
 
   async create(body, file, personId, t) {
     try {
@@ -422,7 +423,7 @@ class TaskRepository {
       logger.error(`Error en TaskRepository->store: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async update(task, body, file, t) {
     // Lista de campos permitidos para actualizar
@@ -481,7 +482,7 @@ class TaskRepository {
       logger.error(`Error en TaskRepository->update: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async delete(task, t) {
     if (task.attachments && task.attachments !== "tasks/default.jpg") {
@@ -489,7 +490,7 @@ class TaskRepository {
     }
 
     return await task.destroy({ transaction: t });
-  }
+  },
 
   async syncTaskPeople(taskId, peopleArray, t, task = []) {
     // Obtener las asociaciones actuales para la tarea especificada
@@ -515,12 +516,12 @@ class TaskRepository {
     const notifications = [];
 
     // Obtener tokens de los usuarios involucrados
-        const personIds = peopleArray.map((p) => p.person_id);
-        const { tokens, userTokens } =
-          await UserRepository.getUserNotificationTokensByPersons(
-            personIds,
-            peopleArray
-          );
+    const personIds = peopleArray.map((p) => p.person_id);
+    const { tokens, userTokens } =
+      await UserRepository.getUserNotificationTokensByPersons(
+        personIds,
+        peopleArray
+      );
     // Recorremos las nuevas asociaciones para determinar si agregar o actualizar
     Object.keys(newMap).forEach((key) => {
       const incoming = newMap[key];
@@ -534,8 +535,8 @@ class TaskRepository {
           task_id: taskId,
           ...incoming,
         });
-         // Notificación de agregado
-         const userAdd = userTokens.find(
+        // Notificación de agregado
+        const userAdd = userTokens.find(
           (u) => u.person_id === parseInt(incoming.person_id)
         );
 
@@ -551,7 +552,7 @@ class TaskRepository {
               home_id: String(task.home_id),
               role_id: String(userAdd.role_id),
               roleName: String(userAdd.roleName),
-              task_id: String(taskId)
+              task_id: String(taskId),
             },
           });
         }
@@ -579,7 +580,7 @@ class TaskRepository {
                 home_id: String(task.home_id),
                 role_id: String(user.role_id),
                 roleName: String(user.roleName),
-                task_id: String(taskId)
+                task_id: String(taskId),
               },
             });
           }
@@ -608,7 +609,7 @@ class TaskRepository {
               home_id: String(task.home_id),
               role_id: String(user.role_id),
               roleName: String(user.roleName),
-              task_id: String(taskId)
+              task_id: String(taskId),
             },
           });
         }
@@ -677,7 +678,46 @@ class TaskRepository {
     }
     // Devolver detalles de las operaciones realizadas
     return { toAdd, toUpdate, toDelete, actions };
-  }
-}
+  },
 
-module.exports = new TaskRepository();
+  async updatePointsAndTasks(homeId, updatesArray, t = null) {
+    try {
+      // Recorrer el array y actualizar cada registro
+      for (const update of updatesArray) {
+        const { id, person_id, points, description } = update;
+
+        // 1. Actualizar la tabla home-person-task
+        const homePersonTask = await HomePersonTask.findByPk(id, {
+          transaction: t,
+        });
+
+        if (homePersonTask) {
+          // Actualizar description en home-person-task
+          homePersonTask.description = description;
+          homePersonTask.points = points;
+          await homePersonTask.save({ transaction: t });
+        }
+        // 2. Incrementar points en la tabla home_person
+        const homePerson = await HomePerson.findOne({
+          where: {
+            home_id: homeId,
+            person_id: person_id,
+          },
+          transaction: t,
+        });
+
+        if (homePerson) {
+          homePerson.points += points;
+          await homePerson.save({ transaction: t });
+        }
+      }
+
+      logger.info("Puntos y tareas actualizados exitosamente.");
+    } catch (error) {
+      logger.error(`Error al actualizar puntos y tareas: ${error.message}`);
+      throw error;
+    }
+  },
+};
+
+module.exports = TaskRepository;

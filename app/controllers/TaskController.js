@@ -29,6 +29,7 @@ const {
   UserRepository,
   NotificationRepository,
   StatusRepository,
+  PersonRepository
 } = require("../repositories");
 
 const TaskController = {
@@ -979,6 +980,70 @@ const TaskController = {
     } catch (error) {
       logger.error("Error en getPeople:", error);
       throw new Error("Error al obtener personas");
+    }
+  },
+
+  async updatePointsAndTasks(req, res) {
+    const { home_id, task_id, people } = req.body;
+
+    // Verificar que el home_id exista en la tabla home
+    const home = await HomeRepository.findById(home_id);
+    if (!home) {
+      return res.status(404).json({
+        message: `No se encontró un hogar con el id: ${home_id}`,
+      });
+    }
+
+    // Verificar que el home_id exista en la tabla home
+    const task = await TaskRepository.findById(task_id);
+    if (!task) {
+      return res.status(404).json({
+        message: `No se encontró una tarea con el id: ${task_id}`,
+      });
+    }
+
+    // Extraer todos los person_id del array de actualizaciones
+    const personIds = people.map((update) => update.person_id);
+
+    // Verificar que todos los person_id existan en la tabla person
+    const persons = await PersonRepository.findByIds(personIds);
+
+    // Comprobar si faltan person_id
+    const missingPersonIds = personIds.filter(
+      (id) => !persons.find((p) => p.id === id)
+    );
+
+    // Si faltan person_id, devolver un error
+    if (missingPersonIds.length > 0) {
+      logger.error(
+        `No se encontraron los siguientes person_id en la tabla person: ${missingPersonIds}`
+      );
+      return res.status(400).json({
+        message: "Datos no encontrados para algunas personas.",
+        missingPersonIds,
+      });
+    }
+
+    const t = await sequelize.transaction(); // Iniciar una transacción
+    try {
+      // Llamar al método del repositorio para actualizar puntos y tareas
+      await TaskRepository.updatePointsAndTasks(home_id, people, t);
+
+      // Commit de la transacción si todo está bien
+      await t.commit();
+
+      // Devolver una respuesta exitosa
+      res.status(200).json({
+        message: "Puntos y tareas actualizados exitosamente.",
+      });
+    } catch (error) {
+      // Rollback en caso de error
+      await t.rollback();
+      logger.error(`Error en updatePointsAndTasks: ${error.message}`);
+      res.status(500).json({
+        message: "Error al actualizar puntos y tareas",
+        error: error.message,
+      });
     }
   },
 };
