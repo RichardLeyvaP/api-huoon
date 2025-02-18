@@ -70,6 +70,15 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'El campo home_id debe ser un número entero'
         }
       }
+    },
+    points: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true,
     }
   },
   {

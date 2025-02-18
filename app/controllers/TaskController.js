@@ -28,8 +28,8 @@ const {
   PriorityRepository,
   UserRepository,
   NotificationRepository,
-  StatusRepository,
   PersonRepository,
+  StatusRepository,
 } = require("../repositories");
 
 const TaskController = {
@@ -283,6 +283,7 @@ const TaskController = {
     const personName = req.person.name;
     let tokensData = [];
     let userTokensData = [];
+    const { start_date, start_time} = req.body
     if (req.body.parent_id) {
       parent = await TaskRepository.findById(req.body.parent_id);
       if (!parent) {
@@ -294,18 +295,47 @@ const TaskController = {
     }
 
     const type = "Task";
-    const name = "Pendiente";
+    // Obtener todos los estados de tipo "Task"
+    const statuses = await StatusRepository.findByType(type);
 
-    const status = await StatusRepository.findByTypeAndName(type, name);
-
-    if (!status) {
-      // Si no se encuentra, devolver un mensaje de error
+    if (!statuses || statuses.length === 0) {
+      logger.info(`No se encontraron estados para el tipo: ${type}`); 
       return res.status(404).json({
-        message: `No se encontró un estado con type: ${type} y name: ${name}`,
+        message: `No se encontraron estados para el tipo: ${type}`,
       });
     }
 
-    // Si se encuentra, asignar el id del estado a req.body.status_id
+    // Obtener la fecha y hora actual
+    const now = new Date();
+    const currentDate = now.toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    const currentTime = now.toTimeString().split(" ")[0].substring(0, 5); // Formato HH:MM
+
+    let status;
+
+    if (start_date > currentDate) {
+      // Si la fecha de inicio es mayor que la fecha actual, filtrar por "Pendiente"
+      status = statuses.find((s) => s.name === "Pendiente");
+    } else if (start_date === currentDate) {
+      if (currentTime < start_time) {
+        // Si es la fecha actual y la hora actual es menor que start_time, filtrar por "Pendiente"
+        status = statuses.find((s) => s.name === "Pendiente");
+      } else {
+        // Si la hora actual es mayor o igual a start_time, filtrar por "Progreso"
+        status = statuses.find((s) => s.name === "En Progreso");
+      }
+    } else {
+      // Si la fecha es menor que la actual, filtrar por "Culminada"
+      status = statuses.find((s) => s.name === "Completada");
+    }
+
+    if (!status) {
+      logger.info(`No se encontró un estado válido para la fecha ${start_date} y hora ${start_time}`); 
+      return res.status(404).json({
+        message: `No se encontró un estado válido para la fecha ${start_date} y hora ${start_time}`,
+      });
+    }
+
+    // Asignar el id del estado filtrado a req.body.status_id
     req.body.status_id = status.id;
     let filteredPeople = [];
     if (req.body.people && req.body.people.length > 0) {
@@ -316,6 +346,7 @@ const TaskController = {
 
       // Si no quedan personas después del filtrado, devolver un error
       if (filteredPeople.length === 0) {
+        logger.info("No se han proporcionado personas válidas."); 
         return res
           .status(400)
           .json({ msg: "No se han proporcionado personas válidas." });
@@ -994,7 +1025,7 @@ const TaskController = {
     }
   },
 
-  async updatePointsAndTasks(req, res) {
+  async createPointsAndTasks(req, res) {
     const { home_id, task_id, people } = req.body;
 
     // Verificar que el home_id exista en la tabla home
@@ -1038,7 +1069,7 @@ const TaskController = {
     const t = await sequelize.transaction(); // Iniciar una transacción
     try {
       // Llamar al método del repositorio para actualizar puntos y tareas
-      await TaskRepository.updatePointsAndTasks(home_id, people, t);
+      await TaskRepository.createPointsAndTasks(home_id, people, t);
 
       // Commit de la transacción si todo está bien
       await t.commit();
@@ -1051,6 +1082,93 @@ const TaskController = {
       // Rollback en caso de error
       await t.rollback();
       logger.error(`Error en updatePointsAndTasks: ${error.message}`);
+      res.status(500).json({
+        message: "Error al actualizar puntos y tareas",
+        error: error.message,
+      });
+    }
+  },
+
+  async updatePointsAndTasks(req, res) {
+    const { home_id, task_id, people } = req.body;
+
+    // Verificar que el home_id exista en la tabla home
+    const home = await HomeRepository.findById(home_id);
+    if (!home) {
+      return res.status(404).json({
+        message: `No se encontró un hogar con el id: ${home_id}`,
+      });
+    }
+
+    // Verificar que el task_id exista en la tabla task
+    const task = await TaskRepository.findById(task_id);
+    if (!task) {
+      return res.status(404).json({
+        message: `No se encontró una tarea con el id: ${task_id}`,
+      });
+    }
+
+    // Extraer todos los person_id del array de actualizaciones
+    const personIds = people.map((update) => update.person_id);
+
+    // Verificar que todos los person_id existan en la tabla person
+    const persons = await PersonRepository.findByIds(personIds);
+
+    // Comprobar si faltan person_id
+    const missingPersonIds = personIds.filter(
+      (id) => !persons.find((p) => p.id === id)
+    );
+
+    // Si faltan person_id, devolver un error
+    if (missingPersonIds.length > 0) {
+      logger.error(
+        `No se encontraron los siguientes person_id en la tabla person: ${missingPersonIds}`
+      );
+      return res.status(400).json({
+        message: "Datos no encontrados para algunas personas.",
+        missingPersonIds,
+      });
+    }
+
+    const t = await sequelize.transaction(); // Iniciar una transacción
+    try {
+      // Obtener los puntos actuales de home_person_task para cada persona
+      const updatesWithCurrentPoints = await Promise.all(
+        people.map(async (person) => {
+          const homePersonTask = await HomePersonTask.findOne({
+            where: {
+              home_id,
+              task_id,
+              person_id: person.person_id,
+            },
+            transaction: t,
+          });
+
+          return {
+            ...person,
+            pointsToSubtract: homePersonTask ? homePersonTask.points : 0, // Puntos actuales en home_person_task
+          };
+        })
+      );
+
+      // Llamar al método del repositorio para actualizar puntos y tareas
+      await TaskRepository.updatePointsAndTasks(
+        home_id,
+        updatesWithCurrentPoints,
+        t
+      );
+
+      // Commit de la transacción si todo está bien
+      await t.commit();
+
+      // Devolver una respuesta exitosa
+      res.status(200).json({
+        message: "Puntos y tareas actualizados exitosamente.",
+      });
+    } catch (error) {
+      // Rollback en caso de error
+      await t.rollback();
+      logger.error(`Error en createPointsAndTasks: ${error.message}`);
       res.status(500).json({
         message: "Error al actualizar puntos y tareas",
         error: error.message,

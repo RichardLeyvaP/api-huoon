@@ -219,6 +219,7 @@ router.post('/task-date-web',  validateSchema(getDateTaskSchema), TaskController
 router.post('/task', multerCategory('attachments', 'tasks'), validateSchema(storeTaskSchema),TaskController.store);
 router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
 router.post('/task-update', multerCategory('attachments', 'tasks'), validateSchema(updateTaskSchema), TaskController.update);
+router.post('/task-create-points', validateSchema(updatePointsAndTasksSchema), TaskController.createPointsAndTasks);
 router.post('/task-update-points', validateSchema(updatePointsAndTasksSchema), TaskController.updatePointsAndTasks);
 router.post('/task-destroy', validateSchema(idTaskSchema), TaskController.destroy);
 

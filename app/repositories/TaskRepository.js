@@ -684,9 +684,48 @@ const TaskRepository = {
     return { toAdd, toUpdate, toDelete, actions };
   },
 
-  async updatePointsAndTasks(homeId, updatesArray, t = null) {
+  async createPointsAndTasks(homeId, updatesArray, t = null) {
     try {
       // Recorrer el array y actualizar cada registro
+      for (const update of updatesArray) {
+        const { id, person_id, points, description } = update;
+
+        // 1. Actualizar la tabla home-person-task
+        const homePersonTask = await HomePersonTask.findByPk(id, {
+          transaction: t,
+        });
+
+        if (homePersonTask) {
+          homePersonTask.description = description;
+          homePersonTask.points = points;
+          await homePersonTask.save({ transaction: t });
+        }
+        // 2. Incrementar points en la tabla home_person
+        const homePerson = await HomePerson.findOne({
+          where: {
+            home_id: homeId,
+            person_id: person_id,
+          },
+          transaction: t,
+        });
+
+        if (homePerson) {
+          homePerson.points += points;
+          homePerson.interactions += 1;
+          await homePerson.save({ transaction: t });
+        }
+      }
+
+      logger.info("Puntos y tareas actualizados exitosamente.");
+    } catch (error) {
+      logger.error(`Error al actualizar puntos y tareas: ${error.message}`);
+      throw error;
+    }
+  },
+
+  async updatePointsAndTasks(homeId, updatesArray, t = null) {
+    try {
+        // Recorrer el array y actualizar cada registro
       for (const update of updatesArray) {
         const { id, person_id, points, description } = update;
 
@@ -711,17 +750,18 @@ const TaskRepository = {
         });
 
         if (homePerson) {
+          homePerson.points -= homePersonTask.points;
           homePerson.points += points;
           await homePerson.save({ transaction: t });
         }
       }
 
-      logger.info("Puntos y tareas actualizados exitosamente.");
+        logger.info("Puntos actualizados exitosamente por home_id y person_id.");
     } catch (error) {
-      logger.error(`Error al actualizar puntos y tareas: ${error.message}`);
-      throw error;
+        logger.error(`Error al actualizar puntos por home_id y person_id: ${error.message}`);
+        throw error;
     }
-  },
+  }
 };
 
 module.exports = TaskRepository;

@@ -154,6 +154,12 @@ const updatePointsAndTasksSchema = Joi.object({
         }),
         description: Joi.string().allow(null).empty("").optional().messages({
           "string.base": "La descripción debe ser una cadena de texto",
+        }),        
+        namePerson: Joi.string().allow(null).empty("").optional().messages({
+          "string.base": "El nombre de la persona debe ser una cadena de texto",
+        }),
+        imagePerson: Joi.string().allow(null).empty("").optional().messages({
+          "string.base": "La imagen de la persona debe ser una cadena de texto",
         }),
       })
     )
