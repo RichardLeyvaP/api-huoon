@@ -22,6 +22,11 @@ const storeTaskSchema = Joi.object({
   recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
   estimated_time: Joi.number().integer().optional().allow(null),
   comments: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
+  notificationDate: Joi.date().optional(),
+  notificationTime: Joi.string()
+    .optional()
+    .pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/)
+    .allow(null), // Formato 24 horas
   attachments: Joi.string()
     .pattern(/\.(jpg|jpeg|png|gif)$/i) // Validar formato de imagen
     .allow(null)
@@ -76,11 +81,16 @@ const updateTaskSchema = Joi.object({
   recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
   estimated_time: Joi.number().integer().optional().allow(null),
   comments: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
+  notificationDate: Joi.date().optional(),
+  notificationTime: Joi.string()
+    .optional()
+    .pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/)
+    .allow(null), // Formato 24 horas
   attachments: Joi.string()
     .pattern(/\.(jpg|jpeg|png|gif)$/i) // Validar formato de imagen
     .allow(null)
     .empty("")
-    .optional() // Hace que sea opcional
+    .optional() // Hace que sea opcional 
     .custom((value, helpers) => {
       const maxSize = 500 * 1024; // 500 KB en bytes
       if (value && value.length > maxSize) {

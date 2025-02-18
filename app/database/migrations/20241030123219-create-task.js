@@ -111,6 +111,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      notificationDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      c: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo end_time puede ser nulo
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

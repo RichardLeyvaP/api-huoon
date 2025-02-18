@@ -393,6 +393,8 @@ const TaskRepository = {
           priority_id: body.priority_id,
           status_id: body.status_id,
           category_id: body.category_id,
+          notificationTime: body.notificationTime,
+          notificationDate: body.notificationDate,
           home_id: body.home_id,
           person_id: personId,
           recurrence: body.recurrence,
@@ -443,6 +445,8 @@ const TaskRepository = {
       "start_time",
       "end_time",
       "type",
+      "notificationDate",
+      "notificationTime"
     ];
     try {
       // Filtrar campos en req.body y construir el objeto updatedData

@@ -29,7 +29,7 @@ const {
   UserRepository,
   NotificationRepository,
   StatusRepository,
-  PersonRepository
+  PersonRepository,
 } = require("../repositories");
 
 const TaskController = {
@@ -128,6 +128,8 @@ const TaskController = {
             start_time: task.start_time,
             endTime: task.end_time,
             end_time: task.end_time,
+            notificationDate: task.notificationDate,
+            notificationTime: task.notificationTime,
             type: task.type,
             priorityId: task.priority_id,
             priority_id: task.priority_id,
@@ -206,6 +208,8 @@ const TaskController = {
             start_time: task.start_time,
             endTime: task.end_time,
             end_time: task.end_time,
+            notificationDate: task.notificationDate,
+            notificationTime: task.notificationTime,
             type: task.type,
             priorityId: task.priority_id,
             priority_id: task.priority_id,
@@ -290,7 +294,7 @@ const TaskController = {
     }
 
     const type = "Task";
-    const name = "Pendiente" 
+    const name = "Pendiente";
 
     const status = await StatusRepository.findByTypeAndName(type, name);
 
@@ -410,9 +414,9 @@ const TaskController = {
         JSON.stringify(activityData),
         { transaction: t } // Aquí pasas la transacción
       );
-    if (tokensData.length) {
+      if (tokensData.length) {
         // Iterar sobre cada usuario y enviar notificación personalizada
-       notifications = userTokensData.map((user) => ({
+        notifications = userTokensData.map((user) => ({
           token: [user.firebaseId],
           notification: {
             title: `${personName} creó la tarea ${task.title} en la que apareces con el rol`,
@@ -427,7 +431,6 @@ const TaskController = {
             task_id: String(task.id),
           },
         }));
-
 
         const notificationsToCreate = userTokensData
           .map((user) => {
@@ -449,24 +452,28 @@ const TaskController = {
           })
           .filter((notification) => notification !== null); // Filtrar los elementos null
 
-          const results = await Promise.allSettled(
-            notificationsToCreate.map(async (notification) => {
-              try {
-                const result = await NotificationRepository.create(notification, t);
-              } catch (error) {
-                logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
-              }
-            })
-          );
+        const results = await Promise.allSettled(
+          notificationsToCreate.map(async (notification) => {
+            try {
+              const result = await NotificationRepository.create(
+                notification,
+                t
+              );
+            } catch (error) {
+              logger.error(
+                `Error al crear notificación para user_id ${notification.user_id}:`,
+                error
+              );
+            }
+          })
+        );
       }
       // Confirmar la transacción
       await t.commit();
-      if (notifications.length){
+      if (notifications.length) {
         // Enviar todas las notificaciones en paralelo
         const firebaseResults =
-          await NotificationRepository.sendNotificationMultiCast(
-            notifications
-          );
+          await NotificationRepository.sendNotificationMultiCast(notifications);
       }
       res.status(201).json({ task });
     } catch (error) {
@@ -623,12 +630,16 @@ const TaskController = {
       let associationsData = [];
       // Sincronizar asociaciones
       //if (filteredPeople.length > 0) {
-        const { toAdd, toUpdate, toDelete } =
-          await TaskRepository.syncTaskPeople(req.body.id, filteredPeople, t, task);
-        associationsData =
-          toAdd.length || toUpdate.length || toDelete.length
-            ? { added: toAdd, updated: toUpdate, deleted: toDelete }
-            : null;
+      const { toAdd, toUpdate, toDelete } = await TaskRepository.syncTaskPeople(
+        req.body.id,
+        filteredPeople,
+        t,
+        task
+      );
+      associationsData =
+        toAdd.length || toUpdate.length || toDelete.length
+          ? { added: toAdd, updated: toUpdate, deleted: toDelete }
+          : null;
       //}
 
       // Registrar la tarea y las asociaciones en el log de actividades

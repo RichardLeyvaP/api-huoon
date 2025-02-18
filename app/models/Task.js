@@ -136,6 +136,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    notificationDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    notificationTime: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'Task',
