@@ -107,7 +107,14 @@ const HomeRepository = {
     });
 
     // Devolver las personas mapeadas
-    let people = homePersons.map((homePerson) => ({
+    let people = homePersons.map((homePerson) => {
+      let percent = homePerson.interactions
+        ? homePerson.points / homePerson.interactions
+        : 0;
+
+      // Redondear a dos decimales y validar que no sea menor a 0
+      percent = percent < 0 || percent == null ? 0 : parseFloat(percent.toFixed(2));
+      return {
       id: homePerson.person_id,
       homePersonId: homePerson.id,
       name: homePerson.person.name,
@@ -115,12 +122,14 @@ const HomeRepository = {
       roleId: homePerson.role_id,
       role_id: homePerson.role_id,
       points: homePerson.points,
+      percent,
       roleName:
         i18n.__(`roles.${homePerson.role.name}.name`) !==
         `roles.${homePerson.role.name}.name`
           ? i18n.__(`roles.${homePerson.role.name}.name`) // Traducción del rol si está disponible
           : homePerson.role.name,
-    }));
+      }
+    });
 
     // Verificar si la persona que hace la consulta tiene relación directa con la tarea
     const personAlreadyIncluded = people.some(
@@ -138,6 +147,7 @@ const HomeRepository = {
           roleId: 0,
           role_id: 0,
           points: 0,
+          percent: 0,
           roleName:
             i18n.__(`roles.${"Creador"}.name`) !== `roles.${"Creador"}.name`
               ? i18n.__(`roles.${"Creador"}.name`) // Traducción del rol si está disponible

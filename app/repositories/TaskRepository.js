@@ -347,6 +347,8 @@ const TaskRepository = {
       image: homePersonTask.person.image,
       roleId: homePersonTask.role_id,
       roleName: homePersonTask.role.name,
+      points: homePersonTask.points ? homePersonTask.points : 0,
+      description: homePersonTask.description ? homePersonTask.description : "",
       roleName:
         i18n.__(`roles.${homePersonTask.role.name}.name`) !==
         `roles.${homePersonTask.role.name}.name`
@@ -367,6 +369,8 @@ const TaskRepository = {
           image: person.image,
           roleId: 0,
           homePersonTaskId: 0,
+          points: 0,
+          description: "",
           roleName:
             i18n.__(`roles.${"Creador"}.name`) !== `roles.${"Creador"}.name`
               ? i18n.__(`roles.${"Creador"}.name`) // Traducción del rol si está disponible
@@ -694,8 +698,14 @@ const TaskRepository = {
         const homePersonTask = await HomePersonTask.findByPk(id, {
           transaction: t,
         });
+        let action = "crear";
+        let cant = 0;
 
         if (homePersonTask) {
+          if(homePersonTask.points !== 0){
+            action = "editar";
+            cant = homePersonTask.points;
+          }
           homePersonTask.description = description;
           homePersonTask.points = points;
           await homePersonTask.save({ transaction: t });
@@ -710,8 +720,13 @@ const TaskRepository = {
         });
 
         if (homePerson) {
-          homePerson.points += points;
+          if(action === "editar"){
+            homePerson.points -= cant;
+          }
+          else{            
           homePerson.interactions += 1;
+          }
+          homePerson.points += points;
           await homePerson.save({ transaction: t });
         }
       }

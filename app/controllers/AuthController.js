@@ -1,6 +1,12 @@
 const { Op } = require("sequelize");
 const Joi = require("joi");
-const { User, Person, UserToken, Configuration, sequelize } = require("../models"); // Importamos sequelize desde db
+const {
+  User,
+  Person,
+  UserToken,
+  Configuration,
+  sequelize,
+} = require("../models"); // Importamos sequelize desde db
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../../config/auth");
@@ -9,7 +15,7 @@ const passport = require("passport");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const { pipeline } = require('stream/promises');
+const { pipeline } = require("stream/promises");
 const moment = require("moment"); // Usamos moment.js para facilitar el manejo de fechas
 // Esquema de validación para el registro de usuario
 
@@ -56,8 +62,8 @@ const AuthController = {
           },
           {
             model: Configuration,
-            as: 'configurations'
-          }
+            as: "configurations",
+          },
         ],
       });
       if (!user) {
@@ -82,8 +88,10 @@ const AuthController = {
             image: user.person.image,
           }
         : null;
-        let home = [];
-        home = user.configurations ? user.configurations[0].home : null;
+      let home = null;
+      if (user.configurations && user.configurations.length > 0) {
+        home = user.configurations[0].home;
+      }
 
       // Construimos el objeto del usuario con la estructura deseada
       const userNew = {
@@ -351,7 +359,10 @@ const AuthController = {
           external_id: id,
           external_auth: "google",
         },
-        include: [{ model: Person, as: "person" },{ model: Configuration, as: 'configurations' }]
+        include: [
+          { model: Person, as: "person" },
+          { model: Configuration, as: "configurations" },
+        ],
       });
       let person = []; // Definimos `person` aquí para que esté accesible en todo el bloque
       let imageUpdateNeeded = false;
@@ -362,7 +373,7 @@ const AuthController = {
           where: {
             email: email,
           },
-          include: [{ model: Person, as: "person" }]
+          include: [{ model: Person, as: "person" }],
         });
 
         if (user) {
@@ -371,7 +382,7 @@ const AuthController = {
             imageUpdateNeeded = true;
             imageUpdateData = {
               imageUrl: image,
-              personId: person.id
+              personId: person.id,
             };
           }
           // Actualiza el usuario si ya existe por correo
@@ -441,21 +452,24 @@ const AuthController = {
       const expiresAt = new Date(decoded.exp * 1000); // 'exp' es en segundos, así que lo convertimos a milisegundos
 
       // Guardar el token en la base de datos
-      await UserToken.create({
-        user_id: user.id,
-        token: token,
-        expires_at: expiresAt,
-      }, { transaction: t});
+      await UserToken.create(
+        {
+          user_id: user.id,
+          token: token,
+          expires_at: expiresAt,
+        },
+        { transaction: t }
+      );
       // Confirma la transacción
       await t.commit();
       // Respuesta en formato JSON
 
-      if (imageUpdateNeeded) {        
+      if (imageUpdateNeeded) {
         await AuthController.handleImageUpdate(imageUpdateData);
       }
 
       let home = [];
-        home = user.configurations ? user.configurations[0].home : null;
+      home = user.configurations ? user.configurations[0].home : null;
 
       const userData = {
         id: userNew.id,
@@ -514,7 +528,7 @@ const AuthController = {
             imageUpdateNeeded = true;
             imageUpdateData = {
               imageUrl: image,
-              personId: person.id
+              personId: person.id,
             };
           }
           // Actualiza el usuario si ya existe por correo
@@ -596,8 +610,8 @@ const AuthController = {
       // Respuesta en formato JSON
 
       // Manejar imagen fuera de la transacción si es necesario
-      
-      if (imageUpdateNeeded) {        
+
+      if (imageUpdateNeeded) {
         await AuthController.handleImageUpdate(imageUpdateData);
       }
 

@@ -69,6 +69,16 @@ const HomeController = {
           const personRole =
             home.homePersons.find((hp) => hp.person_id === personId)?.role
               ?.name || "Creador";
+          // Calcular el porcentaje
+          const homePerson = home.homePersons.find(
+            (hp) => hp.home_id === home.id
+          );
+          let percent = 0;
+          if (homePerson && homePerson.interactions > 0) {
+            percent = homePerson.points / homePerson.interactions; // Calcular porcentaje
+            percent = parseFloat(percent.toFixed(2)); // Redondear a dos decimales
+          }
+
           return {
             id: home.id,
             statusId: home.status_id,
@@ -88,6 +98,7 @@ const HomeController = {
             timezone: home.timezone,
             nameStatus: home.status.name, // Aquí asumo que tienes una propiedad status directa en el modelo
             image: home.image,
+            percent: percent,
             // Personas relacionadas con la tarea
             people: await HomeRepository.peopleHome(home, personId),
           };
@@ -191,7 +202,7 @@ const HomeController = {
       tokensData = tokens;
       userTokensData = userTokens;
     }
-    
+
     let notifications = {};
     const t = await sequelize.transaction();
     try {
@@ -213,7 +224,7 @@ const HomeController = {
         //logica de notificaciones
         if (tokensData.length) {
           // Iterar sobre cada usuario y enviar notificación personalizada
-         notifications = userTokensData.map((user) => ({
+          notifications = userTokensData.map((user) => ({
             token: [user.firebaseId],
             notification: {
               title: `Fuiste asociado al hogar ${home.name}`,
@@ -227,7 +238,6 @@ const HomeController = {
               roleName: String(user.roleName),
             },
           }));
-
 
           const notificationsToCreate = userTokensData
             .map((user) => {
@@ -249,24 +259,28 @@ const HomeController = {
             })
             .filter((notification) => notification !== null); // Filtrar los elementos null
 
-            const results = await Promise.allSettled(
-              notificationsToCreate.map(async (notification) => {
-                try {
-                  const result = await NotificationRepository.create(notification, t);
-                } catch (error) {
-                  logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
-                }
-              })
-            );
+          const results = await Promise.allSettled(
+            notificationsToCreate.map(async (notification) => {
+              try {
+                const result = await NotificationRepository.create(
+                  notification,
+                  t
+                );
+              } catch (error) {
+                logger.error(
+                  `Error al crear notificación para user_id ${notification.user_id}:`,
+                  error
+                );
+              }
+            })
+          );
         }
       }
       await t.commit();
-      if (notifications.length){
+      if (notifications.length) {
         // Enviar todas las notificaciones en paralelo
         const firebaseResults =
-          await NotificationRepository.sendNotificationMultiCast(
-            notifications
-          );
+          await NotificationRepository.sendNotificationMultiCast(notifications);
       }
       res.status(201).json({ home });
     } catch (error) {
@@ -405,12 +419,16 @@ const HomeController = {
       let associationsData = [];
       // Sincronizar asociaciones
       //if (filteredPeople.length > 0) {
-        const { toAdd, toUpdate, toDelete } =
-          await HomeRepository.syncHomePeople(req.body.id, filteredPeople, t, home.name);
-        associationsData =
-          toAdd.length || toUpdate.length || toDelete.length
-            ? { added: toAdd, updated: toUpdate, deleted: toDelete }
-            : null;
+      const { toAdd, toUpdate, toDelete } = await HomeRepository.syncHomePeople(
+        req.body.id,
+        filteredPeople,
+        t,
+        home.name
+      );
+      associationsData =
+        toAdd.length || toUpdate.length || toDelete.length
+          ? { added: toAdd, updated: toUpdate, deleted: toDelete }
+          : null;
       //}
 
       await t.commit();
@@ -436,14 +454,20 @@ const HomeController = {
       if (!home) {
         return res.status(404).json({ msg: "HomeNotFound" });
       }
-      
-      const { people, personIds} = await HomeRepository.getHomePeople(req.body.id);
 
-      const { tokens, userTokens } = await UserRepository.getUserNotificationTokensByPersons(personIds, people);
+      const { people, personIds } = await HomeRepository.getHomePeople(
+        req.body.id
+      );
+
+      const { tokens, userTokens } =
+        await UserRepository.getUserNotificationTokensByPersons(
+          personIds,
+          people
+        );
       let notifications = [];
       if (tokens.length) {
         // Iterar sobre cada usuario y enviar notificación personalizada
-       notifications = userTokens.map((user) => ({
+        notifications = userTokens.map((user) => ({
           token: [user.firebaseId],
           notification: {
             title: `El hogar ${home.name} fue eliminado`,
@@ -457,7 +481,6 @@ const HomeController = {
             roleName: String(user.roleName),
           },
         }));
-
 
         const notificationsToCreate = userTokens
           .map((user) => {
@@ -479,23 +502,24 @@ const HomeController = {
           })
           .filter((notification) => notification !== null); // Filtrar los elementos null
 
-          const results = await Promise.allSettled(
-            notificationsToCreate.map(async (notification) => {
-              try {
-                const result = await NotificationRepository.create(notification);
-              } catch (error) {
-                logger.error(`Error al crear notificación para user_id ${notification.user_id}:`, error);
-              }
-            })
-          );
+        const results = await Promise.allSettled(
+          notificationsToCreate.map(async (notification) => {
+            try {
+              const result = await NotificationRepository.create(notification);
+            } catch (error) {
+              logger.error(
+                `Error al crear notificación para user_id ${notification.user_id}:`,
+                error
+              );
+            }
+          })
+        );
       }
 
-      if (notifications.length){
+      if (notifications.length) {
         // Enviar todas las notificaciones en paralelo
         const firebaseResults =
-          await NotificationRepository.sendNotificationMultiCast(
-            notifications
-          );
+          await NotificationRepository.sendNotificationMultiCast(notifications);
       }
       const homeDelete = await HomeRepository.delete(home);
 
