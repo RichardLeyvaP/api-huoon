@@ -1,6 +1,4 @@
 const { Op, fn, col, literal } = require("sequelize");
-const path = require("path");
-const fs = require("fs");
 const {
   Task,
   Priority,
@@ -234,7 +232,7 @@ const TaskRepository = {
           {
             [Op.or]: [
               { person_id: personId }, // Filtra por person_id en la tabla Task
-              { '$homePersonTasks.person_id$': personId }, // Filtra por person_id en la tabla HomePersonTask
+              { "$homePersonTasks.person_id$": personId }, // Filtra por person_id en la tabla HomePersonTask
             ],
           },
         ],
@@ -450,7 +448,7 @@ const TaskRepository = {
       "end_time",
       "type",
       "notificationDate",
-      "notificationTime"
+      "notificationTime",
     ];
     try {
       // Filtrar campos en req.body y construir el objeto updatedData
@@ -500,7 +498,7 @@ const TaskRepository = {
     return await task.destroy({ transaction: t });
   },
 
-  async syncTaskPeople(taskId, peopleArray, t, task = []) {
+  async syncTaskPeople(taskId, peopleArray, t = null, task = []) {
     // Obtener las asociaciones actuales para la tarea especificada
     const currentAssociations = await HomePersonTask.findAll({
       where: { task_id: taskId },
@@ -702,7 +700,7 @@ const TaskRepository = {
         let cant = 0;
 
         if (homePersonTask) {
-          if(homePersonTask.points !== 0){
+          if (homePersonTask.points !== 0) {
             action = "editar";
             cant = homePersonTask.points;
           }
@@ -720,11 +718,10 @@ const TaskRepository = {
         });
 
         if (homePerson) {
-          if(action === "editar"){
+          if (action === "editar") {
             homePerson.points -= cant;
-          }
-          else{            
-          homePerson.interactions += 1;
+          } else {
+            homePerson.interactions += 1;
           }
           homePerson.points += points;
           await homePerson.save({ transaction: t });
@@ -740,7 +737,7 @@ const TaskRepository = {
 
   async updatePointsAndTasks(homeId, updatesArray, t = null) {
     try {
-        // Recorrer el array y actualizar cada registro
+      // Recorrer el array y actualizar cada registro
       for (const update of updatesArray) {
         const { id, person_id, points, description } = update;
 
@@ -771,12 +768,65 @@ const TaskRepository = {
         }
       }
 
-        logger.info("Puntos actualizados exitosamente por home_id y person_id.");
+      logger.info("Puntos actualizados exitosamente por home_id y person_id.");
     } catch (error) {
-        logger.error(`Error al actualizar puntos por home_id y person_id: ${error.message}`);
-        throw error;
+      logger.error(
+        `Error al actualizar puntos por home_id y person_id: ${error.message}`
+      );
+      throw error;
     }
-  }
+  },
+
+  async getTasksForNotification() {
+    const today = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+    const now = new Date();
+    const currentTime = `${now.getHours()}:${String(now.getMinutes()).padStart(
+      2,
+      "0"
+    )}`; // HH:MM
+    
+    logger.info(`Fecha actual: ${today}, Hora actual: ${currentTime}`);
+    try {
+      const tasks = await Task.findAll({
+        where: {
+          [Op.and]: [
+            sequelize.where(
+              sequelize.fn("DATE", sequelize.col("notificationDate")),
+              Op.eq,
+              today
+            ),
+            { notificationTime: currentTime }, // Comparar directamente como string
+          ],
+        },
+        attributes: ["id", "title", "start_date", "start_time", "home_id"],
+        include: [
+          {
+            model: Home,
+            as: "home",
+            attributes: ["name"],
+          },
+          {
+            model: HomePersonTask,
+            as: "homePersonTasks",
+            required: true,
+            include: [{
+              model: Role,
+              as: 'role',
+              attributes: ['name']
+            }],
+          },
+        ],
+      });
+
+      if (!tasks || tasks.length === 0) {
+        return [];
+      }
+      return tasks;
+    } catch (error) {
+      logger.error("Error al obtener tareas para notificación:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = TaskRepository;

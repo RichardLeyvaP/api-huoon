@@ -10,6 +10,7 @@ const i18n = require("../config/i18n-config"); // Importar la configuración de 
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const cors = require("cors");
+require ('../cron/taskCron')
 
 passport.use(
   new GoogleStrategy(

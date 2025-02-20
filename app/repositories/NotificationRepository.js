@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const { Notification, Home, Sequelize,  } = require("../models"); // Asegúrate de importar tu modelo
+const { Notification, Home, Sequelize } = require("../models"); // Asegúrate de importar tu modelo
 const logger = require("../../config/logger");
 
 const NotificationRepository = {
@@ -80,9 +80,9 @@ const NotificationRepository = {
         where: whereCondition,
         include: [
           {
-              model: Home,
-              as: "home", // Incluir persona si también es necesario
-              atributes: ['name', 'image']
+            model: Home,
+            as: "home", // Incluir persona si también es necesario
+            atributes: ["name", "image"],
           },
         ],
         order: [["createdAt", "DESC"]],
@@ -96,7 +96,7 @@ const NotificationRepository = {
         ? notifications[notifications.length - 1].createdAt.toISOString()
         : null;
 
-         // Mapear las notificaciones al formato deseado
+      // Mapear las notificaciones al formato deseado
       const mappedNotifications = notifications.map((notification) => ({
         id: notification.id,
         user_id: notification.user_id,
@@ -108,8 +108,8 @@ const NotificationRepository = {
         data: JSON.parse(notification.data),
         title: notification.title,
         description: notification.description,
-        createdAt: notification.createdAt.toISOString(),  // Convertir la fecha a formato ISO
-        status: notification.status,  // Suponiendo que 'read' es un campo en tu modelo
+        createdAt: notification.createdAt.toISOString(), // Convertir la fecha a formato ISO
+        status: notification.status, // Suponiendo que 'read' es un campo en tu modelo
         // Otros campos que puedas necesitar
       }));
 
@@ -181,6 +181,7 @@ const NotificationRepository = {
       return { success: false, error: error.message };
     }
   },
+
 };
 
 module.exports = NotificationRepository;

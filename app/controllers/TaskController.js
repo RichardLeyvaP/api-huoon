@@ -283,7 +283,7 @@ const TaskController = {
     const personName = req.person.name;
     let tokensData = [];
     let userTokensData = [];
-    const { start_date, start_time} = req.body
+    const { start_date, start_time } = req.body;
     if (req.body.parent_id) {
       parent = await TaskRepository.findById(req.body.parent_id);
       if (!parent) {
@@ -299,7 +299,7 @@ const TaskController = {
     const statuses = await StatusRepository.findByType(type);
 
     if (!statuses || statuses.length === 0) {
-      logger.info(`No se encontraron estados para el tipo: ${type}`); 
+      logger.info(`No se encontraron estados para el tipo: ${type}`);
       return res.status(404).json({
         message: `No se encontraron estados para el tipo: ${type}`,
       });
@@ -329,7 +329,9 @@ const TaskController = {
     }
 
     if (!status) {
-      logger.info(`No se encontró un estado válido para la fecha ${start_date} y hora ${start_time}`); 
+      logger.info(
+        `No se encontró un estado válido para la fecha ${start_date} y hora ${start_time}`
+      );
       return res.status(404).json({
         message: `No se encontró un estado válido para la fecha ${start_date} y hora ${start_time}`,
       });
@@ -346,7 +348,7 @@ const TaskController = {
 
       // Si no quedan personas después del filtrado, devolver un error
       if (filteredPeople.length === 0) {
-        logger.info("No se han proporcionado personas válidas."); 
+        logger.info("No se han proporcionado personas válidas.");
         return res
           .status(400)
           .json({ msg: "No se han proporcionado personas válidas." });
@@ -1175,6 +1177,119 @@ const TaskController = {
       });
     }
   },
+
+  async verificTasksEarrings() {
+    try {
+      // Obtener tareas para notificación
+      const tasks = await TaskRepository.getTasksForNotification();
+      let tokensData = [];
+      let userTokensData = [];
+      let notifications = {};
+      if (!tasks.length) {
+        return { message: "No hay tareas para notificación." };
+      }
+      // Mapear tareas y enviar notificaciones
+      for (const task of tasks) {
+        const homepersontasks = task.homePersonTasks;
+
+        if (homepersontasks && Array.isArray(homepersontasks) && homepersontasks.length > 0 ) {
+          const personIds = homepersontasks.map((person) =>
+            parseInt(person.person_id)
+          );
+
+          const { tokens, userTokens } =
+            await UserRepository.getUserNotificationTokensByPersons(
+              personIds,
+              homepersontasks
+            );
+          tokensData = tokens;
+          userTokensData = userTokens;
+          logger.info("JSON.stringify(userTokensData)");
+          logger.info(JSON.stringify(userTokensData));
+          if (tokensData.length) {
+            // Iterar sobre cada usuario y enviar notificación personalizada
+            notifications = userTokensData
+              .map((user) => {
+                // Filtrar homepersontasks para obtener el registro que coincide con user.person_id
+                const homePersonTask = homepersontasks.find(
+                  (hpt) => hpt.person_id === user.person_id
+                );
+
+
+                // Obtener el nombre del rol desde el registro filtrado
+                const userRole = homePersonTask.role.name || "Sin Rol";
+
+                // Devolver la notificación personalizada
+                return {
+                  token: [user.firebaseId], // Token de Firebase del usuario
+                  notification: {
+                    title: `Recordatorio de Tarea "${task.title}"`, // Título de la notificación
+                    body: `Recuerda que tienes la tarea "${task.title}" del hogar ${task.home.name} el día ${task.start_date} a las ${task.start_time}`,
+                  },
+                  data: {
+                    route: "/HomePrincipal", // Ruta de la aplicación
+                    home_id: String(task.home_id), // Convertir a string
+                    nameHome: String(task.title), // Nombre de la tarea o del hogar
+                    role_id: String(homePersonTask.role_id), // Convertir a string
+                    roleName: String(userRole), // Nombre del rol del usuario
+                    task_id: String(task.id), // ID de la tarea
+                  },
+                };
+              })
+              .filter((notification) => notification !== null); // Eliminar elementos null
+
+            const notificationsToCreate = userTokensData
+              .map((user) => {
+                const notification = notifications.find(
+                  (n) => n.token[0] === user.firebaseId
+                );
+                const homePersonTask = homepersontasks.find(
+                  (hpt) => hpt.person_id === user.person_id
+                );
+
+
+                // Obtener el nombre del rol desde el registro filtrado
+                const userRole = homePersonTask.roleName || "Sin Rol";
+                if (notification) {
+                  return {
+                    home_id: task.home_id,
+                    user_id: user.user_id,
+                    title: `Recordatorio de Tarea "${task.title}"`,
+                    description: `Recuerda que tienes la tarea "${task.title}" del hogar ${task.home.name} el día ${task.start_date} a las ${task.start_time}. Tu Rol: ${userRole}`,
+                    data: notification.data, // Usamos el valor procesado
+                    route: "/HomePrincipal",
+                    firebaseId: user.firebaseId,
+                  };
+                }
+                return null; // Retornar null si no se encuentra la notificación
+              })
+              .filter((notification) => notification !== null); // Filtrar los elementos null
+
+            const results = await Promise.allSettled(
+              notificationsToCreate.map(async (notification) => {
+                try {
+                  const result = await NotificationRepository.create(
+                    notification
+                  );
+                } catch (error) {
+                  logger.error(`Error al crear notificación para user_id ${notification.user_id}:`,error);
+                }
+              })
+            );
+          }//for de usuario asociados a la tarea
+        }//if de que hay usuarios asociados a la tarea
+        if (notifications.length) {
+          // Enviar todas las notificaciones en paralelo
+          const firebaseResults =
+            await NotificationRepository.sendNotificationMultiCast(notifications);
+        }
+      }//for de tareas del día
+    } catch (error) {
+      logger.error(`Error en verificTasksEarrings: ${error.message}`);
+      throw error;
+    }
+  },
+  
 };
 
 module.exports = TaskController;
