@@ -48,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.HomePerson, { foreignKey: 'person_id', as: 'homePeople', onDelete: 'CASCADE' });
         Person.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'person_id', as: 'homeWarehouseProducts', onDelete: 'CASCADE' });
         Person.hasMany(models.Task, { foreignKey: 'person_id', as: 'tasks', onDelete: 'CASCADE' });
+        Person.hasMany(models.Wish, { foreignKey: 'person_id', as: 'wishes', onDelete: 'CASCADE' });
         Person.hasMany(models.Finance, { foreignKey: 'person_id', as: 'finances', onDelete: 'CASCADE' });
         Person.hasMany(models.Home, { foreignKey: 'person_id', as: 'homes', onDelete: 'CASCADE' });
         Person.hasMany(models.File, { foreignKey: 'person_id', as: 'files', onDelete: 'CASCADE' });

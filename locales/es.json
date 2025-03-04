@@ -181,5 +181,16 @@
     "Hogar": {
       "name": "Hogar"
     }
+  },
+  "wishes": {
+    "Personal": {
+      "name": "Personal"
+    },
+    "Hogar": {
+      "name": "Home"
+    },
+    "Profesional": {
+      "name": "Profesional"
+    }
   } 
 }

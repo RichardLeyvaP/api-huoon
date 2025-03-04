@@ -30,6 +30,7 @@ const { storeProductSchema, updateProductSchema, idProductSchema } = require('./
 const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSchema } = require('./middlewares/validations/financeValidation');
 const { storeFileSchema, updateFileSchema, idFileSchema, typeFileSchema } = require('./middlewares/validations/fileValidation');
 const { getNotificationsSchema } = require('./middlewares/validations/notificationValidation');
+const { storeWishSchema, updateWishSchema, idWishSchema, getWishSchema } = require('./middlewares/validations/wishValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -54,6 +55,7 @@ const OpenAIController = require('./controllers/OpenAIController');
 const FinanceController = require('./controllers/FinanceController');
 const NotificationController = require('./controllers/NotificationController');
 const FileController = require('./controllers/FileController');
+const WishController = require('./controllers/WishController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -299,10 +301,18 @@ router.post('/file-destroy', validateSchema(idFileSchema), FileController.destro
 //Ruta Notificaciones
 router.post('/get-user-notifications', validateSchema(getNotificationsSchema), NotificationController.getUserNotifications);
 
+//Rutas Deseos
+router.get('/wish', WishController.index);
+router.post('/get-type-wishes', validateSchema(getWishSchema), WishController.getTypeWishes);
+router.post('/wish', validateSchema(storeWishSchema), WishController.store);
+router.post('/wish-show', validateSchema(idWishSchema), WishController.show);
+router.put('/wish', validateSchema(updateWishSchema), WishController.update);
+router.post('/wish-destroy', validateSchema(idWishSchema), WishController.destroy);
+
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
-
+router.post('/status-priority-type-apk', WishController.status_priority_type);
 
 module.exports = router;

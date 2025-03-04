@@ -16,6 +16,7 @@ const FinanceRepository = require('./FinanceRepository');
 const NotificationRepository = require('./NotificationRepository');
 const FileRepository = require('./FileRepository');
 const HomePersonRepository = require('./HomePersonRepository');
+const WishRepository = require('./WishRepository');
 
 module.exports = {
     CategoryRepository,
@@ -35,5 +36,6 @@ module.exports = {
     FinanceRepository,
     NotificationRepository,
     FileRepository,
-    HomePersonRepository
+    HomePersonRepository,
+    WishRepository
 };
