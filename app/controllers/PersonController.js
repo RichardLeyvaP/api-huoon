@@ -18,18 +18,19 @@ module.exports = {
             // Mapear los resultados solo si es necesario
             const mappedPeople = people.map(person => {
                 return {
-                    id: person.id,
-                    userId: person.user_id,
-                    name: person.name,
-                    user: person.user.name,
-                    language: person.user.language,
-                    birthDate: person.birth_date,
-                    age: person.age,
-                    gender: person.gender,
-                    email: person.email,
-                    phone: person.phone,
-                    address: person.address,
-                    image: person.image
+                  id: person.id,
+                  userId: person.user_id,
+                  name: person.name,
+                  user: person.user.name,
+                  language: person.user.language,
+                  birthDate: person.birth_date,
+                  age: person.age,
+                  gender: person.gender,
+                  email: person.email,
+                  phone: person.phone,
+                  address: person.address,
+                  image: person.image,
+                  emergencyContact: person.emergencyContact,
                 };
             });
 
@@ -108,7 +109,8 @@ module.exports = {
                     email: person.email,
                     phone: person.phone,
                     address: person.address,
-                    image: person.image
+                    image: person.image,
+                    emergencyContact: person.emergencyContact
                 };
 
             // Si hay transformación, devolver los datos mapeados

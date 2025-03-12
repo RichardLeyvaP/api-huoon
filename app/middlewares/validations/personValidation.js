@@ -9,6 +9,7 @@ const storePersonSchema = Joi.object({
     birth_date: Joi.date().allow(null).empty('').optional(), // nullable
     age: Joi.number().integer().min(0).allow(null).empty('').optional(), // nullable
     gender: Joi.string().max(10).allow(null).empty('').optional(), // nullable
+    emergencyContact: Joi.string().max(50).allow(null).empty('').optional(), // nullable
     email: Joi.string().email().allow(null).empty('').optional(), // nullable
     phone: Joi.string().max(15).allow(null).empty('').optional(), // nullable
     address: Joi.string().max(255).allow(null).empty('').optional(), // nullable
@@ -36,6 +37,7 @@ const updatePersonSchema = Joi.object({
     birth_date: Joi.date().allow(null).empty('').optional(), // nullable
     age: Joi.number().integer().min(0).allow(null).empty('').optional(), // nullable
     gender: Joi.string().max(10).allow(null).empty('').optional(), // nullable
+    emergencyContact: Joi.string().max(50).allow(null).empty('').optional(), // nullable
     email: Joi.string().email().allow(null).empty('').optional(), // nullable
     phone: Joi.string().max(15).allow(null).empty('').optional(), // nullable
     address: Joi.string().max(255).allow(null).empty('').optional(), // nullable

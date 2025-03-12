@@ -7,7 +7,7 @@ const logger = require('../../config/logger'); // Logger para seguimiento
 class PersonRepository {
     async findAll() {
         return await Person.findAll({
-            attributes: ['id', 'user_id', 'name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'image'],
+            attributes: ['id', 'user_id', 'name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'image', 'emergencyContact'],
             include: [
                 {
                     model: User,
@@ -20,7 +20,7 @@ class PersonRepository {
 
     async findById(id) {
         return await Person.findByPk(id, {
-            attributes: ['id', 'user_id', 'name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'image'],
+            attributes: ['id', 'user_id', 'name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'image', 'emergencyContact'],
             include: [
                 {
                     model: User,
@@ -70,6 +70,7 @@ class PersonRepository {
              phone: body.phone,
              address: body.address,
              image: 'people/default.jpg', // Imagen por defecto
+             emergencyContact: body.emergencyContact
          }, { transaction: t });
  
          // Manejo de archivos adjuntos
@@ -91,7 +92,7 @@ class PersonRepository {
 
     async update(person, body, file, t) {
         // Lista de campos que pueden ser actualizados
-        const fieldsToUpdate = ['name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'user_id'];
+        const fieldsToUpdate = ['name', 'birth_date', 'age', 'gender', 'email', 'phone', 'address', 'user_id', 'emergencyContact'];
   
         const updatedData = Object.keys(body)
       .filter(key => fieldsToUpdate.includes(key) && body[key] !== undefined)

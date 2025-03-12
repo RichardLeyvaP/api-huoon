@@ -49,6 +49,10 @@ module.exports = {
       image: {
         allowNull: true,
         type: Sequelize.STRING
+      },      
+      emergencyContact: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
