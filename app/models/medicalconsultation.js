@@ -11,19 +11,51 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      MedicalConsultation.belongsTo(models.Person, {
+        foreignKey: 'person_id',
+        as: 'person'
+      });
     }
   }
   MedicalConsultation.init({
-    person_id: DataTypes.INTEGER,
-    date: DataTypes.DATE,
-    reason: DataTypes.TEXT,
-    diagnosis: DataTypes.TEXT,
-    treatments: DataTypes.JSON,
-    medicalNotes: DataTypes.TEXT,
-    files: DataTypes.JSON
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true, // Indica que 'id' es la clave primaria
+      autoIncrement: true, // Esto hace que el campo 'id' sea auto-incrementable
+    },
+    person_id: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
+    },
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    reason: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    diagnosis: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    treatments: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    medicalNotes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    files: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    }
   }, {
     sequelize,
     modelName: 'MedicalConsultation',
+    tableName: 'medical_consultations',
+    timestamps: true
   });
   return MedicalConsultation;
 };

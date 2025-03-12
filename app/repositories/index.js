@@ -18,6 +18,7 @@ const FileRepository = require('./FileRepository');
 const HomePersonRepository = require('./HomePersonRepository');
 const WishRepository = require('./WishRepository');
 const MedicalHistoryRepository = require('./MedicalHistoryRepository');
+const MedicalConsultationRepository = require('./MedicalConsultationRepository');
 
 module.exports = {
     CategoryRepository,
@@ -39,5 +40,6 @@ module.exports = {
     FileRepository,
     HomePersonRepository,
     WishRepository,
-    MedicalHistoryRepository
+    MedicalHistoryRepository,
+    MedicalConsultationRepository
 };

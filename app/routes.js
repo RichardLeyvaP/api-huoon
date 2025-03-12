@@ -32,6 +32,7 @@ const { storeFileSchema, updateFileSchema, idFileSchema, typeFileSchema } = requ
 const { getNotificationsSchema } = require('./middlewares/validations/notificationValidation');
 const { storeWishSchema, updateWishSchema, idWishSchema, getWishSchema } = require('./middlewares/validations/wishValidation');
 const { storeMedicalHistorySchema, updateMedicalHistorySchema, idMedicalHistorySchema, getMedicalHistorySchema } = require('./middlewares/validations/medicalhistoryValidation');
+const { storeMedicalConsultationSchema, updateMedicalConsultationSchema, idMedicalConsultationSchema, getMedicalConsultationSchema} = require("./middlewares/validations/medicalconsultationValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -58,6 +59,7 @@ const NotificationController = require('./controllers/NotificationController');
 const FileController = require('./controllers/FileController');
 const WishController = require('./controllers/WishController');
 const MedicalHistoryController = require('./controllers/MedicalHistoryController');
+const MedicalConsultationController = require('./controllers/MedicalConsultationController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -318,6 +320,14 @@ router.post('/history-medical', validateSchema(storeMedicalHistorySchema), Medic
 router.post('/history-medical-show', validateSchema(idMedicalHistorySchema), MedicalHistoryController.show);
 router.put('/history-medical', validateSchema(updateMedicalHistorySchema), MedicalHistoryController.update);
 router.post('/history-medical-destroy', validateSchema(idMedicalHistorySchema), MedicalHistoryController.destroy);
+
+//Rutas Consultas médicas
+router.get('/consultation-medical', MedicalConsultationController.index);
+router.post('/get-medical-consultations',  MedicalConsultationController.getByPersonId);
+router.post('/consultation-medical', validateSchema(storeMedicalConsultationSchema), MedicalConsultationController.store);
+router.post('/consultation-medical-show', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.show);
+router.post('/consultation-medical-update', validateSchema(updateMedicalConsultationSchema), MedicalConsultationController.update);
+router.post('/consultation-medical-destroy', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.destroy);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
