@@ -31,6 +31,7 @@ const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSche
 const { storeFileSchema, updateFileSchema, idFileSchema, typeFileSchema } = require('./middlewares/validations/fileValidation');
 const { getNotificationsSchema } = require('./middlewares/validations/notificationValidation');
 const { storeWishSchema, updateWishSchema, idWishSchema, getWishSchema } = require('./middlewares/validations/wishValidation');
+const { storeMedicalHistorySchema, updateMedicalHistorySchema, idMedicalHistorySchema, getMedicalHistorySchema } = require('./middlewares/validations/medicalhistoryValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -56,6 +57,7 @@ const FinanceController = require('./controllers/FinanceController');
 const NotificationController = require('./controllers/NotificationController');
 const FileController = require('./controllers/FileController');
 const WishController = require('./controllers/WishController');
+const MedicalHistoryController = require('./controllers/MedicalHistoryController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -308,6 +310,14 @@ router.post('/wish', validateSchema(storeWishSchema), WishController.store);
 router.post('/wish-show', validateSchema(idWishSchema), WishController.show);
 router.put('/wish', validateSchema(updateWishSchema), WishController.update);
 router.post('/wish-destroy', validateSchema(idWishSchema), WishController.destroy);
+
+//Rutas Historias médicas
+router.get('/history-medical', MedicalHistoryController.index);
+router.post('/get-medical-histories',  MedicalHistoryController.getByPersonId);
+router.post('/history-medical', validateSchema(storeMedicalHistorySchema), MedicalHistoryController.store);
+router.post('/history-medical-show', validateSchema(idMedicalHistorySchema), MedicalHistoryController.show);
+router.put('/history-medical', validateSchema(updateMedicalHistorySchema), MedicalHistoryController.update);
+router.post('/history-medical-destroy', validateSchema(idMedicalHistorySchema), MedicalHistoryController.destroy);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
