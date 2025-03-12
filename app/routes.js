@@ -33,6 +33,7 @@ const { getNotificationsSchema } = require('./middlewares/validations/notificati
 const { storeWishSchema, updateWishSchema, idWishSchema, getWishSchema } = require('./middlewares/validations/wishValidation');
 const { storeMedicalHistorySchema, updateMedicalHistorySchema, idMedicalHistorySchema, getMedicalHistorySchema } = require('./middlewares/validations/medicalhistoryValidation');
 const { storeMedicalConsultationSchema, updateMedicalConsultationSchema, idMedicalConsultationSchema, getMedicalConsultationSchema} = require("./middlewares/validations/medicalconsultationValidation");
+const { storeTypeSchema, updateTypeSchema, idTypeSchema, typeSchema} = require("./middlewares/validations/typeValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -60,6 +61,7 @@ const FileController = require('./controllers/FileController');
 const WishController = require('./controllers/WishController');
 const MedicalHistoryController = require('./controllers/MedicalHistoryController');
 const MedicalConsultationController = require('./controllers/MedicalConsultationController');
+const TypeController = require('./controllers/TypeController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -328,6 +330,14 @@ router.post('/consultation-medical', validateSchema(storeMedicalConsultationSche
 router.post('/consultation-medical-show', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.show);
 router.post('/consultation-medical-update', validateSchema(updateMedicalConsultationSchema), MedicalConsultationController.update);
 router.post('/consultation-medical-destroy', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.destroy);
+
+//Rutas Tipos
+router.get('/type', TypeController.index);
+router.post('/get-type', validateSchema(typeSchema), TypeController.getTypesByType);
+router.post('/type', validateSchema(storeTypeSchema), TypeController.store);
+router.post('/type-show', validateSchema(idTypeSchema), TypeController.show);
+router.put('/type', validateSchema(updateTypeSchema), TypeController.update);
+router.post('/type-destroy', validateSchema(idTypeSchema), TypeController.destroy);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);

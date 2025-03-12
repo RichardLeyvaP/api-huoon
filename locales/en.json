@@ -192,6 +192,47 @@
     "Profesional": {
       "name": "Professional"
     }
+  },
+  "types": {
+    "Examen de Sangre": {
+      "name": "Blood Test",
+      "description": "Analysis of blood components"
+    },
+    "Radiografía": {
+      "name": "X-Ray",
+      "description": "Image of internal structures using X-rays"
+    },
+    "Electrocardiograma": {
+      "name": "Electrocardiogram",
+      "description": "Recording of the heart's electrical activity"
+    },
+    "Resonancia Magnética": {
+      "name": "Magnetic Resonance",
+      "description": "Detailed images of organs and tissues"
+    },
+    "Tomografía Computarizada": {
+      "name": "Computed Tomography",
+      "description": "Cross-sectional images of the body"
+    },
+    "Ultrasonido": {
+      "name": "Ultrasound",
+      "description": "Images of organs using sound waves"
+    },
+    "Prueba de Esfuerzo": {
+      "name": "Stress Test",
+      "description": "Evaluation of the heart during exercise"
+    },
+    "Endoscopia": {
+      "name": "Endoscopy",
+      "description": "Visualization of the inside of the body"
+    },
+    "Colonoscopia": {
+      "name": "Colonoscopy",
+      "description": "Examination of the colon and rectum"
+    },
+    "Prueba de Alergias": {
+      "name": "Allergy Test",
+      "description": "Identification of allergenic substances"
+    }
   }
-  
 }

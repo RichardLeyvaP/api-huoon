@@ -192,5 +192,47 @@
     "Profesional": {
       "name": "Profesional"
     }
+  },
+  "types": {
+    "Examen de Sangre": {
+      "name": "Examen de Sangre",
+      "description": "Análisis de componentes sanguíneos"
+    },
+    "Radiografía": {
+      "name": "Radiografía",
+      "description": "Imagen de estructuras internas usando rayos X"
+    },
+    "Electrocardiograma": {
+      "name": "Electrocardiograma",
+      "description": "Registro de la actividad eléctrica del corazón"
+    },
+    "Resonancia Magnética": {
+      "name": "Resonancia Magnética",
+      "description": "Imágenes detalladas de órganos y tejidos"
+    },
+    "Tomografía Computarizada": {
+      "name": "Tomografía Computarizada",
+      "description": "Imágenes transversales del cuerpo"
+    },
+    "Ultrasonido": {
+      "name": "Ultrasonido",
+      "description": "Imágenes de órganos usando ondas sonoras"
+    },
+    "Prueba de Esfuerzo": {
+      "name": "Prueba de Esfuerzo",
+      "description": "Evaluación del corazón durante el ejercicio"
+    },
+    "Endoscopia": {
+      "name": "Endoscopia",
+      "description": "Visualización del interior del cuerpo"
+    },
+    "Colonoscopia": {
+      "name": "Colonoscopia",
+      "description": "Examen del colon y el recto"
+    },
+    "Prueba de Alergias": {
+      "name": "Prueba de Alergias",
+      "description": "Identificación de sustancias alergénicas"
+    }
   } 
 }
