@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.File, { foreignKey: 'person_id', as: 'files', onDelete: 'CASCADE' });
         Person.hasMany(models.MedicalHistory, { foreignKey: 'person_id', as: 'medicalhistories', onDelete: 'CASCADE' });
         Person.hasMany(models.MedicalConsultation, { foreignKey: 'person_id', as: 'medicalconsultations', onDelete: 'CASCADE' });
+        Person.hasMany(models.MedicalExam, { foreignKey: 'person_id', as: 'medicalexams', onDelete: 'CASCADE' });
     }
 
     /**

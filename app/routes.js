@@ -34,6 +34,7 @@ const { storeWishSchema, updateWishSchema, idWishSchema, getWishSchema } = requi
 const { storeMedicalHistorySchema, updateMedicalHistorySchema, idMedicalHistorySchema, getMedicalHistorySchema } = require('./middlewares/validations/medicalhistoryValidation');
 const { storeMedicalConsultationSchema, updateMedicalConsultationSchema, idMedicalConsultationSchema, getMedicalConsultationSchema} = require("./middlewares/validations/medicalconsultationValidation");
 const { storeTypeSchema, updateTypeSchema, idTypeSchema, typeSchema} = require("./middlewares/validations/typeValidation");
+const { storeMedicalExamSchema, updateMedicalExamSchema, idMedicalExamSchema, getMedicalExamSchema} = require("./middlewares/validations/medicalexamValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -62,6 +63,7 @@ const WishController = require('./controllers/WishController');
 const MedicalHistoryController = require('./controllers/MedicalHistoryController');
 const MedicalConsultationController = require('./controllers/MedicalConsultationController');
 const TypeController = require('./controllers/TypeController');
+const MedicalExamController = require('./controllers/MedicalExamController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -338,6 +340,14 @@ router.post('/type', validateSchema(storeTypeSchema), TypeController.store);
 router.post('/type-show', validateSchema(idTypeSchema), TypeController.show);
 router.put('/type', validateSchema(updateTypeSchema), TypeController.update);
 router.post('/type-destroy', validateSchema(idTypeSchema), TypeController.destroy);
+
+//Rutas Exámenes médicos
+router.get('/medical-exam', MedicalExamController.index);
+router.post('/get-exam-person', validateSchema(getMedicalExamSchema), MedicalExamController.getByPersonId);
+router.post('/medical-exam', multerCategory('medicalexams', 'archive'), validateSchema(storeMedicalExamSchema), MedicalExamController.store);
+router.post('/medical-exam-show', validateSchema(idMedicalExamSchema), MedicalExamController.show);
+router.post('/medical-exam-update', multerCategory('medicalexams', 'archive'), validateSchema(updateMedicalExamSchema), MedicalExamController.update);
+router.post('/medical-exam-destroy', validateSchema(idMedicalExamSchema), MedicalExamController.destroy);
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);

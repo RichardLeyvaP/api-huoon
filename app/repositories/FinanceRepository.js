@@ -5,7 +5,7 @@ const logger = require("../../config/logger"); // Logger para seguimiento
 const { Op } = require("sequelize");
 const ImageService = require("../services/ImageService");
 
-class FinanceRepository {
+const FinanceRepository = {
   async findAll() {
     return await Finance.findAll({
       attributes: [
@@ -21,7 +21,7 @@ class FinanceRepository {
         "image",
       ],
     });
-  }
+  },
 
   async findAllType(id, home_id = null, type) {
     const whereConditions = {};
@@ -53,7 +53,7 @@ class FinanceRepository {
         "image",
       ],
     });
-  }
+  },
 
   async findById(id) {
     return await Finance.findByPk(id, {
@@ -70,7 +70,7 @@ class FinanceRepository {
         "image",
       ],
     });
-  }
+  },
 
   async create(body, file, t) {
     try {
@@ -105,7 +105,7 @@ class FinanceRepository {
       logger.error(`Error en FinanceRepository->create: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async update(finance, body, file, t) {
     // Lista de campos que pueden ser actualizados
@@ -157,7 +157,7 @@ class FinanceRepository {
       logger.error(`Error en FinanceRepository->update: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async delete(finance) {
     if (finance.image && finance.image !== "finances/default.jpg") {
@@ -166,6 +166,6 @@ class FinanceRepository {
 
     return await finance.destroy();
   }
-}
+};
 
-module.exports = new FinanceRepository();
+module.exports = FinanceRepository;

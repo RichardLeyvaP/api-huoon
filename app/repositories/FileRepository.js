@@ -5,7 +5,7 @@ const logger = require("../../config/logger");
 const { Op } = require("sequelize");
 const ImageService = require("../services/ImageService");
 
-class FileRepository {
+const FileRepository = {
   async findAll() {
     return await File.findAll({
       attributes: [
@@ -21,7 +21,7 @@ class FileRepository {
         "personal",
       ],
     });
-  }
+  },
 
   async findAllType(id, home_id = null, personal) {
     const whereConditions = {};
@@ -54,7 +54,7 @@ class FileRepository {
         "personal",
       ],
     });
-  }
+  },
 
   async findById(id) {
     return await File.findByPk(id, {
@@ -71,7 +71,7 @@ class FileRepository {
         "personal",
       ],
     });
-  }
+  },
 
   async create(body, file, t) {
     try {
@@ -109,7 +109,7 @@ class FileRepository {
       logger.error(`Error en FileRepository->create: ${err.message}`);
       throw err;
     }
-  }
+  },
 
   async update(fileRecord, body, newFile, t) {
     const fieldsToUpdate = [
@@ -162,7 +162,7 @@ class FileRepository {
       logger.error(`Error en FileRepository->update: ${err.message}`);
       throw err;
     }
-  }
+  },
 
   async delete(fileRecord) {
     try {
@@ -177,7 +177,7 @@ class FileRepository {
       logger.error(`Error en FileRepository->delete: ${err.message}`);
       throw err;
     }
-  }
-}
+  },
+};
 
-module.exports = new FileRepository();
+module.exports = FileRepository;
