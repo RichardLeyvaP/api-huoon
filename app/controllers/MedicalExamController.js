@@ -10,7 +10,9 @@ const {
 const MedicalExamController = {
   // Obtener todos los registros de exámenes médicos
   async index(req, res) {
-    logger.info(`${req.user.name} - Entra a buscar los registros de exámenes médicos`);
+    logger.info(
+      `${req.user.name} - Entra a buscar los registros de exámenes médicos`
+    );
 
     try {
       const medicalExams = await MedicalExamRepository.findAll();
@@ -21,6 +23,12 @@ const MedicalExamController = {
 
       // Mapear la respuesta
       const mappedMedicalExams = medicalExams.map((exam) => {
+        const translatedName =
+          i18n.__(`types.${exam.type.name}.name`) !==
+          `types.${exam.type.name}.name`
+            ? i18n.__(`types.${exam.type.name}.name`)
+            : exam.type.name;
+
         return {
           id: exam.id,
           personId: exam.person_id,
@@ -28,7 +36,7 @@ const MedicalExamController = {
           date: exam.date,
           typeId: exam.type_id,
           type_id: exam.type_id,
-          typeName: exam.Type ? exam.Type.name : null, // Incluir nombre del tipo de examen
+          typeName: translatedName, // Incluir nombre del tipo de examen
           result: exam.result,
           archive: exam.archive,
         };
@@ -47,12 +55,16 @@ const MedicalExamController = {
 
   // Obtener exámenes médicos por person_id
   async getByPersonId(req, res) {
-    logger.info(`${req.user.name} - Entra a buscar los exámenes médicos de una persona`);
+    logger.info(
+      `${req.user.name} - Entra a buscar los exámenes médicos de una persona`
+    );
 
     const person_id = req.person.id;
 
     try {
-      const medicalExams = await MedicalExamRepository.findAllByPersonId(person_id);
+      const medicalExams = await MedicalExamRepository.findAllByPersonId(
+        person_id
+      );
 
       if (!medicalExams.length) {
         return res.status(204).json({ msg: "MedicalExamsNotFound" });
@@ -60,6 +72,11 @@ const MedicalExamController = {
 
       // Mapear la respuesta
       const mappedMedicalExams = medicalExams.map((exam) => {
+        const translatedName =
+          i18n.__(`types.${exam.type.name}.name`) !==
+          `types.${exam.type.name}.name`
+            ? i18n.__(`types.${exam.type.name}.name`)
+            : exam.type.name;
         return {
           id: exam.id,
           personId: exam.person_id,
@@ -67,7 +84,7 @@ const MedicalExamController = {
           date: exam.date,
           typeId: exam.type_id,
           type_id: exam.type_id,
-          typeName: exam.Type ? exam.Type.name : null,
+          typeName: translatedName,
           result: exam.result,
           archive: exam.archive,
         };
@@ -104,7 +121,11 @@ const MedicalExamController = {
 
     const t = await sequelize.transaction();
     try {
-      const medicalExam = await MedicalExamRepository.create(req.body, req.file, t);
+      const medicalExam = await MedicalExamRepository.create(
+        req.body,
+        req.file,
+        t
+      );
       await t.commit();
       res.status(201).json({ medicalExam });
     } catch (error) {

@@ -16,26 +16,15 @@ const MedicalExamRepository  = {
         "result",
         "archive",
       ],
-      include: [
-        { model: Type, attributes: ["id", "name"] },    // Incluir datos del tipo de examen
-      ],
+      include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
     });
   },
 
   async findAllByPersonId(person_id) {
     return await MedicalExam.findAll({
       where: { person_id },
-      attributes: [
-        "id",
-        "person_id",
-        "date",
-        "type_id",
-        "result",
-        "archive",
-      ],
-      include: [
-        { model: Type, attributes: ["id", "name"] },
-      ],
+      attributes: ["id", "person_id", "date", "type_id", "result", "archive"],
+      include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
     });
   },
 
@@ -49,9 +38,7 @@ const MedicalExamRepository  = {
         "result",
         "archive",
       ],
-      include: [
-        { model: Type, attributes: ["id", "name"] },
-      ],
+      include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
     });
   },
 

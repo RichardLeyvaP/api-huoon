@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class MedicalExam extends Model {
+  class Emergency extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      MedicalExam.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
-      MedicalExam.belongsTo(models.Type, { foreignKey: 'type_id', as: 'type' });
+      Emergency.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
+      Emergency.belongsTo(models.Type, { foreignKey: 'type_id', as: 'type' });
     }
   }
-  MedicalExam.init({
+  Emergency.init({
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true, // Indica que 'id' es la clave primaria
@@ -26,26 +26,34 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     type_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    result: {
+    symptoms: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    archive: {
+    actionTaken: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    contactAlerted: {
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
+    location: {
       type: DataTypes.STRING,
       allowNull: true,
     }
   }, {
     sequelize,
-    modelName: 'MedicalExam',
-    tableName: 'medicalexams',
+    modelName: 'Emergency',
+    tableName: 'emergencies',
     timestamps: true
   });
-  return MedicalExam;
+  return Emergency;
 };

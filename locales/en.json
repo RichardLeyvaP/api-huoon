@@ -233,6 +233,46 @@
     "Prueba de Alergias": {
       "name": "Allergy Test",
       "description": "Identification of allergenic substances"
+    },
+    "Accidente de Tráfico": {
+      "name": "Traffic Accident",
+      "description": "Collision or incident on the road"
+    },
+    "Infarto Cardíaco": {
+      "name": "Heart Attack",
+      "description": "Blockage of blood flow to the heart"
+    },
+    "Derrame Cerebral": {
+      "name": "Stroke",
+      "description": "Interruption of blood flow to the brain"
+    },
+    "Quemaduras Graves": {
+      "name": "Severe Burns",
+      "description": "Injuries to the skin caused by heat, chemicals, or electricity"
+    },
+    "Fracturas Óseas": {
+      "name": "Bone Fractures",
+      "description": "Break or crack in a bone"
+    },
+    "Intoxicación Alimentaria": {
+      "name": "Food Poisoning",
+      "description": "Illness caused by consuming contaminated food"
+    },
+    "Reacción Alérgica Grave": {
+      "name": "Severe Allergic Reaction",
+      "description": "Exaggerated immune system response to an allergen"
+    },
+    "Ahogamiento": {
+      "name": "Drowning",
+      "description": "Respiratory difficulty due to immersion in liquid"
+    },
+    "Ataque de Asma": {
+      "name": "Asthma Attack",
+      "description": "Episode of respiratory difficulty due to asthma"
+    },
+    "Hemorragia Interna": {
+      "name": "Internal Bleeding",
+      "description": "Bleeding inside the body"
     }
   }
 }

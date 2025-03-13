@@ -1,5 +1,9 @@
 const Joi = require("joi");
 
+// Expresiones regulares para validar tipos de archivos
+const imageRegex = /\.(jpg|jpeg|png|gif)$/i;
+const documentRegex = /\.(pdf|doc|docx|txt)$/i;
+
 // Esquema para crear un nuevo examen médico
 const storeMedicalExamSchema = Joi.object({
   person_id: Joi.number().integer().optional().messages({

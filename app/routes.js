@@ -35,6 +35,7 @@ const { storeMedicalHistorySchema, updateMedicalHistorySchema, idMedicalHistoryS
 const { storeMedicalConsultationSchema, updateMedicalConsultationSchema, idMedicalConsultationSchema, getMedicalConsultationSchema} = require("./middlewares/validations/medicalconsultationValidation");
 const { storeTypeSchema, updateTypeSchema, idTypeSchema, typeSchema} = require("./middlewares/validations/typeValidation");
 const { storeMedicalExamSchema, updateMedicalExamSchema, idMedicalExamSchema, getMedicalExamSchema} = require("./middlewares/validations/medicalexamValidation");
+const { storeEmergencySchema, updateEmergencySchema, idEmergencySchema, getEmergencySchema,} = require("./middlewares/validations/emergencyValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -64,6 +65,7 @@ const MedicalHistoryController = require('./controllers/MedicalHistoryController
 const MedicalConsultationController = require('./controllers/MedicalConsultationController');
 const TypeController = require('./controllers/TypeController');
 const MedicalExamController = require('./controllers/MedicalExamController');
+const EmergencyController = require('./controllers/EmergencyController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -348,6 +350,15 @@ router.post('/medical-exam', multerCategory('medicalexams', 'archive'), validate
 router.post('/medical-exam-show', validateSchema(idMedicalExamSchema), MedicalExamController.show);
 router.post('/medical-exam-update', multerCategory('medicalexams', 'archive'), validateSchema(updateMedicalExamSchema), MedicalExamController.update);
 router.post('/medical-exam-destroy', validateSchema(idMedicalExamSchema), MedicalExamController.destroy);
+
+//Rutas Emergencias
+router.get('/emergency', EmergencyController.index);
+router.post('/get-emergency-person', validateSchema(getEmergencySchema), EmergencyController.getByPersonId);
+router.post('/emergency',  validateSchema(storeEmergencySchema), EmergencyController.store);
+router.post('/emergency-show', validateSchema(idEmergencySchema), EmergencyController.show);
+router.put('/emergency', validateSchema(updateEmergencySchema), EmergencyController.update);
+router.post('/emergency-destroy', validateSchema(idEmergencySchema), EmergencyController.destroy);
+
 
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
