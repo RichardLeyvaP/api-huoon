@@ -9,7 +9,7 @@ const session = require('express-session');
 
 //Middlewares
 const auth = require('./middlewares/auth');
-const upload = require('./middlewares/multer'); // Middleware de multer
+const multerMultiple = require('./middlewares/multerMultiple'); // Middleware de multer
 const multerCategory = require('./middlewares/multerCategory');
 const validateSchema = require('./middlewares/validateSchema');
 const { storeCategorySchema, updateCategorySchema, idCategorySchema } = require('./middlewares/validations/categoryValidation');
@@ -330,9 +330,9 @@ router.post('/history-medical-destroy', validateSchema(idMedicalHistorySchema), 
 //Rutas Consultas médicas
 router.get('/consultation-medical', MedicalConsultationController.index);
 router.post('/get-medical-consultations',  MedicalConsultationController.getByPersonId);
-router.post('/consultation-medical', validateSchema(storeMedicalConsultationSchema), MedicalConsultationController.store);
+router.post('/consultation-medical', multerMultiple('files', 'consultations'), validateSchema(storeMedicalConsultationSchema), MedicalConsultationController.store);
 router.post('/consultation-medical-show', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.show);
-router.post('/consultation-medical-update', validateSchema(updateMedicalConsultationSchema), MedicalConsultationController.update);
+router.post('/consultation-medical-update', multerMultiple('files', 'consultations'), validateSchema(updateMedicalConsultationSchema), MedicalConsultationController.update);
 router.post('/consultation-medical-destroy', validateSchema(idMedicalConsultationSchema), MedicalConsultationController.destroy);
 
 //Rutas Tipos
@@ -346,9 +346,9 @@ router.post('/type-destroy', validateSchema(idTypeSchema), TypeController.destro
 //Rutas Exámenes médicos
 router.get('/medical-exam', MedicalExamController.index);
 router.post('/get-exam-person', validateSchema(getMedicalExamSchema), MedicalExamController.getByPersonId);
-router.post('/medical-exam', multerCategory('medicalexams', 'archive'), validateSchema(storeMedicalExamSchema), MedicalExamController.store);
+router.post('/medical-exam', multerCategory('archive', 'medicalexams'), validateSchema(storeMedicalExamSchema), MedicalExamController.store);
 router.post('/medical-exam-show', validateSchema(idMedicalExamSchema), MedicalExamController.show);
-router.post('/medical-exam-update', multerCategory('medicalexams', 'archive'), validateSchema(updateMedicalExamSchema), MedicalExamController.update);
+router.post('/medical-exam-update', multerCategory('archive', 'medicalexams'), validateSchema(updateMedicalExamSchema), MedicalExamController.update);
 router.post('/medical-exam-destroy', validateSchema(idMedicalExamSchema), MedicalExamController.destroy);
 
 //Rutas Emergencias

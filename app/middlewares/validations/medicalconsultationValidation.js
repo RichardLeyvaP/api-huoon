@@ -19,7 +19,7 @@ const storeMedicalConsultationSchema = Joi.object({
   treatments: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().required().messages({
+        id: Joi.number().integer().required().messages({
           "number.base": "El ID del tratamiento debe ser un número",
           "any.required": "El ID del tratamiento es requerido",
         }),
@@ -36,7 +36,7 @@ const storeMedicalConsultationSchema = Joi.object({
   files: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().required().messages({
+        id: Joi.string().required().messages({
           "number.base": "El ID del archivo debe ser un número",
           "any.required": "El ID del archivo es requerido",
         }),
@@ -44,6 +44,14 @@ const storeMedicalConsultationSchema = Joi.object({
           "string.base": "El nombre del archivo debe ser una cadena de texto",
           "any.required": "El nombre del archivo es requerido",
         }),
+        file: Joi.string()
+              .pattern(/\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$/i)
+              .allow(null)
+              .empty('')
+              .optional()
+              .messages({
+                  'string.pattern.base': 'El archivo debe ser una imagen (jpg, jpeg, png, gif) o un documento (pdf, doc, docx, txt)'
+              }),
       })
     )
     .optional(),
@@ -66,7 +74,7 @@ const updateMedicalConsultationSchema = Joi.object({
   treatments: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().required().messages({
+        id: Joi.number().integer().required().messages({
           "number.base": "El ID del tratamiento debe ser un número",
           "any.required": "El ID del tratamiento es requerido",
         }),
@@ -83,7 +91,7 @@ const updateMedicalConsultationSchema = Joi.object({
   files: Joi.array()
     .items(
       Joi.object({
-        id: Joi.number().required().messages({
+        id: Joi.string().required().messages({
           "number.base": "El ID del archivo debe ser un número",
           "any.required": "El ID del archivo es requerido",
         }),
@@ -91,6 +99,14 @@ const updateMedicalConsultationSchema = Joi.object({
           "string.base": "El nombre del archivo debe ser una cadena de texto",
           "any.required": "El nombre del archivo es requerido",
         }),
+        file: Joi.string()
+              .pattern(/\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$/i)
+              .allow(null)
+              .empty('')
+              .optional()
+              .messages({
+                  'string.pattern.base': 'El archivo debe ser una imagen (jpg, jpeg, png, gif) o un documento (pdf, doc, docx, txt)'
+              }),
       })
     )
     .optional(),

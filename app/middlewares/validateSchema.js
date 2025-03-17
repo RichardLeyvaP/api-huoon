@@ -31,6 +31,17 @@ const validateSchema = (schema) => {
     // Normaliza req.body antes de la validación
     if (req.body) {
       normalizeObject(req.body);
+      // Parsear treatments si existe
+      if (req.body.treatments && typeof req.body.treatments === 'string') {
+        try {
+          req.body.treatments = JSON.parse(req.body.treatments); // Convertir la cadena JSON a un array
+        } catch (error) {
+          return res.status(400).json({
+            msg: "Error de validación",
+            details: ['El campo "treatments" debe ser un array válido en formato JSON'],
+          });
+        }
+      }
     }
 
     // Valida los datos normalizados con Joi

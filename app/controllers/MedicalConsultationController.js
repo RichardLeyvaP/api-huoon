@@ -141,9 +141,8 @@ const MedicalConsultationController = {
     logger.info(JSON.stringify(req.body));
 
     const personId = req.person.id;
-
     try {
-      const medicalConsultation = await MedicalConsultationRepository.create(req.body, personId);
+      const medicalConsultation = await MedicalConsultationRepository.create(req.body, personId, req.files);
       res.status(201).json({ medicalConsultation });
     } catch (error) {
       const errorMsg = error.message || "Error desconocido";
@@ -170,7 +169,7 @@ const MedicalConsultationController = {
     }
 
     try {
-      const updatedData = await MedicalConsultationRepository.update(medicalConsultation, req.body);
+      const updatedData = await MedicalConsultationRepository.update(medicalConsultation, req.body, req.files);
       res.status(200).json({ medicalConsultation: updatedData });
     } catch (error) {
       const errorMsg = error.details
@@ -186,9 +185,9 @@ const MedicalConsultationController = {
    * Eliminar una consulta médica.
    */
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Elimina consulta médica con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Elimina consulta médica con ID ${req.body.id}`);
 
-    const { id } = req.params;
+    const { id } = req.body;
 
     // Buscar la consulta médica por ID
     const medicalConsultation = await MedicalConsultationRepository.findById(id);

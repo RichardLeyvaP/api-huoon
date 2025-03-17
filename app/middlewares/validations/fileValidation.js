@@ -76,7 +76,7 @@ const updateFileSchema = Joi.object({
 
 // Esquema para obtener un archivo por ID
 const idFileSchema = Joi.object({
-    home_id: Joi.number().integer().required().messages({
+    id: Joi.number().integer().required().messages({
         'number.base': '"homeId" debe ser un número',
         'number.integer': '"homeId" debe ser un número entero',
     }),
