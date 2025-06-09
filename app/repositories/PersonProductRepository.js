@@ -17,7 +17,7 @@ const logger = require("../../config/logger");
 const ProductRepository = require("./ProductRepository");
 
 class PersonProductRepository {
-  async findAll() {
+  /*async findAll() {
     return await PersonHomeWarehouseProduct.findAll({
       include: [
         {
@@ -54,8 +54,46 @@ class PersonProductRepository {
         },
       ],
     });
-  }
+  }*/
+  async findAll() {
 
+    return await PersonHomeWarehouseProduct.findAll({
+      include: [
+        {
+          model: Home,
+          as: "home",
+          attributes: ["id", "name"],
+        },
+        {
+          model: Person,
+          as: "person",
+          attributes: ["id", "name", "email"],
+        },
+        {
+          model: Warehouse,
+          as: "warehouse",
+          attributes: ["id", "title"],
+        },
+        {
+          model: Product,
+          as: "product",
+          attributes: ["id", "name"],
+          include: [
+            {
+              model: Category,
+              as: "category",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          model: Status,
+          as: "status",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+  }
   async personHomeWarehouseProducts(body) {
     return await PersonHomeWarehouseProduct.findAll({
       where: {
@@ -283,6 +321,80 @@ class PersonProductRepository {
     await product.destroy();
 
     return personHomeWarehouseProductDelete;
+  }
+
+  async findOneByFilters(product_id, warehouse_id, home_id, person_id) {
+    // Construir el objeto where dinámicamente
+    const whereClause = {};
+    if (home_id) whereClause.home_id = home_id;
+    if (product_id) whereClause.product_id = product_id;
+    if (warehouse_id) whereClause.warehouse_id = warehouse_id;
+    if (person_id) whereClause.person_id = person_id;
+
+    try {
+      const result = await PersonHomeWarehouseProduct.findOne({
+        where: whereClause,
+        include: [
+          {
+            model: Home,
+            as: "home",
+            attributes: ["id", "name"],
+          },
+          {
+            model: Person,
+            as: "person",
+            attributes: ["id", "name", "email"],
+          },
+          {
+            model: Warehouse,
+            as: "warehouse",
+            attributes: ["id", "title"],
+          },
+          {
+            model: Product,
+            as: "product",
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Category,
+                as: "category",
+                attributes: ["id", "name"],
+              },
+            ],
+          },
+          {
+            model: Status,
+            as: "status",
+            attributes: ["id", "name"],
+          },
+        ]
+      });
+      return result;
+      
+    } catch (error) {
+      logger.error('Error en findOneByFilters:', error);
+      throw error;
+    }
+  }
+
+  async updateExistingProduct(existingRecord, updateData, transaction = null) {
+  const { quantity, unit_price, purchase_date, purchase_place, total_price } = updateData;
+  
+  
+  const currentQty = parseFloat(existingRecord.quantity);
+  const currentTotal = parseFloat(existingRecord.total_price);
+  const newQty = currentQty + parseFloat(quantity);
+  const newTotal = currentTotal + parseFloat(total_price);
+
+  console.log(`Updating: Qty ${currentQty} -> ${newQty} | Total ${currentTotal} -> ${newTotal}`);
+
+  return await existingRecord.update({
+    quantity: newQty,
+    unit_price: unit_price || existingRecord.unit_price,
+    total_price: newTotal,
+    purchase_date: purchase_date || existingRecord.purchase_date,
+    purchase_place: purchase_place || existingRecord.purchase_place
+  }, { transaction });
   }
 }
 

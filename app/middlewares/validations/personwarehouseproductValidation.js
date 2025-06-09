@@ -84,9 +84,25 @@ const getPersonHomeProductSchema = Joi.object({
     home_id: Joi.number().required(),
 });
 
+const ocrStringSchema = Joi.object({
+        ocrText: Joi.string()
+    .max(5000)
+    .allow(null).empty('')
+    .optional()
+    .messages({
+        'string.max': 'El texto OCR no debe exceder los 5000 caracteres',
+        'string.base': 'El texto OCR debe ser una cadena de texto válida',
+    }),
+     home_id: Joi.number().integer().allow(null).empty('').optional(),
+    warehouse_id: Joi.number().integer().allow(null).empty('').optional(),
+    status_id: Joi.number().integer().allow(null).empty('').optional(),
+    category_id: Joi.number().integer().allow(null).empty('').optional(),
+});
+
 module.exports = {
     storePersonProductSchema,
     updatePersonProductSchema,
     idPersonProductSchema,
-    getPersonHomeProductSchema
+    getPersonHomeProductSchema,
+    ocrStringSchema
 };

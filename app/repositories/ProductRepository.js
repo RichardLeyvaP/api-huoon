@@ -95,6 +95,15 @@ const ProductRepository = {
 
     return await product.destroy();
   },
+
+  async findByNameAndCategory(name, category_id) {
+  return await Product.findOne({
+    where: {
+      name: name,
+      category_id: category_id
+    },
+  });
+  }
 };
 
 module.exports = ProductRepository;

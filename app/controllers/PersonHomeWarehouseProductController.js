@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const Joi = require("joi");
 const path = require("path");
 const fs = require("fs");
+const ocrProcessor = require("../services/OCRProcessorService");
 const {
   Person,
   Warehouse,
@@ -135,7 +136,7 @@ const PersonHomeWarehouseProductController = {
         await PersonProductRepository.personHomeWarehouseProducts(req.body);
 
       if (!homeWarehouseProducts || homeWarehouseProducts.length === 0) {
-        logger.error(
+        logger.info(
           `PersonHomeWarehouseController->homeWarehouseProducts: No se encontraron productos para home_id: ${home_id}, warehouse_id: ${warehouse_id}`
         );
         return res.status(204).json({ msg: "NoProductsFound" });
@@ -271,7 +272,17 @@ const PersonHomeWarehouseProductController = {
     // Verificar si el producto existe o crear uno nuevo
     let product;
     let filename;
-    c
+    if (product_id && product_id !== undefined) {
+      product = await ProductRepository.findById(product_id);
+      if (!product) {
+        logger.error(
+          `PersonHomeWarehouseController->store: Producto no encontrado con ID ${product_id}`
+        );
+        return res.status(204).json({ msg: "ProductNotFound" });
+      } else {
+        filename = product.image;
+      }
+    }
 
     // Verificar si la categoría existe
     if (category_id && category_id !== 0) {
@@ -450,7 +461,7 @@ const PersonHomeWarehouseProductController = {
       }
 
       if (warehouse_id) {
-        const warehouse = await WarehouseRepository.findById(warehouse_id);
+        const warehouse = await WareHouseRepository.findById(warehouse_id);
         if (!warehouse) {
           logger.error(
             `PersonHomeWarehouseProductsController->update: Almacén no encontrado con ID ${warehouse_id}`
@@ -763,6 +774,193 @@ const PersonHomeWarehouseProductController = {
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
+
+  async processOCR(req, res) {
+    try {
+      const { ocrText, home_id, warehouse_id, status_id, category_id} = req.body;
+
+      const home = await HomeRepository.findById(home_id);
+    if (!home) {
+      logger.error(
+        `PersonHomeWarehouseController->processOCR: Hogar no encontrado con ID ${home_id}`
+      );
+      return res.status(204).json({ msg: "HomeNotFound" });
+    }
+
+    // Obtener el ID de la persona del usuario autenticado
+    const person_id = req.person.id;
+
+    // Verificar si la persona está asociada con el hogar
+    const person = await Person.findByPk(person_id, {
+      include: [
+        {
+          model: HomePerson,
+          as: "homePeople",
+          where: { home_id: home_id }, // Filtra por el home_id que buscas
+          required: true, // Esto asegura que solo se devuelvan personas que tengan esa relación
+        },
+      ],
+    });
+
+    if (!person) {
+      logger.error(
+        `PersonHomeWarehouseController->processOCR: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
+      );
+      return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
+    }
+
+    // Verificar si el almacén existe
+    const warehouse = await WareHouseRepository.findById(warehouse_id);
+    if (!warehouse) {
+      logger.error(
+        `PersonHomeWarehouseController->processOCR: Almacén no encontrado con ID ${warehouse_id}`
+      );
+      return res.status(204).json({ msg: "WarehouseNotFound" });
+    }
+
+    // Verificar si el estado existe
+    const status = await StatusRepository.findById(status_id);
+    if (!status) {
+      logger.error(
+        `PersonHomeWarehouseController->processOCR: Estado no encontrado con ID ${status_id}`
+      );
+      return res.status(204).json({ msg: "StatusNotFound" });
+    }
+
+
+      const products = await ocrProcessor.extractProductsFromOCR(ocrText);
+      logger.info("Resultado del procesamiento OCR:", JSON.stringify(products, null, 2));
+
+      const processedProducts = [];
+      const errors = [];
+      const transaction = await sequelize.transaction();
+      // Hacer una copia del array para evitar modificaciones accidentales
+        const productosAProcesar = [...products.productos];
+        
+        for (const producto of productosAProcesar) {
+            try {
+                // Validación defensiva - asegurar que producto existe
+                if (!producto || !producto.nombre) {
+                    errors.push({
+                        productName: 'Producto sin nombre',
+                        error: 'El producto no tiene estructura válida'
+                    });
+                    continue;
+                }
+
+                const nombreProducto = String(producto.nombre).trim();
+                logger.info(`Procesando producto: ${nombreProducto}`);
+
+                let dbProduct = await ProductRepository.findByNameAndCategory(nombreProducto, category_id);
+                
+                if (!dbProduct) {
+                    logger.info("Creando nuevo producto para:", nombreProducto);
+                    
+                    // Crear producto principal
+                    dbProduct = await ProductRepository.create(
+                        { name: nombreProducto, category_id },
+                        null,
+                        transaction
+                    );
+
+                    // Crear relación en el almacén
+                    await PersonProductRepository.create(
+                        {
+                            product_id: dbProduct.id,
+                            warehouse_id,
+                            status_id,
+                            home_id,
+                            unit_price: producto.precioUnitario,
+                            total_price: producto.total,
+                            quantity: producto.cantidad,
+                            purchase_date: products.documento.fecha,
+                            purchase_place: products.documento.lugar?.nombre || 'Desconocido',
+                        },
+                        null,
+                        transaction,
+                        person_id
+                    );
+                } else {
+                    logger.info("Producto encontrado en DB:", dbProduct.id);
+                    
+                    // Buscar registro existente
+                    const existingRecord = await PersonProductRepository.findOneByFilters(
+                        dbProduct.id,
+                        warehouse_id,
+                        home_id,
+                        person_id
+                    );
+                    logger.info("Registro existente encontrado:", existingRecord?.id || 'Ninguno');
+                    
+                    if (existingRecord) {
+                        // Actualizar registro existente
+                        await PersonProductRepository.updateExistingProduct(
+                            existingRecord,
+                            {
+                                unit_price: producto.precioUnitario,
+                                total_price: producto.total,
+                                quantity: producto.cantidad,
+                                purchase_date: products.documento.fecha,
+                                purchase_place: products.documento.lugar?.nombre || existingRecord.purchase_place,
+                            },
+                            transaction
+                        );
+                        logger.info("Producto existente actualizado");
+                    } else {
+                        // Crear nueva relación
+                        await PersonProductRepository.create(
+                            {
+                                product_id: dbProduct.id,
+                                warehouse_id,
+                                status_id,
+                                home_id,
+                                unit_price: producto.precioUnitario,
+                                total_price: producto.total,
+                                quantity: producto.cantidad,
+                                purchase_date: products.documento.fecha,
+                                purchase_place: products.documento.lugar?.nombre || 'Desconocido',
+                            },
+                            null,
+                            transaction,
+                            person_id
+                        );
+                        logger.info("Nueva relación producto-almacén creada");
+                    }
+                }
+
+                processedProducts.push({
+                    ...producto,
+                    dbMatch: dbProduct,
+                    priceValid: false
+                });
+
+            } catch (error) {
+                logger.error(`Error procesando producto ${producto?.nombre || 'desconocido'}:`, error);
+                errors.push({
+                    productName: producto?.nombre || 'Producto desconocido',
+                    error: error.message
+                });
+            }
+        }
+        await transaction.commit();
+        // Devolver resultados (en un controlador de ruta)
+         // Enviar respuesta al cliente
+        return res.status(200).json({
+            success: true,
+            count: processedProducts.length,
+            products: processedProducts,
+            errors,
+            documentInfo: products.documento
+        });
+    } catch (error) { 
+      if (transaction) await transaction.rollback();
+      logger.error('Error en el controlador:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message || 'Error al procesar el OCR' 
+      });
+    }
+  }
 };
 
 module.exports = PersonHomeWarehouseProductController;

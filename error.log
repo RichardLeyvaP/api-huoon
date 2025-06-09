@@ -420,3 +420,52 @@
 2025-01-15 17:51:15 error: FinanceController->index: Hogar is not defined
 2025-01-15 17:52:52 error: FinanceController->index: Hogar is not defined
 2025-01-17 13:09:15 error: FinanceController->index: Op is not defined
+2025-03-13 13:13:47 error: Validation error in POST /api/file-destroy - Body: {"id":6} - Errors: "home_id" is required, "id" is not allowed
+2025-03-13 13:22:22 error: Validation error in POST /api/file-update - Body: {"date":null,"description":"ertertertet","name":"terterterte","personal":"0","id":null} - Errors: "date" debe ser una fecha válida, "id" debe ser un número
+2025-03-13 13:24:21 error: Validation error in POST /api/file-update - Body: {"home_id":"1","description":"werwerwerwer","name":"rewrwerwerwer","personal":"1","id":null} - Errors: "id" debe ser un número
+2025-03-13 14:10:35 error: Validation error in POST /api/consultation-medical - Body: {"reason":"gfgdfgd","diagnosis":"dfgdfgdfg","medicalNotes":"dfgdfgdfgdfg","treatments":[{"id":1,"name":"gdfgdfgdfgdfg"}],"files":[{},{"id":2,"name":null}]} - Errors: La fecha de la consulta es requerida, El ID del archivo es requerido, El nombre del archivo es requerido, El nombre del archivo debe ser una cadena de texto
+2025-03-13 14:15:21 error: Validation error in POST /api/consultation-medical - Body: {"reason":"dgdfgdfg","diagnosis":"dgdfgdfg","medicalNotes":"dfgdfgdfgdfgdf","treatments":[{"id":1,"name":"gdfgdfgdfg"}],"files":[{}]} - Errors: La fecha de la consulta es requerida, El ID del archivo es requerido, El nombre del archivo es requerido
+2025-03-13 14:20:40 error: Validation error in POST /api/consultation-medical - Body: {"reason":"sfdfsdf","diagnosis":"sdfdsfsfsf","medicalNotes":"sfsfsfsdf","treatments":[{"id":1,"name":"sdfsdfsdfsdf"}],"date":"2025-03-13T18:20:40.179Z","files":[{}]} - Errors: El ID del archivo es requerido, El nombre del archivo es requerido
+2025-03-13 14:31:52 error: Validation error in POST /api/consultation-medical - Body: {"reason":"fsfsdf","diagnosis":"sdfsdfsd","medicalNotes":"sdfsdfsdfsdf","treatments":[],"date":"2025-03-13T18:31:52.716Z","files":[{}]} - Errors: "files[0]" must be a string
+2025-03-13 15:38:25 error: Validation error in POST /api/consultation-medical - Body: {"reason":"tretetert","diagnosis":"ertertertert","medicalNotes":"ertertertet","treatments":[],"date":"2025-03-13T19:38:25.631Z","files":[{"id":1,"name":"Bosquemar.png","file":{}}]} - Errors: "files[0]" must be a string
+2025-03-13 15:52:04 error: Validation error in POST /api/emergency - Body: {} - Errors: El ID del tipo es requerido, La fecha de la emergencia es requerida, Los síntomas son requeridos
+2025-03-13 16:01:05 error: Validation error in POST /api/emergency - Body: {} - Errors: El ID del tipo es requerido, La fecha de la emergencia es requerida, Los síntomas son requeridos
+2025-03-13 16:03:02 error: Validation error in POST /api/emergency - Body: {} - Errors: El ID del tipo es requerido, La fecha de la emergencia es requerida, Los síntomas son requeridos
+2025-03-13 16:07:07 error: Validation error in POST /api/emergency - Body: {} - Errors: El ID del tipo es requerido, La fecha de la emergencia es requerida, Los síntomas son requeridos
+2025-03-13 16:31:49 error: Validation error in POST /api/consultation-medical - Body: {"reason":"gfdgfdgdfg","diagnosis":"dfgdfgdfgdfg","medicalNotes":"dfgdfgdfgdfg","treatments":null,"date":"2025-03-13T20:31:49.846Z","files":[{"id":"1","name":"account-circle-outline.png"}]} - Errors: "treatments" must be an array, "file" es un campo obligatorio
+2025-03-13 16:37:24 error: Validation error in POST /api/consultation-medical - Body: {"reason":"vxvxcvxcv","diagnosis":"xvxcvxcv","medicalNotes":"xcvxcvxcv","date":"2025-03-13T20:37:24.529Z","files":[{"id":"1","name":"account-circle-outline.png"}]} - Errors: "file" es un campo obligatorio
+2025-03-13 17:03:45 error: MedicalConsultationController->store: Cannot set headers after they are sent to the client
+2025-03-13 17:30:33 error: Validation error in POST /api/consultation-medical-update - Body: {} - Errors: El ID de la consulta médica es requerido
+2025-03-13 17:32:10 error: Validation error in POST /api/consultation-medical-update - Body: {} - Errors: El ID de la consulta médica es requerido
+2025-03-14 11:58:25 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 11:58:25 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:05:12 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:05:12 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:08:45 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:08:45 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:11:38 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:11:38 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:12:44 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:12:44 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:13:01 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:13:01 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:14:55 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:14:55 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:43:59 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:43:59 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:45:13 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:45:13 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:45:44 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-14 12:45:44 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-17 10:58:13 error: Validation error in POST /api/consultation-medical-update - Body: {"files":[{"id":"20250314174001704","name":"account-circle-outline.png","file":"undefined"},{"id":"2","name":"Bosquemar.png"}],"id":"1"} - Errors: "files[0].id" must be a safe number, El archivo debe ser una imagen (jpg, jpeg, png, gif) o un documento (pdf, doc, docx, txt)
+2025-03-17 11:03:07 error: Validation error in POST /api/consultation-medical-update - Body: {"files":[{"id":"20250314174001704","name":"account-circle-outline.png","file":null},{"id":"2","name":"Bosquemar.png"}],"id":"1"} - Errors: "files[0].id" must be a safe number
+2025-03-17 11:06:00 error: Error en MedicalConsultationRepository->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:06:00 error: MedicalConsultationController->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:18:09 error: Error en MedicalConsultationRepository->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:18:09 error: MedicalConsultationController->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:32:03 error: Error en MedicalConsultationRepository->create: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:32:03 error: MedicalConsultationController->store: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 11:36:02 error: Error en MedicalConsultationRepository->update: The "path" argument must be of type string. Received undefined
+2025-03-17 11:36:02 error: MedicalConsultationController->update: The "path" argument must be of type string. Received undefined
+2025-03-17 13:30:53 error: Error en MedicalConsultationRepository->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 13:30:53 error: MedicalConsultationController->update: Cannot read properties of undefined (reading 'originalname')

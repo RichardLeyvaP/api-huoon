@@ -12,3 +12,5 @@ config/serviceAccountKey.json
 
 combined.log
 error.log
+
+logs/

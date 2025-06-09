@@ -25,7 +25,7 @@ const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHou
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
 const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema, updatePointsAndTasksSchema } = require('./middlewares/validations/taskValidation');
-const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema } = require('./middlewares/validations/personwarehouseproductValidation');
+const { storePersonProductSchema, updatePersonProductSchema, idPersonProductSchema, getPersonHomeProductSchema, ocrStringSchema } = require('./middlewares/validations/personwarehouseproductValidation');
 const { storeProductSchema, updateProductSchema, idProductSchema } = require('./middlewares/validations/productValidation');
 const { storeFinanceSchema, updateFinanceSchema, idFinanceSchema, getFinanceSchema } = require('./middlewares/validations/financeValidation');
 const { storeFileSchema, updateFileSchema, idFileSchema, typeFileSchema } = require('./middlewares/validations/fileValidation');
@@ -291,6 +291,7 @@ router.post('/person-home-warehouse-product-show', validateSchema(idPersonProduc
 router.post('/person-home-warehouse-products', validateSchema(getPersonHomeProductSchema), PersonHomeWarehouseProductController.personHomeWarehouseProducts);//Devolver los productos de un almacén en un hogar
 router.post('/person-home-warehouse-product-update', multerCategory('image', 'personProducts'), validateSchema(updatePersonProductSchema), PersonHomeWarehouseProductController.update);
 router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
+router.post("/process-ocr", validateSchema(ocrStringSchema), PersonHomeWarehouseProductController.processOCR);
 
 //Rutas Finanzas
 router.get('/finance', FinanceController.index);

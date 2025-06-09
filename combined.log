@@ -1,469 +1,179 @@
-2025-01-09 11:50:18 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 11:50:18 info: Entra a Buscar Las categorias de Task
-2025-01-09 11:50:18 info: Entra a Buscar Los estados de Task
-2025-01-09 11:50:18 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 11:50:18 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 11:50:18 info: JSON.stringify(firstHome)
-2025-01-09 11:50:18 info: [{"id":1,"person_id":4,"role_id":4,"home_id":1,"createdAt":"2024-11-26T10:47:39.000Z","updatedAt":"2024-11-26T10:47:39.000Z","role":{"id":4,"name":"Miembro","description":"Miembro de familia","type":"Home","createdAt":"2024-11-19T18:21:45.000Z","updatedAt":"2024-11-19T18:21:45.000Z"}}]
-2025-01-09 11:50:18 info: JSON.stringify(firstHome)
-2025-01-09 11:50:18 info: [{"id":2,"person_id":2,"role_id":3,"home_id":1,"createdAt":"2024-11-26T10:47:39.000Z","updatedAt":"2024-11-26T10:47:39.000Z","role":{"id":3,"name":"Padre","description":"Padre de familia","type":"Home","createdAt":"2024-11-19T18:21:27.000Z","updatedAt":"2024-11-19T18:21:27.000Z"}}]
-2025-01-09 11:50:18 info: JSON.stringify(firstHome)
-2025-01-09 11:50:18 info: [{"id":5,"person_id":1,"role_id":4,"home_id":1,"createdAt":"2024-11-26T10:48:50.000Z","updatedAt":"2024-11-26T10:48:50.000Z","role":{"id":4,"name":"Miembro","description":"Miembro de familia","type":"Home","createdAt":"2024-11-19T18:21:45.000Z","updatedAt":"2024-11-19T18:21:45.000Z"}}]
-2025-01-09 11:50:18 info: JSON.stringify(firstHome)
-2025-01-09 11:50:18 info: [{"id":6,"person_id":5,"role_id":3,"home_id":1,"createdAt":"2024-12-06T08:55:16.000Z","updatedAt":"2024-12-06T08:55:16.000Z","role":{"id":3,"name":"Padre","description":"Padre de familia","type":"Home","createdAt":"2024-11-19T18:21:27.000Z","updatedAt":"2024-11-19T18:21:27.000Z"}}]
-2025-01-09 11:50:18 info: JSON.stringify(firstHome)
-2025-01-09 11:50:18 info: [{"id":7,"person_id":6,"role_id":4,"home_id":1,"createdAt":"2024-12-06T08:55:16.000Z","updatedAt":"2024-12-06T08:55:16.000Z","role":{"id":4,"name":"Miembro","description":"Miembro de familia","type":"Home","createdAt":"2024-11-19T18:21:45.000Z","updatedAt":"2024-11-19T18:21:45.000Z"}}]
-2025-01-09 11:50:18 info: Entra a Buscar Los roles de Task
-2025-01-09 11:50:50 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 11:50:50 info: Entra a Buscar Las categorias de Task
-2025-01-09 11:50:50 info: Entra a Buscar Los estados de Task
-2025-01-09 11:50:50 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 11:50:50 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 11:50:50 info: JSON.stringify(firstHome)
-2025-01-09 11:50:50 info: undefined
-2025-01-09 11:50:50 info: JSON.stringify(firstHome)
-2025-01-09 11:50:50 info: undefined
-2025-01-09 11:50:50 info: JSON.stringify(firstHome)
-2025-01-09 11:50:50 info: undefined
-2025-01-09 11:50:50 info: JSON.stringify(firstHome)
-2025-01-09 11:50:50 info: undefined
-2025-01-09 11:50:50 info: JSON.stringify(firstHome)
-2025-01-09 11:50:50 info: undefined
-2025-01-09 11:50:50 info: Entra a Buscar Los roles de Task
-2025-01-09 11:53:36 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 11:53:36 info: Entra a Buscar Las categorias de Task
-2025-01-09 11:53:36 info: Entra a Buscar Los estados de Task
-2025-01-09 11:53:36 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 11:53:36 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 11:53:36 info: Entra a Buscar Los roles de Task
-2025-01-09 12:07:56 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:08:00 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:08:00 error: TaskController->getTaskDate: i18n is not defined
-2025-01-09 12:09:30 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:09:32 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:12:02 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:12:02 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:12:02 info: Entra a Buscar Los estados de Task
-2025-01-09 12:12:02 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:12:02 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:12:02 info: Entra a Buscar Los roles de Task
-2025-01-09 12:16:00 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:16:01 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:16:03 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:16:03 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:16:03 info: Entra a Buscar Los estados de Task
-2025-01-09 12:16:03 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:16:03 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:16:03 info: Entra a Buscar Los roles de Task
-2025-01-09 12:17:21 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:17:21 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:17:21 info: Entra a Buscar Los estados de Task
-2025-01-09 12:17:21 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:17:21 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:17:21 info: Entra a Buscar Los roles de Task
-2025-01-09 12:22:11 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:22:12 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:22:16 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:22:16 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:22:16 info: Entra a Buscar Los estados de Task
-2025-01-09 12:22:16 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:22:16 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:22:16 info: Entra a Buscar Los roles de Task
-2025-01-09 12:24:34 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:24:36 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:24:36 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:24:36 info: Entra a Buscar Los estados de Task
-2025-01-09 12:24:36 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:24:36 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:24:36 info: Entra a Buscar Los roles de Task
-2025-01-09 12:25:30 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:25:32 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:25:32 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:25:32 info: Entra a Buscar Los estados de Task
-2025-01-09 12:25:32 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:25:32 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:25:32 info: Entra a Buscar Los roles de Task
-2025-01-09 12:26:20 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:31:25 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:31:26 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:31:30 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:31:31 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:31:32 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:31:32 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:31:32 info: Entra a Buscar Los estados de Task
-2025-01-09 12:31:32 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:31:32 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:31:32 info: Entra a Buscar Los roles de Task
-2025-01-09 12:31:51 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:32:35 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:32:38 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:32:39 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:32:39 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:32:39 info: Entra a Buscar Los estados de Task
-2025-01-09 12:32:39 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:32:39 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:32:39 info: Entra a Buscar Los roles de Task
-2025-01-09 12:36:44 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:36:48 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:36:51 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:36:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:37:07 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:37:08 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:37:10 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:37:10 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:37:10 info: Entra a Buscar Los estados de Task
-2025-01-09 12:37:10 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:37:10 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:37:10 info: Entra a Buscar Los roles de Task
-2025-01-09 12:37:23 info: irais891230 - Actualiza la tarea con ID 1
-2025-01-09 12:37:23 info: datos recibidos al editar una tarea
-2025-01-09 12:37:23 info: {"people":[{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"},{"home_id":"1","person_id":"6","role_id":"6"}],"id":"1"}
-2025-01-09 12:37:23 info: datos filteredPeople
-2025-01-09 12:37:23 info: [{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"},{"home_id":"1","person_id":"6","role_id":"6"}]
-2025-01-09 12:37:23 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:37:26 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:37:26 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:37:26 info: Entra a Buscar Los estados de Task
-2025-01-09 12:37:26 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:37:26 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:37:26 info: Entra a Buscar Los roles de Task
-2025-01-09 12:37:31 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-09 12:37:32 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:37:33 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:37:33 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:37:33 info: Entra a Buscar Los estados de Task
-2025-01-09 12:37:33 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:37:33 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:37:33 info: Entra a Buscar Los roles de Task
-2025-01-09 12:37:45 info: irais891230 - Actualiza la tarea con ID 1
-2025-01-09 12:37:45 info: datos recibidos al editar una tarea
-2025-01-09 12:37:45 info: {"people":[{"home_id":"1","person_id":"4","role_id":"0"},{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}],"id":"1"}
-2025-01-09 12:37:45 info: datos filteredPeople
-2025-01-09 12:37:45 info: [{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}]
-2025-01-09 12:37:46 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:37:52 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:37:52 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:37:52 info: Entra a Buscar Los estados de Task
-2025-01-09 12:37:52 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:37:52 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:37:52 info: Entra a Buscar Los roles de Task
-2025-01-09 12:38:12 info: irais891230 - Actualiza la tarea con ID 1
-2025-01-09 12:38:12 info: datos recibidos al editar una tarea
-2025-01-09 12:38:12 info: {"people":[{"home_id":"1","person_id":"4","role_id":"5"},{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}],"id":"1"}
-2025-01-09 12:38:12 info: datos filteredPeople
-2025-01-09 12:38:12 info: [{"home_id":"1","person_id":"4","role_id":"5"},{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}]
-2025-01-09 12:38:12 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:38:14 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:38:14 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:38:14 info: Entra a Buscar Los estados de Task
-2025-01-09 12:38:14 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:38:14 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:38:14 info: Entra a Buscar Los roles de Task
-2025-01-09 12:38:23 info: irais891230 - Actualiza la tarea con ID 1
-2025-01-09 12:38:23 info: datos recibidos al editar una tarea
-2025-01-09 12:38:23 info: {"people":[{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}],"id":"1"}
-2025-01-09 12:38:23 info: datos filteredPeople
-2025-01-09 12:38:23 info: [{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"}]
-2025-01-09 12:38:23 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 12:38:24 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 12:38:24 info: Entra a Buscar Las categorias de Task
-2025-01-09 12:38:24 info: Entra a Buscar Los estados de Task
-2025-01-09 12:38:24 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 12:38:24 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 12:38:24 info: Entra a Buscar Los roles de Task
-2025-01-09 12:55:48 info: Entrando a loguearse
-2025-01-09 13:04:30 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:04:32 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:04:32 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:04:32 info: Entra a Buscar Los estados de Task
-2025-01-09 13:04:32 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:04:32 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:04:32 info: Entra a Buscar Los roles de Task
-2025-01-09 13:06:56 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:06:58 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:07:00 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:07:00 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:07:00 info: Entra a Buscar Los estados de Task
-2025-01-09 13:07:00 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:07:00 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:07:00 info: Entra a Buscar Los roles de Task
-2025-01-09 13:07:34 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:07:39 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:07:55 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:07:57 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:07:59 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:07:59 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:07:59 info: Entra a Buscar Los estados de Task
-2025-01-09 13:07:59 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:07:59 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:07:59 info: Entra a Buscar Los roles de Task
-2025-01-09 13:09:58 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:09:58 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:09:59 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:10:01 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:10:04 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:10:07 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:15:45 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:15:49 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:15:52 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:15:54 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:16:01 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:16:01 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:16:01 info: Entra a Buscar Los estados de Task
-2025-01-09 13:16:01 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:16:01 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:16:01 info: Entra a Buscar Los roles de Task
-2025-01-09 13:16:48 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:16:48 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:16:48 info: Entra a Buscar Los estados de Task
-2025-01-09 13:16:48 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:16:48 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:16:48 info: Entra a Buscar Los roles de Task
-2025-01-09 13:17:22 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:32:15 info: Entrando a loguearse
-2025-01-09 13:32:47 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:41:29 info: Entrando a loguearse
-2025-01-09 13:41:36 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:41:42 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:41:42 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:41:42 info: Entra a Buscar Los estados de Task
-2025-01-09 13:41:42 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:41:42 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:41:42 info: Entra a Buscar Los roles de Task
-2025-01-09 13:42:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:42:53 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:42:54 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:42:57 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:01 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:03 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:06 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:09 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:20 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:43:22 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:43:22 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:43:22 info: Entra a Buscar Los estados de Task
-2025-01-09 13:43:22 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:43:22 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:43:22 info: Entra a Buscar Los roles de Task
-2025-01-09 13:45:34 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:49:43 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 13:49:43 info: Entra a Buscar Las categorias de Task
-2025-01-09 13:49:43 info: Entra a Buscar Los estados de Task
-2025-01-09 13:49:43 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 13:49:43 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 13:49:43 info: Entra a Buscar Los roles de Task
-2025-01-09 13:51:30 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:56:48 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 13:58:28 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-09 14:04:53 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-09 14:04:53 info: Entra a Buscar Las categorias de Task
-2025-01-09 14:04:53 info: Entra a Buscar Los estados de Task
-2025-01-09 14:04:53 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 14:04:53 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 14:04:53 info: Entra a Buscar Los roles de Task
-2025-01-09 19:56:12 info: Entrando a loguearse
-2025-01-09 19:56:16 info: Entrando a loguearse
-2025-01-09 19:56:22 info: Entrando a loguearse
-2025-01-09 19:57:06 info: Entrando a loguearse
-2025-01-09 19:57:32 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 19:57:45 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 19:57:50 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 19:57:54 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 19:57:59 info: prueba2 - Entra a la ruta unificada de Tasks
-2025-01-09 19:57:59 info: Entra a Buscar Las categorias de Task
-2025-01-09 19:57:59 info: Entra a Buscar Los estados de Task
-2025-01-09 19:57:59 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 19:57:59 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 19:57:59 info: Entra a Buscar Los roles de Task
-2025-01-09 19:58:18 info: prueba2 - Actualiza la tarea con ID 1
-2025-01-09 19:58:18 info: datos recibidos al editar una tarea
-2025-01-09 19:58:18 info: {"people":[{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"},{"home_id":"1","person_id":"4","role_id":"6"}],"id":"1"}
-2025-01-09 19:58:18 info: datos filteredPeople
-2025-01-09 19:58:18 info: [{"home_id":"1","person_id":"2","role_id":"5"},{"home_id":"1","person_id":"1","role_id":"6"},{"home_id":"1","person_id":"4","role_id":"6"}]
-2025-01-09 19:58:18 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 20:01:27 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 20:01:35 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-09 20:01:54 info: prueba2 - Entra a la ruta unificada de Tasks
-2025-01-09 20:01:54 info: Entra a Buscar Las categorias de Task
-2025-01-09 20:01:54 info: Entra a Buscar Los estados de Task
-2025-01-09 20:01:54 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-09 20:01:54 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-09 20:01:54 info: Entra a Buscar Los roles de Task
-2025-01-10 07:13:13 info: Entrando a loguearse
-2025-01-10 07:13:40 info: Entrando a loguearse
-2025-01-10 07:14:01 info: Entrando a loguearse
-2025-01-10 07:15:08 info: irais891230 - Entra a buscar los almacenes asociados a él
-2025-01-10 07:17:14 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:17:23 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:19:04 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:19:06 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:19:26 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:20:25 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:31:33 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:31:35 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-10 07:32:10 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-10 07:32:10 info: Entra a Buscar Las categorias de Task
-2025-01-10 07:32:10 info: Entra a Buscar Los estados de Task
-2025-01-10 07:32:10 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-10 07:32:10 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-10 07:32:10 info: Entra a Buscar Los roles de Task
-2025-01-15 09:32:29 info: Entrando a loguearse
-2025-01-15 09:42:21 error: Validation error in POST /api/finance-show?branch_id=21&business_id=&enrollment_id=&type=Sucursal - Body: {"home_id":1,"spent":150.5,"income":500,"date":"2025-01-15","description":"Pago mensual de servicios","type":"Home","method":"Efectivo"} - Errors: "id" es un campo obligatorio, "home_id" is not allowed, "spent" is not allowed, "income" is not allowed, "date" is not allowed, "description" is not allowed, "type" is not allowed, "method" is not allowed
-2025-01-15 09:42:50 error: Validation error in POST /api/finance - Body: {"home_id":1,"spent":150.5,"income":500,"date":"2025-01-15","description":"Pago mensual de servicios","type":"Home","method":"Efectivo"} - Errors: "person_id" es un campo obligatorio
-2025-01-15 09:43:26 info: prueba2 - Crea un nuevo registro financiero
-2025-01-15 09:44:34 info: prueba2 - Actualiza el registro financiero con ID 1
-2025-01-15 09:44:34 info: Registro financiero actualizado exitosamente (ID: 1)
-2025-01-15 09:48:28 info: prueba2 - Actualiza el registro financiero con ID 1
-2025-01-15 09:48:28 error: PersonWarehouseController->update: La persona con ID undefined no está asociada con el hogar con ID 1
-2025-01-15 09:48:43 info: prueba2 - Crea un nuevo registro financiero
-2025-01-15 09:49:17 info: prueba2 - Elimina el registro financiero con ID 1
-2025-01-15 09:49:17 error: FinanceController->destroy: finance.destroy is not a function
-2025-01-15 09:50:09 info: prueba2 - Elimina el registro financiero con ID 1
-2025-01-15 14:30:49 info: Entrando a loguearse
-2025-01-15 14:30:55 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:36:09 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:38:26 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:41:52 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:41:55 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:52:56 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:54:44 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:33 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:45 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:46 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:49 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:51 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:58:58 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:00 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:08 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:15 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:16 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:19 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:23 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 14:59:27 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:00:48 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:18:41 info: Entrando a loguearse
-2025-01-15 15:18:45 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:18:58 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:19:01 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:20:05 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:43 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:46 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:48 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:51 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:54 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:26:58 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:27:01 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:29:07 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:29:17 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:33:17 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:33:51 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:33:55 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:34:04 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:34:05 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:34:13 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:36:13 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:36:20 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:36:26 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:37:28 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:38:42 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:38:46 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:39:08 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:39:32 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:41:01 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:41:07 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:41:15 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:42:06 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:42:35 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:43:13 info: Entrando a loguearse
-2025-01-15 15:43:16 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:43:31 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:46:42 info: Entrando a loguearse
-2025-01-15 15:46:45 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 15:46:55 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 15:50:31 info: Entrando a loguearse
-2025-01-15 15:50:39 info: irais891230 - Entra a buscar los registros financieros
-2025-01-15 15:50:57 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 16:17:36 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-15 16:17:42 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-15 16:17:42 info: Entra a Buscar Las categorias de Task
-2025-01-15 16:17:42 info: Entra a Buscar Los estados de Task
-2025-01-15 16:17:42 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-15 16:17:42 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-15 16:17:42 info: Entra a Buscar Los roles de Task
-2025-01-15 16:17:46 info: irais891230 - Actualiza la tarea con ID 27
-2025-01-15 16:17:46 info: datos recibidos al editar una tarea
-2025-01-15 16:17:46 info: {"status_id":"1","id":"27"}
-2025-01-15 16:17:46 info: Task actualizada exitosamente (ID: 27)
-2025-01-15 16:17:46 info: irais891230 - Entra a buscar las tareas de una fecha dada
-2025-01-15 16:17:48 info: irais891230 - Entra a la ruta unificada de Tasks
-2025-01-15 16:17:48 info: Entra a Buscar Las categorias de Task
-2025-01-15 16:17:48 info: Entra a Buscar Los estados de Task
-2025-01-15 16:17:48 info: Entra a Buscar Las prioridades en (category_status_priority)
-2025-01-15 16:17:48 info: Entra a Buscar Las personas en (category_status_priority)
-2025-01-15 16:17:48 info: Entra a Buscar Los roles de Task
-2025-01-15 17:00:57 info: Entrando a loguearse
-2025-01-15 17:01:09 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:01:21 error: Validation error in POST /api/finance - Body: {} - Errors: "home_id" es un campo obligatorio, "date" es un campo obligatorio
-2025-01-15 17:02:44 info: prueba2 - Crea un nuevo registro financiero
-2025-01-15 17:02:44 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:06:31 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:06:35 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:06:38 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:06:49 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:06:53 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:07:04 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:07:08 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:07:20 info: prueba2 - Actualiza el registro financiero con ID 1
-2025-01-15 17:07:20 info: datos recibidos al editar una finanza
-2025-01-15 17:07:20 info: {"type":"Personal","id":"1"}
-2025-01-15 17:07:20 info: Registro financiero actualizado exitosamente (ID: 1)
-2025-01-15 17:07:20 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:09:44 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:09:47 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:12:37 info: prueba2 - Crea un nuevo registro financiero
-2025-01-15 17:12:37 info: datos recibidos al crear una finanza
-2025-01-15 17:12:37 info: {"spent":"5000","description":"otros gastos","type":"Personal","date":"Wed Jan 15 2025 17:12:36 GMT-0500 (hora estándar de Cuba)","home_id":"1"}
-2025-01-15 17:12:37 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:13:40 info: prueba2 - Actualiza el registro financiero con ID 2
-2025-01-15 17:13:40 info: datos recibidos al editar una finanza
-2025-01-15 17:13:40 info: {"type":"Hogar","id":"2"}
-2025-01-15 17:13:40 info: Registro financiero actualizado exitosamente (ID: 2)
-2025-01-15 17:13:40 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:14:47 info: prueba2 - Elimina el registro financiero con ID 2
-2025-01-15 17:14:47 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:22:31 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:23:00 error: Validation error in POST /api/get-home-finance - Body: {} - Errors: "home_id" is required
-2025-01-15 17:23:13 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:23:18 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:23:24 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:23:34 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:38:52 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:39:04 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:39:06 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:39:24 info: Entrando a loguearse
-2025-01-15 17:39:27 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:40:24 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:41:02 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:48:17 error: Validation error in POST /api/get-home-finance - Body: {"home_id":1} - Errors: "type" is required
-2025-01-15 17:48:21 error: Validation error in POST /api/get-home-finance - Body: {"home_id":1,"type":1} - Errors: "type" must be a string
-2025-01-15 17:48:28 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:48:28 error: FinanceController->index: Hogar is not defined
-2025-01-15 17:51:15 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:51:15 error: FinanceController->index: Hogar is not defined
-2025-01-15 17:52:52 info: prueba2 - Entra a buscar los registros financieros
-2025-01-15 17:52:52 error: FinanceController->index: Hogar is not defined
-2025-01-15 17:54:24 info: prueba2 - Entra a buscar los registros financieros
-2025-01-17 08:53:16 info: Entrando a loguearse
-2025-01-17 08:53:37 info: prueba2 - Entra a buscar las tareas de una fecha dada
-2025-01-17 13:09:07 info: Entrando a loguearse
-2025-01-17 13:09:15 info: prueba2 - Entra a buscar los registros financieros
-2025-01-17 13:09:15 error: FinanceController->index: Op is not defined
-2025-01-17 13:10:03 info: prueba2 - Entra a buscar los registros financieros
-2025-01-17 13:20:33 info: Entrando a loguearse
-2025-01-17 13:20:39 info: irais891230 - Entra a buscar los registros financieros
-2025-01-17 13:20:56 info: Entrando a loguearse
-2025-01-17 13:20:59 info: prueba2 - Entra a buscar los registros financieros
-2025-01-17 13:22:16 info: prueba2 - Entra a buscar los registros financieros
-2025-01-17 13:22:48 info: Entrando a loguearse
-2025-01-17 13:22:52 info: irais891230 - Entra a buscar los registros financieros
-2025-01-17 13:23:01 info: irais891230 - Entra a buscar los registros financieros
+2025-03-17 13:17:40 info: prueba2 - Actualiza la consulta médica con ID undefined
+2025-03-17 13:17:40 info: Datos recibidos al editar una consulta médica
+2025-03-17 13:17:40 info: {"files":[{"id":"20250317155958140","name":"Bosquemar.png","file":null},{"id":"2","name":"account-circle-outline.png"}],"id":"13"}
+2025-03-17 13:17:40 info: No está en los nuevos
+2025-03-17 13:17:40 info: Archivo eliminado exitosamente: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317155958140.png
+2025-03-17 13:17:40 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317171740200.png
+2025-03-17 13:17:40 info: Consulta médica actualizada exitosamente (ID: 13)
+2025-03-17 13:17:40 info: prueba2 - Busca las consultas médicas de una persona
+2025-03-17 13:18:00 info: Fecha actual: 2025-03-17, Hora actual: 13:18
+2025-03-17 13:19:00 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:19:37 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:19:43 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:19:51 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:19:54 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:19:57 info: Fecha actual: 2025-03-17, Hora actual: 13:19
+2025-03-17 13:20:00 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:15 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:29 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:38 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:42 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:46 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:20:56 info: Fecha actual: 2025-03-17, Hora actual: 13:20
+2025-03-17 13:21:02 info: Fecha actual: 2025-03-17, Hora actual: 13:21
+2025-03-17 13:21:10 info: prueba2 - Actualiza la consulta médica con ID undefined
+2025-03-17 13:21:10 info: Datos recibidos al editar una consulta médica
+2025-03-17 13:21:10 info: {"files":[{"id":"20250317171740200","name":"account-circle-outline.png","file":null},{"id":"2","name":"Bosquemar.png"}],"id":"13"}
+2025-03-17 13:21:10 info: Old file object:
+2025-03-17 13:21:10 info: updated Files:
+2025-03-17 13:21:10 info: Old file ID:
+2025-03-17 13:21:10 info: Old file object:
+2025-03-17 13:21:10 info: New file ID:
+2025-03-17 13:21:10 info: New file object:
+2025-03-17 13:21:10 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317172110841.png
+2025-03-17 13:21:10 info: Consulta médica actualizada exitosamente (ID: 13)
+2025-03-17 13:21:10 info: prueba2 - Busca las consultas médicas de una persona
+2025-03-17 13:22:00 info: Fecha actual: 2025-03-17, Hora actual: 13:22
+2025-03-17 13:22:13 info: Fecha actual: 2025-03-17, Hora actual: 13:22
+2025-03-17 13:22:16 info: Fecha actual: 2025-03-17, Hora actual: 13:22
+2025-03-17 13:22:19 info: Fecha actual: 2025-03-17, Hora actual: 13:22
+2025-03-17 13:23:00 info: Fecha actual: 2025-03-17, Hora actual: 13:23
+2025-03-17 13:24:00 info: Fecha actual: 2025-03-17, Hora actual: 13:24
+2025-03-17 13:25:00 info: Fecha actual: 2025-03-17, Hora actual: 13:25
+2025-03-17 13:25:13 info: Fecha actual: 2025-03-17, Hora actual: 13:25
+2025-03-17 13:25:17 info: Fecha actual: 2025-03-17, Hora actual: 13:25
+2025-03-17 13:25:24 info: Fecha actual: 2025-03-17, Hora actual: 13:25
+2025-03-17 13:26:00 info: Fecha actual: 2025-03-17, Hora actual: 13:26
+2025-03-17 13:27:00 info: Fecha actual: 2025-03-17, Hora actual: 13:27
+2025-03-17 13:28:00 info: Fecha actual: 2025-03-17, Hora actual: 13:28
+2025-03-17 13:29:00 info: Fecha actual: 2025-03-17, Hora actual: 13:29
+2025-03-17 13:29:08 info: Fecha actual: 2025-03-17, Hora actual: 13:29
+2025-03-17 13:29:40 info: Fecha actual: 2025-03-17, Hora actual: 13:29
+2025-03-17 13:29:45 info: Fecha actual: 2025-03-17, Hora actual: 13:29
+2025-03-17 13:30:00 info: Fecha actual: 2025-03-17, Hora actual: 13:30
+2025-03-17 13:30:12 info: Fecha actual: 2025-03-17, Hora actual: 13:30
+2025-03-17 13:30:40 info: Fecha actual: 2025-03-17, Hora actual: 13:30
+2025-03-17 13:30:53 info: prueba2 - Actualiza la consulta médica con ID undefined
+2025-03-17 13:30:53 info: Datos recibidos al editar una consulta médica
+2025-03-17 13:30:53 info: {"files":[{"id":"20250317172110840","name":"Bosquemar.png","file":null},{"id":"2","name":"account-circle-outline.png"}],"id":"13"}
+2025-03-17 13:30:53 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317173053187.png
+2025-03-17 13:30:53 error: Error en MedicalConsultationRepository->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 13:30:53 error: MedicalConsultationController->update: Cannot read properties of undefined (reading 'originalname')
+2025-03-17 13:31:00 info: Fecha actual: 2025-03-17, Hora actual: 13:31
+2025-03-17 13:31:35 info: Fecha actual: 2025-03-17, Hora actual: 13:31
+2025-03-17 13:31:46 info: prueba2 - Actualiza la consulta médica con ID undefined
+2025-03-17 13:31:46 info: Datos recibidos al editar una consulta médica
+2025-03-17 13:31:46 info: {"files":[{"id":"20250317172110840","name":"Bosquemar.png","file":null},{"id":"2","name":"account-circle-outline.png"}],"id":"13"}
+2025-03-17 13:31:46 info: Imagen movida exitosamente a: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317173146846.png
+2025-03-17 13:31:46 info: Consulta médica actualizada exitosamente (ID: 13)
+2025-03-17 13:31:47 info: prueba2 - Busca las consultas médicas de una persona
+2025-03-17 13:32:00 info: Fecha actual: 2025-03-17, Hora actual: 13:32
+2025-03-17 13:32:03 info: prueba2 - Actualiza la consulta médica con ID undefined
+2025-03-17 13:32:03 info: Datos recibidos al editar una consulta médica
+2025-03-17 13:32:03 info: {"files":[{"id":"20250317173146850","name":"account-circle-outline.png","file":null}],"id":"13"}
+2025-03-17 13:32:03 info: No está en los nuevos
+2025-03-17 13:32:03 info: Archivo eliminado exitosamente: D:\Dev Klint\Huoon\api-huoon\public\consultations\20250317172110841.png
+2025-03-17 13:32:03 info: Consulta médica actualizada exitosamente (ID: 13)
+2025-03-17 13:32:03 info: prueba2 - Busca las consultas médicas de una persona
+2025-03-17 13:33:00 info: Fecha actual: 2025-03-17, Hora actual: 13:33
+2025-03-17 13:34:00 info: Fecha actual: 2025-03-17, Hora actual: 13:34
+2025-03-17 13:35:00 info: Fecha actual: 2025-03-17, Hora actual: 13:35
+2025-03-17 13:36:00 info: Fecha actual: 2025-03-17, Hora actual: 13:36
+2025-03-17 13:37:00 info: Fecha actual: 2025-03-17, Hora actual: 13:37
+2025-03-17 13:38:00 info: Fecha actual: 2025-03-17, Hora actual: 13:38
+2025-03-17 13:39:00 info: Fecha actual: 2025-03-17, Hora actual: 13:39
+2025-03-17 13:40:00 info: Fecha actual: 2025-03-17, Hora actual: 13:40
+2025-03-17 13:41:00 info: Fecha actual: 2025-03-17, Hora actual: 13:41
+2025-03-17 13:43:00 info: Fecha actual: 2025-03-17, Hora actual: 13:43
+2025-03-17 13:44:00 info: Fecha actual: 2025-03-17, Hora actual: 13:44
+2025-03-17 13:44:25 info: Fecha actual: 2025-03-17, Hora actual: 13:44
+2025-03-17 13:45:00 info: Fecha actual: 2025-03-17, Hora actual: 13:45
+2025-03-17 13:45:48 info: Fecha actual: 2025-03-17, Hora actual: 13:45
+2025-03-17 13:46:00 info: Fecha actual: 2025-03-17, Hora actual: 13:46
+2025-03-17 13:46:15 info: Fecha actual: 2025-03-17, Hora actual: 13:46
+2025-03-17 13:47:00 info: Fecha actual: 2025-03-17, Hora actual: 13:47
+2025-03-17 13:48:00 info: Fecha actual: 2025-03-17, Hora actual: 13:48
+2025-03-17 13:49:00 info: Fecha actual: 2025-03-17, Hora actual: 13:49
+2025-03-17 13:50:00 info: Fecha actual: 2025-03-17, Hora actual: 13:50
+2025-03-17 13:51:00 info: Fecha actual: 2025-03-17, Hora actual: 13:51
+2025-03-17 13:52:00 info: Fecha actual: 2025-03-17, Hora actual: 13:52
+2025-03-17 13:53:00 info: Fecha actual: 2025-03-17, Hora actual: 13:53
+2025-03-17 13:54:00 info: Fecha actual: 2025-03-17, Hora actual: 13:54
+2025-03-17 13:55:00 info: Fecha actual: 2025-03-17, Hora actual: 13:55
+2025-03-17 13:56:00 info: Fecha actual: 2025-03-17, Hora actual: 13:56
+2025-03-17 13:57:00 info: Fecha actual: 2025-03-17, Hora actual: 13:57
+2025-03-17 13:58:00 info: Fecha actual: 2025-03-17, Hora actual: 13:58
+2025-03-17 13:59:00 info: Fecha actual: 2025-03-17, Hora actual: 13:59
+2025-03-17 13:59:05 info: Fecha actual: 2025-03-17, Hora actual: 13:59
+2025-03-17 13:59:12 info: Fecha actual: 2025-03-17, Hora actual: 13:59
+2025-03-17 13:59:20 info: Fecha actual: 2025-03-17, Hora actual: 13:59
+2025-03-17 13:59:25 info: Fecha actual: 2025-03-17, Hora actual: 13:59
+2025-03-17 14:00:00 info: Fecha actual: 2025-03-17, Hora actual: 14:00
+2025-03-17 14:01:00 info: Fecha actual: 2025-03-17, Hora actual: 14:01
+2025-03-17 14:01:08 info: Fecha actual: 2025-03-17, Hora actual: 14:01
+2025-03-17 14:01:14 info: Fecha actual: 2025-03-17, Hora actual: 14:01
+2025-03-17 14:02:00 info: Fecha actual: 2025-03-17, Hora actual: 14:02
+2025-03-17 14:03:00 info: Fecha actual: 2025-03-17, Hora actual: 14:03
+2025-03-17 14:04:00 info: Fecha actual: 2025-03-17, Hora actual: 14:04
+2025-03-17 14:05:00 info: Fecha actual: 2025-03-17, Hora actual: 14:05
+2025-03-17 14:06:00 info: Fecha actual: 2025-03-17, Hora actual: 14:06
+2025-03-17 14:07:00 info: Fecha actual: 2025-03-17, Hora actual: 14:07
+2025-03-17 14:08:00 info: Fecha actual: 2025-03-17, Hora actual: 14:08
+2025-03-17 14:09:00 info: Fecha actual: 2025-03-17, Hora actual: 14:09
+2025-03-17 14:10:00 info: Fecha actual: 2025-03-17, Hora actual: 14:10
+2025-03-17 14:11:00 info: Fecha actual: 2025-03-17, Hora actual: 14:11
+2025-03-17 14:12:00 info: Fecha actual: 2025-03-17, Hora actual: 14:12
+2025-03-17 14:13:00 info: Fecha actual: 2025-03-17, Hora actual: 14:13
+2025-03-17 14:14:00 info: Fecha actual: 2025-03-17, Hora actual: 14:14
+2025-03-17 14:15:00 info: Fecha actual: 2025-03-17, Hora actual: 14:15
+2025-03-17 14:16:00 info: Fecha actual: 2025-03-17, Hora actual: 14:16
+2025-03-17 14:17:00 info: Fecha actual: 2025-03-17, Hora actual: 14:17
+2025-03-17 14:18:00 info: Fecha actual: 2025-03-17, Hora actual: 14:18
+2025-03-17 14:19:00 info: Fecha actual: 2025-03-17, Hora actual: 14:19
+2025-03-17 14:20:00 info: Fecha actual: 2025-03-17, Hora actual: 14:20
+2025-03-17 14:21:00 info: Fecha actual: 2025-03-17, Hora actual: 14:21
+2025-03-17 14:22:00 info: Fecha actual: 2025-03-17, Hora actual: 14:22
+2025-03-17 14:24:00 info: Fecha actual: 2025-03-17, Hora actual: 14:24
+2025-03-17 14:25:00 info: Fecha actual: 2025-03-17, Hora actual: 14:25
+2025-03-17 14:26:00 info: Fecha actual: 2025-03-17, Hora actual: 14:26
+2025-03-17 14:27:00 info: Fecha actual: 2025-03-17, Hora actual: 14:27
+2025-03-17 14:28:00 info: Fecha actual: 2025-03-17, Hora actual: 14:28
+2025-03-17 14:29:00 info: Fecha actual: 2025-03-17, Hora actual: 14:29
+2025-03-17 14:30:00 info: Fecha actual: 2025-03-17, Hora actual: 14:30
+2025-03-17 14:31:00 info: Fecha actual: 2025-03-17, Hora actual: 14:31
+2025-03-17 14:32:00 info: Fecha actual: 2025-03-17, Hora actual: 14:32
+2025-03-17 14:33:00 info: Fecha actual: 2025-03-17, Hora actual: 14:33
+2025-03-17 14:34:00 info: Fecha actual: 2025-03-17, Hora actual: 14:34
+2025-03-17 14:35:00 info: Fecha actual: 2025-03-17, Hora actual: 14:35
+2025-03-17 14:36:00 info: Fecha actual: 2025-03-17, Hora actual: 14:36
+2025-03-17 14:37:00 info: Fecha actual: 2025-03-17, Hora actual: 14:37
+2025-03-17 14:37:41 info: Fecha actual: 2025-03-17, Hora actual: 14:37
+2025-03-17 14:37:48 info: Fecha actual: 2025-03-17, Hora actual: 14:37
+2025-03-17 14:37:54 info: Fecha actual: 2025-03-17, Hora actual: 14:37
+2025-03-17 14:38:00 info: Fecha actual: 2025-03-17, Hora actual: 14:38
+2025-03-17 14:39:00 info: Fecha actual: 2025-03-17, Hora actual: 14:39
+2025-03-17 14:40:00 info: Fecha actual: 2025-03-17, Hora actual: 14:40
+2025-03-17 14:41:00 info: Fecha actual: 2025-03-17, Hora actual: 14:41
+2025-03-17 14:42:00 info: Fecha actual: 2025-03-17, Hora actual: 14:42
+2025-03-17 14:42:16 info: Fecha actual: 2025-03-17, Hora actual: 14:42
+2025-03-17 14:42:28 info: Fecha actual: 2025-03-17, Hora actual: 14:42
+2025-03-17 14:42:33 info: Fecha actual: 2025-03-17, Hora actual: 14:42
+2025-03-17 14:42:36 info: Fecha actual: 2025-03-17, Hora actual: 14:42
+2025-03-17 14:43:00 info: Fecha actual: 2025-03-17, Hora actual: 14:43
+2025-06-04 16:46:53 info: Fecha actual: 2025-06-04, Hora actual: 16:46
+2025-06-04 16:47:00 info: Fecha actual: 2025-06-04, Hora actual: 16:47
+2025-06-04 16:48:00 info: Fecha actual: 2025-06-04, Hora actual: 16:48
+2025-06-04 16:49:00 info: Fecha actual: 2025-06-04, Hora actual: 16:49
+2025-06-04 16:50:00 info: Fecha actual: 2025-06-04, Hora actual: 16:50
+2025-06-04 16:51:00 info: Fecha actual: 2025-06-04, Hora actual: 16:51
+2025-06-04 16:52:00 info: Fecha actual: 2025-06-04, Hora actual: 16:52
+2025-06-04 16:53:00 info: Fecha actual: 2025-06-04, Hora actual: 16:53
+2025-06-04 16:54:00 info: Fecha actual: 2025-06-04, Hora actual: 16:54
+2025-06-04 16:55:12 info: Fecha actual: 2025-06-04, Hora actual: 16:55
+2025-06-04 16:56:00 info: Fecha actual: 2025-06-04, Hora actual: 16:56
+2025-06-04 16:56:53 info: Entrando a loguearse
+2025-06-04 16:57:00 info: yasmany891230 - Entra a buscar las hogares
+2025-06-04 16:57:00 info: yasmany891230 - Buscando las notificaciones
+2025-06-04 16:57:00 info: Fecha actual: 2025-06-04, Hora actual: 16:57
+2025-06-04 16:58:00 info: Fecha actual: 2025-06-04, Hora actual: 16:58
+2025-06-04 16:59:00 info: Fecha actual: 2025-06-04, Hora actual: 16:59

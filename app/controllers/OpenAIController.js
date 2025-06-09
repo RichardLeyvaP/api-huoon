@@ -1,5 +1,5 @@
 const logger = require('../../config/logger'); // Importa el logger
-const openai  = require('../../config/openaiClient'); // Importa el logger
+const openai  = require('../../config/openaiClient'); // Importa el IA
 const { AiInteractionRepository } = require('../repositories');
 const userConversations = {};
 module.exports = {
