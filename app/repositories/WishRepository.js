@@ -1,4 +1,4 @@
-const { Op, fn, col, literal } = require("sequelize");
+const { Op, fn, col, literal, Sequelize } = require("sequelize");
 const {
   Wish,
   Priority,
@@ -33,7 +33,7 @@ const WishRepository = {
     });
   },
 
-  async findAllType(id, home_id = null, type) {
+  /*async findAllType(id, home_id = null, type) {
     const whereConditions = { parent_id: null};
     // Según el tipo, establecer el campo correcto para la consulta
     if (type === "Hogar") {
@@ -64,8 +64,62 @@ const WishRepository = {
           },
         ],
       });
-  },
+  },*/
+  async findAllType(id, home_id = null, type, date = null) {
+    const whereConditions = { parent_id: null };
+    
+    // Configuración según tipo
+    if (type === "Hogar") {
+      whereConditions.type = type;
+      whereConditions.home_id = id;
+    } else if (type === "Personal" || type === "Profesional") {
+      whereConditions.type = type;
+      whereConditions.person_id = id;
+    } else {
+      whereConditions[Op.or] = [
+        { home_id: home_id, type: "Hogar" },
+        { person_id: id, type: "Personal" },
+        { person_id: id, type: "Profesional" },
+      ];
+    }
 
+    // Manejo de fecha
+    if (date) {
+      // Opción 1: Comparación exacta (si el campo es DATE)
+      // whereConditions.date = date;
+      
+      // Opción 2: Comparar solo la parte de fecha (si el campo es DATETIME)
+      whereConditions[Op.and] = [
+        Sequelize.where(Sequelize.fn('DATE', Sequelize.col('Wish.date')), '=', date),
+        ...(whereConditions[Op.and] || [])
+      ];
+      
+      // Opción 3: Rango de fechas (si necesitas todo el día)
+      // whereConditions.date = {
+      //   [Op.gte]: new Date(date + 'T00:00:00'),
+      //   [Op.lte]: new Date(date + 'T23:59:59')
+      // }
+    }
+
+    return await Wish.findAll({
+      where: whereConditions,
+      include: [
+        { model: Priority, as: "priority" },
+        { model: Status, as: "status" },
+        {
+          model: Wish,
+          as: "children",
+          include: [
+            { model: Priority, as: "priority" },
+            { model: Status, as: "status" },
+          ],
+        },
+      ],
+      order: [
+        ['date', 'DESC'] // Opcional: ordenar por fecha descendente
+      ]
+    });
+  },
   async mapChildren(children, personId) {
     try {
       return await Promise.all(

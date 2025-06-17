@@ -225,66 +225,74 @@ const TaskRepository = {
   },
 
   async findAllDateWeb(start_date, personId, homeId) {
+    const whereClause = {
+      [Op.and]: [
+        { home_id: homeId },
+        {
+          [Op.or]: [
+            { person_id: personId },
+            { "$homePersonTasks.person_id$": personId },
+          ],
+        },
+      ],
+    };
+
+    // Si se proporciona start_date, agregar el filtro por fecha
+    if (start_date) {
+      whereClause[Op.and].push(
+        sequelize.where(
+          sequelize.fn("DATE", sequelize.col("Task.start_date")),
+          start_date
+        )
+      );
+    }
+
     return await Task.findAll({
-      where: {
-        [Op.and]: [
-          { home_id: homeId }, // Filtra por home_id
-          {
-            [Op.or]: [
-              { person_id: personId }, // Filtra por person_id en la tabla Task
-              { "$homePersonTasks.person_id$": personId }, // Filtra por person_id en la tabla HomePersonTask
-            ],
-          },
-        ],
-      },
+      where: whereClause,
       include: [
         {
           model: HomePersonTask,
           as: "homePersonTasks",
-          required: false, // Permite tareas sin relación en home_person_task
+          required: false,
         },
         {
           model: Task,
-          as: "children", // Relación para tareas hijas
+          as: "children",
           include: [
             {
               model: HomePersonTask,
               as: "homePersonTasks",
-              required: false, // Permite tareas hijas sin relación en home_person_task
+              required: false,
               where: {
-                person_id: personId, // Filtrar por la persona en las tareas hijas
+                person_id: personId,
               },
             },
             { model: Priority, as: "priority" },
             { model: Status, as: "status" },
             { model: Category, as: "category" },
-            {
-              model: Person, // Incluir la persona relacionada
-              as: "person",
-              required: false, // Puede no tener relación
-            },
-            {
-              model: Home, // Incluir el hogar relacionado
-              as: "home",
-              required: false, // Puede no tener relación
-            },
+            { model: Person, as: "person", required: false },
+            { model: Home, as: "home", required: false },
           ],
-          required: false, // Incluir aunque no haya hijos
+          required: false,
         },
         { model: Priority, as: "priority" },
         { model: Status, as: "status" },
         { model: Category, as: "category" },
-        {
-          model: Person, // Incluir la persona relacionada
-          as: "person",
-          required: false, // Puede no tener relación
-        },
-        {
-          model: Home, // Incluir el hogar relacionado
-          as: "home",
-          required: false, // Puede no tener relación
-        },
+        { model: Person, as: "person", required: false },
+        { model: Home, as: "home", required: false },
       ],
+      order: [
+        [sequelize.literal(`(
+          CASE 
+            WHEN Task.start_time >= NOW() 
+            THEN TIMESTAMPDIFF(SECOND, NOW(), Task.start_time)
+            ELSE TIMESTAMPDIFF(SECOND, Task.start_time, NOW())
+          END
+        )`), 'ASC'],
+        
+        // Orden secundario por fecha+hora
+        ['start_time', 'ASC']
+      ]
     });
   },
 

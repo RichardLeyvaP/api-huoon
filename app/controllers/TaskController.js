@@ -216,6 +216,7 @@ const TaskController = {
             colorPriority: task.priority?.color,
             statusId: task.status_id,
             status_id: task.status_id,
+            nameStatus: task.status.name,
             categoryId: task.category_id,
             category_id: task.category_id,
             nameCategory: task.category?.name,
@@ -603,6 +604,7 @@ const TaskController = {
     }
 
     let filteredPeople = [];
+    if ('people' in req.body) {
     if (req.body.people && req.body.people.length > 0) {
       // Filtrar las personas con role_id != 0
       filteredPeople = req.body.people.filter(
@@ -650,6 +652,9 @@ const TaskController = {
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
       }
     }
+    }else{
+      filteredPeople = null;
+    }
 
     const t = await sequelize.transaction();
     try {
@@ -662,7 +667,7 @@ const TaskController = {
 
       let associationsData = [];
       // Sincronizar asociaciones
-      //if (filteredPeople.length > 0) {
+      if (filteredPeople !== null) {
       const { toAdd, toUpdate, toDelete } = await TaskRepository.syncTaskPeople(
         req.body.id,
         filteredPeople,
@@ -673,7 +678,7 @@ const TaskController = {
         toAdd.length || toUpdate.length || toDelete.length
           ? { added: toAdd, updated: toUpdate, deleted: toDelete }
           : null;
-      //}
+      }
 
       // Registrar la tarea y las asociaciones en el log de actividades
       const activityData = {

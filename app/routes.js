@@ -18,7 +18,7 @@ const { storeHomeSchema, updateHomeSchema, idHomeSchema } = require('./middlewar
 const { storeHomeTypeSchema, updateHomeTypeSchema, idHomeTypeSchema } = require('./middlewares/validations/homeTypeValidation');
 const { storePrioritySchema, updatePrioritySchema, idPrioritySchema } = require('./middlewares/validations/priorityValidation');
 const { storeRoleSchema, updateRoleSchema, idRoleSchema } = require('./middlewares/validations/roleValidation');
-const { storeStatusSchema, updateStatusSchema, idStatusSchema } = require('./middlewares/validations/statusValidation');
+const { storeStatusSchema, updateStatusSchema, idStatusSchema, typeStatusSchema } = require('./middlewares/validations/statusValidation');
 const { storeHomePersonSchema, updateHomePersonSchema, idHomePersonSchema, assignPeopleSchema } = require('./middlewares/validations/homePersonValidation');
 const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = require('./middlewares/validations/warehouseValidation');
 const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
@@ -171,6 +171,7 @@ router.post('/status', validateSchema(storeStatusSchema), StatusController.store
 router.post('/status-show', validateSchema(idStatusSchema), StatusController.show);
 router.put('/status', validateSchema(updateStatusSchema), StatusController.update);
 router.post('/status-destroy', validateSchema(idStatusSchema), StatusController.destroy);
+router.post('/status-by-type', validateSchema(typeStatusSchema), StatusController.findByType);//okks
 
 //Rutas Roles
 router.get('/role', RoleController.index);

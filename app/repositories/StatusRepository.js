@@ -32,7 +32,7 @@ const StatusRepository = {
       where: {
         type, // Filtrar por type
       },
-      attributes: ['id', 'name'], // Seleccionar los atributos deseados
+      attributes: ['id', 'name', 'description', 'color', 'icon', 'type'],  // Seleccionar los atributos deseados
     });
   },
 

@@ -103,7 +103,7 @@ const PersonHomeWarehouseProductController = {
     try {
       // Obtener el ID de la persona del usuario autenticado
       const person_id = req.person.id;
-
+      
       // Verificar que el hogar existe
       const home = await HomeRepository.findById(home_id);
       if (!home) {
@@ -113,14 +113,14 @@ const PersonHomeWarehouseProductController = {
         return res.status(204).json({ msg: "HomeNotFound" });
       }
 
-      const person = await PersonRepository.getPersonHouse(person_id, home_id);
+      /*const person = await PersonRepository.getPersonHouse(person_id, home_id);
 
       if (!person) {
         logger.error(
           `PersonHomeWarehouseController->homeWarehouseProducts: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
         );
         return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
-      }
+      }*/
 
       // Verificar que el almacén existe
       const warehouse = await WareHouseRepository.findById(warehouse_id);

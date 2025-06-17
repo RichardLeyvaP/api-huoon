@@ -1,7 +1,8 @@
 const logger = require('../../config/logger');
-const { StatusRepository } = require('../repositories');
+const { StatusRepository, TaskRepository, WishRepository, FinanceRepository, PersonWareHouseRepository, HomeRepository, FileRepository, PersonProductRepository } = require('../repositories');
+const { StatusService } = require('../services');
 
-module.exports = {
+const StatusController = {
     async index(req, res) {
         logger.info(`${req.user.name} - Accediendo a la lista de estados`);
 
@@ -98,7 +99,6 @@ module.exports = {
             return res.status(500).json({ error: 'ServerError' });
         }
     },
-    
     async destroy(req, res) {
         logger.info(`${req.user.name} - Eliminando un estado`);
     
@@ -121,6 +121,66 @@ module.exports = {
             logger.error(`StatusController->destroy: Error al eliminar el estado: ${error.message}`);
             return res.status(500).json({ error: 'ServerError' });
         }
+    },
+    async getLocalISODate() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+    },
+    async findByType(req, res) {
+        logger.info(`${req.user.name} - Buscando estados por tipo: ${req.params.type}`);
+
+        try {
+            const { type, home_id } = req.body; // Obtener el type de los parámetros de la ruta
+
+            // Obtener los estados filtrados por type desde el repositorio
+            const statuses = await StatusService.getStatus(type);
+
+            const personId = req.person.id;
+
+            const date = await StatusController.getLocalISODate();
+            // Obtener solo las tareas principales (sin padre) directamente en la consulta
+            const tasks = await TaskRepository.findAllDateWeb(
+                date,
+                personId,
+                home_id
+            );
+
+            const wishes = await WishRepository.findAllType(personId, home_id, 'Todas', date);
+
+            const finances = await FinanceRepository.findAllType(personId, home_id, 'Todas', date);
+
+            const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, personId);
+            const warehouseIds = personWarehouses.map(item => item.warehouse_id);
+
+            const files = await FileRepository.findAllType(personId, home_id, 2, date);
+
+            const homes = await HomeRepository.findAllHomes(personId);
+
+            const products = await PersonProductRepository.getTotalProductsQuantity({
+              home_id: home_id,
+              warehouse_ids: warehouseIds, // Array de almacenes
+              date: date, // Opcional
+            });
+
+            res.status(200).json({
+              status: statuses,
+              task: tasks.length,
+              whish: wishes.length,
+              finance: finances.length,
+              personWarehouses: personWarehouses.length,
+              home: homes.length,
+              file: files.length,
+              product: products,
+            });
+
+        } catch (error) {
+            logger.error(`Error en StatusController->findByType: ${error.message}`);
+            res.status(500).json({ error: 'ServerError' });
+        }
     }
-    
 }
+
+module.exports = StatusController;

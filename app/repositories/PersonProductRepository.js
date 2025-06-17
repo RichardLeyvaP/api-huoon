@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 const ImageService = require("../services/ImageService");
@@ -16,7 +16,7 @@ const {
 const logger = require("../../config/logger");
 const ProductRepository = require("./ProductRepository");
 
-class PersonProductRepository {
+const  PersonProductRepository = {
   /*async findAll() {
     return await PersonHomeWarehouseProduct.findAll({
       include: [
@@ -93,7 +93,7 @@ class PersonProductRepository {
         },
       ],
     });
-  }
+  },
   async personHomeWarehouseProducts(body) {
     return await PersonHomeWarehouseProduct.findAll({
       where: {
@@ -130,7 +130,44 @@ class PersonProductRepository {
         },
       ],
     });
-  }
+  },
+
+  async getTotalProductsQuantity(body) {
+    const { home_id, warehouse_ids, date } = body;
+    
+    const whereConditions = {
+        home_id: home_id
+    };
+
+    // Filtro por warehouse_ids si se proporciona
+    if (warehouse_ids && warehouse_ids.length > 0) {
+        whereConditions.warehouse_id = {
+            [Op.in]: warehouse_ids
+        };
+    }
+
+    // Filtro por fecha (solo parte de fecha)
+    if (date) {
+        whereConditions.purchase_date = Sequelize.where(
+            Sequelize.fn('DATE_FORMAT', 
+                Sequelize.col('purchase_date'),
+                '%Y-%m-%d'
+            ),
+            '=',
+            date
+        );
+    }
+
+    const result = await PersonHomeWarehouseProduct.findOne({
+        where: whereConditions,
+        attributes: [
+            [Sequelize.fn('SUM', Sequelize.col('quantity')), 'total_quantity']
+        ],
+        raw: true
+    });
+
+    return result ? result.total_quantity || 0 : 0;
+  },
 
   async findById(id) {
     return await PersonHomeWarehouseProduct.findByPk(id, {
@@ -169,7 +206,7 @@ class PersonProductRepository {
         },
       ],
     });
-  }
+  },
 
   async create(body, file, t, person_id) {
     const {
@@ -237,7 +274,7 @@ class PersonProductRepository {
       logger.error(`Error en PersonProductRepository->store: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async update(personHomeWarehouseProduct, body, file, t) {
     // Lista de campos permitidos para actualizar
@@ -297,7 +334,7 @@ class PersonProductRepository {
       logger.error(`Error en PersonProductRepository->update: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
-  }
+  },
 
   async delete(personHomeWarehouseProduct) {
     // Verificar y eliminar la imagen si no es la predeterminada
@@ -321,7 +358,7 @@ class PersonProductRepository {
     await product.destroy();
 
     return personHomeWarehouseProductDelete;
-  }
+  },
 
   async findOneByFilters(product_id, warehouse_id, home_id, person_id) {
     // Construir el objeto where dinámicamente
@@ -375,7 +412,7 @@ class PersonProductRepository {
       logger.error('Error en findOneByFilters:', error);
       throw error;
     }
-  }
+  },
 
   async updateExistingProduct(existingRecord, updateData, transaction = null) {
   const { quantity, unit_price, purchase_date, purchase_place, total_price } = updateData;
@@ -395,7 +432,7 @@ class PersonProductRepository {
     purchase_date: purchase_date || existingRecord.purchase_date,
     purchase_place: purchase_place || existingRecord.purchase_place
   }, { transaction });
-  }
+  },
 }
 
-module.exports = new PersonProductRepository();
+module.exports = PersonProductRepository;

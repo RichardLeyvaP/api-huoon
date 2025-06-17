@@ -21,8 +21,19 @@ const idStatusSchema = Joi.object({
     id: Joi.number().required()
 });
 
+const typeStatusSchema = Joi.object({
+  type: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'El tipo es requerido',
+      'string.empty': 'El tipo no puede estar vacío',
+    }),
+    home_id: Joi.number().integer().allow(null).empty('').optional(),
+});
+
 module.exports = {
     storeStatusSchema,
     updateStatusSchema,
     idStatusSchema,
+    typeStatusSchema
 };

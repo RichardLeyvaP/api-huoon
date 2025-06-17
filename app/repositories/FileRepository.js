@@ -23,7 +23,7 @@ const FileRepository = {
     });
   },
 
-  async findAllType(id, home_id = null, personal) {
+  /*async findAllType(id, home_id = null, personal) {
     const whereConditions = {};
 
     if (personal === 1) {
@@ -54,7 +54,38 @@ const FileRepository = {
         "personal",
       ],
     });
-  },
+  },*/
+
+  async findAllType(id, home_id = null, personal, date = null) {
+    const whereConditions = {};
+
+    if (personal === 1) {
+      whereConditions.personal = 1;
+      whereConditions.person_id = id;
+    } else if (personal === 0) {
+      whereConditions.personal = 0;
+      whereConditions.home_id = home_id;
+    } else {
+        whereConditions[Op.or] = [
+            { home_id: home_id, personal: 0 },
+            { person_id: id, personal: 1 }
+        ];
+    }
+
+    // Añadir condición de fecha si existe
+    if (date) {
+      whereConditions.date = date; // Para campos DATE (sin hora)
+    }
+
+    return await File.findAll({
+      where: whereConditions,
+      attributes: [
+        "id", "name", "archive", "type", "size", "date",
+        "description", "person_id", "home_id", "personal"
+      ],
+      order: [['date', 'DESC']] // Ordenar por fecha descendente
+    });
+},
 
   async findById(id) {
     return await File.findByPk(id, {
