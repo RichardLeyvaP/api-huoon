@@ -313,7 +313,7 @@ const TaskRepository = {
       // Formatear la respuesta
       const formattedResponse = homePersonTask.map((person) => ({
         person_id: person.person_id,
-        role_id: person.role_id,
+        role_id: person.role_id ? person.role_id : null,
         roleName: person.role ? person.role.name : null, // Obtener el nombre del rol
       }));
       // Crear un array solo con los person_id
@@ -330,7 +330,7 @@ const TaskRepository = {
     }
   },
 
-  async peopleTask(task, personId) {
+  /*async peopleTask(task, personId) {
     const homePersonTasks = await HomePersonTask.findAll({
       where: { task_id: task.id },
       include: [
@@ -351,15 +351,15 @@ const TaskRepository = {
       homePersonTaskId: homePersonTask.id,
       name: homePersonTask.person.name,
       image: homePersonTask.person.image,
-      roleId: homePersonTask.role_id,
-      roleName: homePersonTask.role.name,
+      roleId: homePersonTask.role_id || null, // null si no existe
+      roleName: homePersonTask.role.name || "",
       points: homePersonTask.points ? homePersonTask.points : 0,
       description: homePersonTask.description ? homePersonTask.description : "",
-      roleName:
-        i18n.__(`roles.${homePersonTask.role.name}.name`) !==
-        `roles.${homePersonTask.role.name}.name`
-          ? i18n.__(`roles.${homePersonTask.role.name}.name`) // Traducción del rol si está disponible
-          : homePersonTask.role.name,
+      roleName: homePersonTask.role 
+    ? (i18n.__(`roles.${homePersonTask.role.name}.name`) !== `roles.${homePersonTask.role.name}.name`
+      ? i18n.__(`roles.${homePersonTask.role.name}.name`)
+      : homePersonTask.role.name)
+    : "",
     }));
     // Verificar si la persona que hace la consulta tiene relación directa con la tarea
     const personAlreadyIncluded = people.some(
@@ -386,8 +386,81 @@ const TaskRepository = {
     }
 
     return people;
-  },
+  },*/
+  async peopleTask(task, personId) {
+    const homePersonTasks = await HomePersonTask.findAll({
+      where: { task_id: task.id },
+      include: [
+        {
+          model: Role,
+          as: "role",
+          required: false // Asegura que la consulta no falle si no hay rol
+        },
+        {
+          model: Person,
+          as: "person",
+          required: true // Persona es obligatoria
+        },
+      ],
+    });
 
+    // Devolver las personas mapeadas con manejo seguro de roles
+    let people = homePersonTasks.map((homePersonTask) => {
+      const basePerson = {
+        id: homePersonTask.person_id,
+        homePersonTaskId: homePersonTask.id,
+        name: homePersonTask.person?.name || "", // Manejo seguro del nombre
+        image: homePersonTask.person?.image || "", // Manejo seguro de la imagen
+        roleId: homePersonTask.role_id || null,
+        points: homePersonTask.points || 0,
+        description: homePersonTask.description || ""
+      };
+
+      // Manejo seguro del nombre del rol con traducción
+      if (homePersonTask.role) {
+        const roleName = homePersonTask.role.name;
+        const translatedRoleName = i18n.__(`roles.${roleName}.name`);
+        return {
+          ...basePerson,
+          roleName: translatedRoleName !== `roles.${roleName}.name` 
+            ? translatedRoleName 
+            : roleName
+        };
+      } else {
+        return {
+          ...basePerson,
+          roleName: "" // Rol vacío si no existe
+        };
+      }
+    });
+
+    // Verificar si la persona que hace la consulta tiene relación directa con la tarea
+    const personAlreadyIncluded = people.some(
+      (person) => person.id === personId
+    );
+
+    // Si la persona no está relacionada, se agrega solo como "Creador"
+    if (!personAlreadyIncluded && task.person_id === personId) {
+      const person = await Person.findByPk(personId);
+      if (person) {
+        const creatorRoleName = i18n.__(`roles.Creador.name`);
+        people.push({
+          id: task.person_id,
+          name: person.name || "",
+          image: person.image || "",
+          roleId: 0,
+          homePersonTaskId: 0,
+          points: 0,
+          description: "",
+          roleName: creatorRoleName !== `roles.Creador.name`
+            ? creatorRoleName
+            : "Creador"
+        });
+      }
+    }
+
+    return people;
+  },
   async create(body, file, personId, t) {
     try {
       // Crear la tarea
@@ -559,20 +632,20 @@ const TaskRepository = {
             token: [userAdd.firebaseId],
             notification: {
               title: `Fuiste asociado con la tarea ${task.title}`,
-              body: `Tu rol: ${userAdd.roleName}`,
+              body: /*`Tu rol: ${userAdd.roleName}`*/'',
             },
             data: {
               route: "/getTask",
               home_id: String(task.home_id),
-              role_id: String(userAdd.role_id),
-              roleName: String(userAdd.roleName),
+              //role_id: String(userAdd.role_id),
+              //roleName: String(userAdd.roleName),
               task_id: String(taskId),
             },
           });
         }
-      } else {
+      } /*else {
         // Si la asociación existe pero el rol ha cambiado, la actualizamos
-        if (current.role_id !== incoming.role_id) {
+        /*if (current.role_id !== incoming.role_id) {
           toUpdate.push({
             id: current.id, // Usamos el id de la relación actual
             role_id: incoming.role_id,
@@ -599,7 +672,7 @@ const TaskRepository = {
             });
           }
         }
-      }
+      }*/
     });
 
     // Recorremos las asociaciones actuales para eliminar las que ya no existen en el nuevo conjunto
@@ -621,8 +694,8 @@ const TaskRepository = {
             data: {
               route: "/getTask",
               home_id: String(task.home_id),
-              role_id: String(user.role_id),
-              roleName: String(user.roleName),
+              //role_id: String(user.role_id),
+              //roleName: String(user.roleName),
               task_id: String(taskId),
             },
           });
@@ -642,7 +715,7 @@ const TaskRepository = {
     if (toUpdate.length > 0) {
       for (const update of toUpdate) {
         await HomePersonTask.update(
-          { role_id: update.role_id },
+          //{ role_id: update.role_id },
           { where: { id: update.id }, transaction: t }
         );
       }

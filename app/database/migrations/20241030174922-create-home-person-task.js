@@ -16,7 +16,7 @@ module.exports = {
           key: 'id'
         },
         onDelete: 'CASCADE',
-        allowNull: false
+        allowNull: true
       },
       task_id: {
         type: Sequelize.BIGINT,

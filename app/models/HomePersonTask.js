@@ -49,11 +49,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     role_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       validate: {
-        notNull: {
-          msg: 'El campo role_id es obligatorio'
-        },
         isInt: {
           msg: 'El campo role_id debe ser un número entero'
         }

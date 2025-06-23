@@ -51,9 +51,9 @@ const storeTaskSchema = Joi.object({
     .items(
       Joi.object({
         person_id: Joi.number().required(),
-        role_id: Joi.number().required(),
+        role_id: Joi.number().integer().allow(null, "").optional().empty(null),
         home_id: Joi.number().required(),
-        roleName: Joi.string().allow(null).empty("").optional(),
+        roleName: Joi.string().allow(null, "").empty("").optional(),
       })
     )
     .optional(),
@@ -109,10 +109,10 @@ const updateTaskSchema = Joi.object({
   people: Joi.array()
     .items(
       Joi.object({
-        person_id: Joi.number().required(),
-        role_id: Joi.number().required(),
+       person_id: Joi.number().required(),
+        role_id: Joi.number().integer().allow(null, "").optional().empty(null),
         home_id: Joi.number().required(),
-        roleName: Joi.string().allow(null).empty("").optional(),
+        roleName: Joi.string().allow(null, "").empty("").optional(),
       })
     )
     .optional(),

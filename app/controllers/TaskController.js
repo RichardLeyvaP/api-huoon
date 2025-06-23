@@ -343,9 +343,7 @@ const TaskController = {
     let filteredPeople = [];
     if (req.body.people && req.body.people.length > 0) {
       // Filtrar las personas con role_id != 0
-      filteredPeople = req.body.people.filter(
-        (person) => parseInt(person.role_id) !== 0
-      );
+      filteredPeople = req.body.people;
 
       // Si no quedan personas después del filtrado, devolver un error
       if (filteredPeople.length === 0) {
@@ -358,29 +356,28 @@ const TaskController = {
       const personIds = filteredPeople.map((person) =>
         parseInt(person.person_id)
       );
-      const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
+      //const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
       const homeIds = filteredPeople.map((person) => parseInt(person.home_id));
-
       // Verificar personas, roles y hogares
-      const [persons, roles, homes] = await Promise.all([
+      const [persons, homes] = await Promise.all([
         Person.findAll({ where: { id: personIds } }),
-        Role.findAll({ where: { id: roleIds } }),
+        //Role.findAll({ where: { id: roleIds } }),
         Home.findAll({ where: { id: homeIds } }),
       ]);
       // Comprobar si alguna entidad no existe
       const missingPersons = personIds.filter(
         (id) => !persons.find((p) => p.id === id)
       );
-      const missingRoles = roleIds.filter(
+      /*const missingRoles = roleIds.filter(
         (id) => !roles.find((r) => r.id === id)
-      );
+      );*/
       const missingHomes = homeIds.filter(
         (id) => !homes.find((h) => h.id === id)
       );
 
-      if (missingPersons.length || missingRoles.length || missingHomes.length) {
-        logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
-                            Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
+      if (missingPersons.length /*|| missingRoles.length*/ || missingHomes.length) {
+        logger.error(`No se encontraron personas, o hogares con los siguientes IDs: 
+                            Personas: ${missingPersons}, Hogares: ${missingHomes}`);
         return res
           .status(400)
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
@@ -420,17 +417,18 @@ const TaskController = {
           const personTaskAssociation = await HomePersonTask.create(
             {
               task_id: task.id,
-              person_id,
-              role_id,
-              home_id,
+              person_id: person_id,
+              //role_id,
+              home_id: home_id,
+              //role_id
             },
             { transaction: t }
           );
 
           associationsData.push({
-            person_id,
-            role_id,
-            home_id,
+            person_id: person,
+            //role_id,
+            home_id: home_id,
             association_id: personTaskAssociation.id,
           });
         }
@@ -453,14 +451,14 @@ const TaskController = {
         notifications = userTokensData.map((user) => ({
           token: [user.firebaseId],
           notification: {
-            title: `${personName} creó la tarea ${task.title} en la que apareces con el rol`,
-            body: `Tu Rol ${user.roleName}`,
+            title: `${personName} creó la tarea ${task.title}`,
+            body: /*`Tu Rol ${user.roleName}`*/'',
           },
           data: {
             route: "/HomePrincipal",
             home_id: String(task.home_id), // Convertir a string
             nameHome: String(task.title),
-            role_id: String(user.role_id), // Convertir a string
+            //role_id: String(user.role_id), // Convertir a string
             roleName: String(user.roleName),
             task_id: String(task.id),
           },
@@ -476,7 +474,7 @@ const TaskController = {
                 home_id: task.home_id,
                 user_id: user.user_id,
                 title: `${personName} creó la tarea ${task.title} en la que apareces con el rol`,
-                description: `Tu rol ${user.roleName}`,
+                description: ''/*`Tu rol ${user.roleName}`*/,
                 data: notification.data, // Usamos el valor procesado
                 route: "/HomePrincipal",
                 firebaseId: user.firebaseId,
@@ -624,29 +622,29 @@ const TaskController = {
       const personIds = filteredPeople.map((person) =>
         parseInt(person.person_id)
       );
-      const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
+      //const roleIds = filteredPeople.map((person) => parseInt(person.role_id));
       const homeIds = filteredPeople.map((person) => parseInt(person.home_id));
 
       // Verificar personas, roles y hogares
-      const [persons, roles, homes] = await Promise.all([
+      const [persons, homes] = await Promise.all([
         Person.findAll({ where: { id: personIds } }),
-        Role.findAll({ where: { id: roleIds } }),
+       // Role.findAll({ where: { id: roleIds } }),
         Home.findAll({ where: { id: homeIds } }),
       ]);
       // Comprobar si alguna entidad no existe
       const missingPersons = personIds.filter(
         (id) => !persons.find((p) => p.id === id)
       );
-      const missingRoles = roleIds.filter(
+      /*const missingRoles = roleIds.filter(
         (id) => !roles.find((r) => r.id === id)
-      );
+      );*/
       const missingHomes = homeIds.filter(
         (id) => !homes.find((h) => h.id === id)
       );
 
-      if (missingPersons.length || missingRoles.length || missingHomes.length) {
+      if (missingPersons.length || missingHomes.length) {
         logger.error(`No se encontraron personas, roles o hogares con los siguientes IDs: 
-                            Personas: ${missingPersons}, Roles: ${missingRoles}, Hogares: ${missingHomes}`);
+                            Personas: ${missingPersons}, Hogares: ${missingHomes}`);
         return res
           .status(400)
           .json({ msg: "Datos no encontrados para algunas asociaciones." });
@@ -818,14 +816,14 @@ const TaskController = {
         token: [user.firebaseId],
         notification: {
           title: `La tarea ${task.title} fue eliminada`,
-          body: `Tu Rol ${user.roleName}`,
+          body: /*`Tu Rol ${user.roleName}`*/'',
         },
         data: {
           route: "/getHome",
           home_id: String(task.home_id), // Convertir a string
           nametask: String(task.name),
-          role_id: String(user.role_id), // Convertir a string
-          roleName: String(user.roleName),
+          //role_id: String(user.role_id), // Convertir a string
+          //roleName: String(user.roleName),
           task_id: String(task.id),
         },
       }));
@@ -840,7 +838,7 @@ const TaskController = {
               home_id: task.home_id,
               user_id: user.user_id,
               title: `La tarea ${task.title} fue eliminada`,
-              description: `Tu rol ${user.roleName}`,
+              description: /*`Tu rol ${user.roleName}`*/'',
               data: notification.data, // Usamos el valor procesado
               route: "/getHome",
               firebaseId: user.firebaseId,
@@ -932,6 +930,7 @@ const TaskController = {
         return {
           id: item.id, // El identificador único
           name: i18n.__(`recurrence.${item.name}.name`), // La traducción del nombre
+          recurrenceName: item.name,
         };
       });
 
@@ -969,6 +968,7 @@ const TaskController = {
       return priorities.map((priority) => {
         return {
           id: priority.id,
+          name: priority.name,
           namePriority:
             i18n.__(`priority.${priority.name}.name`) !==
             `priority.${priority.name}.name`
