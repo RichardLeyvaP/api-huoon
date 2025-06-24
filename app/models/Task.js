@@ -110,7 +110,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     category_id: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
     },
     recurrence: {
       type: DataTypes.STRING,

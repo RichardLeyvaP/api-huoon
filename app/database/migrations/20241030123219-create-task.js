@@ -66,7 +66,7 @@ module.exports = {
       },
       category_id: {
         type: Sequelize.BIGINT,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'categories',
           key: 'id',

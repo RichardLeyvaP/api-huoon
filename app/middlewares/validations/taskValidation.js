@@ -17,7 +17,7 @@ const storeTaskSchema = Joi.object({
   priority_id: Joi.number().integer().required(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),
-  category_id: Joi.number().integer().required(),
+  category_id: Joi.number().integer().allow(null, "").optional().empty(null),
   home_id: Joi.number().integer().required(),
   recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
   estimated_time: Joi.number().integer().optional().allow(null),
@@ -76,7 +76,7 @@ const updateTaskSchema = Joi.object({
   priority_id: Joi.number().integer().optional(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),
-  category_id: Joi.number().integer().optional(),
+  category_id: Joi.number().integer().allow(null, "").optional().empty(null),
   home_id: Joi.number().integer().optional(),
   recurrence: Joi.string().optional().allow(null), // Puede ser nulo o cadena vacía
   estimated_time: Joi.number().integer().optional().allow(null),

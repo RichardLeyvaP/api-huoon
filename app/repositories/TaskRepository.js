@@ -632,20 +632,20 @@ const TaskRepository = {
             token: [userAdd.firebaseId],
             notification: {
               title: `Fuiste asociado con la tarea ${task.title}`,
-              body: /*`Tu rol: ${userAdd.roleName}`*/'',
+              body: `Tu rol: ${userAdd.roleName}`,
             },
             data: {
               route: "/getTask",
               home_id: String(task.home_id),
-              //role_id: String(userAdd.role_id),
-              //roleName: String(userAdd.roleName),
+              role_id: String(userAdd.role_id),
+              roleName: String(userAdd.roleName),
               task_id: String(taskId),
             },
           });
         }
-      } /*else {
+      } else {
         // Si la asociación existe pero el rol ha cambiado, la actualizamos
-        /*if (current.role_id !== incoming.role_id) {
+        if (current.role_id !== incoming.role_id) {
           toUpdate.push({
             id: current.id, // Usamos el id de la relación actual
             role_id: incoming.role_id,
@@ -672,7 +672,7 @@ const TaskRepository = {
             });
           }
         }
-      }*/
+      }
     });
 
     // Recorremos las asociaciones actuales para eliminar las que ya no existen en el nuevo conjunto
@@ -694,8 +694,8 @@ const TaskRepository = {
             data: {
               route: "/getTask",
               home_id: String(task.home_id),
-              //role_id: String(user.role_id),
-              //roleName: String(user.roleName),
+              role_id: String(user.role_id),
+              roleName: String(user.roleName),
               task_id: String(taskId),
             },
           });
@@ -715,7 +715,7 @@ const TaskRepository = {
     if (toUpdate.length > 0) {
       for (const update of toUpdate) {
         await HomePersonTask.update(
-          //{ role_id: update.role_id },
+          { role_id: update.role_id },
           { where: { id: update.id }, transaction: t }
         );
       }

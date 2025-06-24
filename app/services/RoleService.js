@@ -17,6 +17,7 @@ class RoleService {
         return roles.map(role => {
             return {
                 id: role.id,
+                name: role.name,
                 nameRol: i18n.__(`roles.${role.name}.name`) !== `roles.${role.name}.name`
                 ? i18n.__(`roles.${role.name}.name`)
                 : role.name,
