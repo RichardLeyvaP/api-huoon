@@ -31,6 +31,12 @@ module.exports = {
                   address: person.address,
                   image: person.image,
                   emergencyContact: person.emergencyContact,
+                    // Nuevos campos
+                    medicalRecordNumber: person.medical_record_number,
+                    documentType: person.document_type,
+                    documentNumber: person.document_number,
+                    healthCoverage: person.health_coverage,
+                    coverageName: person.coverage_name
                 };
             });
 
@@ -110,7 +116,13 @@ module.exports = {
                     phone: person.phone,
                     address: person.address,
                     image: person.image,
-                    emergencyContact: person.emergencyContact
+                    emergencyContact: person.emergencyContact,
+                    // Nuevos campos
+                    medicalRecordNumber: person.medical_record_number,
+                    documentType: person.document_type,
+                    documentNumber: person.document_number,
+                    healthCoverage: person.health_coverage,
+                    coverageName: person.coverage_name
                 };
 
             // Si hay transformación, devolver los datos mapeados

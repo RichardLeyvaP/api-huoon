@@ -26,6 +26,12 @@ const storePersonSchema = Joi.object({
     .messages({
         'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
     }),
+    // Nuevos campos
+    medical_record_number: Joi.string().max(100).allow(null).empty('').optional(),
+    document_type: Joi.string().max(100).allow(null).empty('').optional(),
+    document_number: Joi.string().max(100).allow(null).empty('').optional(),
+    health_coverage: Joi.string().max(100).allow(null).empty('').optional(),
+    coverage_name: Joi.string().max(100).allow(null).empty('').optional()
 });
 
 const updatePersonSchema = Joi.object({
@@ -55,6 +61,12 @@ const updatePersonSchema = Joi.object({
         'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
     }),
     id: Joi.number().required(),
+    // Nuevos campos
+    medical_record_number: Joi.string().max(100).allow(null).empty('').optional(),
+    document_type: Joi.string().max(100).allow(null).empty('').optional(),
+    document_number: Joi.string().max(100).allow(null).empty('').optional(),
+    health_coverage: Joi.string().max(100).allow(null).empty('').optional(),
+    coverage_name: Joi.string().max(100).allow(null).empty('').optional()
 });
 
 const idPersonSchema = Joi.object({

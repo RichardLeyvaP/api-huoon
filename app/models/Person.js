@@ -125,11 +125,44 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    // Nuevos campos añadidos según la migración
+  medical_record_number: {
+    type: DataTypes.STRING(100),
+    unique: true,
+    allowNull: true
+  },
+  document_type: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  document_number: {
+    type: DataTypes.STRING(100),
+    unique: true,
+    allowNull: true
+  },
+  health_coverage: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  coverage_name: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
   }, {
     sequelize,
     modelName: 'Person',
     tableName: 'people', // Asegúrate de que el nombre de la tabla sea correcto
     timestamps: true, // Si deseas incluir createdAt y updatedAt
+    indexes: [
+    {
+      unique: true,
+      fields: ['medical_record_number']
+    },
+    {
+      unique: true,
+      fields: ['document_number']
+    }
+  ]
   });
   return Person;
 };
