@@ -14,12 +14,19 @@ const storeMedicalExamSchema = Joi.object({
     "date.base": '"fecha" debe ser una fecha válida',
     "any.required": '"fecha" es un campo obligatorio',
   }),
-  type_id: Joi.number().integer().required().messages({
+  type_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "string.number": '"type_id" debe ser un number válido',
     "any.required": '"type_id" es un campo obligatorio',
   }),
-  result: Joi.string().allow(null).empty("").optional().messages({
-    "string.base": '"resultado" debe ser una cadena de texto',
+  exam_name: Joi.string().max(200).allow(null, '').optional().messages({
+    "string.base": '"exam_name" debe ser una cadena de texto',
+    "string.max": '"exam_name" no debe exceder los 200 caracteres'
+  }),
+  results: Joi.string().allow(null, '').optional().messages({
+    "string.base": '"results" debe ser una cadena de texto',
+  }),
+  observations: Joi.string().allow(null, '').optional().messages({
+    "string.base": '"observations" debe ser una cadena de texto',
   }),
   archive: Joi.string()
       .pattern(/\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$/i)
@@ -36,14 +43,21 @@ const updateMedicalExamSchema = Joi.object({
   person_id: Joi.number().integer().allow(null).empty("").optional().messages({
     "string.number": '"person_id" debe ser un number válido',
   }),
-  date: Joi.date().allow(null).empty("").optional().messages({
-    "date.base": '"fecha" debe ser una fecha válida',
-  }),
   type_id: Joi.number().integer().allow(null).empty("").optional().messages({
     "string.number": '"type_id" debe ser un number válido',
   }),
-  result: Joi.string().allow(null).empty("").optional().messages({
-    "string.base": '"resultado" debe ser un numero entero',
+  date: Joi.date().allow(null).empty("").optional().messages({
+    "date.base": '"fecha" debe ser una fecha válida',
+  }),
+  exam_name: Joi.string().max(200).allow(null, '').optional().messages({
+    "string.base": '"exam_name" debe ser una cadena de texto',
+    "string.max": '"exam_name" no debe exceder los 200 caracteres'
+  }),
+  results: Joi.string().allow(null, '').optional().messages({
+    "string.base": '"results" debe ser una cadena de texto',
+  }),
+  observations: Joi.string().allow(null, '').optional().messages({
+    "string.base": '"observations" debe ser una cadena de texto',
   }),
   archive: Joi.string()
       .pattern(/\.(jpg|jpeg|png|gif|pdf|doc|docx|txt)$/i)

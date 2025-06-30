@@ -95,8 +95,64 @@
     "En Mantenimiento": {
       "name": "En Mantenimiento",
       "description": "La casa está en mantenimiento o reparaciones"
+    },
+    "Activo": {
+      "name": "Activo",
+      "description": "Estado activo"
+    },
+    "Inactivo": {
+      "name": "Inactivo",
+      "description": "Estado inactivo"
+    },
+    "Resuelto": {
+      "name": "Resuelto",
+      "description": "Estado resuelto"
     }
   },
+  "severity": {
+  "Leve": {
+    "name": "Leve",
+    "description": "Antecedente de enfermedad con impacto leve en la salud"
+  },
+  "Moderado": {
+    "name": "Moderado",
+    "description": "Antecedente de enfermedad con impacto moderado en la salud"
+  },
+  "Severo": {
+    "name": "Severo",
+    "description": "Antecedente de enfermedad con impacto severo en la salud"
+  }
+},
+"familyRelations": {
+  "Padre": {
+    "name": "Padre",
+    "description": "Parentesco de padre"
+  },
+  "Madre": {
+    "name": "Madre",
+    "description": "Parentesco de madre"
+  },
+  "Hijo/a": {
+    "name": "Hijo/a",
+    "description": "Parentesco de hijo o hija"
+  },
+  "Hermano/a": {
+    "name": "Hermano/a",
+    "description": "Parentesco de hermano o hermana"
+  },
+  "Abuelo/a": {
+    "name": "Abuelo/a",
+    "description": "Parentesco de abuelo o abuela"
+  },
+  "Tío/a": {
+    "name": "Tío/a",
+    "description": "Parentesco de tío o tía"
+  },
+  "Otro": {
+    "name": "Otro",
+    "description": "Otro tipo de parentesco"
+  }
+},
   "recurrence": {
     "Diaria": {
       "name": "Diaria"
@@ -273,6 +329,58 @@
     "Hemorragia Interna": {
       "name": "Hemorragia Interna",
       "description": "Sangrado dentro del cuerpo"
-    }
+    },
+    "Enfermedad": {
+    "name": "Enfermedad",
+    "description": "Condición anormal que afecta el cuerpo"
+  },
+  "Alergia": {
+    "name": "Alergia",
+    "description": "Respuesta inmunológica adversa a una sustancia"
+  },
+  "Cirugía": {
+    "name": "Cirugía",
+    "description": "Procedimiento médico que implica incisión o manipulación de tejido"
+  },
+  "Hospitalización": {
+    "name": "Hospitalización",
+    "description": "Estancia en un hospital para tratamiento médico"
+  },
+  "Medicación": {
+    "name": "Medicación",
+    "description": "Administración de fármacos para tratar o prevenir enfermedades"
+  },
+  "Vacunación": {
+    "name": "Vacunación",
+    "description": "Administración de vacunas para prevenir enfermedades"
+  },
+  "Presuntivo": {
+    "name": "Presuntivo",
+    "description": "Diagnóstico inicial basado en síntomas y evaluación preliminar"
+  },
+  "Definitivo": {
+    "name": "Definitivo",
+    "description": "Diagnóstico confirmado mediante pruebas, estudios o evaluación especializada"
+  },
+  "Control": {
+    "name": "Control",
+    "description": "Consulta de seguimiento o control médico"
+  },
+  "Urgencia": {
+    "name": "Urgencia",
+    "description": "Consulta por emergencia médica"
+  },
+  "Primera vez": {
+    "name": "Primera vez",
+    "description": "Primera consulta con el profesional"
+  },
+  "Examen": {
+    "name": "Examen",
+    "description": "Consulta para realización de exámenes médicos"
+  },
+  "Otro": {
+    "name": "Otro",
+    "description": "Otro tipo de consulta no especificada"
+  }
   } 
 }

@@ -95,8 +95,64 @@
     "En Mantenimiento": {
       "name": "Under Maintenance",
       "description": "The house is under maintenance or repair"
+    },
+    "Activo": {
+      "name": "Activo",
+      "description": "Estado activo"
+    },
+    "Inactivo": {
+      "name": "Inactivo",
+      "description": "Estado inactivo"
+    },
+    "Resuelto": {
+      "name": "Resuelto",
+      "description": "Estado resuelto"
     }
   },
+  "severity": {
+  "Leve": {
+    "name": "Mild",
+    "description": "Medical history with mild health impact"
+  },
+  "Moderado": {
+    "name": "Moderate",
+    "description": "Medical history with moderate health impact"
+  },
+  "Severo": {
+    "name": "Severe",
+    "description": "Medical history with severe health impact"
+  }
+},
+"familyRelations": {
+  "Padre": {
+    "name": "Father",
+    "description": "Father relationship"
+  },
+  "Madre": {
+    "name": "Mother",
+    "description": "Mother relationship"
+  },
+  "Hijo/a": {
+    "name": "Son/Daughter",
+    "description": "Son or daughter relationship"
+  },
+  "Hermano/a": {
+    "name": "Brother/Sister",
+    "description": "Sibling relationship"
+  },
+  "Abuelo/a": {
+    "name": "Grandfather/Grandmother",
+    "description": "Grandparent relationship"
+  },
+  "Tío/a": {
+    "name": "Uncle/Aunt",
+    "description": "Uncle or aunt relationship"
+  },
+  "Otro": {
+    "name": "Other",
+    "description": "Other type of relationship"
+  }
+},
   "recurrence": {
     "Diaria": {
       "name": "Daily"
@@ -273,6 +329,58 @@
     "Hemorragia Interna": {
       "name": "Internal Bleeding",
       "description": "Bleeding inside the body"
-    }
+    },
+    "Enfermedad": {
+    "name": "Disease",
+    "description": "Abnormal condition affecting the body"
+  },
+  "Alergia": {
+    "name": "Allergy",
+    "description": "Adverse immune response to a substance"
+  },
+  "Cirugía": {
+    "name": "Surgery",
+    "description": "Medical procedure involving incision or tissue manipulation"
+  },
+  "Hospitalización": {
+    "name": "Hospitalization",
+    "description": "Stay in a hospital for medical treatment"
+  },
+  "Medicación": {
+    "name": "Medication",
+    "description": "Administration of drugs to treat or prevent diseases"
+  },
+  "Vacunación": {
+    "name": "Vaccination",
+    "description": "Administration of vaccines to prevent diseases"
+  },
+   "Presuntivo": {
+    "name": "Presumptive",
+    "description": "Initial diagnosis based on symptoms and preliminary evaluation"
+  },
+  "Definitivo": {
+    "name": "Definitive",
+    "description": "Diagnosis confirmed through tests, studies, or specialized evaluation"
+  },
+  "Control": {
+    "name": "Follow-up",
+    "description": "Medical follow-up or check-up consultation"
+  },
+  "Urgencia": {
+    "name": "Emergency",
+    "description": "Emergency medical consultation"
+  },
+  "Primera vez": {
+    "name": "First visit",
+    "description": "First consultation with the professional"
+  },
+  "Examen": {
+    "name": "Exam",
+    "description": "Consultation for medical tests"
+  },
+  "Otro": {
+    "name": "Other",
+    "description": "Unspecified consultation type"
+  }
   }
 }

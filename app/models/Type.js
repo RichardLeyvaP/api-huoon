@@ -13,6 +13,22 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Type.hasMany(models.MedicalExam, { foreignKey: 'type_id', as: 'medicalexams', onDelete: 'CASCADE' });
       Type.hasMany(models.Emergency, { foreignKey: "type_id",as: "emergencies", onDelete: "CASCADE",});
+      Type.hasMany(models.PersonalBackground, {
+        foreignKey: 'type_id',
+        as: 'personalBackgrounds', 
+        });
+      Type.hasMany(models.FamilyBackground, {
+        foreignKey: 'type_id',
+        as: 'familyBackgrounds'
+      });  
+      Type.hasMany(models.MedicalConsultation, {
+        foreignKey: 'type_id',
+        as: 'medicalConsultations'
+      }); 
+      Type.hasMany(models.Diagnosis, {
+        foreignKey: 'type_id',
+        as: 'diagnoses'
+      }); 
     }
   }
   Type.init(

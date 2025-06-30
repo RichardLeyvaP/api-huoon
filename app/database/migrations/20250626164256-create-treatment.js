@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('medical_consultations', {
+    await queryInterface.createTable('treatments', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -15,40 +15,47 @@ module.exports = {
           model: "people",
           key: "id",
         },
+        onDelete: 'CASCADE',
+        allowNull: false,
       },
-      type_id: {
-        allowNull: true,
-        type: Sequelize.INTEGER, //('Control', 'Urgencia', 'Primera vez', 'Examen', 'Otro')
+      medical_consultation_id: {
+        type: Sequelize.INTEGER,
         references: {
-          model: "types",
+          model: "medical_consultations",
           key: "id",
         },
+        allowNull: true,
       },
-      date: {
-        type: Sequelize.DATEONLY
+      medication: {
+        type: Sequelize.STRING(100),
+        allowNull: true,
       },
-      reason: {
+      dosage: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      frequency: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      duration: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
+      instructions: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      diagnosis: {
+      purpose: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      treatments: {
-        type: Sequelize.JSON,
-        allowNull: true
-      },
-      professional: {  // nombre_examen en inglés
-        type: Sequelize.STRING(200),
-        allowNull: true
-      },
-      medicalNotes: {
-        type: Sequelize.TEXT,
+      startDate: {
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
-      files: {
-        type: Sequelize.JSON,
+      endDate: {
+        type: Sequelize.DATEONLY,
         allowNull: true,
       },
       createdAt: {
@@ -62,6 +69,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('medical_consultations');
+    await queryInterface.dropTable('treatments');
   }
 };

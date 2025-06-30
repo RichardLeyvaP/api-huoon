@@ -4,14 +4,14 @@ const fs = require('fs');
 const { Person, User, HomePerson, Home, sequelize } = require('../models');
 const logger = require('../../config/logger');
 
-class PersonRepository {
+const  PersonRepository = {
     async findAll() {
         return await Person.findAll({
             attributes: [
                 'id', 'user_id', 'name', 'birth_date', 'age', 'gender', 
                 'email', 'phone', 'address', 'image', 'emergencyContact',
                 'medical_record_number', 'document_type', 'document_number',
-                'health_coverage', 'coverage_name'
+                'health_coverage', 'coverage_name', 'blood_type'
             ],
             include: [
                 {
@@ -21,7 +21,7 @@ class PersonRepository {
                 },
             ],
         });
-    }
+    },
 
     async findById(id) {
         return await Person.findByPk(id, {
@@ -29,7 +29,7 @@ class PersonRepository {
                 'id', 'user_id', 'name', 'birth_date', 'age', 'gender', 
                 'email', 'phone', 'address', 'image', 'emergencyContact',
                 'medical_record_number', 'document_type', 'document_number',
-                'health_coverage', 'coverage_name'
+                'health_coverage', 'coverage_name', 'blood_type', 'updatedAt'
             ],
             include: [
                 {
@@ -39,7 +39,7 @@ class PersonRepository {
                 },
             ],
         });
-    }
+    },
 
     async getPersonHouse(personId, home_id) {
         return await Person.findByPk(personId, {
@@ -47,7 +47,7 @@ class PersonRepository {
                 'id', 'user_id', 'name', 'birth_date', 'age', 'gender', 
                 'email', 'phone', 'address', 'image', 'emergencyContact',
                 'medical_record_number', 'document_type', 'document_number',
-                'health_coverage', 'coverage_name'
+                'health_coverage', 'coverage_name', 'blood_type'
             ],
             include: [
                 {
@@ -70,7 +70,7 @@ class PersonRepository {
                 ]
             }
         });
-    }
+    },
 
     async create(body, file, user, t) {
         try {
@@ -91,7 +91,8 @@ class PersonRepository {
                 document_type: body.document_type,
                 document_number: body.document_number,
                 health_coverage: body.health_coverage,
-                coverage_name: body.coverage_name
+                coverage_name: body.coverage_name,
+                blood_type: body.blood_type
             }, { transaction: t });
 
             // Manejo de archivos adjuntos
@@ -109,7 +110,7 @@ class PersonRepository {
             logger.error(`Error en PersonRepository->store: ${err.message}`);
             throw err;
         }
-    }
+    },
 
     async update(person, body, file, t) {
         // Lista de campos que pueden ser actualizados (incluyendo los nuevos)
@@ -117,7 +118,7 @@ class PersonRepository {
             'name', 'birth_date', 'age', 'gender', 'email', 'phone', 
             'address', 'user_id', 'emergencyContact',
             'medical_record_number', 'document_type', 'document_number',
-            'health_coverage', 'coverage_name'
+            'health_coverage', 'coverage_name', 'blood_type'
         ];
   
         const updatedData = Object.keys(body)
@@ -157,7 +158,7 @@ class PersonRepository {
             logger.error(`Error en PersonRepository->update: ${err.message}`);
             throw err;
         }
-    }
+    },
 
     async delete(person) {
         if (person.image && person.image !== 'people/default.jpg') {
@@ -167,7 +168,7 @@ class PersonRepository {
         }
       
         return await person.destroy();
-    }
+    },
 
     async findByIds(ids) {
         try {
@@ -176,7 +177,7 @@ class PersonRepository {
                     'id', 'user_id', 'name', 'birth_date', 'age', 'gender', 
                     'email', 'phone', 'address', 'image', 'emergencyContact',
                     'medical_record_number', 'document_type', 'document_number',
-                    'health_coverage', 'coverage_name'
+                    'health_coverage', 'coverage_name', 'blood_type'
                 ],
                 where: {
                     id: ids,
@@ -187,7 +188,7 @@ class PersonRepository {
             logger.error(`Error al buscar personas por IDs: ${error.message}`);
             throw error;
         }
-    }
+    },
 }
 
-module.exports = new PersonRepository();
+module.exports = PersonRepository;

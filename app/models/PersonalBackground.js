@@ -3,23 +3,30 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class MedicalExam extends Model {
+  class PersonalBackground extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      MedicalExam.belongsTo(models.Person, { foreignKey: 'person_id', as: 'person' });
-      MedicalExam.belongsTo(models.Type, { foreignKey: 'type_id', as: 'type' });
+      PersonalBackground.belongsTo(models.Person, {
+    foreignKey: 'person_id',
+    as: 'person', // Nombre de la relación inversa
+  });
+
+  // Relación con Type si existe
+  PersonalBackground.belongsTo(models.Type, {
+    foreignKey: 'type_id',
+    as: 'type'
+  });
     }
   }
-  MedicalExam.init({
+  PersonalBackground.init({
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true, // Indica que 'id' es la clave primaria
-      autoIncrement: true, // Esto hace que el campo 'id' sea auto-incrementable
+      primaryKey: true,
+      autoIncrement: true,
     },
     person_id: {
       type: DataTypes.INTEGER,
@@ -38,31 +45,35 @@ module.exports = (sequelize, DataTypes) => {
       },
       allowNull: true,
     },
-    date: {
+    description: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    details: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    startDate: {
       type: DataTypes.DATEONLY,
       allowNull: true,
     },
-    exam_name: {
-      type: DataTypes.STRING(200),
+    endDate: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
-    results: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    observations: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    archive: {
+    status: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    severity: {
+      type: DataTypes.STRING, //('Leve', 'Moderado', 'Severo')
       allowNull: true,
     }
   }, {
     sequelize,
-    modelName: 'MedicalExam',
-    tableName: 'medicalexams',
+    modelName: 'PersonalBackground',
+    tableName: 'personal_backgrounds',
     timestamps: true
   });
-  return MedicalExam;
+  return PersonalBackground;
 };

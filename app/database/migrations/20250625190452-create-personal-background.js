@@ -2,45 +2,51 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('medicalexams', {
+    await queryInterface.createTable('personal_backgrounds', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      person_id: {
+       person_id: {
         type: Sequelize.BIGINT,
+        allowNull: false,
         references: {
-          model: "people",
-          key: "id",
+          model: 'people',  // Nombre de la tabla relacionada
+          key: 'id',
         },
-      },
-      date: {
-        type: Sequelize.DATEONLY,
-        allowNull: false
+        onDelete: 'CASCADE',
       },
       type_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
-        type: Sequelize.INTEGER, //('Laboratorio', 'Imagen', 'Electrocardiograma', 'Endoscopía', 'Otro')
         references: {
-          model: "types",
-          key: "id",
+          model: 'types',  // Nombre de la tabla relacionada
+          key: 'id',
         },
       },
-      exam_name: {  // nombre_examen en inglés
-        type: Sequelize.STRING(200),
+      description: {
+        type: Sequelize.STRING,
         allowNull: true
       },
-      results: {  // resultados en inglés (ya existía como result)
+      details: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      observations: {  // observaciones en inglés
-        type: Sequelize.TEXT,
+      startDate: {
+        type: Sequelize.DATEONLY,
         allowNull: true
       },
-      archive: {
+      endDate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
+      },
+      status: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      severity: {
         type: Sequelize.STRING,
         allowNull: true
       },
@@ -55,6 +61,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('medicalexams');
+    await queryInterface.dropTable('personal_backgrounds');
   }
 };

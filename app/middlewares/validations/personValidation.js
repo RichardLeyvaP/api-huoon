@@ -31,7 +31,13 @@ const storePersonSchema = Joi.object({
     document_type: Joi.string().max(100).allow(null).empty('').optional(),
     document_number: Joi.string().max(100).allow(null).empty('').optional(),
     health_coverage: Joi.string().max(100).allow(null).empty('').optional(),
-    coverage_name: Joi.string().max(100).allow(null).empty('').optional()
+    coverage_name: Joi.string().max(100).allow(null).empty('').optional(),
+    blood_type: Joi.string()
+      .trim()
+      .uppercase()
+      .pattern(/^(A|B|AB|O)[+-]$/)
+      .allow(null, '')
+      .optional(),
 });
 
 const updatePersonSchema = Joi.object({
@@ -66,7 +72,13 @@ const updatePersonSchema = Joi.object({
     document_type: Joi.string().max(100).allow(null).empty('').optional(),
     document_number: Joi.string().max(100).allow(null).empty('').optional(),
     health_coverage: Joi.string().max(100).allow(null).empty('').optional(),
-    coverage_name: Joi.string().max(100).allow(null).empty('').optional()
+    coverage_name: Joi.string().max(100).allow(null).empty('').optional(),
+    blood_type: Joi.string()
+      .trim()
+      .uppercase()
+      .pattern(/^(A|B|AB|O)[+-]$/)
+      .allow(null, '')
+      .optional(),
 });
 
 const idPersonSchema = Joi.object({

@@ -866,7 +866,7 @@ const TaskRepository = {
       "0"
     )}`; // HH:MM
     
-    logger.info(`Fecha actual: ${today}, Hora actual: ${currentTime}`);
+    //logger.info(`Fecha actual: ${today}, Hora actual: ${currentTime}`);
     try {
       const tasks = await Task.findAll({
         where: {

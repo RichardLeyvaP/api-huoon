@@ -37,7 +37,10 @@ const MedicalExamController = {
           typeId: exam.type_id,
           type_id: exam.type_id,
           typeName: translatedName, // Incluir nombre del tipo de examen
-          result: exam.result,
+          exam_name: exam.exam_name,
+          examName: exam.exam_name,
+          results: exam.results,
+          observations: exam.observations,
           archive: exam.archive,
         };
       });
@@ -85,7 +88,10 @@ const MedicalExamController = {
           typeId: exam.type_id,
           type_id: exam.type_id,
           typeName: translatedName,
-          result: exam.result,
+          exam_name: exam.exam_name,
+          examName: exam.exam_name,
+          results: exam.results,
+          observations: exam.observations,
           archive: exam.archive,
         };
       });
@@ -108,15 +114,17 @@ const MedicalExamController = {
     logger.info(JSON.stringify(req.body));
 
     req.body.person_id = req.person.id; // Asignar el ID de la persona autenticada
-    const { date, type_id, result, archive } = req.body;
+    const { date, type_id, results, archive } = req.body;
 
     // Verificar si el tipo de examen existe
-    const type = await TypeRepository.findById(type_id);
-    if (!type) {
-      logger.error(
-        `MedicalExamController->store: Tipo de examen no encontrado con ID ${type_id}`
-      );
-      return res.status(404).json({ msg: "TypeNotFound" });
+     if (type_id) {
+      const type = await TypeRepository.findById(type_id);
+      if (!type) {
+        logger.error(
+          `MedicalExamController->store: Tipo de examen no encontrado con ID ${type_id}`
+        );
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
     }
 
     const t = await sequelize.transaction();
@@ -160,7 +168,10 @@ const MedicalExamController = {
         typeId: medicalExam.type_id,
         type_id: medicalExam.type_id,
         typeName: medicalExam.Type ? medicalExam.Type.name : null,
-        result: exam.result,
+        exam_name: exam.exam_name,
+          examName: exam.exam_name,
+          results: exam.results,
+          observations: exam.observations,
         archive: exam.archive,
       };
 
@@ -184,7 +195,7 @@ const MedicalExamController = {
     logger.info(JSON.stringify(req.body));
 
     const { id } = req.body;
-    const { date, type_id, result, archive } = req.body;
+    const { type_id} = req.body;
 
     const medicalExam = await MedicalExamRepository.findById(id);
 

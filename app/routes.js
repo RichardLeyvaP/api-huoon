@@ -36,6 +36,12 @@ const { storeMedicalConsultationSchema, updateMedicalConsultationSchema, idMedic
 const { storeTypeSchema, updateTypeSchema, idTypeSchema, typeSchema} = require("./middlewares/validations/typeValidation");
 const { storeMedicalExamSchema, updateMedicalExamSchema, idMedicalExamSchema, getMedicalExamSchema} = require("./middlewares/validations/medicalexamValidation");
 const { storeEmergencySchema, updateEmergencySchema, idEmergencySchema, getEmergencySchema,} = require("./middlewares/validations/emergencyValidation");
+const { storePersonalBackgroundSchema, updatePersonalBackgroundSchema, idPersonalBackgroundSchema, getPersonalBackgroundSchema } = require('./middlewares/validations/personalBackgroundValidation');
+const { storeFamilyBackgroundSchema, updateFamilyBackgroundSchema, idFamilyBackgroundSchema, getFamilyBackgroundSchema } = require('./middlewares/validations/familyBackgroundValidation');
+const {  storePhysicalExamSchema, updatePhysicalExamSchema, idPhysicalExamSchema, getPhysicalExamSchema } = require('./middlewares/validations/physicalExamValidation');
+const { storePsychosocialBackgroundSchema, updatePsychosocialBackgroundSchema, idPsychosocialBackgroundSchema, getPsychosocialBackgroundSchema } = require('./middlewares/validations/psychosocialBackgroundValidation');
+const { storeDiagnosisSchema, updateDiagnosisSchema, idDiagnosisSchema, getDiagnosisSchema } = require('./middlewares/validations/diagnosisValidation');
+const { storeTreatmentSchema, updateTreatmentSchema, idTreatmentSchema, getTreatmentSchema } = require('./middlewares/validations/treatmentValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -66,6 +72,12 @@ const MedicalConsultationController = require('./controllers/MedicalConsultation
 const TypeController = require('./controllers/TypeController');
 const MedicalExamController = require('./controllers/MedicalExamController');
 const EmergencyController = require('./controllers/EmergencyController');
+const PersonalBackgroundController = require('./controllers/PersonalBackgroundController');
+const FamilyBackgroundController = require('./controllers/FamilyBackgroundController');
+const PhysicalExamController = require('./controllers/PhysicalExamController');
+const PsychosocialBackgroundController = require('./controllers/PsychosocialBackgroundController');
+const DiagnosisController = require('./controllers/DiagnosisController');
+const TreatmentController = require('./controllers/TreatmentController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -160,6 +172,7 @@ router.put('/configuration', ConfigurationController.update);
 
 //Rutas Personas
 router.get('/person', PersonController.index);
+router.get('/person-profile', PersonController.getPersonProfile);
 router.post('/person-show', validateSchema(idPersonSchema), PersonController.show);
 router.post('/person', validateSchema(storePersonSchema), multerCategory('image', 'people'), PersonController.store);
 router.post('/person-update', validateSchema(updatePersonSchema), multerCategory('image', 'people'), PersonController.update);
@@ -172,6 +185,62 @@ router.post('/status-show', validateSchema(idStatusSchema), StatusController.sho
 router.put('/status', validateSchema(updateStatusSchema), StatusController.update);
 router.post('/status-destroy', validateSchema(idStatusSchema), StatusController.destroy);
 router.post('/status-by-type', validateSchema(typeStatusSchema), StatusController.findByType);//okks
+
+// Rutas para antecedentes personales
+router.get('/personal-background', PersonalBackgroundController.index);
+router.post('/get-background-person', PersonalBackgroundController.getByPersonId);
+router.post('/get-background-type', PersonalBackgroundController.getByType); // Nueva ruta para filtrar por tipo
+router.post('/get-active-backgrounds', PersonalBackgroundController.getActive); // Nueva ruta para antecedentes activos
+router.post('/personal-background', validateSchema(storePersonalBackgroundSchema), PersonalBackgroundController.store);
+router.post('/personal-background-show', validateSchema(idPersonalBackgroundSchema), PersonalBackgroundController.show);
+router.post('/personal-background-update', validateSchema(updatePersonalBackgroundSchema), PersonalBackgroundController.update);
+router.post('/personal-background-destroy', validateSchema(idPersonalBackgroundSchema), PersonalBackgroundController.destroy);
+
+// Rutas para antecedentes familiares
+router.get('/family-background', FamilyBackgroundController.index);
+router.post('/get-family-background-person', FamilyBackgroundController.getByPersonId);
+router.post('/get-family-background-type', FamilyBackgroundController.getByType);
+router.post('/get-family-background-relationship', FamilyBackgroundController.getByRelationship);
+router.post('/get-family-background-disease', FamilyBackgroundController.getByDisease);
+router.post('/family-background', validateSchema(storeFamilyBackgroundSchema), FamilyBackgroundController.store);
+router.post('/family-background-show', FamilyBackgroundController.show);
+router.post('/family-background-update', validateSchema(updateFamilyBackgroundSchema), FamilyBackgroundController.update);
+router.post('/family-background-destroy', validateSchema(idFamilyBackgroundSchema), FamilyBackgroundController.destroy);
+
+// Exámenes físicos
+router.get('/physical-exams', PhysicalExamController.index);
+router.post('/physical-exams-person', PhysicalExamController.getByPersonId);
+router.post('/physical-exams', validateSchema(storePhysicalExamSchema), PhysicalExamController.store);
+router.post('/physical-exams-show', validateSchema(idPhysicalExamSchema), PhysicalExamController.show);
+router.post('/physical-exams-update', validateSchema(updatePhysicalExamSchema), PhysicalExamController.update);
+router.post('/physical-exams-delete', validateSchema(idPhysicalExamSchema), PhysicalExamController.destroy);
+
+// Psychosocial Background Routes
+router.get('/psychosocial-backgrounds', PsychosocialBackgroundController.index);
+router.get('/psychosocial-backgrounds-person', PsychosocialBackgroundController.getByPersonId);
+router.post('/psychosocial-background', validateSchema(storePsychosocialBackgroundSchema), PsychosocialBackgroundController.store);
+router.post('/psychosocial-background-show', validateSchema(idPsychosocialBackgroundSchema), PsychosocialBackgroundController.show);
+router.post('/psychosocial-background-update', validateSchema(updatePsychosocialBackgroundSchema), PsychosocialBackgroundController.update);
+router.post('/psychosocial-background-delete', validateSchema(idPsychosocialBackgroundSchema), PsychosocialBackgroundController.destroy);
+
+// Diagnosis Routes
+router.get('/diagnoses', DiagnosisController.index);
+router.post('/diagnoses-person', DiagnosisController.getByPersonId);
+router.post('/diagnosis', validateSchema(storeDiagnosisSchema), DiagnosisController.store);
+router.post('/diagnosis-show', validateSchema(idDiagnosisSchema), DiagnosisController.show);
+router.post('/diagnosis-update', validateSchema(updateDiagnosisSchema), DiagnosisController.update);
+router.post('/diagnosis-delete', validateSchema(idDiagnosisSchema), DiagnosisController.destroy);
+
+// Treatment Routes
+router.get('/treatments', TreatmentController.index);
+router.post('/treatments-person', TreatmentController.getByPersonId);
+router.get('/active-treatments', TreatmentController.getActiveTreatments);
+router.post('/treatment', validateSchema(storeTreatmentSchema), TreatmentController.store);
+router.post('/treatment-show', validateSchema(idTreatmentSchema), TreatmentController.show);
+router.post('/treatment-update', validateSchema(updateTreatmentSchema), TreatmentController.update);
+router.post('/treatment-delete', validateSchema(idTreatmentSchema), TreatmentController.destroy);
+
+
 
 //Rutas Roles
 router.get('/role', RoleController.index);
@@ -367,5 +436,9 @@ router.get('/productcategory-productstatus-apk', ProductController.category_stat
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 router.post('/status-priority-type-apk', WishController.status_priority_type);
+router.post('/get-type-state-severity', validateSchema(typeSchema), PersonalBackgroundController.getTypesByTypeStateSeverity);
+router.post('/get-type-relationship', validateSchema(typeSchema), FamilyBackgroundController.getTypesByTypeRelation);
+router.post('/get-type-diagnoses', validateSchema(typeSchema), DiagnosisController.getTypesByTypeRelation);
+router.post('/get-type-consultations', validateSchema(typeSchema), MedicalConsultationController.getTypesByTypeRelation);
 
 module.exports = router;

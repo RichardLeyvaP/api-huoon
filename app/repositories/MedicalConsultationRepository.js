@@ -1,7 +1,8 @@
 const { Op } = require("sequelize");
-const { MedicalConsultation, Person } = require("../models"); // Importar los modelos necesarios
+const { MedicalConsultation, Person, Type } = require("../models"); // Importar los modelos necesarios
 const logger = require("../../config/logger"); // Importa el logger
 const ImageService = require("../services/ImageService");
+
 
 const MedicalConsultationRepository = {
   /**
@@ -11,6 +12,7 @@ const MedicalConsultationRepository = {
     return await MedicalConsultation.findAll({
       include: [
         { model: Person, as: "person" }, // Relación con Person
+        { model: Type, as: "type" },
       ],
     });
   },
@@ -24,6 +26,7 @@ const MedicalConsultationRepository = {
       where: { person_id: personId }, // Filtrar por personId
       include: [
         { model: Person, as: "person" }, // Relación con Person
+        { model: Type, as: "type" },
       ],
     });
   },
@@ -36,6 +39,7 @@ const MedicalConsultationRepository = {
     return await MedicalConsultation.findByPk(id, {
       include: [
         { model: Person, as: "person" }, // Relación con Person
+        { model: Type, as: "type" },
       ],
     });
   },
@@ -58,6 +62,8 @@ const MedicalConsultationRepository = {
           medicalNotes: body.medicalNotes,
           files: [], // Inicialmente, los archivos están vacíos
           person_id: personId,
+          type_id: body.type_id,
+          professional: body.professional
         },
         { transaction: t }
       );
@@ -124,6 +130,8 @@ const MedicalConsultationRepository = {
       "treatments",
       "medicalNotes",
       "files",
+      "type_id",
+      "professional"
     ];
 
     try {

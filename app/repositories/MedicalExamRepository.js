@@ -13,7 +13,9 @@ const MedicalExamRepository  = {
         "person_id",
         "date",
         "type_id",
-        "result",
+        "exam_name",
+        "results",
+        "observations",
         "archive",
       ],
       include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
@@ -23,8 +25,8 @@ const MedicalExamRepository  = {
   async findAllByPersonId(person_id) {
     return await MedicalExam.findAll({
       where: { person_id },
-      attributes: ["id", "person_id", "date", "type_id", "result", "archive"],
-      include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
+      attributes: ["id", "person_id", "date", "type_id", "exam_name", "results", "observations", "archive",],
+      include: [{ model: Type, as: "type" }],
     });
   },
 
@@ -35,7 +37,9 @@ const MedicalExamRepository  = {
         "person_id",
         "date",
         "type_id",
-        "result",
+        "exam_name",
+        "results",
+        "observations",
         "archive",
       ],
       include: [{ model: Type, attributes: ["id", "name"], as: "type" }],
@@ -50,7 +54,9 @@ const MedicalExamRepository  = {
           person_id: body.person_id,
           date: body.date,
           type_id: body.type_id,
-          result: body.result,
+          exam_name: body.exam_name,
+          results: body.results,
+          observations: body.observations,
           archive: "medicalexams/default.jpg", // archive temporal
         },
         { transaction: t }
@@ -83,7 +89,9 @@ const MedicalExamRepository  = {
       "person_id",
       "date",
       "type_id",
-      "result",
+      "exam_name",
+        "results",
+        "observations",
       "archive",
     ];
     const updatedData = {};
@@ -135,6 +143,29 @@ const MedicalExamRepository  = {
       logger.error(`Error en MedicalExamRepository->delete: ${err.message}`);
       throw err;
     }
+  },
+  async getLastByPersonId(person_id) {
+    return await MedicalExam.findOne({
+      where: { person_id },
+      attributes: [
+        "id",
+        "person_id",
+        "date",
+        "type_id",
+        "exam_name",
+        "results",
+        "observations",
+        "archive"
+      ],
+      include: [
+        { 
+          model: Type, 
+          attributes: ["id", "name"], 
+          as: "type" 
+        }
+      ],
+      order: [['date', 'DESC']]
+    });
   }
 };
 

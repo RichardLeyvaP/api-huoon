@@ -95,8 +95,64 @@
     "En Mantenimiento": {
       "name": "Em Manutenção",
       "description": "A casa está em manutenção ou reparo"
+    },
+    "Ativo": {
+      "name": "Ativo",
+      "description": "Estado ativo"
+    },
+    "Inativo": {
+      "name": "Inativo",
+      "description": "Estado inativo"
+    },
+    "Resolvido": {
+      "name": "Resolvido",
+      "description": "Estado resolvido"
     }
   },
+  "severity": {
+  "Leve": {
+    "name": "Leve",
+    "description": "Histórico médico com impacto leve na saúde"
+  },
+  "Moderado": {
+    "name": "Moderado",
+    "description": "Histórico médico com impacto moderado na saúde"
+  },
+  "Severo": {
+    "name": "Severo",
+    "description": "Histórico médico com impacto severo na saúde"
+  }
+},
+"familyRelations": {
+  "Padre": {
+    "name": "Pai",
+    "description": "Relação de pai"
+  },
+  "Madre": {
+    "name": "Mãe",
+    "description": "Relação de mãe"
+  },
+  "Hijo/a": {
+    "name": "Filho/a",
+    "description": "Relação de filho ou filha"
+  },
+  "Hermano/a": {
+    "name": "Irmão/ã",
+    "description": "Relação de irmão ou irmã"
+  },
+  "Abuelo/a": {
+    "name": "Avô/ó",
+    "description": "Relação de avô ou avó"
+  },
+  "Tío/a": {
+    "name": "Tio/a",
+    "description": "Relação de tio ou tia"
+  },
+  "Otro": {
+    "name": "Outro",
+    "description": "Outro tipo de relação"
+  }
+},
   "recurrence": {
     "Diaria": {
       "name": "Diária"
@@ -173,16 +229,16 @@
   "Evento": {
     "name": "Evento"
   }
-},
-"finances": {
-  "Personal": {
-    "name": "Pessoal"
   },
-  "Hogar": {
-    "name": "Lar"
-  }
-},
-"wishes": {
+  "finances": {
+    "Personal": {
+      "name": "Pessoal"
+    },
+    "Hogar": {
+      "name": "Lar"
+    }
+  },
+  "wishes": {
     "Personal": {
       "name": "Personal"
     },
@@ -273,6 +329,58 @@
     "Hemorragia Interna": {
       "name": "Hemorragia Interna",
       "description": "Sangramento interno no corpo"
-    }
+    },
+    "Enfermedad": {
+    "name": "Doença",
+    "description": "Condição anormal que afeta o corpo"
+  },
+  "Alergia": {
+    "name": "Alergia",
+    "description": "Resposta imunológica adversa a uma substância"
+  },
+  "Cirugía": {
+    "name": "Cirurgia",
+    "description": "Procedimento médico envolvendo incisão ou manipulação de tecido"
+  },
+  "Hospitalización": {
+    "name": "Hospitalização",
+    "description": "Permanência em hospital para tratamento médico"
+  },
+  "Medicación": {
+    "name": "Medicação",
+    "description": "Administração de medicamentos para tratar ou prevenir doenças"
+  },
+  "Vacunación": {
+    "name": "Vacinação",
+    "description": "Administração de vacinas para prevenir doenças"
+  },
+  "Presuntivo": {
+    "name": "Presuntivo",
+    "description": "Diagnóstico inicial baseado em sintomas e avaliação preliminar"
+  },
+  "Definitivo": {
+    "name": "Definitivo",
+    "description": "Diagnóstico confirmado por meio de exames, estudos ou avaliação especializada"
+  },
+  "Control": {
+    "name": "Controle",
+    "description": "Consulta de acompanhamento médico"
+  },
+  "Urgencia": {
+    "name": "Emergência",
+    "description": "Consulta médica de emergência"
+  },
+  "Primera vez": {
+    "name": "Primeira vez",
+    "description": "Primeira consulta com o profissional"
+  },
+  "Examen": {
+    "name": "Exame",
+    "description": "Consulta para realização de exames médicos"
+  },
+  "Otro": {
+    "name": "Outro",
+    "description": "Outro tipo de consulta não especificada"
+  }
   }
 }

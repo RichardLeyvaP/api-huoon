@@ -15,6 +15,15 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'person_id',
         as: 'person'
       });
+      MedicalConsultation.belongsTo(models.Type, { foreignKey: 'type_id', as: 'type' });
+      MedicalConsultation.hasMany(models.PhysicalExam, {
+        foreignKey: 'medical_consultation_id',
+        as: 'physicalExams'
+        });
+        MedicalConsultation.hasMany(models.Diagnosis, {
+        foreignKey: 'medical_consultation_id',
+        as: 'diagnoses'
+        });
     }
   }
   MedicalConsultation.init({
@@ -24,20 +33,37 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true, // Esto hace que el campo 'id' sea auto-incrementable
     },
     person_id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Person', // Nombre de la tabla de usuarios (asegúrate de que esté bien)
+        key: 'id'
+      },
+      onDelete: 'CASCADE',
       allowNull: false,
+    },
+    type_id: {
+      type: DataTypes.INTEGER,  //('Control', 'Urgencia', 'Primera vez', 'Examen', 'Otro')
+      references: {
+        model: 'Type', // Nombre de la tabla de usuarios (asegúrate de que esté bien)
+        key: 'id'
+      },
+      allowNull: true,
     },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    professional: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     reason: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     diagnosis: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     treatments: {
       type: DataTypes.JSON,

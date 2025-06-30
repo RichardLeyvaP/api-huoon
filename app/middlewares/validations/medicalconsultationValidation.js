@@ -2,16 +2,21 @@ const Joi = require("joi");
 
 // Esquema para crear una nueva consulta médica (MedicalConsultation)
 const storeMedicalConsultationSchema = Joi.object({
- person_id: Joi.number().integer().optional().messages({
-     "number.base": "El ID de la persona debe ser un número",
+  person_id: Joi.number().integer().allow(null).empty("").optional().messages({
+     "string.number": '"person_id" debe ser un number válido',
+   }),
+   type_id: Joi.number().integer().allow(null).empty("").optional().messages({
+     "string.number": '"type_id" debe ser un number válido',
    }),
   date: Joi.date().required().messages({
     "date.base": "La fecha de la consulta debe ser una fecha válida",
     "any.required": "La fecha de la consulta es requerida",
   }),
-  reason: Joi.string().required().messages({
-    "string.base": "El motivo de la consulta debe ser una cadena de texto",
-    "any.required": "El motivo de la consulta es requerido",
+  reason: Joi.string().optional().allow(null, "").empty("").default(null).messages({
+    "string.base": "El Motivo debe ser una cadena de texto",
+  }),
+  professional: Joi.string().optional().allow(null, "").empty("").default(null).messages({
+    "string.base": "El profesional debe ser una cadena de texto",
   }),
   diagnosis: Joi.string().optional().allow(null, "").empty("").default(null).messages({
     "string.base": "El diagnóstico debe ser una cadena de texto",
@@ -59,14 +64,17 @@ const storeMedicalConsultationSchema = Joi.object({
 
 // Esquema para actualizar una consulta médica (MedicalConsultation)
 const updateMedicalConsultationSchema = Joi.object({
-  person_id: Joi.number().integer().optional().messages({
-    "number.base": "El ID de la persona debe ser un número",
-  }),
-  date: Joi.date().optional().messages({
-    "date.base": "La fecha de la consulta debe ser una fecha válida",
-  }),
+   person_id: Joi.number().integer().allow(null).empty("").optional().messages({
+      "string.number": '"person_id" debe ser un number válido',
+    }),
+    type_id: Joi.number().integer().allow(null).empty("").optional().messages({
+      "string.number": '"type_id" debe ser un number válido',
+    }),
   reason: Joi.string().optional().messages({
     "string.base": "El motivo de la consulta debe ser una cadena de texto",
+  }),
+  professional: Joi.string().optional().allow(null, "").empty("").default(null).messages({
+    "string.base": "El profesional debe ser una cadena de texto",
   }),
   diagnosis: Joi.string().optional().allow(null, "").empty("").default(null).messages({
     "string.base": "El diagnóstico debe ser una cadena de texto",

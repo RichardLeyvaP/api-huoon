@@ -56,6 +56,27 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.MedicalConsultation, { foreignKey: 'person_id', as: 'medicalconsultations', onDelete: 'CASCADE' });
         Person.hasMany(models.MedicalExam, { foreignKey: 'person_id', as: 'medicalexams', onDelete: 'CASCADE' });
         Person.hasMany(models.Emergency, { foreignKey: 'person_id', as: 'emergencies', onDelete: 'CASCADE' });
+        Person.hasMany(models.PersonalBackground, {
+        foreignKey: 'person_id',
+        as: 'personalBackgrounds', // Cambiado de 'emergencies' a 'backgrounds' para mayor claridad
+        onDelete: 'CASCADE' // Elimina los antecedentes si se elimina la persona
+        });
+        Person.hasMany(models.FamilyBackground, {
+        foreignKey: 'person_id',
+        as: 'familyBackgrounds'
+        });
+        Person.hasMany(models.PhysicalExam, {
+        foreignKey: 'person_id',
+        as: 'physicalExams'
+        });
+        Person.hasMany(models.PsychosocialBackground, {
+        foreignKey: 'person_id',
+        as: 'psychosocialBackgrounds'
+        });
+        Person.hasMany(models.Diagnosis, {
+        foreignKey: 'person_id',
+        as: 'diagnoses'
+        });
     }
 
     /**
@@ -148,6 +169,13 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.STRING(100),
     allowNull: true
   },
+   blood_type: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    validate: {
+      is: /^(A|B|AB|O)[+-]$/i // Validación básica para grupos sanguíneos
+    }
+  }
   }, {
     sequelize,
     modelName: 'Person',

@@ -1,8 +1,8 @@
 const Joi = require("joi");
 const { MedicalConsultation, Person } = require("../models"); // Importar los modelos necesarios
 const logger = require("../../config/logger"); // Importa el logger
-const { MedicalConsultationRepository, PersonRepository } = require("../repositories");
-
+const { MedicalConsultationRepository, PersonRepository, TypeRepository } = require("../repositories");
+const i18n = require("../../config/i18n-config");
 const MedicalConsultationController = {
   /**
    * Obtener todas las consultas médicas.
@@ -17,21 +17,35 @@ const MedicalConsultationController = {
       }
 
       // Mapear las consultas médicas para asegurar que los datos JSON estén en el formato correcto
-      const mappedMedicalConsultations = medicalConsultations.map((consultation) => ({
-        id: consultation.id,
-        date: consultation.date,
-        reason: consultation.reason,
-        diagnosis: consultation.diagnosis,
-        treatments: Array.isArray(consultation.treatments)
-          ? consultation.treatments // Si ya es un array, úsalo directamente
-          : JSON.parse(consultation.treatments || "[]"), // Si es una cadena JSON, parsearla
-        medicalNotes: consultation.medicalNotes,
-        files: Array.isArray(consultation.files)
-          ? consultation.files // Si ya es un array, úsalo directamente
-          : JSON.parse(consultation.files || "[]"), // Si es una cadena JSON, parsearla
-        personId: consultation.person_id,
-        person_id: consultation.person_id,
-      }));
+      const mappedMedicalConsultations = medicalConsultations.map((consultation) => {
+        const translatedTypeName =
+          i18n.__(`types.${consultation.type?.name}.name`) !==
+          `types.${consultation.type?.name}.name`
+            ? i18n.__(`types.${consultation.type?.name}.name`)
+            : consultation.type?.name;
+
+        return {
+          id: consultation.id,
+          date: consultation.date,
+          reason: consultation.reason,
+          diagnosis: consultation.diagnosis,
+          treatments: Array.isArray(consultation.treatments)
+            ? consultation.treatments
+            : JSON.parse(consultation.treatments || "[]"),
+          medicalNotes: consultation.medicalNotes,
+          files: Array.isArray(consultation.files)
+            ? consultation.files
+            : JSON.parse(consultation.files || "[]"),
+          personId: consultation.person_id,
+          person_id: consultation.person_id,
+          
+          // Nuevos campos agregados
+          professional: consultation.professional, // Asumiendo que professional es un string
+          typeId: consultation.type_id,
+          type_id: consultation.type_id,
+          typeName: translatedTypeName, // Nombre del tipo traducido
+        };
+      });
 
       return res.status(200).json({ medicalConsultations: mappedMedicalConsultations });
     } catch (error) {
@@ -50,7 +64,7 @@ const MedicalConsultationController = {
   async show(req, res) {
     logger.info(`${req.user.name} - Busca una consulta médica`); // Registro de la acción
     try {
-      const { id } = req.params;
+      const { id } = req.body;
 
       // Consulta la consulta médica por su ID con las relaciones requeridas
       const medicalConsultation = await MedicalConsultationRepository.findById(id);
@@ -67,14 +81,25 @@ const MedicalConsultationController = {
         reason: medicalConsultation.reason,
         diagnosis: medicalConsultation.diagnosis,
         treatments: Array.isArray(medicalConsultation.treatments)
-          ? medicalConsultation.treatments // Si ya es un array, úsalo directamente
-          : JSON.parse(medicalConsultation.treatments || "[]"), // Si es una cadena JSON, parsearla
+          ? medicalConsultation.treatments
+          : JSON.parse(medicalConsultation.treatments || "[]"),
         medicalNotes: medicalConsultation.medicalNotes,
         files: Array.isArray(medicalConsultation.files)
-          ? medicalConsultation.files // Si ya es un array, úsalo directamente
-          : JSON.parse(medicalConsultation.files || "[]"), // Si es una cadena JSON, parsearla
+          ? medicalConsultation.files
+          : JSON.parse(medicalConsultation.files || "[]"),
         personId: medicalConsultation.person_id,
         person_id: medicalConsultation.person_id,
+        
+        // Nuevos campos agregados
+        professional: medicalConsultation.professional, // Campo professional como string
+        typeId: medicalConsultation.type_id,
+        type_id: medicalConsultation.type_id,
+        typeName: (
+          i18n.__(`types.${medicalConsultation.type?.name}.name`) !== 
+          `types.${medicalConsultation.type?.name}.name`
+        ) 
+          ? i18n.__(`types.${medicalConsultation.type?.name}.name`)
+          : medicalConsultation.type?.name,
       };
 
       // Respuesta JSON con los datos de la consulta médica
@@ -105,23 +130,38 @@ const MedicalConsultationController = {
       }
 
       // Mapear las consultas médicas para asegurar que los datos JSON estén en el formato correcto
-      const mappedMedicalConsultations = medicalConsultations.map((consultation) => ({
-        id: consultation.id,
-        date: consultation.date,
-        reason: consultation.reason,
-        diagnosis: consultation.diagnosis,
-        treatments: Array.isArray(consultation.treatments)
-          ? consultation.treatments // Si ya es un array, úsalo directamente
-          : JSON.parse(consultation.treatments || "[]"), // Si es una cadena JSON, parsearla
-        medicalNotes: consultation.medicalNotes,
-        files: Array.isArray(consultation.files)
-          ? consultation.files // Si ya es un array, úsalo directamente
-          : JSON.parse(consultation.files || "[]"), // Si es una cadena JSON, parsearla
-        personId: consultation.person_id,
-        person_id: consultation.person_id,
-      }));
+      const mappedMedicalConsultations = medicalConsultations.map((consultation) => {
+        const translatedTypeName =
+          i18n.__(`types.${consultation.type?.name}.name`) !==
+          `types.${consultation.type?.name}.name`
+            ? i18n.__(`types.${consultation.type?.name}.name`)
+            : consultation.type?.name;
 
-      return res.status(200).json({ medicalConsultations: mappedMedicalConsultations });
+        return {
+          id: consultation.id,
+          date: consultation.date,
+          reason: consultation.reason,
+          diagnosis: consultation.diagnosis,
+          treatments: Array.isArray(consultation.treatments)
+            ? consultation.treatments
+            : JSON.parse(consultation.treatments || "[]"),
+          medicalNotes: consultation.medicalNotes,
+          files: Array.isArray(consultation.files)
+            ? consultation.files
+            : JSON.parse(consultation.files || "[]"),
+          personId: consultation.person_id,
+          person_id: consultation.person_id,
+          
+          // Nuevos campos agregados
+          professional: consultation.professional, // Asumiendo que professional es un string
+          typeId: consultation.type_id,
+          type_id: consultation.type_id,
+          typeName: translatedTypeName, // Nombre del tipo traducido
+          type: consultation.type?.name
+        };
+      });
+
+      return res.status(200).json({ consultations: mappedMedicalConsultations });
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
@@ -140,7 +180,17 @@ const MedicalConsultationController = {
     logger.info("Datos recibidos al crear una consulta médica");
     logger.info(JSON.stringify(req.body));
 
+    const { type_id} = req.body;
     const personId = req.person.id;
+     if (type_id) {
+      const type = await TypeRepository.findById(type_id);
+      if (!type) {
+        logger.error(
+          `MedicalConsultationController->store: Tipo de examen no encontrado con ID ${type_id}`
+        );
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
+    }
     try {
       const medicalConsultation = await MedicalConsultationRepository.create(req.body, personId, req.files);
       res.status(201).json({ medicalConsultation });
@@ -166,6 +216,16 @@ const MedicalConsultationController = {
     // Verificación de existencia
     if (!medicalConsultation) {
       return res.status(404).json({ msg: "MedicalConsultationNotFound" });
+    }
+    const { type_id} = req.body;
+    if (type_id) {
+      const type = await TypeRepository.findById(type_id);
+      if (!type) {
+        logger.error(
+          `MedicalConsultationController->update: Tipo de examen no encontrado con ID ${type_id}`
+        );
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
     }
 
     try {
@@ -205,6 +265,50 @@ const MedicalConsultationController = {
         : error.message || "Error desconocido";
 
       logger.error("MedicalConsultationController->destroy: " + errorMsg);
+      res.status(500).json({ error: "ServerError", details: errorMsg });
+    }
+  },
+
+  async getTypesByTypeRelation(req, res) {
+    logger.info(`${req.user.name} - Buscando tipos de tipo ${req.body.type}`);
+
+    try {
+      const { type } = req.body; // Supongamos que el tipo viene en el cuerpo de la solicitud
+      const types = await TypeRepository.findByType(type);
+
+      if (!types || types.length === 0) {
+        return res
+          .status(404)
+          .json({
+            message: "No se encontraron tipos para el tipo especificado.",
+          });
+      }
+
+      // Formatear los resultados para traducir name y description
+      const formattedTypes = types.map((typeItem) => {
+        const translatedName = i18n.__(`types.${typeItem.name}.name`) !==
+              `types.${typeItem.name}.name`
+              ? i18n.__(`types.${typeItem.name}.name`)
+              : typeItem.name;
+
+        const translatedDescription = i18n.__(`types.${typeItem.name}.name`) !==
+              `types.${typeItem.name}.name`
+              ? i18n.__(`types.${typeItem.name}.description`)
+              : typeItem.description;
+
+        return {
+          ...typeItem.toJSON(), // Mantener todos los campos originales
+          nameTranslated: translatedName, // Sobrescribir name con la traducción
+          descriptionTranslated: translatedDescription, // Sobrescribir description con la traducción
+        };
+      });
+
+      return res.status(200).json({ types: formattedTypes/*, relationships: translatedFamilyRelationsData*/ });
+    } catch (error) {
+      const errorMsg = error.details
+        ? error.details.map((detail) => detail.message).join(", ")
+        : error.message || "Error desconocido";
+      logger.error("TypeController->getTypesByType: " + errorMsg);
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },

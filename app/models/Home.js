@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
   Home.hasMany(models.File, { foreignKey: 'home_id', as: 'files', onDelete: 'CASCADE' });
   Home.hasMany(models.Notification, { foreignKey: 'home_id', as: 'notifications', onDelete: 'CASCADE' });
   Home.belongsTo(models.Person, { as: 'person', foreignKey: 'person_id' }); // Relación directa
+  Home.hasMany(models.FamilyBackground, {
+        foreignKey: 'home_id',
+        as: 'familyBackgrounds'
+      });
     }
   }
   Home.init({

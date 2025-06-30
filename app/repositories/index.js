@@ -22,6 +22,12 @@ const MedicalConsultationRepository = require('./MedicalConsultationRepository')
 const TypeRepository = require('./TypeRepository');
 const MedicalExamRepository = require('./MedicalExamRepository');
 const EmergencyRepository = require('./EmergencyRepository');
+const PersonalBackgroundRepository = require('./PersonalBackgroundRepository');
+const FamilyBackgroundRepository = require('./FamilyBackgroundRepository');
+const PhysicalExamRepository = require('./PhysicalExamRepository');
+const PsychosocialBackgroundRepository = require('./PsychosocialBackgroundRepository ');
+const DiagnosisRepository = require('./DiagnosisRepository ');
+const TreatmentRepository = require('./TreatmentRepository');
 
 module.exports = {
     CategoryRepository,
@@ -47,5 +53,11 @@ module.exports = {
     MedicalConsultationRepository,
     TypeRepository,
     MedicalExamRepository,
-    EmergencyRepository
+    EmergencyRepository,
+    PersonalBackgroundRepository,
+    FamilyBackgroundRepository,
+    PhysicalExamRepository,
+    PsychosocialBackgroundRepository,
+    DiagnosisRepository,
+    TreatmentRepository
 };
