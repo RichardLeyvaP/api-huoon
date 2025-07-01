@@ -175,7 +175,7 @@ router.get('/person', PersonController.index);
 router.get('/person-profile', PersonController.getPersonProfile);
 router.post('/person-show', validateSchema(idPersonSchema), PersonController.show);
 router.post('/person', validateSchema(storePersonSchema), multerCategory('image', 'people'), PersonController.store);
-router.post('/person-update', validateSchema(updatePersonSchema), multerCategory('image', 'people'), PersonController.update);
+router.post('/person-update', multerCategory('image', 'people'), validateSchema(updatePersonSchema), PersonController.update);
 router.post('/person-destroy', validateSchema(idPersonSchema), PersonController.destroy);
 
 //Rutas Statuses
@@ -366,10 +366,13 @@ router.post("/process-ocr", validateSchema(ocrStringSchema), PersonHomeWarehouse
 //Rutas Finanzas
 router.get('/finance', FinanceController.index);
 router.post('/get-type-finance', validateSchema(getFinanceSchema), FinanceController.getTypeFinances);
+router.post('/get-type-finance-range', validateSchema(getFinanceSchema), FinanceController.getTypeFinancesRange);
 router.post('/finance', multerCategory('image', 'finances'), validateSchema(storeFinanceSchema), FinanceController.store);
 router.post('/finance-show', validateSchema(idFinanceSchema), FinanceController.show);
 router.post('/finance-update', multerCategory('image', 'finances'), validateSchema(updateFinanceSchema), FinanceController.update);
 router.post('/finance-destroy', validateSchema(idFinanceSchema), FinanceController.destroy);
+router.post('/finance-statistics-month',  FinanceController.getPersonFinancialStats);
+router.post('/get-finances-data',  FinanceController.getFinacesData);
 
 //Rutas Files
 router.get('/file', FileController.index);

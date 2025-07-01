@@ -382,5 +382,31 @@
     "name": "Other",
     "description": "Unspecified consultation type"
   }
+  },
+  "gender": {
+    "Male": { "name": "Male" },
+    "Female": { "name": "Female" },
+    "Other": { "name": "Other" }
+  },
+  "documentType": {
+    "RUT": { "name": "RUT" },
+    "DNI": { "name": "DNI" },
+    "Passport": { "name": "Passport" }
+  },
+  "healthCoverage": {
+    "Isapre": { "name": "Isapre" },
+    "Fonasa": { "name": "Fonasa" },
+    "Insurance": { "name": "Insurance" },
+    "Other": { "name": "Other" }
+  },
+  "financeType": {
+    "Personal": {
+      "name": "Personal",
+      "description": "Personal financial record"
+    },
+    "Hogar": {
+      "name": "Household",
+      "description": "Household financial record"
+    }
   }
 }

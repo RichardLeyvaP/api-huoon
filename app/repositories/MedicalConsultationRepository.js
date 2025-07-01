@@ -31,6 +31,18 @@ const MedicalConsultationRepository = {
     });
   },
 
+  async findLastByPersonId(personId) {
+  return await MedicalConsultation.findOne({
+    where: { person_id: personId },
+    include: [
+      { model: Person, as: "person" },
+      { model: Type, as: "type" }
+    ],
+    order: [['date', 'DESC']], // Ordenar por fecha descendente
+    limit: 1 // Limitar a 1 resultado
+  });
+},
+
   /**
    * Obtener una consulta médica por su ID.
    * @param {number} id - ID de la consulta médica.

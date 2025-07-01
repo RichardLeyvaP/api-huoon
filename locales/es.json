@@ -382,5 +382,31 @@
     "name": "Otro",
     "description": "Otro tipo de consulta no especificada"
   }
-  } 
+  },
+  "gender": {
+    "Male": { "name": "Masculino" },
+    "Female": { "name": "Femenino" },
+    "Other": { "name": "Otro" }
+  },
+  "documentType": {
+    "RUT": { "name": "RUT" },
+    "DNI": { "name": "DNI" },
+    "Passport": { "name": "Pasaporte" }
+  },
+  "healthCoverage": {
+    "Isapre": { "name": "Isapre" },
+    "Fonasa": { "name": "Fonasa" },
+    "Insurance": { "name": "Seguro" },
+    "Other": { "name": "Otro" }
+  },
+  "financeType": {
+    "Personal": {
+      "name": "Personal",
+      "description": "Registro financiero personal"
+    },
+    "Hogar": {
+      "name": "Hogar",
+      "description": "Registro financiero del hogar"
+    }
+  }
 }

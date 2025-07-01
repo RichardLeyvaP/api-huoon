@@ -5,7 +5,7 @@ const logger = require('../../config/logger');
 const i18n = require("../../config/i18n-config"); // Importar i18n para traducciones
 const bcrypt = require('bcrypt');
 const authConfig = require('../../config/auth');
-const { PersonRepository, UserRepository, PhysicalExamRepository, MedicalExamRepository, TreatmentRepository, PersonalBackgroundRepository, FamilyBackgroundRepository, DiagnosisRepository } = require('../repositories');
+const { PersonRepository, UserRepository, PhysicalExamRepository, MedicalExamRepository, TreatmentRepository, PersonalBackgroundRepository, FamilyBackgroundRepository, DiagnosisRepository, MedicalConsultationRepository } = require('../repositories');
 const Module = require('module');
 
 const PersonController = {
@@ -97,52 +97,94 @@ const PersonController = {
     },
     
     async show(req, res) {
-        logger.info(`${req.user.name} - Accediendo a buscar una persona`);
-        
-        try {
-            // Buscar persona por ID
-            // Usar findByPk si estás buscando por clave primaria (id)
-            const person = await PersonRepository.findById(req.body.id);  // findByPk en lugar de findById
-            if (!person) {
-                return res.status(404).json({ msg: 'PersonNotFound' });
-            }
-            // Mapear los resultados solo si es necesario
-            const mappedPeople = {
-                    id:person.id,
-                    userId: person.user_id,
-                    name: person.name,
-                    user: person.user.name,
-                    language: person.user.language,
-                    birthDate: person.birth_date,
-                    age: person.age,
-                    gender: person.gender,
-                    email: person.email,
-                    phone: person.phone,
-                    address: person.address,
-                    image: person.image,
-                    emergencyContact: person.emergencyContact,
-                    // Nuevos campos
-                    medicalRecordNumber: person.medical_record_number,
-                    documentType: person.document_type,
-                    documentNumber: person.document_number,
-                    healthCoverage: person.health_coverage,
-                    coverageName: person.coverage_name,
-                    blood_type: person.blood_type,
-                    bloodType: person.blood_type,
-                };
+    logger.info(`${req.user.name} - Accediendo a buscar una persona`);
+    
+    try {
+        // 1. Buscar persona
+        const person = await PersonRepository.findById(req.body.id);
+        if (!person) {
+            return res.status(404).json({ msg: 'PersonNotFound' });
+        }
 
-            // Si hay transformación, devolver los datos mapeados
-            res.status(200).json({ people: mappedPeople });
+        // 2. Función mejorada para traducción con fallback al valor original
+        const translateField = (value, category) => {
+            if (!value) return null;
+            
+            try {
+                const translationKey = `${category}.${value}.name`;
+                const translation = i18n.__(translationKey);
+                
+                // Si no existe la traducción, i18n.__ suele devolver la misma clave
+                return translation === translationKey ? value : translation;
+            } catch (e) {
+                // En caso de cualquier error, devolver el valor original
+                return value;
+            }
+        };
+
+        // 3. Mapear respuesta con traducciones
+        const mappedPeople = {
+            id: person.id,
+            userId: person.user_id,
+            name: person.name,
+            user: person.user.name,
+            language: person.user.language,
+            birthDate: person.birth_date,
+            birth_date: person.birth_date,
+            age: person.age,
+            gender: person.gender,
+            genderTranslated: translateField(person.gender, 'gender'),
+            email: person.email,
+            phone: person.phone,
+            address: person.address,
+            image: person.image,
+            emergencyContact: person.emergencyContact,
+            medicalRecordNumber: person.medical_record_number,
+            medical_record_number: person.medical_record_number,
+            documentType: person.document_type,
+            document_type: person.document_type,
+            documentTypeTranslated: translateField(person.document_type, 'documentType'),
+            documentNumber: person.document_number,
+            documen_number: person.document_number,
+            healthCoverage: person.health_coverage,
+            health_coverage: person.health_coverage,
+            healthCoverageTranslated: translateField(person.health_coverage, 'healthCoverage'),
+            coverageName: person.coverage_name,
+            coverage_name: person.coverage_name,
+            bloodType: person.blood_type,
+            blood_type: person.blood_type,
+        };
+
+        // 4. Función para generar opciones traducidas
+        const generateTranslatedOptions = () => ({
+            genders: ['Male', 'Female', 'Other'].map(id => ({
+                id,
+                name: translateField(id, 'gender')
+            })),
+            documentTypes: ['RUT', 'DNI', 'Passport'].map(id => ({
+                id,
+                name: translateField(id, 'documentType')
+            })),
+            healthCoverages: ['Isapre', 'Fonasa', 'Insurance', 'Other'].map(id => ({
+                id,
+                name: translateField(id, 'healthCoverage')
+            }))
+        });
+
+        // 5. Devolver respuesta estructurada
+        res.status(200).json({ 
+            person: mappedPeople,
+            options: generateTranslatedOptions()
+        });
 
         } catch (error) {
             const errorMsg = error.details
-            ? error.details.map(detail => detail.message).join(', ')
-            : error.message || 'Error desconocido';
+                ? error.details.map(detail => detail.message).join(', ')
+                : error.message || 'Error desconocido';
             logger.error('PeopleController->show: ' + errorMsg);
             return res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
     },
-
     async update(req, res) {
         logger.info(`${req.user.name} - Editando una persona`);
         logger.info('datos recibidos al editar una persona');
@@ -414,8 +456,47 @@ const PersonController = {
                         : null,
                     type: diagnosis.type?.name
                 } : null;
+
+                const consultation = await MedicalConsultationRepository.findLastByPersonId(person_id);
+                    const mappedMedicalConsultation = consultation
+                      ? {
+                          id: consultation.id,
+                          date: consultation.date,
+                          reason: consultation.reason,
+                          diagnosis: consultation.diagnosis,
+                          treatments: Array.isArray(consultation.treatments)
+                            ? consultation.treatments
+                            : JSON.parse(consultation.treatments || "[]"),
+                          medicalNotes: consultation.medicalNotes,
+                          files: Array.isArray(consultation.files)
+                            ? consultation.files
+                            : JSON.parse(consultation.files || "[]"),
+                          personId: consultation.person_id,
+                          person_id: consultation.person_id,
+                          professional: consultation.professional,
+                          typeId: consultation.type_id,
+                          type_id: consultation.type_id,
+                          typeName: consultation.type?.name 
+                        ? (i18n.__(`types.${diagnosis.type.name}.name`) !== `types.${diagnosis.type.name}.name`
+                            ? i18n.__(`types.${diagnosis.type.name}.name`)
+                            : diagnosis.type.name)
+                        : null,
+                          type: consultation.type?.name,
+                        }
+                      : null;
             // Devolver los datos mapeados
-            res.status(200).json({ person: mappedPerson, physicalExam: mappedPhysicalExam, medicalExam: mappedExam, treatment: mappedTreatment, backgroundPerson: mappedBackgroundsPerson, backgroundFamily: mappedBackgroundsFamily, diagnosis: mappedDiagnosis });
+            res
+              .status(200)
+              .json({
+                person: mappedPerson,
+                physicalExam: mappedPhysicalExam,
+                medicalExam: mappedExam,
+                treatment: mappedTreatment,
+                backgroundPerson: mappedBackgroundsPerson,
+                backgroundFamily: mappedBackgroundsFamily,
+                diagnosis: mappedDiagnosis,
+                consultation: mappedMedicalConsultation,
+              });
 
         } catch (error) {
             const errorMsg = error.details

@@ -116,6 +116,76 @@ const FinanceController = {
     }
   },
 
+  async getTypeFinancesRange(req, res) {
+    logger.info(`${req.user.name} - Buscando registros financieros con rango`);
+
+    const { home_id, type, startDate, endDate } = req.body;
+    const home = await HomeRepository.findById(home_id);
+    if (!home) {
+        logger.error(`Hogar no encontrado con ID ${home_id}`);
+        return res.status(404).json({ msg: "HomeNotFound" });
+    }
+    
+    const person_id = req.person.id;
+
+    try {
+        // Preparar el objeto dateRange
+        const dateRange = {};
+        
+        // Solo asignar las fechas si fueron proporcionadas
+        if (startDate) dateRange.startDate = startDate;
+        if (endDate) dateRange.endDate = endDate;
+
+        let finances = [];
+        if (type === 'Hogar') {
+            finances = await FinanceRepository.findAllTypeRange(home_id, null, type, dateRange);
+        } else if (type === 'Personal') {
+            finances = await FinanceRepository.findAllTypeRange(person_id, null, type, dateRange);
+        } else {
+            finances = await FinanceRepository.findAllTypeRange(person_id, home_id, type, dateRange);
+        }
+
+        if (!finances.length) {
+            logger.info('No se encontraron registros financieros');
+            return res.status(204).json({ msg: "FinancesNotFound" });
+        }
+
+        // Mapear la respuesta
+        const mappedFinances = finances.map((finance) => ({
+            id: finance.id,
+            homeId: finance.home_id,
+            home_id: finance.home_id,
+            personId: finance.person_id,
+            person_id: finance.person_id,
+            spent: finance.spent,
+            income: finance.income,
+            date: finance.date,
+            description: finance.description,
+            type: i18n.__(`finances.${finance.type}.name`) !== `finances.${finance.type}.name`
+                ? i18n.__(`finances.${finance.type}.name`)
+                : finance.type,
+            method: finance.method,
+            image: finance.image,
+            finance: finance.income ? 'Ingreso' : 'Gasto',
+            idType: finance.type
+        }));
+
+        logger.info(`Devolviendo ${finances.length} registros financieros`);
+        res.status(200).json({ finances: mappedFinances });
+    } catch (error) {
+        const errorMsg = error.details
+            ? error.details.map((detail) => detail.message).join(", ")
+            : error.message || "Error desconocido";
+
+        logger.error("Error en getTypeFinancesRange: " + errorMsg);
+        res.status(500).json({ 
+            error: "ServerError", 
+            details: errorMsg,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+},
+
   // Crear un nuevo registro financiero
   async store(req, res) {
     logger.info(`${req.user.name} - Crea un nuevo registro financiero`);
@@ -313,6 +383,106 @@ const FinanceController = {
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
+
+  async getPersonFinancialStats(req, res) {
+    logger.info(`${req.user.name} - Consulta estadísticas financieras personales`);
+
+    const person_id = req.person.id;
+
+    try {
+      const stats = await FinanceRepository.getPersonFinancialStats(person_id);
+
+      // Formatear montos con separadores de miles
+      const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('es-CO', {
+          style: 'decimal',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(amount);
+      };
+
+      // Obtener descripción del último movimiento (si existe)
+      let lastMovementDescription = "No hay movimientos";
+      if (stats.lastRecord) {
+        lastMovementDescription = stats.lastRecord.description || 
+          (stats.lastRecord.income ? "Ingreso registrado" : "Gasto registrado");
+      }
+
+      // Construir respuesta específica para la UI
+      const response = {
+        incomeCard: {
+          current: formatCurrency(stats.currentMonth.income),
+          percentage: stats.percentages.income,
+          lastMonth: formatCurrency(stats.lastMonth.income),
+          icon: "mdi-cash",
+          color: "green"
+        },
+        spentCard: {
+          current: formatCurrency(stats.currentMonth.spent),
+          percentage: stats.percentages.spent,
+          lastMonth: formatCurrency(stats.lastMonth.spent),
+          icon: "mdi-cart",
+          color: "red"
+        },
+        balanceCard: {
+          current: formatCurrency(stats.currentMonth.balance),
+          icon: "mdi-scale-balance",
+          color: "blue-darken-2"
+        },
+        movementsCard: {
+          total: formatCurrency(stats.currentMonth.income + stats.currentMonth.spent),
+          lastMovement: {
+            amount: stats.lastRecord ? formatCurrency(stats.lastRecord.income || stats.lastRecord.spent) : "0",
+            description: lastMovementDescription,
+            icon: stats.lastRecord?.income ? "mdi-cash" : "mdi-cart",
+            type: stats.lastRecord?.income ? "income" : "spent"
+          },
+          icon: "mdi-calendar-clock",
+          color: "amber-darken-2"
+        }
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      logger.error("FinanceController->getPersonFinancialStats: " + error.message);
+      res.status(500).json({ 
+        error: "ServerError", 
+        message: "Error al obtener estadísticas financieras personales" 
+      });
+    }
+  },
+  
+  async getFinacesData(req, res) {
+    logger.info(`${req.user.name} - Datos para agregar finanzas`);
+
+    const person_id = req.person.id;
+
+    try {
+     const financeTypeData = [
+        { id: "Personal", name: "Personal", description: "Registro financiero personal" },
+        { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
+          ];
+
+          const translatedFinanceTypeData = financeTypeData.map((item) => ({
+        id: item.id,
+        name: i18n.__(`financeType.${item.id}.name`) !== `financeType.${item.id}.name`
+              ? i18n.__(`financeType.${item.id}.name`)
+              : item.name,
+        description: i18n.__(`financeType.${item.id}.description`) !== `financeType.${item.id}.description`
+              ? i18n.__(`financeType.${item.id}.description`)
+              : item.description,
+        originalName: item.name
+      }));
+
+      res.status(200).json({'types': translatedFinanceTypeData});
+    } catch (error) {
+      logger.error("FinanceController->getFinacesData: " + error.message);
+      res.status(500).json({ 
+        error: "ServerError", 
+        message: "Error al obtener estadísticas financieras personales" 
+      });
+    }
+  }
 };
 
 module.exports = FinanceController;
