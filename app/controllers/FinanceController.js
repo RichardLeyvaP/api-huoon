@@ -5,6 +5,7 @@ const {
   FinanceRepository,
   PersonRepository,
   HomeRepository,
+  SuggestionRepository,
 } = require("../repositories"); // Asegúrate de que tengas un repositorio para Finance
 
 const FinanceController = {
@@ -388,8 +389,38 @@ const FinanceController = {
     logger.info(`${req.user.name} - Consulta estadísticas financieras personales`);
 
     const person_id = req.person.id;
+    const dateParam = req.body.date || new Date().toISOString().slice(0, 10);;
 
     try {
+
+      const suggestionStatusData = [
+        { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
+        { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
+        { id: "Completado", name: "Completado", description: "La sugerencia ha sido resuelta" },
+      ];
+
+      const translatedSuggestionStatusData = suggestionStatusData.map((item) => ({
+        id: item.id,
+        name: i18n.__(`suggestionStatus.${item.id}.name`) !== `suggestionStatus.${item.id}.name`
+          ? i18n.__(`suggestionStatus.${item.id}.name`)
+          : item.name,
+        description: i18n.__(`suggestionStatus.${item.id}.description`) !== `suggestionStatus.${item.id}.description`
+          ? i18n.__(`suggestionStatus.${item.id}.description`)
+          : item.description,
+        statusName: item.name
+      }));
+      
+      const suggestions = await SuggestionRepository.findAllByPersonId(person_id, dateParam);
+       const mappedSuggestions = suggestions.map(suggestion => ({
+        id: suggestion.id,
+        title: suggestion.title,
+        description: suggestion.description,
+        content: suggestion.content,
+        status: suggestion.status,
+        homeId: suggestion.home_id,
+        home_id: suggestion.home_id,
+        date: suggestion.date
+      }));
       const stats = await FinanceRepository.getPersonFinancialStats(person_id);
 
       // Formatear montos con separadores de miles
@@ -430,7 +461,7 @@ const FinanceController = {
           color: "blue-darken-2"
         },
         movementsCard: {
-          total: formatCurrency(stats.currentMonth.income + stats.currentMonth.spent),
+          total: formatCurrency(stats.currentMonth.income - stats.currentMonth.spent),
           lastMovement: {
             amount: stats.lastRecord ? formatCurrency(stats.lastRecord.income || stats.lastRecord.spent) : "0",
             description: lastMovementDescription,
@@ -439,9 +470,10 @@ const FinanceController = {
           },
           icon: "mdi-calendar-clock",
           color: "amber-darken-2"
-        }
+        },
+        suggestions: mappedSuggestions,
+        statusuggestions: translatedSuggestionStatusData
       };
-
       res.status(200).json(response);
     } catch (error) {
       logger.error("FinanceController->getPersonFinancialStats: " + error.message);

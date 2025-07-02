@@ -4,5 +4,6 @@ module.exports = {
     StatusService: require('./StatusService'),
     RoleService: require('./RoleService'),
     ActivityLogService: require('./ActivityLogService'),
+    IntentDetectionService: require('./IntentDetectionService'),
     // Agregar otros servicios según sea necesario
   };

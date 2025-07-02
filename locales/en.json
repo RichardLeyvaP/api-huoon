@@ -408,5 +408,19 @@
       "name": "Household",
       "description": "Household financial record"
     }
+  },
+  "suggestionStatus": {
+  "Pendiente": {
+    "name": "Pending",
+    "description": "The suggestion is awaiting review"
+  },
+  "Revisado": {
+    "name": "Reviewed",
+    "description": "The suggestion has been reviewed"
+  },
+  "Completado": {
+    "name": "Completed",
+    "description": "The suggestion has been resolved"
   }
+}
 }

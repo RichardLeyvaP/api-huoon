@@ -408,5 +408,19 @@
       "name": "Hogar",
       "description": "Registro financiero del hogar"
     }
+  },
+    "suggestionStatus": {
+    "Pendiente": {
+      "name": "Pendiente",
+      "description": "La sugerencia está en espera de revisión"
+    },
+    "Revisado": {
+      "name": "Revisado",
+      "description": "La sugerencia ha sido revisada"
+    },
+    "Completado": {
+      "name": "Completado",
+      "description": "La sugerencia ha sido resuelta"
+    }
   }
 }

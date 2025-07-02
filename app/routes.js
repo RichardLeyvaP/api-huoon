@@ -42,6 +42,7 @@ const {  storePhysicalExamSchema, updatePhysicalExamSchema, idPhysicalExamSchema
 const { storePsychosocialBackgroundSchema, updatePsychosocialBackgroundSchema, idPsychosocialBackgroundSchema, getPsychosocialBackgroundSchema } = require('./middlewares/validations/psychosocialBackgroundValidation');
 const { storeDiagnosisSchema, updateDiagnosisSchema, idDiagnosisSchema, getDiagnosisSchema } = require('./middlewares/validations/diagnosisValidation');
 const { storeTreatmentSchema, updateTreatmentSchema, idTreatmentSchema, getTreatmentSchema } = require('./middlewares/validations/treatmentValidation');
+const { storeSuggestionSchema, updateSuggestionSchema, idSuggestionSchema, getSuggestionSchema } = require('./middlewares/validations/suggestionValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -78,6 +79,7 @@ const PhysicalExamController = require('./controllers/PhysicalExamController');
 const PsychosocialBackgroundController = require('./controllers/PsychosocialBackgroundController');
 const DiagnosisController = require('./controllers/DiagnosisController');
 const TreatmentController = require('./controllers/TreatmentController');
+const SuggestionController = require('./controllers/SuggestionController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -240,7 +242,13 @@ router.post('/treatment-show', validateSchema(idTreatmentSchema), TreatmentContr
 router.post('/treatment-update', validateSchema(updateTreatmentSchema), TreatmentController.update);
 router.post('/treatment-delete', validateSchema(idTreatmentSchema), TreatmentController.destroy);
 
-
+// Rutas para sugerencias
+router.get('/suggestion', SuggestionController.index);
+router.post('/get-suggestion-person', SuggestionController.getByPersonId);
+router.post('/suggestion', validateSchema(storeSuggestionSchema), SuggestionController.store);
+router.post('/suggestion-show', SuggestionController.show);
+router.post('/suggestion-update', validateSchema(updateSuggestionSchema), SuggestionController.update);
+router.post('/suggestion-destroy', validateSchema(idSuggestionSchema), SuggestionController.destroy);
 
 //Rutas Roles
 router.get('/role', RoleController.index);

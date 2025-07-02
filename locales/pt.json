@@ -408,5 +408,19 @@
       "name": "Doméstico",
       "description": "Registro financeiro doméstico"
     }
+  },
+  "suggestionStatus": {
+  "Pendiente": {
+    "name": "Pendente",
+    "description": "A sugestão está aguardando revisão"
+  },
+  "Revisado": {
+    "name": "Revisado",
+    "description": "A sugestão foi revisada"
+  },
+  "Completado": {
+    "name": "Concluído",
+    "description": "A sugestão foi resolvida"
   }
+}
 }

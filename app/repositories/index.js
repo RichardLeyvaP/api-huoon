@@ -28,6 +28,7 @@ const PhysicalExamRepository = require('./PhysicalExamRepository');
 const PsychosocialBackgroundRepository = require('./PsychosocialBackgroundRepository ');
 const DiagnosisRepository = require('./DiagnosisRepository ');
 const TreatmentRepository = require('./TreatmentRepository');
+const SuggestionRepository = require('./SuggestionRepository');
 
 module.exports = {
     CategoryRepository,
@@ -59,5 +60,6 @@ module.exports = {
     PhysicalExamRepository,
     PsychosocialBackgroundRepository,
     DiagnosisRepository,
-    TreatmentRepository
+    TreatmentRepository,
+    SuggestionRepository
 };
