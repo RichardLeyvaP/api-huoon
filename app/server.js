@@ -10,6 +10,7 @@ const i18n = require("../config/i18n-config"); // Importar la configuración de 
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const cors = require("cors");
+const logger = require("../config/logger");
 require ('../cron/taskCron')
 
 passport.use(
@@ -34,7 +35,7 @@ passport.use(
         email: userEmail, // Email del usuario
         image: profile.photos[0]?.value, // URL de la imagen de perfil
       };
-      console.log("Datos del usuario:", userData); // Para verificar que se está creando correctamente
+      //console.log("Datos del usuario:", userData); // Para verificar que se está creando correctamente
       done(null, userData);
     }
   )
@@ -63,7 +64,7 @@ passport.use(
         image: profile.photos[0]?.value, // URL de la imagen de perfil
       };
 
-      console.log("Datos del usuario desde Facebook:", userData); // Log para verificar los datos del usuario
+      //console.log("Datos del usuario desde Facebook:", userData); // Log para verificar los datos del usuario
       done(null, userData);
     }
   )
@@ -89,27 +90,40 @@ app.use(
 const PORT = process.env.PORT || 8000;
 
 // Lista de orígenes permitidos
-const allowedOrigins = ['https://huoon.wezen.cl', 'http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = [
+  'https://huoon.wezen.cl', 
+  'http://localhost:3000', 
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',  // Agregar explícitamente 127.0.0.1
+  'http://127.0.0.1:3001',
+  'http://localhost:8000',   // Para desarrollo directo
+  'http://127.0.0.1:8000'
+];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Permitir solicitudes sin origen (por ejemplo, desde aplicaciones móviles o Postman)
-      if (!origin) return callback(null, true);
-  
-      // Verificar si el origen está en la lista de permitidos
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'El origen de la solicitud no está permitido.';
-        return callback(new Error(msg), false);
+      // Permitir en desarrollo sin verificación
+      if (process.env.NODE_ENV === 'development') {
+        return callback(null, true);
       }
-  
+      
+      // Verificación solo en producción
+      if (process.env.NODE_ENV === 'production') {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+          const msg = 'El origen de la solicitud no está permitido.';
+          return callback(new Error(msg), false);
+        }
+      }
+      
       return callback(null, true);
     },
-    //origin: 'http://localhost:8080',  // Asegúrate de permitir tu dominio frontend
     allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'Expires'],
-    credentials: true // Permitir credenciales (cookies, tokens, etc.)
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] // Asegurar todos los métodos
   })
-); // Habilita CORS para todos los orígenes
+);
 
 //Middlewares
 app.use(express.json());
@@ -129,14 +143,14 @@ app.use(passport.session());
 app.use("/api", require("./routes"));
 
 const server = app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  logger.info(`Servidor escuchando en http://localhost:${PORT}`);
   sequelize
     .authenticate()
     .then(() => {
-      console.log("Conexión a la base de datos exitosa");
+      logger.info("Conexión a la base de datos exitosa");
     })
     .catch((error) => {
-      console.error("Error al conectar a la base de datos:", error);
+      logger.error("Error al conectar a la base de datos:", error);
       process.exit(1); // Sale si no puede conectar con la DB
     });
 });
@@ -144,16 +158,16 @@ const server = app.listen(PORT, () => {
 // Maneja la señal SIGINT para cerrar conexiones y el servidor
 process.on("SIGINT", async () => {
   try {
-    console.log("Cerrando la conexión a la base de datos...");
+    logger.info("Cerrando la conexión a la base de datos...");
     await sequelize.close(); // Cierra la conexión a la base de datos
-    console.log("Conexión a la base de datos cerrada.");
+    logger.info("Conexión a la base de datos cerrada.");
 
     server.close(() => {
-      console.log("Servidor cerrado.");
+      logger.info("Servidor cerrado.");
       process.exit(0); // Sale de la aplicación correctamente
     });
   } catch (error) {
-    console.error("Error al cerrar la conexión a la base de datos:", error);
+    logger.info("Error al cerrar la conexión a la base de datos:", error);
     process.exit(1); // Si ocurre un error, termina con código de error
   }
 });

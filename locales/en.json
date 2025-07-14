@@ -39,7 +39,67 @@
             "Lavandería": {
               "name": "Laundry",
               "description": "Washing clothes"
-            }
+            },
+            "Alquiler": {
+    "name": "Rent",
+    "description": "Rent or mortgage payment"
+  },
+  "Electricidad": {
+    "name": "Electricity",
+    "description": "Electricity bill"
+  },
+  "Agua": {
+    "name": "Water",
+    "description": "Water utility bill"
+  },
+  "Gas": {
+    "name": "Gas",
+    "description": "Natural gas or propane supply"
+  },
+  "Internet": {
+    "name": "Internet",
+    "description": "Internet service"
+  },
+  "Telefonía": {
+    "name": "Phone",
+    "description": "Mobile/cell phone plan"
+  },
+  "Supermercado": {
+    "name": "Groceries",
+    "description": "Basic food shopping"
+  },
+  "Transporte": {
+    "name": "Transportation",
+    "description": "Fuel, tickets or vehicle maintenance"
+  },
+  "Seguros": {
+    "name": "Insurance",
+    "description": "Insurance policies (home, car, health)"
+  },
+  "Salud": {
+    "name": "Healthcare",
+    "description": "Medical and pharmacy expenses"
+  },
+  "Educación": {
+    "name": "Education",
+    "description": "Tuition, books or courses"
+  },
+  "Ahorros": {
+    "name": "Savings",
+    "description": "Monthly savings fund"
+  },
+  "Ocio": {
+    "name": "Leisure",
+    "description": "Entertainment and outings"
+  },
+  "Ropa": {
+    "name": "Clothing",
+    "description": "Apparel and footwear"
+  },
+  "Mantenimiento_Hogar": {
+    "name": "Home Maintenance",
+    "description": "Home repairs and improvements"
+  }
     },
   "priority": {
       "Baja": {

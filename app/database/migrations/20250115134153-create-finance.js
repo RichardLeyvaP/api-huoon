@@ -18,6 +18,14 @@ module.exports = {
         },
         onDelete: 'CASCADE'
       },
+      budget_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'budgets', // El nombre de la tabla de referencia también debe ser en minúsculas
+          key: 'id'
+        },
+      },
       home_id: {
         type: Sequelize.BIGINT,
         allowNull: false,
@@ -36,7 +44,7 @@ module.exports = {
         allowNull: true,
       },
       date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false,
       },
       description: {

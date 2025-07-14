@@ -43,6 +43,7 @@ const { storePsychosocialBackgroundSchema, updatePsychosocialBackgroundSchema, i
 const { storeDiagnosisSchema, updateDiagnosisSchema, idDiagnosisSchema, getDiagnosisSchema } = require('./middlewares/validations/diagnosisValidation');
 const { storeTreatmentSchema, updateTreatmentSchema, idTreatmentSchema, getTreatmentSchema } = require('./middlewares/validations/treatmentValidation');
 const { storeSuggestionSchema, updateSuggestionSchema, idSuggestionSchema, getSuggestionSchema } = require('./middlewares/validations/suggestionValidation');
+const { storeBudgetSchema, updateBudgetSchema, idBudgetSchema, getBudgetsSchema } = require('./middlewares/validations/budgetValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -80,6 +81,7 @@ const PsychosocialBackgroundController = require('./controllers/PsychosocialBack
 const DiagnosisController = require('./controllers/DiagnosisController');
 const TreatmentController = require('./controllers/TreatmentController');
 const SuggestionController = require('./controllers/SuggestionController');
+const BudgetController = require('./controllers/BudgetController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -103,7 +105,7 @@ router.get('/google-callback', (req, res, next) => {
         logger.error('Usuario no encontrado en la respuesta de Google:', info);
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
-      console.log('Datos en la ruta:', user);
+      //console.log('Datos en la ruta:', user);
       // Llama a tu función en el controlador aquí
       try {
         await AuthController.googleCallback(req, res, user);
@@ -126,7 +128,7 @@ router.get('/facebook-callback', (req, res, next) => {
             logger.error('Usuario no encontrado en la respuesta de Facebook:', info);
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
-        console.log('Datos en la ruta desde Facebook:', user);
+        //console.log('Datos en la ruta desde Facebook:', user);
 
         try {
             // Llama a tu función en el controlador
@@ -246,9 +248,20 @@ router.post('/treatment-delete', validateSchema(idTreatmentSchema), TreatmentCon
 router.get('/suggestion', SuggestionController.index);
 router.post('/get-suggestion-person', SuggestionController.getByPersonId);
 router.post('/suggestion', validateSchema(storeSuggestionSchema), SuggestionController.store);
-router.post('/suggestion-show', SuggestionController.show);
+router.post('/suggestion-show', validateSchema(idSuggestionSchema), SuggestionController.show);
 router.post('/suggestion-update', validateSchema(updateSuggestionSchema), SuggestionController.update);
 router.post('/suggestion-destroy', validateSchema(idSuggestionSchema), SuggestionController.destroy);
+
+// Rutas CRUD básicas para presupuestos
+router.get('/budget', BudgetController.index); // Obtener todos los presupuestos
+router.post('/get-budget-person', BudgetController.getByPersonId);
+router.post('/budget', validateSchema(storeBudgetSchema), BudgetController.store); // Crear nuevo presupuesto
+router.post('/budget-show', validateSchema(idBudgetSchema),BudgetController.show); // Obtener un presupuesto específico
+router.post('/budget-update', validateSchema(updateBudgetSchema), BudgetController.update); // Actualizar presupuesto
+router.delete('/budget', validateSchema(idBudgetSchema), BudgetController.destroy); // Eliminar presupuesto
+
+// Ruta para obtener presupuestos por persona
+router.post('/budget-by-person', validateSchema(getBudgetsSchema), BudgetController.getByPersonId);
 
 //Rutas Roles
 router.get('/role', RoleController.index);
@@ -307,6 +320,8 @@ router.get('/task', TaskController.index);
 router.post('/task-date-apk',  validateSchema(getDateTaskSchema), TaskController.getTaskDate);
 router.post('/task-date-web',  validateSchema(getDateTaskSchema), TaskController.getTaskDateWeb);
 router.post('/task', multerCategory('attachments', 'tasks'), validateSchema(storeTaskSchema),TaskController.store);
+router.post('/task-bulk',TaskController.storeBulk);//okk
+router.post('/task-chat-suggestion',TaskController.generateSuggestion);
 router.post('/task-show', validateSchema(idTaskSchema), TaskController.show);
 router.post('/task-update', multerCategory('attachments', 'tasks'), validateSchema(updateTaskSchema), TaskController.update);
 router.post('/task-create-points', validateSchema(updatePointsAndTasksSchema), TaskController.createPointsAndTasks);
@@ -445,6 +460,7 @@ router.post('/emergency-destroy', validateSchema(idEmergencySchema), EmergencyCo
 //Rutas Unificadas
 router.get('/productcategory-productstatus-apk', ProductController.category_status);
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
+router.post('/category-budgets', BudgetController.category_budgets);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 router.post('/status-priority-type-apk', WishController.status_priority_type);
 router.post('/get-type-state-severity', validateSchema(typeSchema), PersonalBackgroundController.getTypesByTypeStateSeverity);

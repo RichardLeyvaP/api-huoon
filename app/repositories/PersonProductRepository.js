@@ -423,7 +423,7 @@ const  PersonProductRepository = {
   const newQty = currentQty + parseFloat(quantity);
   const newTotal = currentTotal + parseFloat(total_price);
 
-  console.log(`Updating: Qty ${currentQty} -> ${newQty} | Total ${currentTotal} -> ${newTotal}`);
+  logger.info(`Updating: Qty ${currentQty} -> ${newQty} | Total ${currentTotal} -> ${newTotal}`);
 
   return await existingRecord.update({
     quantity: newQty,

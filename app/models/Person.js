@@ -77,6 +77,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'person_id',
         as: 'diagnoses'
         });
+        Person.hasMany(models.Budget, {
+          foreignKey: 'person_id',
+          as: 'budgets',
+        });
     }
 
     /**
@@ -89,7 +93,7 @@ module.exports = (sequelize, DataTypes) => {
           include: [{ association: 'user' }],
         });
       } catch (error) {
-        console.error("Error en findByUserId: ", error);
+        logger.error("Error en findByUserId: ", error);
         throw error;
       }
     }

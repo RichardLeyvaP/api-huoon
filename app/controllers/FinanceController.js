@@ -6,6 +6,8 @@ const {
   PersonRepository,
   HomeRepository,
   SuggestionRepository,
+  BudgetRepository,
+  CategoryRepository,
 } = require("../repositories"); // Asegúrate de que tengas un repositorio para Finance
 
 const FinanceController = {
@@ -151,25 +153,40 @@ const FinanceController = {
             return res.status(204).json({ msg: "FinancesNotFound" });
         }
 
-        // Mapear la respuesta
-        const mappedFinances = finances.map((finance) => ({
-            id: finance.id,
-            homeId: finance.home_id,
-            home_id: finance.home_id,
-            personId: finance.person_id,
-            person_id: finance.person_id,
-            spent: finance.spent,
-            income: finance.income,
-            date: finance.date,
-            description: finance.description,
-            type: i18n.__(`finances.${finance.type}.name`) !== `finances.${finance.type}.name`
-                ? i18n.__(`finances.${finance.type}.name`)
-                : finance.type,
-            method: finance.method,
-            image: finance.image,
-            finance: finance.income ? 'Ingreso' : 'Gasto',
-            idType: finance.type
-        }));
+       // Mapear la respuesta con categorías traducidas
+        const mappedFinances = finances.map((finance) => {
+            // Traducción de la categoría
+            const categoryName = finance.budget?.category?.name;
+            let translatedCategory = categoryName;
+            
+            if (categoryName) {
+                const translationKey = `categories.${categoryName}.name`;
+                translatedCategory = i18n.__(translationKey) !== translationKey 
+                    ? i18n.__(translationKey) 
+                    : categoryName;
+            }
+
+            return {
+                id: finance.id,
+                homeId: finance.home_id,
+                home_id: finance.home_id,
+                personId: finance.person_id,
+                person_id: finance.person_id,
+                spent: finance.spent,
+                income: finance.income,
+                date: finance.date,
+                description: finance.description,
+                type: finance.type,
+                typeTranslate: i18n.__(`finances.${finance.type}.name`) !== `finances.${finance.type}.name`
+                    ? i18n.__(`finances.${finance.type}.name`)
+                    : finance.type,
+                method: finance.method,
+                image: finance.image,
+                finance: finance.income ? 'Ingreso' : 'Gasto',
+                idType: finance.type,
+                categoryName: translatedCategory,
+            };
+        });
 
         logger.info(`Devolviendo ${finances.length} registros financieros`);
         res.status(200).json({ finances: mappedFinances });
@@ -185,7 +202,7 @@ const FinanceController = {
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
-},
+  },
 
   // Crear un nuevo registro financiero
   async store(req, res) {
@@ -204,6 +221,7 @@ const FinanceController = {
       type,
       method,
       image,
+      budget_id
     } = req.body;
 
     // Verificar si la persona existe
@@ -214,6 +232,15 @@ const FinanceController = {
       );
       return res.status(404).json({ msg: "HomeNotFound" });
     }
+   if (budget_id) {
+    const budget = await BudgetRepository.findById(budget_id);
+    if (!budget) {
+      logger.error(
+        `FinanceController->store: Prespuesto no encontrado con ID ${budget_id}`
+      );
+      return res.status(404).json({ msg: "BudgetNotFound" });
+    }
+  }
 
     // Verificar si la persona existe y pertenece al hogar
     const person = await PersonRepository.getPersonHouse(person_id, home_id);
@@ -305,6 +332,7 @@ const FinanceController = {
       type,
       method,
       image,
+      budget_id
     } = req.body;
 
     const finance = await FinanceRepository.findById(id);
@@ -326,6 +354,16 @@ const FinanceController = {
         );
         return res.status(404).json({ msg: "HomeNotFound" });
       }
+
+      if (budget_id) {
+    const budget = await BudgetRepository.findById(budget_id);
+    if (!budget) {
+      logger.error(
+        `FinanceController->store: Prespuesto no encontrado con ID ${budget_id}`
+      );
+      return res.status(404).json({ msg: "BudgetNotFound" });
+    }
+  }
 
       // Verificar si la persona existe y pertenece al hogar
       const person = await PersonRepository.getPersonHouse(person_id, home_id);
@@ -486,10 +524,42 @@ const FinanceController = {
   
   async getFinacesData(req, res) {
     logger.info(`${req.user.name} - Datos para agregar finanzas`);
-
+    const { home_id } = req.body;
     const person_id = req.person.id;
+    if (home_id) {
+        const home = await HomeRepository.findById(home_id);
+        if (!home) {
+          logger.error(`Hogar no encontrado con ID ${home_id}`);
+          return res.status(404).json({ msg: "TypeNotFound" });
+        }
+      }
 
     try {
+    const budgets = await BudgetRepository.findAllByPersonId(person_id, home_id);
+    const mappedBudgets = budgets.map((budget) => {
+            const translatedCategory = i18n.__(`categories.${budget.category?.name}.name`) !== `categories.${budget.category?.name}.name`
+              ? i18n.__(`categories.${budget.category?.name}.name`)
+              : budget.category?.name;
+    
+            return {
+              id: budget.id,
+              person_id: budget.person_id,
+              category_id: budget.category_id,
+              amount: budget.amount,
+              used_amount: budget.used_amount,
+              remaining_amount: budget.amount - budget.used_amount,
+              start_date: budget.start_date,
+              end_date: budget.end_date,
+              budget_type: budget.budget_type,
+              status: budget.status,
+              description: budget.description,
+              currency: budget.currency,
+              categoryName: translatedCategory,
+              icon: budget.category.icon,
+              categoryOriginal: budget.category?.name
+            };
+          });
+
      const financeTypeData = [
         { id: "Personal", name: "Personal", description: "Registro financiero personal" },
         { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
@@ -506,7 +576,7 @@ const FinanceController = {
         originalName: item.name
       }));
 
-      res.status(200).json({'types': translatedFinanceTypeData});
+      res.status(200).json({'types': translatedFinanceTypeData, 'budgets': mappedBudgets});
     } catch (error) {
       logger.error("FinanceController->getFinacesData: " + error.message);
       res.status(500).json({ 

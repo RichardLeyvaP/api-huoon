@@ -39,7 +39,67 @@
         "Lavandería": {
           "name": "Lavandería",
           "description": "Lavar la ropa"
-        }
+        },
+        "Alquiler": {
+    "name": "Alquiler",
+    "description": "Pago de alquiler o hipoteca"
+  },
+  "Electricidad": {
+    "name": "Electricidad",
+    "description": "Factura de luz"
+  },
+  "Agua": {
+    "name": "Agua",
+    "description": "Factura de agua"
+  },
+  "Gas": {
+    "name": "Gas",
+    "description": "Suministro de gas natural o bombonas"
+  },
+  "Internet": {
+    "name": "Internet",
+    "description": "Servicio de conexión a internet"
+  },
+  "Telefonía": {
+    "name": "Telefonía",
+    "description": "Plan de celular/teléfono fijo"
+  },
+  "Supermercado": {
+    "name": "Supermercado",
+    "description": "Compra de alimentos básicos"
+  },
+  "Transporte": {
+    "name": "Transporte",
+    "description": "Combustible, pasajes o mantenimiento de vehículo"
+  },
+  "Seguros": {
+    "name": "Seguros",
+    "description": "Pólizas de seguro (hogar, auto, salud)"
+  },
+  "Salud": {
+    "name": "Salud",
+    "description": "Gastos médicos y farmacia"
+  },
+  "Educación": {
+    "name": "Educación",
+    "description": "Colegiatura, libros o cursos"
+  },
+  "Ahorros": {
+    "name": "Ahorros",
+    "description": "Fondo de ahorro mensual"
+  },
+  "Ocio": {
+    "name": "Ocio",
+    "description": "Entretenimiento y salidas"
+  },
+  "Ropa": {
+    "name": "Ropa",
+    "description": "Prendas de vestir y calzado"
+  },
+  "Mantenimiento_Hogar": {
+    "name": "Mantenimiento Hogar",
+    "description": "Reparaciones y mejoras del hogar"
+  }
       },
     "priority": {
       "Baja": {
@@ -226,8 +286,8 @@
     "Tarea": {
       "name": "Tarea"
     },
-    "Evento": {
-      "name": "Evento"
+    "Meta": {
+      "name": "Meta"
     }
   },
   "finances": {

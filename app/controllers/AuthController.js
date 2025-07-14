@@ -800,7 +800,7 @@ const AuthController = {
       });
     } catch (error) {
       await transaction.commit();
-      console.error("Error en facebookCallback:", error);
+      logger.error("Error en facebookCallback:", error);
       return res.status(500).json({ error: "ServerError" });
     }
   },

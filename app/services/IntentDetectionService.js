@@ -4,18 +4,15 @@ const openai = require('../../config/openaiClient');
 const IntentDetectionService = {
   async detectarIntent(textoUsuario) {
     try {
-      const prompt = `
-Analiza el siguiente texto y dime si contiene una intención clara (como pedir algo, saludar, quejarse, programar una tarea, etc.).
+       const prompt = `
+Analiza el siguiente texto para determinar si es una meta que podría descomponerse en tareas. Responde en formato JSON con:
+- "is_meta": boolean (true si es una meta accionable)
+- "reason": breve explicación
 
-**Si hay intención**, devuélvela en **formato JSON** con los siguientes campos:
-- "intent": una palabra o frase corta que represente la intención (ej. "saludo", "queja", "programar_tarea").
-- "confidence": número entre 0 y 1 que indique cuán seguro estás.
-- "explanation": breve explicación del por qué.
-
-**Si no hay intención clara**, responde exactamente:
-\`\`\`json
-{ "intent": null }
-\`\`\`
+Ejemplos de metas accionables:
+- "Control de gastos mensuales"
+- "Organizar la boda"
+- "Renovar la cocina"
 
 Texto a analizar:
 \`\`\`

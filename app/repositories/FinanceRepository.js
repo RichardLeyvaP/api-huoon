@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Sequelize, Op } = require('sequelize'); // Asegúrate de importar Sequelize
-const { Finance, User, sequelize } = require("../models");
+const { Finance, User, Budget, Category, sequelize } = require("../models");
 const logger = require("../../config/logger"); // Logger para seguimiento
 const ImageService = require("../services/ImageService");
 
@@ -178,6 +178,19 @@ const FinanceRepository = {
             "type",
             "method",
             "image",
+            "budget_id" // Añadir este campo
+        ],
+        include: [
+            {
+                model: Budget,
+                as: 'budget',
+                attributes: ['id', 'amount', 'used_amount'],
+                include: [{
+                    model: Category,
+                    as: 'category',
+                    attributes: ['id', 'name', 'icon']
+                }]
+            }
         ],
         order: [
             ['date', 'DESC']
@@ -214,6 +227,7 @@ const FinanceRepository = {
           description: body.description,
           type: body.type,
           method: body.method,
+          budget_id: body.budget_id,
           image: "finances/default.jpg", // Imagen por defecto
         },
         { transaction: t }
@@ -229,10 +243,46 @@ const FinanceRepository = {
         finance.image = await ImageService.moveFile(file, newFilename);
         await finance.update({ image: finance.image }, { transaction: t });
       }
+
+      // Actualizar el used_amount en budgets si hay un budget_id válido
+      // Debug: verificar valores recibidos
+      logger.info(`Datos recibidos - budget_id: ${body.budget_id}, spent: ${body.spent}`);
+
+      if (body.budget_id && body.budget_id !== 0 && body.spent) {
+        logger.info('Actualizando used_amount...');
+        await this.updateBudgetUsedAmount(body.budget_id, body.spent, t);
+      }
       return finance;
     } catch (err) {
       logger.error(`Error en FinanceRepository->create: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
+    }
+  },
+
+  async updateBudgetUsedAmount(budgetId, amount, t) {
+    try {
+      // Validar que amount sea un número positivo
+      const spentAmount = parseFloat(amount);
+      if (isNaN(spentAmount) || spentAmount <= 0) {
+        throw new Error(`Monto inválido: ${amount}`);
+      }
+
+      const budget = await Budget.findByPk(budgetId, { transaction: t });
+      if (!budget) {
+        throw new Error(`Presupuesto no encontrado (ID: ${budgetId})`);
+      }
+
+      // Debug: valores antes de actualizar
+      logger.info(`Budget actual - used_amount: ${budget.used_amount}, amount: ${budget.amount}`);
+
+      const newUsedAmount = parseFloat(budget.used_amount || 0) + spentAmount;
+   
+      await budget.update({ used_amount: newUsedAmount }, { transaction: t });
+      
+      logger.info(`Budget actualizado - used_amount: ${newUsedAmount}`);
+    } catch (err) {
+      logger.error(`Error en updateBudgetUsedAmount: ${err.message}`);
+      throw err;
     }
   },
 
@@ -247,6 +297,7 @@ const FinanceRepository = {
       "description",
       "type",
       "method",
+      "category_id"
     ];
 
     const updatedData = Object.keys(body)
@@ -257,6 +308,10 @@ const FinanceRepository = {
       }, {});
 
     try {
+      // Manejar cambios en el presupuesto (budget_id o spent)
+     if (body.budget_id !== undefined || body.spent !== undefined) {
+      logger.info(`Actualizando presupuesto - old_budget: ${finance.budget_id}, new_budget: ${body.budget_id}, old_spent: ${finance.spent}, new_spent: ${body.spent}`);
+    }
       // Manejar el archivo si se proporciona
       if (file) {
         if (finance.image && finance.image !== "finances/default.jpg") {
@@ -287,7 +342,55 @@ const FinanceRepository = {
       throw err; // Propagar el error para que el rollback se ejecute
     }
   },
+  async handleBudgetUpdate(finance, body, t) {
+    const oldBudgetId = finance.budget_id;
+    const oldSpent = parseFloat(finance.spent) || 0;
+    const newBudgetId = body.budget_id !== undefined ? body.budget_id : oldBudgetId;
+    const newSpent = body.spent !== undefined ? parseFloat(body.spent) : oldSpent;
 
+    // Caso 1: No hay presupuesto asociado (ni viejo ni nuevo)
+    if (!oldBudgetId && !newBudgetId) return;
+
+    // Caso 2: Se removió el presupuesto (restar del viejo)
+    if (oldBudgetId && !newBudgetId) {
+      await this.adjustBudgetAmount(oldBudgetId, -oldSpent, t);
+      return;
+    }
+
+    // Caso 3: Se cambió de presupuesto
+    if (oldBudgetId && newBudgetId && oldBudgetId !== newBudgetId) {
+      // Restar del presupuesto viejo
+      await this.adjustBudgetAmount(oldBudgetId, -oldSpent, t);
+      // Sumar al nuevo presupuesto
+      await this.adjustBudgetAmount(newBudgetId, newSpent, t);
+      return;
+    }
+
+    // Caso 4: Mismo presupuesto pero cambió el monto
+    if (oldBudgetId === newBudgetId && oldSpent !== newSpent) {
+      const difference = newSpent - oldSpent;
+      await this.adjustBudgetAmount(newBudgetId, difference, t);
+    }
+  },
+
+  /**
+   * Ajusta el monto usado en un presupuesto
+   * @param {number} budgetId - ID del presupuesto
+   * @param {number} amount - Cantidad a ajustar (puede ser positiva o negativa)
+   * @param {object} t - Transacción de Sequelize
+   */
+  async adjustBudgetAmount(budgetId, amount, t) {
+    try {
+      const budget = await Budget.findByPk(budgetId, { transaction: t });
+      if (budget) {
+        const newUsedAmount = parseFloat(budget.used_amount || 0) + amount;
+        await budget.update({ used_amount: newUsedAmount }, { transaction: t });
+      }
+    } catch (err) {
+      logger.error(`Error en FinanceRepository->adjustBudgetAmount: ${err.message}`);
+      throw err;
+    }
+  },
   async delete(finance) {
     if (finance.image && finance.image !== "finances/default.jpg") {
         await ImageService.deleteFile(finance.image);

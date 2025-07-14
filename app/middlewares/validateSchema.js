@@ -25,7 +25,7 @@ const validateSchema = (schema) => {
 
     // Si Multer procesó la imagen, ahora los datos deben estar en req.body
     if (req.file) {
-      console.log("Archivo recibido:", req.file); // Aquí puedes ver los detalles del archivo
+      logger.info("Archivo recibido:", req.file); // Aquí puedes ver los detalles del archivo
     }
 
     // Normaliza req.body antes de la validación

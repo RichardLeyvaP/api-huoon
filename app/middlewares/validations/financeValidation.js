@@ -6,6 +6,7 @@ const storeFinanceSchema = Joi.object({
         'number.integer': '"home_id" debe ser un número entero',
         'any.required': '"home_id" es un campo obligatorio',
     }),
+    budget_id: Joi.number().integer().allow(null, "").optional().empty(null),
     spent: Joi.number().precision(2).allow(null).empty('').optional().custom((value, helpers) => {
         return value === "" ? null : value;
     }).messages({
@@ -51,6 +52,7 @@ const storeFinanceSchema = Joi.object({
 
 const updateFinanceSchema = Joi.object({
     home_id: Joi.number().integer().allow(null).empty('').optional(),
+    budget_id: Joi.number().integer().allow(null, "").optional().empty(null),
     spent: Joi.number().precision(2).allow(null).empty('').optional().custom((value, helpers) => {
         return value === "" ? null : value;
     }),

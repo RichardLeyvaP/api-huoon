@@ -30,7 +30,12 @@ const {
   NotificationRepository,
   PersonRepository,
   StatusRepository,
+  RoleRepository,
+  HomePersonRepository,
 } = require("../repositories");
+const IntentDetectionService = require("../services/IntentDetectionService");
+const TaskSuggestionService = require('../services/TaskSuggestionService');
+const openai = require('../../config/openaiClient');
 
 const TaskController = {
   // Obtener todas las tareas
@@ -275,7 +280,258 @@ const TaskController = {
             logger.error('TaskController->mapParent', error.message);
         }
     },*/
+  /*async storeBulk(req, res){
+   logger.info(`${req.user.name} - Crea nuevas tareas`);
+    logger.info("Datos recibidos al crear tareas");
+    logger.info(JSON.stringify(req.body));
+    
+    const personId = req.person.id;
+    const tasksToCreate = req.body.tasks || [req.body]; // Acepta array o objeto único
+    
+    if (!tasksToCreate.length) {
+        logger.error("No se recibieron tareas para crear");
+        return res.status(400).json({ msg: "NoTasksProvided" });
+    }
 
+    // Iniciar la transacción
+    const t = await sequelize.transaction();
+    try {
+        const createdTasks = [];
+        
+        for (const taskData of tasksToCreate) {
+            // Validación básica de datos requeridos
+            if (!taskData.title || !taskData.type || !taskData.home_id) {
+                logger.error(`Faltan datos requeridos en la tarea: ${JSON.stringify(taskData)}`);
+                continue; // O podrías devolver error inmediatamente
+            }
+
+            // Determinar el estado basado en fechas (similar al original)
+            const type = taskData.type;
+            const statuses = await StatusRepository.findByType(type);
+            
+            if (!statuses || statuses.length === 0) {
+                logger.error(`No se encontraron estados para el tipo: ${type}`);
+                continue;
+            }
+
+            const now = new Date();
+            const currentDate = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().split(' ')[0].substring(0, 5);
+            
+            const { start_date, start_time } = taskData;
+            let status;
+
+            if (start_date > currentDate) {
+                status = statuses.find((s) => s.name === "Pendiente");
+            } else if (start_date === currentDate) {
+                if (currentTime < start_time) {
+                    status = statuses.find((s) => s.name === "Pendiente");
+                } else {
+                    status = statuses.find((s) => s.name === "En Progreso");
+                }
+            } else {
+                status = statuses.find((s) => s.name === "Completada");
+            }
+
+            if (!status) {
+                logger.error(`No se encontró estado válido para fecha ${start_date} y hora ${start_time}`);
+                continue;
+            }
+
+            taskData.status_id = status.id;
+
+            // Filtrar personas con role_id != 0 (si existen)
+            let filteredPeople = [];
+            if (taskData.people && taskData.people.length > 0) {
+                filteredPeople = taskData.people.filter(
+                    (person) => parseInt(person.role_id) !== 0
+                );
+            }
+
+            // Crear la tarea
+            const task = await TaskRepository.create(taskData, null, personId, t);
+            createdTasks.push(task);
+
+            // Registrar la creación en el log de actividades
+            await ActivityLogService.createActivityLog(
+                "Task",
+                task.id,
+                "create",
+                req.user.id,
+                JSON.stringify(task),
+                { transaction: t }
+            );
+
+            // Crear asociaciones con personas (si existen)
+            if (filteredPeople.length > 0) {
+                for (const person of filteredPeople) {
+                    await HomePersonTask.create(
+                        {
+                            task_id: task.id,
+                            person_id: person.person_id,
+                            role_id: person.role_id,
+                            home_id: person.home_id
+                        },
+                        { transaction: t }
+                    );
+                }
+            }
+        }
+
+        // Confirmar la transacción
+        await t.commit();
+        
+        res.status(201).json({ 
+            success: true,
+            createdTasks: createdTasks.length,
+            tasks: createdTasks
+        });
+        
+    } catch (error) {
+        // Revertir la transacción si ocurre un error
+        await t.rollback();
+        const errorMsg = error.message || "Error desconocido";
+        logger.error("TaskController->store (simplified): " + errorMsg);
+        res.status(500).json({ 
+            error: "ServerError", 
+            details: errorMsg 
+        });
+    }
+  },*/
+  async storeBulk(req, res) {
+    logger.info(`${req.user.name} - Crea nuevas tareas`);
+    logger.info("Datos recibidos al crear tareas");
+    logger.info(JSON.stringify(req.body));
+    
+    const personId = req.person.id;
+    const tasksToCreate = req.body.tasks || [req.body];
+    
+    if (!tasksToCreate.length) {
+        logger.error("No se recibieron tareas para crear");
+        return res.status(400).json({ msg: "NoTasksProvided" });
+    }
+
+    // Obtener configuraciones necesarias al inicio
+    const [priorities, taskRoles] = await Promise.all([
+        PriorityRepository.findAll(),
+        RoleRepository.getRolesType('Task') // Obtener solo roles de tipo Task
+    ]);
+
+    // Crear mapeos para fácil acceso
+    const priorityMap = {};
+    priorities.forEach(p => {
+        priorityMap[p.id] = p;
+    });
+
+    const roleMap = {};
+    taskRoles.forEach(role => {
+        roleMap[role.id] = role;
+    });
+
+    // Iniciar la transacción
+    const t = await sequelize.transaction();
+    try {
+        const createdTasks = [];
+        
+        for (const taskData of tasksToCreate) {
+            // Validación básica de datos requeridos
+            if (!taskData.title || !taskData.type || !taskData.home_id) {
+                logger.error(`Faltan datos requeridos en la tarea: ${JSON.stringify(taskData)}`);
+                continue;
+            }
+
+            // Resto del código de creación de tarea (status, etc.)
+            // ... (mantener todo el código existente hasta la creación de la tarea)
+
+            // Crear la tarea
+            const task = await TaskRepository.create(taskData, null, personId, t);
+            createdTasks.push(task);
+
+            // Registrar la creación en el log de actividades
+            await ActivityLogService.createActivityLog(
+                "Task",
+                task.id,
+                "create",
+                req.user.id,
+                JSON.stringify(task),
+                { transaction: t }
+            );
+
+            // Crear asociaciones con personas y asignar puntos
+            if (taskData.people && taskData.people.length > 0) {
+                const filteredPeople = taskData.people.filter(
+                    (person) => parseInt(person.role_id) !== 0
+                );
+
+                for (const person of filteredPeople) {
+                    // Verificar que el rol existe y es de tipo Task
+                    const role = roleMap[person.role_id];
+                    if (!role) {
+                        logger.warn(`Rol con ID ${person.role_id} no encontrado o no es de tipo Task`);
+                        continue;
+                    }
+
+                    // Crear asociación
+                    await HomePersonTask.create(
+                        {
+                            task_id: task.id,
+                            person_id: person.person_id,
+                            role_id: person.role_id,
+                            home_id: person.home_id
+                        },
+                        { transaction: t }
+                    );
+
+                    // Calcular puntos basados en prioridad y rol
+                    const priority = priorityMap[taskData.priority_id];
+                    const basePoints = priority ? priority.level : 1; // Usar level de prioridad o 1 por defecto
+                    
+                    // Asignar multiplicador basado en el rol
+                    let roleMultiplier = 1.0; // Valor por defecto
+                    if (role.name === 'Responsable') {
+                        roleMultiplier = 1.5;
+                    } else if (role.name === 'Colaborador') {
+                        roleMultiplier = 1.0;
+                    } else if (role.name === 'Creador') {
+                        roleMultiplier = 1.2; // Puntos adicionales para el creador
+                    }
+
+                    const pointsToAdd = Math.round(basePoints * roleMultiplier);
+
+                    // Asignar puntos
+                    await HomePersonRepository.addPointsToPersonInHome(
+                        person.home_id,
+                        person.person_id,
+                        pointsToAdd,
+                        { transaction: t }
+                    );
+
+                    logger.info(`Asignados ${pointsToAdd} puntos a persona ${person.person_id} por tarea ${task.id}`);
+                }
+            }
+        }
+
+        // Confirmar la transacción
+        await t.commit();
+        
+        res.status(201).json({ 
+            success: true,
+            createdTasks: createdTasks.length,
+            tasks: createdTasks,
+            message: `Tareas creadas y puntos asignados a los participantes`
+        });
+        
+    } catch (error) {
+        // Revertir la transacción si ocurre un error
+        await t.rollback();
+        const errorMsg = error.message || "Error desconocido";
+        logger.error("TaskController->storeBulk: " + errorMsg);
+        res.status(500).json({ 
+            error: "ServerError", 
+            details: errorMsg 
+        });
+    }
+  },
   async store(req, res) {
     logger.info(`${req.user.name} - Crea una nueva tarea`);
     logger.info("datos recibidos al crear una tarea");
@@ -396,6 +652,7 @@ const TaskController = {
     }
 
     let notifications = {};
+    let suggestedTasks = []; // Array para almacenar las sugerencias
 
     // Iniciar la transacción
     const t = await sequelize.transaction();
@@ -411,6 +668,183 @@ const TaskController = {
         JSON.stringify(task)
       );
 
+      //Logica de empleo de la IA, para sugerir nuevas tareas
+      // Generar sugerencias solo si es una Meta
+      /*if (req.body.type === "Meta") {
+        try {
+          // 1. Primero detectamos la intención
+          const intentResult = await IntentDetectionService.detectarIntent(
+            `${req.body.title}. ${req.body.description}`
+          );
+
+          // 2. Solo generamos sugerencias si detectamos intención relevante
+          if (intentResult.is_meta) {
+            const prompt = `
+      La siguiente es una meta que ha sido creada:
+      Título: ${req.body.title}
+      Descripción: ${req.body.description}
+
+      Genera 5 tareas específicas que ayudarían a cumplir esta meta. Devuélvelas en formato JSON con el siguiente formato:
+      {
+        "suggested_tasks": [
+          {
+            "title": "Título de la tarea 1",
+            "description": "Descripción detallada",
+            "estimated_time": "Número entero de minutos (60-480)",
+            "priority_id": "1-5 (1 más alta)"
+          },
+          ...
+        ]
+      }
+
+      Requisitos:
+      1. Cada tarea debe ser concreta y ejecutable
+      2. Deben ser pasos lógicos para alcanzar la meta
+      3. Tiempos estimados realistas (entre 1 y 8 horas)
+      4. Prioridad según urgencia e importancia
+            `;
+
+            const response = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [
+                { role: "system", content: "Eres un experto en descomposición de metas en tareas accionables." },
+                { role: "user", content: prompt }
+              ],
+              temperature: 0.3,
+              max_tokens: 1000
+            });
+
+            const content = response.choices[0].message.content;
+            const jsonStart = content.indexOf('{');
+            const jsonEnd = content.lastIndexOf('}') + 1;
+            const jsonString = content.slice(jsonStart, jsonEnd);
+            const suggestions = JSON.parse(jsonString);
+
+            // Formatear las sugerencias
+            suggestedTasks = suggestions.suggested_tasks.map(taskSuggestion => ({
+              ...taskSuggestion,
+              parent_id: task.id, // ID de la meta recién creada
+              type: "Task",
+              home_id: req.body.home_id,
+              people: req.body.people,
+              start_date: req.body.start_date,
+              start_time: req.body.start_time,
+              status_id: status.id,
+              // Asegurar que los tipos sean correctos
+              priority_id: String(taskSuggestion.priority_id),
+              estimated_time: String(taskSuggestion.estimated_time)
+            }));
+            logger.info(`Sugerencias para la meta ${task.id}`);
+             logger.info(JSON.stringify(suggestedTasks, null, 2));
+            logger.info(`Generadas ${suggestedTasks.length} tareas sugeridas para la meta ${task.id}`);
+          } else {
+            logger.info(`No se generaron sugerencias. Intención detectada: ${intentResult.intent}`);
+          }
+        } catch (error) {
+          logger.error("Error en el proceso de generación de sugerencias:", error);
+          suggestedTasks = [];
+        }
+      }*/
+      if (req.body.type === "Meta") {
+    try {
+        // Obtener prioridades disponibles
+        const priorities = await PriorityRepository.findAll();
+        
+        // 1. Primero detectamos la intención
+        const intentResult = await IntentDetectionService.detectarIntent(
+            `${req.body.title}. ${req.body.description}`
+        );
+
+        // 2. Solo generamos sugerencias si detectamos intención relevante
+        if (intentResult.is_meta) {
+            // Construir descripción de prioridades para el prompt
+            const priorityDescriptions = priorities.map(p => 
+                `- ID ${p.id}: ${p.name} (Nivel ${p.level}): ${p.description}`
+            ).join('\n');
+
+            const prompt = `
+            La siguiente es una meta que ha sido creada:
+            Título: ${req.body.title}
+            Descripción: ${req.body.description}
+
+            Genera 5 tareas específicas que ayudarían a cumplir esta meta. Devuélvelas en formato JSON con el siguiente formato:
+            {
+                "suggested_tasks": [
+                    {
+                        "title": "Título de la tarea 1",
+                        "description": "Descripción detallada",
+                        "estimated_time": "Número entero de minutos (60-480)",
+                        "priority_id": "ID de prioridad válido (ver opciones abajo)"
+                    },
+                    ...
+                ]
+            }
+
+            Opciones de prioridad disponibles:
+            ${priorityDescriptions}
+
+            Requisitos:
+            1. Cada tarea debe ser concreta y ejecutable
+            2. Deben ser pasos lógicos para alcanzar la meta
+            3. Tiempos estimados realistas (entre 1 y 8 horas)
+            4. Prioridad debe ser uno de los IDs disponibles
+            5. Usar el ID de prioridad, no el nombre o nivel
+            `;
+
+            const response = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    { role: "system", content: "Eres un experto en descomposición de metas en tareas accionables." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0.3,
+                max_tokens: 1000,
+                response_format: { type: "json_object" } // Forzar respuesta en JSON
+            });
+
+            // Procesar la respuesta
+            const content = response.choices[0].message.content;
+            let suggestions;
+            
+            try {
+                suggestions = JSON.parse(content);
+            } catch (error) {
+                logger.error("Error parsing JSON response from OpenAI:", error);
+                throw new Error("Invalid response format from AI");
+            }
+
+            // Validar que las prioridades sean correctas
+            const validPriorityIds = priorities.map(p => p.id);
+            const invalidTasks = suggestions.suggested_tasks.filter(
+                task => !validPriorityIds.includes(task.priority_id)
+            );
+
+            if (invalidTasks.length > 0) {
+                logger.error("Algunas tareas sugeridas tienen prioridades inválidas");
+                throw new Error("Invalid priorities in suggested tasks");
+            }
+
+            // Formatear las sugerencias
+            suggestedTasks = suggestions.suggested_tasks.map(taskSuggestion => ({
+                ...taskSuggestion,
+                parent_id: task.id,
+                type: "Task",
+                home_id: req.body.home_id,
+                people: req.body.people,
+                start_date: req.body.start_date,
+                start_time: req.body.start_time,
+                status_id: status.id,
+                priority_id: String(taskSuggestion.priority_id),
+                estimated_time: String(taskSuggestion.estimated_time)
+            }));
+
+            logger.info(`Generadas ${suggestedTasks.length} tareas sugeridas para la meta ${task.id}`);
+        }
+    } catch (error) {
+        logger.error("Error en el proceso de generación de sugerencias:", error);
+        suggestedTasks = [];
+    }
+}
       const associationsData = [];
       if (filteredPeople.length > 0) {
         // Crear las asociaciones en paralelo
@@ -510,7 +944,8 @@ const TaskController = {
         const firebaseResults =
           await NotificationRepository.sendNotificationMultiCast(notifications);
       }
-      res.status(201).json({ task });
+      res.status(201).json({ task,
+        suggestedTasks: req.body.type === "Meta" ? suggestedTasks : undefined  });
     } catch (error) {
       // Revertir la transacción si ocurre un error
       await t.rollback();
@@ -520,6 +955,93 @@ const TaskController = {
     }
   },
 
+  async generateSuggestion(req, res) {
+    logger.info(`${req.user.name} - Solicita generación de sugerencia de tarea`);
+    logger.info("texto recibido para crear la tarea");
+    logger.info(JSON.stringify(req.body));
+    
+    const personId = req.person.id;
+    try {
+      if (!req.body.text || !req.body.home_id) {
+        throw new Error("Texto y home_id son requeridos");
+      }
+
+      const result = await TaskSuggestionService.processTextToTask(
+        req.body.text,
+        req.body.home_id,
+        personId
+      );
+
+      // Validación adicional de la respuesta
+      if (!result.suggestedTask.title || result.suggestedTask.title === "undefined") {
+        throw new Error("No se pudo generar un título válido");
+      }
+      const enhancedResponse = {
+            success: true,
+            suggestedTask: {
+                ...result.suggestedTask,
+                // Normalización de campos
+                people: result.suggestedTask.people || [],
+                start_date: result.suggestedTask.start_date || null,
+                start_time: result.suggestedTask.start_time || null,
+                estimated_time: result.suggestedTask.estimated_time || null
+            }
+        };
+         const categories = await CategoryService.getCategories(personId, "Task"); //const categories = await TaskController.getCategories(personId);
+      const statuses = await StatusService.getStatus("Task");
+      const priorities = await TaskController.getPriorities();
+      const people = await TaskController.getPeople(req.body.home_id); //await TaskController.getPeople(value.home_id);
+      const roles = await RoleService.getRoles("Task");
+      const recurrenceData = [
+        { id: "Diaria", name: "Diaria" },
+        { id: "Semanal", name: "Semanal" },
+        { id: "Mensual", name: "Mensual" },
+        { id: "Anual", name: "Anual" },
+        { id: "No se repite", name: "No se repite" },
+      ];
+
+      const translatedRecurrenceData = recurrenceData.map((item) => {
+        return {
+          id: item.id, // El identificador único
+          name: i18n.__(`recurrence.${item.name}.name`), // La traducción del nombre
+          recurrenceName: item.name,
+        };
+      });
+
+      const typeTaskData = [
+        { id: "Tarea", name: "Tarea" },
+        { id: "Evento", name: "Evento" },
+      ];
+
+      const translatedTypeTaskData = typeTaskData.map((item) => {
+        return {
+          id: item.id, // El identificador
+          name: i18n.__(`typetask.${item.name}.name`), // El nombre traducido
+        };
+      });
+      //res.status(200).json({ suggestedTask: enhancedResponse.suggestedTask });
+       return res.status(200).json({ suggestedTask: enhancedResponse.suggestedTask,
+         taskcategories: categories,
+        taskstatus: statuses,
+        taskpriorities: priorities,
+        taskpeople: people,
+        taskrecurrences: translatedRecurrenceData,
+        taskroles: roles,
+        tasktype: translatedTypeTaskData,
+        }); // Tareas encontradas
+    } catch (error) {
+      logger.error('TaskSuggestionController error:', error);
+      
+      // Respuesta de error detallada
+      res.status(500).json({
+        success: false,
+        error: 'SuggestionFailed',
+        message: error.message || 'Error al generar sugerencia',
+        receivedText: req.body.text, // Para debugging
+        timestamp: new Date().toISOString()
+      });
+    }
+},
   async show(req, res) {
     // Registro en logs de la acción realizada por el usuario
     logger.info(`${req.user.name} - Busca una tarea`);

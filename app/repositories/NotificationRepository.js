@@ -115,7 +115,7 @@ const NotificationRepository = {
 
       return { notifications: mappedNotifications, hasMore, nextCursor };
     } catch (error) {
-      console.error("Error en getNotificationsByUser:", error);
+      logger.error("Error en getNotificationsByUser:", error);
       throw error;
     }
     /*try {

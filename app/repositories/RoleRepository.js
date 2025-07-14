@@ -41,6 +41,25 @@ const RoleRepository = {
     }
   },
 
+  async getRolesType(type) {
+    logger.info(`Entra a Buscar Los roles de ${type}`);
+    try {
+        const roles = await Role.findAll({
+            where: { type: type }
+        });
+
+        return roles.map(role => {
+            return {
+                id: role.id,
+                name: role.name,
+                description: role.description
+            };
+        });
+    } catch (error) {
+        logger.error('Error en getRoles:', error);
+        throw new Error('Error al obtener los roles');
+    }
+    },
   // Actualizar un rol
   async update(role, body) {
     // Lista de campos que pueden ser actualizados

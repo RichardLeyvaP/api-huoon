@@ -55,6 +55,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'home_id',
         as: 'familyBackgrounds'
       });
+    
+    Home.hasMany(models.Budget, {
+      foreignKey: 'home_id',
+      as: 'budgets'
+    });
     }
   }
   Home.init({

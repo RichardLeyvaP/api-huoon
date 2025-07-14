@@ -39,7 +39,67 @@
         "Lavandería": {
           "name": "Lavanderia",
           "description": "Lavar roupas"
-        }
+        },
+        "Alquiler": {
+    "name": "Aluguel",
+    "description": "Pagamento de aluguel ou hipoteca"
+  },
+  "Electricidad": {
+    "name": "Eletricidade",
+    "description": "Conta de luz"
+  },
+  "Agua": {
+    "name": "Água",
+    "description": "Conta de água"
+  },
+  "Gas": {
+    "name": "Gás",
+    "description": "Gás natural ou botijão"
+  },
+  "Internet": {
+    "name": "Internet",
+    "description": "Serviço de internet"
+  },
+  "Telefonía": {
+    "name": "Telefonia",
+    "description": "Plano de celular/telefone fixo"
+  },
+  "Supermercado": {
+    "name": "Supermercado",
+    "description": "Compra de alimentos básicos"
+  },
+  "Transporte": {
+    "name": "Transporte",
+    "description": "Combustível, passagens ou manutenção de veículo"
+  },
+  "Seguros": {
+    "name": "Seguros",
+    "description": "Apólices de seguro (casa, carro, saúde)"
+  },
+  "Salud": {
+    "name": "Saúde",
+    "description": "Gastos médicos e farmácia"
+  },
+  "Educación": {
+    "name": "Educação",
+    "description": "Mensalidades, livros ou cursos"
+  },
+  "Ahorros": {
+    "name": "Poupança",
+    "description": "Fundo de poupança mensal"
+  },
+  "Ocio": {
+    "name": "Lazer",
+    "description": "Entretenimento e passeios"
+  },
+  "Ropa": {
+    "name": "Roupas",
+    "description": "Vestuário e calçados"
+  },
+  "Mantenimiento_Hogar": {
+    "name": "Manutenção da Casa",
+    "description": "Reparos e melhorias domésticas"
+  }
     },
   "priority": {
       "Baja": {
