@@ -481,9 +481,11 @@ const TaskController = {
                         },
                         { transaction: t }
                     );
-
-                    // Calcular puntos basados en prioridad y rol
-                    const priority = priorityMap[taskData.priority_id];
+                    let pointsToAdd = 0;
+                    if ( taskData.score){
+                      pointsToAdd = taskData.score;
+                    } else {
+                        const priority = priorityMap[taskData.priority_id];
                     const basePoints = priority ? priority.level : 1; // Usar level de prioridad o 1 por defecto
                     
                     // Asignar multiplicador basado en el rol
@@ -496,7 +498,8 @@ const TaskController = {
                         roleMultiplier = 1.2; // Puntos adicionales para el creador
                     }
 
-                    const pointsToAdd = Math.round(basePoints * roleMultiplier);
+                    pointsToAdd = Math.round(basePoints * roleMultiplier);
+                    }
 
                     // Asignar puntos
                     await HomePersonRepository.addPointsToPersonInHome(
@@ -774,7 +777,8 @@ const TaskController = {
                         "title": "Título de la tarea 1",
                         "description": "Descripción detallada",
                         "estimated_time": "Número entero de minutos (60-480)",
-                        "priority_id": "ID de prioridad válido (ver opciones abajo)"
+                        "priority_id": "ID de prioridad válido (ver opciones abajo)",
+                        "score": "Puntuación del 1 al 10 basada en complejidad e importancia"
                     },
                     ...
                 ]
@@ -784,11 +788,17 @@ const TaskController = {
             ${priorityDescriptions}
 
             Requisitos:
+            Requisitos:
             1. Cada tarea debe ser concreta y ejecutable
             2. Deben ser pasos lógicos para alcanzar la meta
             3. Tiempos estimados realistas (entre 1 y 8 horas)
             4. Prioridad debe ser uno de los IDs disponibles
             5. Usar el ID de prioridad, no el nombre o nivel
+            6. Asignar una puntuación del 1 al 10 basada en:
+               - Complejidad de la tarea
+               - Importancia para la meta
+               - Tiempo estimado requerido
+               - Nivel de prioridad
             `;
 
             const response = await openai.chat.completions.create({
@@ -824,6 +834,16 @@ const TaskController = {
                 throw new Error("Invalid priorities in suggested tasks");
             }
 
+             // Validar que las puntuaciones estén entre 1 y 10
+            const invalidScores = suggestions.suggested_tasks.filter(
+                task => task.score < 1 || task.score > 10
+            );
+
+            if (invalidScores.length > 0) {
+                logger.error("Algunas tareas sugeridas tienen puntuaciones inválidas");
+                throw new Error("Invalid scores in suggested tasks");
+            }
+
             // Formatear las sugerencias
             suggestedTasks = suggestions.suggested_tasks.map(taskSuggestion => ({
                 ...taskSuggestion,
@@ -835,7 +855,8 @@ const TaskController = {
                 start_time: req.body.start_time,
                 status_id: status.id,
                 priority_id: String(taskSuggestion.priority_id),
-                estimated_time: String(taskSuggestion.estimated_time)
+                estimated_time: String(taskSuggestion.estimated_time),
+                score: String(taskSuggestion.score) 
             }));
 
             logger.info(`Generadas ${suggestedTasks.length} tareas sugeridas para la meta ${task.id}`);
