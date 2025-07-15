@@ -130,7 +130,7 @@ const StatusController = {
     return `${year}-${month}-${day}`;
     },
     async findByType(req, res) {
-        logger.info(`${req.user.name} - Buscando estados por tipo: ${req.params.type}`);
+        logger.info(`${req.user.name} - Buscando estados por tipo: ${req.body.type}`);
 
         try {
             const { type, home_id } = req.body; // Obtener el type de los parámetros de la ruta

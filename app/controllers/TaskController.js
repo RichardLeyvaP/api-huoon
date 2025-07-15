@@ -788,7 +788,6 @@ const TaskController = {
             ${priorityDescriptions}
 
             Requisitos:
-            Requisitos:
             1. Cada tarea debe ser concreta y ejecutable
             2. Deben ser pasos lógicos para alcanzar la meta
             3. Tiempos estimados realistas (entre 1 y 8 horas)
