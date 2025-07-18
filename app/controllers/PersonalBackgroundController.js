@@ -334,6 +334,23 @@ const PersonalBackgroundController = {
       severityName: item.name
     }));
 
+    const statusData = [
+      { id: "Activo", name: "Activo", description: "Estado activo" },
+      { id: "Inactivo", name: "Inactivo", description: "Estado inactivo" },
+      { id: "Resuelto", name: "Resuelto", description: "Estado resuelto" }
+    ];
+
+    const translatedStatusData = statusData.map((item) => ({
+      id: item.id,
+      name: i18n.__(`status.${item.id}.name`) !== `status.${item.id}.name`
+            ? i18n.__(`status.${item.id}.name`)
+            : item.name,
+      description: i18n.__(`status.${item.id}.description`) !== `status.${item.id}.description`
+            ? i18n.__(`status.${item.id}.description`)
+            : item.description,
+      originalName: item.name // Mantenemos el nombre original como referencia
+    }));
+
       return res.status(200).json({ types: formattedTypes, status: translatedStatusData, severity: translatedSeverityData });
     } catch (error) {
       const errorMsg = error.details
