@@ -168,6 +168,7 @@ router.use(auth);
 router.get('/logout', AuthController.logout);
 router.post('/update-password', validateSchema(updatePasswordSchema), AuthController.updatePassword);
 router.post('/ask-ai', OpenAIController.getAIResponse);
+router.post('/ask-ai-task', OpenAIController.getAITask);
 router.post('/ask-ai-module', OpenAIController.AiInteraction);
 
 //Ruta Configurations
@@ -301,6 +302,7 @@ router.post('/home-type-destroy', validateSchema(idHomeTypeSchema), HomeTypeCont
 //Rutas Home
 router.get('/home', HomeController.index);
 router.post('/person-homes', HomeController.getHomes);
+router.post('/home-verify-code', HomeController.verifyCode);
 router.post('/home', multerCategory('image', 'homes'), validateSchema(storeHomeSchema), HomeController.store);
 router.post('/home-show', validateSchema(idHomeSchema), HomeController.show);
 router.post('/home-update', multerCategory('image', 'homes'), validateSchema(updateHomeSchema), HomeController.update);

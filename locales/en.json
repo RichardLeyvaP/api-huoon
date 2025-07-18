@@ -286,8 +286,8 @@
     "Tarea": {
       "name": "Task"
     },
-    "Evento": {
-      "name": "Event"
+    "Meta": {
+      "name": "Goal"
     }
   },
   "finances": {

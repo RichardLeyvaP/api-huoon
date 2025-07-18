@@ -10,8 +10,11 @@ const {
   Person,
   sequelize,
 } = require("../models");
+const crypto = require("crypto");
 const logger = require("../../config/logger"); // Logger para seguimiento
 const i18n = require("../../config/i18n-config");
+const bcrypt = require('bcrypt');
+const authConfig = require('../../config/auth'); 
 const e = require("express");
 const ImageService = require("../services/ImageService");
 const UserRepository = require("./UserRepository");
@@ -31,6 +34,7 @@ const HomeRepository = {
         "residents",
         "home_type_id",
         "status_id",
+        "code"
       ],
       include: [
         {
@@ -173,6 +177,7 @@ const HomeRepository = {
         "home_type_id",
         "status_id",
         "person_id",
+        "code"
       ],
       include: [
         {
@@ -223,6 +228,17 @@ const HomeRepository = {
     }
   },
 
+  async encryptData(data, secretKey) {
+    const iv = "2017111319891230"; // IV fijo de 16 bytes
+    const cipher = crypto.createCipheriv(
+      "aes-256-cbc",
+      Buffer.from(secretKey),
+      iv
+    );
+    let encrypted = cipher.update(JSON.stringify(data), "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return encrypted; // Retorna un string
+  },
   // Crear una nueva casa con manejo de imágenes
   async create(body, file, t) {
     const {
@@ -234,7 +250,16 @@ const HomeRepository = {
       home_type_id,
       status_id,
       person_id,
+      code
     } = body;
+    let hashedCode = null;
+  if (code) {
+   const baseKey = "bulletin"; // Usa el string que desees
+
+      // Generar la clave de 32 bytes con SHA-256
+      const secretKey = crypto.createHash("sha256").update(baseKey).digest();
+      hashedCode = await this.encryptData(code, secretKey);
+  }
     const home = await Home.create(
       {
         name,
@@ -245,6 +270,7 @@ const HomeRepository = {
         home_type_id,
         status_id,
         person_id,
+        code: hashedCode,
         image: "homes/default.jpg", // Imagen predeterminada
       },
       { transaction: t }
@@ -283,6 +309,12 @@ const HomeRepository = {
         obj[key] = body[key];
         return obj;
       }, {});
+        // Manejo seguro del código
+  if (Object.prototype.hasOwnProperty.call(body, 'code')) {
+    updatedData.code = (body.code && typeof body.code === 'string' && body.code.trim() !== '')
+      ? bcrypt.hashSync(body.code.trim(), Number.parseInt(authConfig.rounds))
+      : null;
+  }
 
     try {
       // Manejar el archivo si se proporciona
@@ -310,6 +342,35 @@ const HomeRepository = {
       throw err; // Propagar el error para que el rollback se ejecute
     }
   },
+  
+ async verifyHomeCode(codeToVerify) {
+  try {
+    // 1. Generar el hash del código a verificar (con los mismos rounds)
+    const baseKey = "bulletin"; // Usa el string que desees
+
+      // Generar la clave de 32 bytes con SHA-256
+      const secretKey = crypto.createHash("sha256").update(baseKey).digest();
+      let hashedCode = await this.encryptData(codeToVerify, secretKey);
+    logger.info(hashedCode);
+    // 2. Búsqueda directa en la DB (solo 1 query)
+    const home = await Home.findOne({
+      where: {
+        code: hashedCode // Busca el hash completo directamente
+      }
+    });
+
+    if (home) {
+      // Guardar en caché para futuras búsquedas
+      return { found: true, home: home };
+    }
+
+    return { found: false, home: null };
+
+  } catch (error) {
+    logger.error(`Error en verifyHomeCode: ${error.message}`);
+    return { found: false, home: null };
+  }
+},
 
   async syncHomePeople(homeId, peopleArray, t, home = null) {
     // Obtener las asociaciones actuales para la tarea especificada

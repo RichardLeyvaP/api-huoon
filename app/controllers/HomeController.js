@@ -1,4 +1,4 @@
-const { Person, Role, HomePerson, sequelize } = require("../models"); // Importar el modelo Home
+const { Person, Role, HomePerson, Configuration, sequelize } = require("../models"); // Importar el modelo Home
 const logger = require("../../config/logger"); // Importa el logger
 const i18n = require("../../config/i18n-config");
 const { StatusService, RoleService } = require("../services");
@@ -9,6 +9,7 @@ const {
   WareHouseRepository,
   UserRepository,
   NotificationRepository,
+  RoleRepository,
 } = require("../repositories");
 
 const HomeController = {
@@ -38,6 +39,7 @@ const HomeController = {
           timezone: home.timezone,
           nameStatus: home.status.name, // Aquí asumo que tienes una propiedad status directa en el modelo
           image: home.image,
+          code: home.code
         };
       });
 
@@ -99,6 +101,7 @@ const HomeController = {
             nameStatus: home.status.name, // Aquí asumo que tienes una propiedad status directa en el modelo
             image: home.image,
             percent: percent,
+            code: home.code,
             // Personas relacionadas con la tarea
             people: await HomeRepository.peopleHome(home, personId),
           };
@@ -132,6 +135,7 @@ const HomeController = {
       status_id,
       image,
       people,
+      code,
     } = req.body;
     let tokensData = [];
     let userTokensData = [];
@@ -202,7 +206,7 @@ const HomeController = {
       tokensData = tokens;
       userTokensData = userTokens;
     }
-
+    
     let notifications = {};
     const t = await sequelize.transaction();
     try {
@@ -276,6 +280,14 @@ const HomeController = {
           );
         }
       }
+      const user = req.user; // Supone que tienes el ID del usuario en `req.user`.
+        // Intentar encontrar la configuración del usuario
+        let userConfig = await Configuration.findOne({ where: { user_id: user.id } });
+
+        // Si no existe, crear una nueva configuración para el usuario usando los valores por defecto
+        if (!userConfig) {
+            userConfig = await Configuration.create({ user_id: user.id, language: user.language, home: home.id });
+        }
       await t.commit();
       if (notifications.length) {
         // Enviar todas las notificaciones en paralelo
@@ -317,6 +329,7 @@ const HomeController = {
         timezone: home.timezone,
         nameStatus: home.status.name,
         image: home.image,
+        code: home.code
       };
 
       res.status(200).json({ homes: mappedHome });
@@ -328,8 +341,61 @@ const HomeController = {
       logger.error("HomeController->show: " + errorMsg);
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
-  },
+  },      
 
+ async verifyCode(req, res) {
+    logger.info(`${req.user.name} - Verificando código de hogar`);
+  logger.info("Código recibido");
+    logger.info(JSON.stringify(req.body));
+  try {
+    const { code } = req.body;
+    
+    if (!code) {
+      return res.status(400).json({
+        error: "missing_code",
+        message: "El código es requerido"
+      });
+    }
+
+    const { found, home } = await HomeRepository.verifyHomeCode(code);
+    
+    if (!found) {
+      return res.status(404).json({
+        error: "invalid_code",
+        message: "Código no válido o hogar no encontrado"
+      });
+    }
+    const user = req.user; // Supone que tienes el ID del usuario en `req.user`.
+        // Obtener la configuración por defecto del sistema
+        const defaultConfig = await Configuration.findOne({ where: { isDefault: true } });
+
+        // Intentar encontrar la configuración del usuario
+        let userConfig = await Configuration.findOne({ where: { user_id: user.id } });
+
+        // Si no existe, crear una nueva configuración para el usuario usando los valores por defecto
+        if (!userConfig) {
+            userConfig = await Configuration.create({ user_id: user.id, language: user.language, home: home.id });
+        }
+        else{
+          await userConfig.update({home: home.id});
+        }
+    // Resto de la lógica (asignar rol, etc.)...
+    return res.status(200).json({
+      success: true,
+      home: {
+        id: home.id,
+        name: home.name
+      }
+    });
+
+  } catch (error) {
+    logger.error(`verifyCode error: ${error.message}`);
+    return res.status(500).json({
+      error: "server_error",
+      message: "Error al verificar el código"
+    });
+  }
+},
   // Actualizar una casa
   async update(req, res) {
     logger.info(`${req.user.name} - Actualiza el home con ID ${req.body.id}`);

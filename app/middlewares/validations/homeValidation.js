@@ -8,6 +8,9 @@ const storeHomeSchema = Joi.object({
   geo_location: Joi.string().allow(null).empty("").optional(),
   timezone: Joi.string().allow(null).empty("").optional(),
   status_id: Joi.number().integer().required(),
+  code: Joi.string().allow(null, '').optional().messages({
+    "string.base": "El código debe ser una cadena de texto"
+  }),
   image: Joi.string()
       .pattern(/\.(jpg|jpeg|png|gif)$/i)  // Validar formato de imagen
       .allow(null).empty('').optional()                         // Hace que sea opcional
@@ -40,6 +43,9 @@ const updateHomeSchema = Joi.object({
   geo_location: Joi.string().allow(null).empty("").optional(),
   timezone: Joi.string().allow(null).empty("").optional(),
   status_id: Joi.number().integer().allow(null).empty("").optional(),
+  code: Joi.string().allow(null, '').optional().messages({
+    "string.base": "El código debe ser una cadena de texto"
+  }),
   image: Joi.string()
       .pattern(/\.(jpg|jpeg|png|gif)$/i)  // Validar formato de imagen
       .allow(null).empty('').optional()                         // Hace que sea opcional

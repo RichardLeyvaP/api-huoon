@@ -43,6 +43,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+     type: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    typeTask: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'Tarea' // Valor por defecto
+    },
     person_id: {
       type: DataTypes.INTEGER,
       allowNull: false

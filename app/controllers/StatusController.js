@@ -1,5 +1,5 @@
 const logger = require('../../config/logger');
-const { StatusRepository, TaskRepository, WishRepository, FinanceRepository, PersonWareHouseRepository, HomeRepository, FileRepository, PersonProductRepository } = require('../repositories');
+const { StatusRepository, TaskRepository, WishRepository, FinanceRepository, PersonWareHouseRepository, HomeRepository, FileRepository, PersonProductRepository, SuggestionRepository } = require('../repositories');
 const { StatusService } = require('../services');
 
 const StatusController = {
@@ -164,13 +164,14 @@ const StatusController = {
               warehouse_ids: warehouseIds, // Array de almacenes
               date: date, // Opcional
             });
-
+            const allSuggestions = await SuggestionRepository.findTodaySuggestions(null, personId, home_id);
             res.status(200).json({
               status: statuses,
               task: tasks.length,
               whish: wishes.length,
               finance: finances.length,
               personWarehouses: personWarehouses.length,
+              suggestion: allSuggestions.length,
               home: homes.length,
               file: files.length,
               product: products,

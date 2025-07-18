@@ -1,3 +1,4 @@
+const { IntentDetectionService } = require(".");
 const logger = require("../../config/logger");
 const openai = require("../../config/openaiClient");
 const {
@@ -332,9 +333,9 @@ ${data.recurrenceOptions}
     }
 
     // Asegurar tipo válido
-    taskData.type = ["Task", "Meta"].includes(taskData.type)
+    taskData.type = ["Tarea", "Meta"].includes(taskData.type)
       ? taskData.type
-      : "Task";
+      : "Tarea";
 
     // Validar prioridad
     const validPriorityIds = priorities.map((p) => p.id);
@@ -449,6 +450,157 @@ ${data.recurrenceOptions}
       );
     });
   },
+
+  //para las sugrencias de tareas para cumplir la meta
+  async generateTaskSuggestions(metaData, parentTask) {
+    if (metaData.type !== "Meta") {
+      return [];
+    }
+
+    try {
+      const priorities = await PriorityRepository.findAll();
+      const intentResult = await IntentDetectionService.detectarIntent(
+        `${metaData.title}. ${metaData.description}`
+      );
+
+      if (!intentResult.is_meta) {
+        return [];
+      }
+
+      const suggestions = await this._generateAISuggestions(metaData, priorities);
+      const validatedSuggestions = this._validateSuggestions(suggestions, priorities);
+      
+      return this._formatSuggestions(validatedSuggestions, {
+        metaData,
+        parentTask,
+        priorities
+      });
+    } catch (error) {
+      logger.error("Error generating task suggestions:", error);
+      return [];
+    }
+  },
+
+  async _generateAISuggestions(metaData, priorities) {
+    const priorityDescriptions = priorities.map(p => 
+      `- ID ${p.id}: ${p.name} (Nivel ${p.level}): ${p.description}`
+    ).join('\n');
+
+    const prompt = this._buildPrompt(metaData, priorityDescriptions);
+    
+    const response = await this.openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "Eres un experto en descomposición de metas en tareas accionables." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 1000,
+      response_format: { type: "json_object" }
+    });
+
+    return JSON.parse(response.choices[0].message.content);
+  },
+
+  _buildPrompt(metaData, priorityDescriptions) {
+    return `
+      La siguiente es una meta que ha sido creada:
+      Título: ${metaData.title}
+      Descripción: ${metaData.description}
+      Fecha de inicio: ${metaData.start_date}
+      Fecha límite: ${metaData.end_date || 'No especificada'}
+
+      Genera 5 tareas específicas que ayudarían a cumplir esta meta, distribuyéndolas inteligentemente en el período disponible. Devuélvelas en formato JSON con el siguiente formato:
+      {
+          "suggested_tasks": [
+              {
+                  "title": "Título de la tarea 1",
+                  "description": "Descripción detallada",
+                  "estimated_time": "Número entero de minutos (60-480)",
+                  "priority_id": "ID de prioridad válido (ver opciones abajo)",
+                  "score": "Puntuación del 1 al 10 basada en complejidad e importancia",
+                  "suggested_start_date": "YYYY-MM-DD (distribuida según fecha inicio meta)",
+                  "suggested_end_date": "YYYY-MM-DD (o null si es de un solo día)"
+              },
+              ...
+          ]
+      }
+
+      Opciones de prioridad disponibles:
+      ${priorityDescriptions}
+
+      Requisitos:
+      1. Cada tarea debe ser concreta y ejecutable
+      2. Deben ser pasos lógicos para alcanzar la meta
+      3. Tiempos estimados realistas (entre 1 y 8 horas)
+      4. Prioridad debe ser uno de los IDs disponibles
+      5. Usar el ID de prioridad, no el nombre o nivel
+      6. Asignar una puntuación del 1 al 10 basada en:
+         - Complejidad de la tarea
+         - Importancia para la meta
+         - Tiempo estimado requerido
+         - Nivel de prioridad
+      7. Distribuir las tareas considerando:
+         - Si hay fecha límite, distribuir equitativamente en el período
+         - Tareas prioritarias deben programarse antes
+         - Tareas complejas con más tiempo deben tener más espacio
+         - Si no hay fecha límite, sugerir plazos razonables
+      8. Para tareas de un solo día, suggested_end_date debe ser null
+    `;
+  },
+
+  _validateSuggestions(suggestions, priorities) {
+    const validPriorityIds = priorities.map(p => p.id);
+    
+    // Validar prioridades
+    const invalidTasks = suggestions.suggested_tasks.filter(
+      task => !validPriorityIds.includes(task.priority_id)
+    );
+
+    if (invalidTasks.length > 0) {
+      logger.error("Algunas tareas sugeridas tienen prioridades inválidas");
+      throw new Error("Invalid priorities in suggested tasks");
+    }
+
+    // Validar puntuaciones
+    const invalidScores = suggestions.suggested_tasks.filter(
+      task => task.score < 1 || task.score > 10
+    );
+
+    if (invalidScores.length > 0) {
+      logger.error("Algunas tareas sugeridas tienen puntuaciones inválidas");
+      throw new Error("Invalid scores in suggested tasks");
+    }
+
+    return suggestions;
+  },
+
+  _formatSuggestions(suggestions, { metaData, parentTask, priorities }) {
+    return suggestions.suggested_tasks.map(taskSuggestion => {
+      const priority = priorities.find(p => p.id === taskSuggestion.priority_id);
+      
+      return {
+        ...taskSuggestion,
+        parent_id: parentTask.id,
+        type: "Tarea",
+        home_id: metaData.home_id,
+        people: metaData.people,
+        start_date: taskSuggestion.suggested_start_date || metaData.start_date,
+        end_date: taskSuggestion.suggested_end_date || null,
+        start_time: metaData.start_time,
+        status_id: metaData.status_id,
+        priority_id: String(taskSuggestion.priority_id),
+        priority_name: priority ? priority.name : 'Unknown',
+        priority_name_translated: priority ? 
+          (i18n.__(`priority.${priority.name}.name`) !== `priority.${priority.name}.name` 
+            ? i18n.__(`priority.${priority.name}.name`) 
+            : priority.name) 
+          : 'Unknown',
+        estimated_time: String(taskSuggestion.estimated_time),
+        score: String(taskSuggestion.score) 
+      };
+    });
+  }
 };
 
 module.exports = TaskSuggestionService;

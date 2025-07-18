@@ -1,5 +1,8 @@
+
+const i18n = require("../../config/i18n-config");
 const logger = require("../../config/logger");
-const { SuggestionRepository, HomeRepository } = require("../repositories");
+const { SuggestionRepository, HomeRepository, FinanceRepository, BudgetRepository } = require("../repositories");
+const FinancialAIService = require("../services/FinancesSuggestion");
 
 const SuggestionController = {
   /**
@@ -23,7 +26,9 @@ const SuggestionController = {
         personId: suggestion.person_id,
         homeId: suggestion.home_id,
         home_id: suggestion.home_id,
-        date: suggestion.date
+        date: suggestion.date,
+        type: suggestion.type,
+        typeTask: suggestion.typeTask || 'Tarea'
       }));
 
       return res.status(200).json({ suggestions: mapped });
@@ -55,7 +60,9 @@ const SuggestionController = {
         personId: suggestion.person_id,
         homeId: suggestion.home_id,
         home_id: suggestion.home_id,
-        date: suggestion.date
+        date: suggestion.date,
+        type: suggestion.type,
+        typeTask: suggestion.typeTask || 'Tarea'
       };
 
       return res.status(200).json({ suggestion: result });
@@ -72,22 +79,26 @@ const SuggestionController = {
     logger.info(`${req.user.name} - Busca sugerencias por persona`);
     try {
       const personId = req.person.id;
-      const { date} = req.body
-      const suggestions = await SuggestionRepository.findAllByPersonId(personId, date);
+      const { date, home_id} = req.body
+      const suggestions = await SuggestionRepository.findTodaySuggestions(null, personId, home_id);
 
       if (!suggestions.length) {
         return res.status(204).json({ msg: "SuggestionNotFound", suggestions: [] });
       }
-
+      
       const mapped = suggestions.map(suggestion => ({
         id: suggestion.id,
         title: suggestion.title,
         description: suggestion.description,
         content: suggestion.content,
-        status: suggestion.status,
+        status: i18n.__(`suggestionStatus.${suggestion.status}.name`) !== `suggestionStatus.${suggestion.status}.name`
+                  ? i18n.__(`suggestionStatus.${suggestion.status}.name`)
+                  : suggestion.status,
         homeId: suggestion.home_id,
         home_id: suggestion.home_id,
-        date: suggestion.date
+        date: suggestion.date,
+        type: suggestion.type,
+        typeTask: suggestion.typeTask || 'Tarea'
       }));
 
       return res.status(200).json({ suggestions: mapped });
@@ -174,7 +185,58 @@ const SuggestionController = {
       logger.error("SuggestionController->destroy: " + error.message);
       res.status(500).json({ error: "ServerError", details: error.message });
     }
-  }
+  },
+
+   async generateAndGetSuggestions(req, res) {
+    logger.info(`${req.user.name} - Se generan las sugerencias `);
+
+    const person_id = req.person.id;
+    const dateParam = req.body.date || new Date().toISOString().slice(0, 10);
+    const home_id = req.body.home_id;
+
+    try {
+
+       const stats = await FinanceRepository.getPersonFinancialStats(person_id);
+      
+      // 2. Obtener presupuestos actuales
+      const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
+      
+      // 3. Verificar si ya hay sugerencias hoy
+      const todaySuggestions = await SuggestionRepository.findTodaySuggestions(person_id, home_id);
+      
+      // 4. Generar nuevas sugerencias si no hay o son pocas
+      let aiSuggestions = [];
+      if (todaySuggestions.length === 0) { // Umbral para generar nuevas
+        const aiResponse = await FinancialAIService.generateFinancialSuggestions(
+          stats, 
+          budgets, 
+          todaySuggestions
+        );
+        aiSuggestions = aiResponse.suggestions || [];
+        
+        // Guardar nuevas sugerencias
+        for (const suggestion of aiSuggestions) {
+          await SuggestionRepository.create({
+            person_id,
+            home_id,
+            title: suggestion.title,
+            description: suggestion.description,
+            content: suggestion.content,
+            status: 'Pendiente',
+            type: 'Finanzas',
+            typeTask: suggestion.typeTask || 'Tarea'
+          });
+        }
+      }
+      res.status(200).json({"msg": 'Sugerencias creadas correctamente'});
+    } catch (error) {
+      logger.error("SugestionController->getPersonFinancialStats: " + error.message);
+      res.status(500).json({ 
+        error: "ServerError", 
+        message: "Error al obtener estadísticas financieras personales" 
+      });
+    }
+  },
 };
 
 module.exports = SuggestionController;

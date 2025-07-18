@@ -17,6 +17,8 @@ const path = require("path");
 const axios = require("axios");
 const { pipeline } = require("stream/promises");
 const moment = require("moment"); // Usamos moment.js para facilitar el manejo de fechas
+const SuggestionService = require("../services/SuggestionService");
+const { HomePersonRepository } = require("../repositories");
 // Esquema de validación para el registro de usuario
 
 const schema = Joi.object({
@@ -132,6 +134,33 @@ const AuthController = {
         personEmail: user.person.email,
         personImage: user.person.image,
       });
+      // Lanzar proceso de sugerencias en segundo plano (después de enviar la respuesta)
+      if (user.person?.id) {
+        setImmediate(async () => {
+          try {
+            // Obtener homeId para el servicio (nueva lógica)
+            let homeIdForService = null;
+            
+            // 1. Intentar de configurations primero
+            if (user.configurations && user.configurations.length > 0 && user.configurations[0].home_id) {
+              homeIdForService = user.configurations[0].home_id;
+            } 
+            // 2. Si no hay, buscar en HomePerson
+            else {
+             const homePerson = await HomePersonRepository.findLatestHomeByPersonId(user.person.id);
+              
+              if (homePerson?.home) {
+                homeIdForService = homePerson.home.id;
+              }
+            }
+
+            logger.info(`Llamando servicio con personId: ${user.person.id}, homeId: ${homeIdForService}`);
+            await SuggestionService.generateSuggestions(user.person.id, homeIdForService);
+          } catch (error) {
+            logger.error(`Error en servicio background: ${error.message}`);
+          }
+        });
+      }
     } catch (err) {
       logger.error("Error al loguear usuario: " + err.message);
       res.status(500).json({ error: "Error en el servidor" });

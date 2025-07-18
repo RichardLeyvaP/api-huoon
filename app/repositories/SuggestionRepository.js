@@ -73,11 +73,13 @@ const SuggestionRepository = {
         {
           person_id: body.person_id,
           home_id: body.home_id || null,
-          date: body.date || await this.getCurrentLocalDate(),
+          date: body.date || (await this.getCurrentLocalDate()),
           title: body.title,
           description: body.description || null,
           content: body.content || null,
-          status: body.status || 'pending',
+          status: body.status || "pending",
+          type: body.type || null,
+          typeTask: body.typeTask || 'Tarea' // Nuevo campo
         },
         { transaction: t }
       );
@@ -101,7 +103,9 @@ const SuggestionRepository = {
       "title",
       "description",
       "content",
-      "status"
+      "status",
+      "type",
+      "typeTask"
     ];
 
     try {
@@ -177,6 +181,47 @@ const SuggestionRepository = {
       where.person_id = personId;
     }
 
+    return await Suggestion.findAll({
+      where,
+      include: [
+        { model: Person, as: "person" },
+        { model: Home, as: "home" },
+      ],
+      order: [['date', 'DESC']],
+    });
+  },
+
+  async findTodaySuggestions(type = null, person_id, home_id = null) {
+    const today = new Date().toISOString().slice(0, 10);
+    const where = {
+      person_id,
+      date: today
+    };
+    
+    if (home_id) {
+      where.home_id = home_id;
+    }
+
+     if (type) {
+      where.type = type;
+    }
+    
+    return await Suggestion.findAll({
+      where,
+      order: [['createdAt', 'DESC']]
+    });
+},
+async findByType(type, personId = null, homeId = null) {
+    const where = { type };
+    
+    if (personId) {
+      where.person_id = personId;
+    }
+    
+    if (homeId) {
+      where.home_id = homeId;
+    }
+    
     return await Suggestion.findAll({
       where,
       include: [

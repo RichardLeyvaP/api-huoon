@@ -9,6 +9,7 @@ const {
   BudgetRepository,
   CategoryRepository,
 } = require("../repositories"); // Asegúrate de que tengas un repositorio para Finance
+const FinancialAIService = require("../services/FinancesSuggestion");
 
 const FinanceController = {
   // Obtener todos los registros de finanzas
@@ -427,9 +428,44 @@ const FinanceController = {
     logger.info(`${req.user.name} - Consulta estadísticas financieras personales`);
 
     const person_id = req.person.id;
-    const dateParam = req.body.date || new Date().toISOString().slice(0, 10);;
+    const dateParam = req.body.date || new Date().toISOString().slice(0, 10);
+    const home_id = req.body.home_id;
 
     try {
+
+       const stats = await FinanceRepository.getPersonFinancialStats(person_id);
+      
+      /*// 2. Obtener presupuestos actuales
+      const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
+      
+      // 3. Verificar si ya hay sugerencias hoy
+      const todaySuggestions = await SuggestionRepository.findTodaySuggestions(person_id, home_id);
+      
+      // 4. Generar nuevas sugerencias si no hay o son pocas
+      let aiSuggestions = [];
+      if (todaySuggestions.length < 3) { // Umbral para generar nuevas
+        const aiResponse = await FinancialAIService.generateFinancialSuggestions(
+          stats, 
+          budgets, 
+          todaySuggestions
+        );
+        aiSuggestions = aiResponse.suggestions || [];
+        
+        // Guardar nuevas sugerencias
+        for (const suggestion of aiSuggestions) {
+          await SuggestionRepository.create({
+            person_id,
+            home_id,
+            title: suggestion.title,
+            description: suggestion.description,
+            content: suggestion.content,
+            status: 'Pendiente',
+          });
+        }
+      }*/
+      
+      // 5. Obtener todas las sugerencias (existentes + nuevas)
+      const allSuggestions = await SuggestionRepository.findTodaySuggestions('Finanzas', person_id, home_id);
 
       const suggestionStatusData = [
         { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
@@ -448,8 +484,8 @@ const FinanceController = {
         statusName: item.name
       }));
       
-      const suggestions = await SuggestionRepository.findAllByPersonId(person_id, dateParam);
-       const mappedSuggestions = suggestions.map(suggestion => ({
+      //const suggestions = await SuggestionRepository.findAllByPersonId(person_id, dateParam);
+       const mappedSuggestions = allSuggestions.map(suggestion => ({
         id: suggestion.id,
         title: suggestion.title,
         description: suggestion.description,
@@ -459,7 +495,7 @@ const FinanceController = {
         home_id: suggestion.home_id,
         date: suggestion.date
       }));
-      const stats = await FinanceRepository.getPersonFinancialStats(person_id);
+      //const stats = await FinanceRepository.getPersonFinancialStats(person_id);
 
       // Formatear montos con separadores de miles
       const formatCurrency = (amount) => {

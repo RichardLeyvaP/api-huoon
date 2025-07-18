@@ -221,6 +221,18 @@ const HomePersonRepository = {
       throw error;
     }
   },
+
+   async findLatestHomeByPersonId(personId) {
+    return await HomePerson.findOne({
+      where: { person_id: personId },
+      order: [['createdAt', 'DESC']], // Tomar el más reciente
+      include: [{
+        model: Home,
+        as: "home",
+        attributes: ['id']
+      }]
+    });
+  }
 };
 
 module.exports = HomePersonRepository;

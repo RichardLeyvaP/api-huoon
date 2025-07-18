@@ -61,6 +61,46 @@ const BudgetRepository = {
       ]
     });
   },
+
+  async findAllCurrentByPersonId(personId, homeId = null) {
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const whereConditions = {
+      [Op.and]: [
+        { 
+          [Op.or]: [
+            { person_id: personId, budget_type: 'Personal' }
+          ]
+        },
+        {
+          start_date: { [Op.lte]: currentMonthEnd },
+          end_date: { [Op.gte]: currentMonthStart }
+        }
+      ]
+    };
+
+    if (homeId) {
+      whereConditions[Op.and][0][Op.or].push({
+        home_id: homeId,
+        budget_type: 'Hogar'
+      });
+    }
+
+    return await Budget.findAll({
+      where: whereConditions,
+      include: [
+        { model: Person, as: "person" },
+        { model: Home, as: "home" },
+        { model: Category, as: "category" },
+      ],
+      order: [
+        ['budget_type', 'ASC'],
+        ['start_date', 'DESC']
+      ]
+    });
+},
   /**
    * Obtener presupuestos por ID de hogar
    * @param {number} homeId - ID del hogar

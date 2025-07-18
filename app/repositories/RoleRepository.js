@@ -10,6 +10,24 @@ const RoleRepository = {
     });
   },
 
+  async findOne(conditions) {
+    try {
+      return await Role.findOne({
+        where: conditions
+      });
+    } catch (error) {
+      logger.error(`RoleRepository->findOne: ${error.message}`);
+      throw error; // Puedes manejar esto diferente si prefieres
+    }
+  },
+
+   async findHomeMemberRole() {
+    return this.findOne({
+      type: 'Home',
+      name: 'Miembro' // Asegúrate que coincida exactamente con tu DB
+    });
+  },
+
   // Buscar un rol por ID
   async findById(id) {
     return await Role.findByPk(id, {

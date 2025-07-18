@@ -26,6 +26,12 @@ const storeSuggestionSchema = Joi.object({
     "string.base": "El estado debe ser una cadena de texto",
     "any.only": "El estado debe ser uno de: pending, reviewed, approved, rejected",
   }),
+  type: Joi.string().allow(null).optional().messages({ // Nuevo campo
+    "string.base": "El tipo debe ser una cadena de texto",
+  }),
+  typeTask: Joi.string().optional().allow(null, '').messages({
+    "string.base": "El tipo de tarea debe ser una cadena de texto"
+  }),
 });
 
 // Esquema para actualizar una sugerencia
@@ -56,6 +62,12 @@ const updateSuggestionSchema = Joi.object({
   status: Joi.string().optional().messages({
     "string.base": "El estado debe ser una cadena de texto",
     "any.only": "El estado debe ser uno de: pending, reviewed, approved, rejected",
+  }),
+  type: Joi.string().allow(null).optional().messages({ // Nuevo campo
+    "string.base": "El tipo debe ser una cadena de texto",
+  }),
+  typeTask: Joi.string().optional().allow(null, '').messages({
+    "string.base": "El tipo de tarea debe ser una cadena de texto"
   }),
 });
 
