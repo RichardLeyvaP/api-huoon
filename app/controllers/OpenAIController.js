@@ -96,7 +96,8 @@ async getAITask(req, res) {
     intent: intentDetection.intent,
     confidence: intentDetection.confidence,
     explanation: intentDetection.explanation,
-    originalQuestion: question
+    originalQuestion: question,
+    task: intentDetection.taskData || null,
   });
 }
       // Realizar la solicitud a OpenAI

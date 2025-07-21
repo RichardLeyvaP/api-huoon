@@ -47,6 +47,37 @@ const updatePasswordSchema = Joi.object({
 
 const AuthController = {
   //login
+  async getPreferredOrLatestHome(user) {
+  let home = null;
+
+  if (user.configurations && user.configurations.length > 0) {
+    const config = user.configurations[0];
+
+    if (config.home === null || config.home === undefined) {
+      const homePerson = await HomePersonRepository.findLatestHomeByPersonId(user.person.id);
+
+      if (homePerson) {
+        const homeId = homePerson.get('home_id');
+        const homeData = homePerson.get('home');
+
+        home = homeId || (homeData ? homeData.id : null);
+      }
+    } else {
+      home = config.home;
+    }
+  } else {
+    const homePerson = await HomePersonRepository.findLatestHomeByPersonId(user.person.id);
+
+    if (homePerson) {
+      const homeId = homePerson.get('home_id');
+      const homeData = homePerson.get('home');
+
+      home = homeId || (homeData ? homeData.id : null);
+    }
+  }
+
+  return home;
+},
   async login(req, res) {
     logger.info("Entrando a loguearse");
     try {
@@ -90,10 +121,7 @@ const AuthController = {
             image: user.person.image,
           }
         : null;
-      let home = null;
-      if (user.configurations && user.configurations.length > 0) {
-        home = user.configurations[0].home;
-      }
+      let home = await AuthController.getPreferredOrLatestHome(user);
 
       // Construimos el objeto del usuario con la estructura deseada
       const userNew = {
@@ -138,24 +166,8 @@ const AuthController = {
       if (user.person?.id) {
         setImmediate(async () => {
           try {
-            // Obtener homeId para el servicio (nueva lógica)
-            let homeIdForService = null;
-            
-            // 1. Intentar de configurations primero
-            if (user.configurations && user.configurations.length > 0 && user.configurations[0].home_id) {
-              homeIdForService = user.configurations[0].home_id;
-            } 
-            // 2. Si no hay, buscar en HomePerson
-            else {
-             const homePerson = await HomePersonRepository.findLatestHomeByPersonId(user.person.id);
-              
-              if (homePerson?.home) {
-                homeIdForService = homePerson.home.id;
-              }
-            }
-
-            logger.info(`Llamando servicio con personId: ${user.person.id}, homeId: ${homeIdForService}`);
-            await SuggestionService.generateSuggestions(user.person.id, homeIdForService);
+           logger.info(`Llamando servicio con personId: ${user.person.id}, homeId: ${home}`);
+            await SuggestionService.generateSuggestions(user.person.id, home);
           } catch (error) {
             logger.error(`Error en servicio background: ${error.message}`);
           }

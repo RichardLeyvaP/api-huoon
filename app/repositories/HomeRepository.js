@@ -8,6 +8,8 @@ const {
   HomePerson,
   Role,
   Person,
+  User,
+  Configuration,
   sequelize,
 } = require("../models");
 const crypto = require("crypto");
@@ -254,7 +256,7 @@ const HomeRepository = {
     } = body;
     let hashedCode = null;
   if (code) {
-   const baseKey = "bulletin"; // Usa el string que desees
+   const baseKey = "huoon"; // Usa el string que desees
 
       // Generar la clave de 32 bytes con SHA-256
       const secretKey = crypto.createHash("sha256").update(baseKey).digest();
@@ -467,7 +469,7 @@ const HomeRepository = {
     });
 
     // Recorremos las asociaciones actuales para eliminar las que ya no existen en el nuevo conjunto
-    currentAssociations.forEach((current) => {
+    await Promise.all(currentAssociations.map(async (current) => {
       const key = `${current.person_id}-${current.home_id}`;
       if (!newMap[key]) {
         toDelete.push(current.id);
@@ -490,8 +492,41 @@ const HomeRepository = {
             },
           });
         }
+        //eliminar de la onfiguración el home si esta como preferido
+         // Actualizar configuración directamente aquí
+    try {
+      const person = await Person.findOne({
+        where: { id: current.person_id },
+        include: [{
+          model: User,
+          as: 'user'
+        }],
+        transaction: t,
+      });
+
+      if (!person || !person.user) return;
+
+      const userId = person.user.id;
+
+      const configsToUpdate = await Configuration.findAll({
+        where: {
+          user_id: userId,
+          home: current.home_id,
+        },
+        transaction: t,
+      });
+
+      if (configsToUpdate.length > 0) {
+        for (const config of configsToUpdate) {
+          await config.update({ home: null }, { transaction: t });
+        }
       }
-    });
+    } catch (error) {
+      logger.error(`Error al actualizar configuración para persona ${current.person_id}:`, error);
+    }
+
+      }
+}));
 
     // Aplicar las operaciones: eliminar, actualizar, agregar
     if (toDelete.length > 0) {

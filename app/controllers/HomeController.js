@@ -1,4 +1,4 @@
-const { Person, Role, HomePerson, Configuration, sequelize } = require("../models"); // Importar el modelo Home
+const { Person, Role, HomePerson, Configuration, User, sequelize } = require("../models"); // Importar el modelo Home
 const logger = require("../../config/logger"); // Importa el logger
 const i18n = require("../../config/i18n-config");
 const { StatusService, RoleService } = require("../services");
@@ -288,6 +288,12 @@ const HomeController = {
         if (!userConfig) {
             userConfig = await Configuration.create({ user_id: user.id, language: user.language, home: home.id });
         }
+        // Si existe pero home es null, actualizarlo
+      else if (userConfig.home === null || userConfig.home === undefined) {
+        await userConfig.update({
+          home: home.id
+        });
+      }
       await t.commit();
       if (notifications.length) {
         // Enviar todas las notificaciones en paralelo
@@ -376,8 +382,11 @@ const HomeController = {
         if (!userConfig) {
             userConfig = await Configuration.create({ user_id: user.id, language: user.language, home: home.id });
         }
-        else{
-          await userConfig.update({home: home.id});
+        // Si existe pero home es null, actualizarlo
+        else if (userConfig.home === null || userConfig.home === undefined) {
+          await userConfig.update({
+            home: home.id
+          });
         }
     // Resto de la lógica (asignar rol, etc.)...
     return res.status(200).json({
@@ -524,6 +533,36 @@ const HomeController = {
       const { people, personIds } = await HomeRepository.getHomePeople(
         req.body.id
       );
+
+      // 3. Actualizar `preferred_home` para cada persona
+    for (const person of people) {
+      const { person_id } = person;
+
+      // Actualizar configuración directamente aquí
+        const [updatedCount] = await Configuration.update(
+        { home: null },
+        {
+          include: [
+            {
+              model: User,
+              as: 'user',
+              include: [
+                {
+                  model: Person,
+                  as: 'person',
+                  where: { id: person_id },
+                  required: true,
+                }
+              ],
+              required: true,
+            }
+          ],
+          where: {
+            home: req.body.id,
+          }
+        }
+      );
+    }
 
       const { tokens, userTokens } =
         await UserRepository.getUserNotificationTokensByPersons(
