@@ -37,6 +37,10 @@ module.exports = {
         allowNull: true,
         defaultValue: 'Tarea'
       },
+      taskData: {
+        type: Sequelize.JSON, // Permitir almacenamiento de arrays
+        allowNull: true
+      },
       person_id: {
         type: Sequelize.BIGINT,
         allowNull: false,

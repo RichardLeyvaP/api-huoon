@@ -98,6 +98,9 @@ const SuggestionController = {
         home_id: suggestion.home_id,
         date: suggestion.date,
         type: suggestion.type,
+         taskData: Array.isArray(suggestion.taskData)
+          ? suggestion.taskData // Si ya es un array, úsalo directamente
+          : JSON.parse(suggestion.taskData), // Si es una cadena JSON, parsearla
         typeTask: suggestion.typeTask || 'Tarea'
       }));
 

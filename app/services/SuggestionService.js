@@ -41,7 +41,8 @@ const SuggestionService = {
             content: suggestion.content,
             status: 'Pendiente',
             type: 'Finanzas',
-            typeTask: suggestion.typeTask || 'Tarea'
+            typeTask: suggestion.typeTask || 'Tarea',
+            taskData: suggestion.taskData
           });
         }
         
@@ -84,7 +85,8 @@ const SuggestionService = {
             content: suggestion.content,
             status: 'Pendiente',
             type: 'Salud',
-            typeTask: suggestion.typeTask || 'Tarea'
+            typeTask: suggestion.typeTask || 'Tarea',
+            taskData: suggestion.taskData
           });
         }
         

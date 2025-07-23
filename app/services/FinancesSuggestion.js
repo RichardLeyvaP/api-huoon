@@ -1,12 +1,18 @@
 // services/FinancialAIService.js
 const logger = require('../../config/logger');
 const openai = require('../../config/openaiClient');
+const { PriorityRepository } = require('../repositories');
 
 const FinancialAIService = {
   async generateFinancialSuggestions(financialData, budgetData, existingSuggestions = []) {
     try {
       // Formatear los datos para el prompt
-      const currentDate = new Date().toISOString().slice(0, 10);
+      const priorities = await PriorityRepository.findAll(); // [{id: 1, name: "Alta"}, ...]
+
+    const now = new Date();
+const todayFormatted = now.toISOString().split('T')[0]; // YYYY-MM-DD
+const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // HH:mm
+
       const formattedBudget = budgetData.map(b => ({
         type: b.budget_type,
         category: b.category?.name || 'Sin categoría',
@@ -38,14 +44,33 @@ REGLAS:
 2. Considera si las sugerencias existentes cubren ya las necesidades
 3. Si los datos no han cambiado mucho y hay sugerencias recientes, no repitas
 4. Máximo 3 sugerencias adicionales si son realmente necesarias
-
-FORMATO PARA SUGERENCIAS (si se generan):
+Fecha actual: ${todayFormatted}
+Hora actual: ${currentTimeFormatted}
+FORMATO PARA CADA SUGERENCIA (si se generan):
 {
-  "title": "Título sugerencia",
-      "description": "Descripción detallada",
-      "content": "Contenido ampliado con pasos concretos",
-      "typeTask": "Tarea/Meta" // "Tarea" para acciones específicas y concretas, "Meta" para objetivos a largo plazo
+  "title": "Título claro y conciso",
+  "description": "string (breve, no repetir el título, debe ser útil)",
+  "content": "Contenido ampliado con pasos concretos, explicación y contexto",
+  "typeTask": "Tarea" | "Meta",
+  "taskData": {
+      "title": Mismo que el campo superior,
+      "description": Mismo que el campo superior,
+      "start_date": string (YYYY-MM-DD, si no se menciona, la IA debe sugerir una razonable),
+      "start_time": string (HH:mm, si no se menciona, la IA debe sugerir una razonable),
+      "end_date": string (YYYY-MM-DD, solo para Meta, si no se menciona, la IA debe sugerir una razonable),
+      "end_time": string (HH:mm, solo para Meta, si no se menciona, la IA debe sugerir una razonable),
+      "priority_id": número (usa uno de los siguientes: ${priorities.map(p => `${p.id}(${p.name})`).join(', ')}),
+      "estimated_time": número (en minutos, si no se menciona, la IA debe sugerir una razonable),
+      "type": "Tarea" o "Meta"
+    }
 }
+
+Instrucciones adicionales:
+- La descripción NO debe ser solo "realizar una tarea para..." sino que debe ser útil y descriptiva.
+- Si no se especifica una fecha u hora, la IA debe inferir una razonable basada en el contexto actual.
+- Si es una Meta, incluye end_date y end_time razonables si no se especifican.
+- La prioridad debe asignarse en función de la importancia percibida de la tarea/meta.
+- El tiempo estimado debe ser coherente con el tipo de tarea/meta.
 
 RESPONDER CON JSON que contenga:
 {

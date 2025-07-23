@@ -52,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'Tarea' // Valor por defecto
     },
+     taskData: {
+      type: DataTypes.JSON, // Tipo de dato JSON
+      allowNull: true, // Puede ser nulo
+    },
     person_id: {
       type: DataTypes.INTEGER,
       allowNull: false

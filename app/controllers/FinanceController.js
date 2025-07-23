@@ -493,7 +493,9 @@ const FinanceController = {
         status: suggestion.status,
         homeId: suggestion.home_id,
         home_id: suggestion.home_id,
-        date: suggestion.date
+        start_date: suggestion.date,
+        type: suggestion.typeTask,
+        taskData: suggestion.taskData,
       }));
       //const stats = await FinanceRepository.getPersonFinancialStats(person_id);
 

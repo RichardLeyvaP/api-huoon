@@ -79,7 +79,8 @@ const SuggestionRepository = {
           content: body.content || null,
           status: body.status || "pending",
           type: body.type || null,
-          typeTask: body.typeTask || 'Tarea' // Nuevo campo
+          typeTask: body.typeTask || 'Tarea', // Nuevo campo
+          taskData: body.taskData || null,
         },
         { transaction: t }
       );
@@ -105,7 +106,8 @@ const SuggestionRepository = {
       "content",
       "status",
       "type",
-      "typeTask"
+      "typeTask",
+      "taskData",
     ];
 
     try {
