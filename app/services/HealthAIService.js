@@ -116,17 +116,21 @@ ${formattedConsultations.slice(0, 3).map(c => `- ${c.date} con ${c.doctor} (${c.
 SUGERENCIAS EXISTENTES HOY (${existingSuggestions.length}):
 ${existingSuggestions.map(s => `- ${s.title} (${s.status})`).join('\n') || 'Ninguna'}
 
-REGLAS PARA LAS SUGERENCIAS:
-1. Prioriza prevención basada en antecedentes familiares
-2. Considera factores de riesgo según diagnósticos y exámenes
-3. Sugiere seguimientos necesarios según tratamientos actuales
-4. Propón mejoras de estilo de vida basadas en IMC y presión arterial
-5. No repitas sugerencias existentes a menos que sea urgente
-6. Máximo 3 sugerencias si son realmente necesarias, y de ser necesario agregar mas por la importancia agregarlas, como maximo 6 en total
-7. Considera fechas recientes como más relevantes
+REGLAS:
+1. Solo sugiere si hay algo NUEVO Y RELEVANTE que aconsejar
+2. Considera si las sugerencias existentes cubren ya las necesidades
+3. Si los datos no han cambiado mucho y hay sugerencias recientes, no repitas
+4. Máximo 3 sugerencias adicionales si son realmente necesarias
+5. VERIFICA LA COHERENCIA ENTRE TIEMPO ESTIMADO Y PERIODO DE EJECUCIÓN:
+   - Para tareas cortas (menos de 8 horas), las fechas de inicio y fin deben ser el mismo día o días consecutivos
+   - Para metas con tiempo estimado inferior a 1 día, NO sugieras plazos mensuales
+   - La diferencia entre start_date/start_time y end_date/end_time debe ser coherente con estimated_time
+   - Si hay incoherencia, PRIORITIZA el tiempo estimado y ajusta las fechas en consecuencia
+6. VALIDA que el tiempo estimado sea razonable para el tipo de tarea/meta descrito
 
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
+
 FORMATO PARA CADA SUGERENCIA (si se generan):
 {
   "title": "Título claro y conciso",
@@ -152,10 +156,11 @@ Instrucciones adicionales:
 - Si es una Meta, incluye end_date y end_time razonables si no se especifican.
 - La prioridad debe asignarse en función de la importancia percibida de la tarea/meta.
 - El tiempo estimado debe ser coherente con el tipo de tarea/meta.
+- ANTES de sugerir cambios en fechas, verifica que exista incoherencia real entre tiempo estimado y periodo planificado.
 
 RESPONDER CON JSON que contenga:
 {
-  "analysis": "Breve análisis de la situación de salud y necesidad de nuevas sugerencias",
+  "analysis": "Breve análisis de la situación y necesidad de nuevas sugerencias",
   "suggestions": [
     // Solo incluir si cumplen todas las reglas anteriores
     // Máximo 3 sugerencias

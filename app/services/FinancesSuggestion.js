@@ -44,8 +44,16 @@ REGLAS:
 2. Considera si las sugerencias existentes cubren ya las necesidades
 3. Si los datos no han cambiado mucho y hay sugerencias recientes, no repitas
 4. Máximo 3 sugerencias adicionales si son realmente necesarias
+5. VERIFICA LA COHERENCIA ENTRE TIEMPO ESTIMADO Y PERIODO DE EJECUCIÓN:
+   - Para tareas cortas (menos de 8 horas), las fechas de inicio y fin deben ser el mismo día o días consecutivos
+   - Para metas con tiempo estimado inferior a 1 día, NO sugieras plazos mensuales
+   - La diferencia entre start_date/start_time y end_date/end_time debe ser coherente con estimated_time
+   - Si hay incoherencia, PRIORITIZA el tiempo estimado y ajusta las fechas en consecuencia
+6. VALIDA que el tiempo estimado sea razonable para el tipo de tarea/meta descrito
+
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
+
 FORMATO PARA CADA SUGERENCIA (si se generan):
 {
   "title": "Título claro y conciso",
@@ -71,6 +79,7 @@ Instrucciones adicionales:
 - Si es una Meta, incluye end_date y end_time razonables si no se especifican.
 - La prioridad debe asignarse en función de la importancia percibida de la tarea/meta.
 - El tiempo estimado debe ser coherente con el tipo de tarea/meta.
+- ANTES de sugerir cambios en fechas, verifica que exista incoherencia real entre tiempo estimado y periodo planificado.
 
 RESPONDER CON JSON que contenga:
 {

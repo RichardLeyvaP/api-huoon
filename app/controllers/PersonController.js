@@ -5,7 +5,7 @@ const logger = require('../../config/logger');
 const i18n = require("../../config/i18n-config"); // Importar i18n para traducciones
 const bcrypt = require('bcrypt');
 const authConfig = require('../../config/auth');
-const { PersonRepository, UserRepository, PhysicalExamRepository, MedicalExamRepository, TreatmentRepository, PersonalBackgroundRepository, FamilyBackgroundRepository, DiagnosisRepository, MedicalConsultationRepository } = require('../repositories');
+const { PersonRepository, UserRepository, PhysicalExamRepository, MedicalExamRepository, TreatmentRepository, PersonalBackgroundRepository, FamilyBackgroundRepository, DiagnosisRepository, MedicalConsultationRepository, SuggestionRepository } = require('../repositories');
 const Module = require('module');
 
 const PersonController = {
@@ -277,7 +277,7 @@ const PersonController = {
         logger.info(`${req.user.name} - Accediendo al perfil de una persona`);
         
         try {
-    
+            const { home_id } = req.body;
             const person_id = req.person.id;
             // Buscar persona por ID obtenido de req.person
             logger.info('comenzar a optener los datos');
@@ -484,6 +484,39 @@ const PersonController = {
                           type: consultation.type?.name,
                         }
                       : null;
+                      //Sugerencias de salud
+                      const allSuggestions = await SuggestionRepository.findTodaySuggestions('Salud', person_id, home_id);
+
+                    const suggestionStatusData = [
+                        { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
+                        { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
+                        { id: "Completado", name: "Completado", description: "La sugerencia ha sido resuelta" },
+                    ];
+
+                    const translatedSuggestionStatusData = suggestionStatusData.map((item) => ({
+                        id: item.id,
+                        name: i18n.__(`suggestionStatus.${item.id}.name`) !== `suggestionStatus.${item.id}.name`
+                        ? i18n.__(`suggestionStatus.${item.id}.name`)
+                        : item.name,
+                        description: i18n.__(`suggestionStatus.${item.id}.description`) !== `suggestionStatus.${item.id}.description`
+                        ? i18n.__(`suggestionStatus.${item.id}.description`)
+                        : item.description,
+                        statusName: item.name
+                    }));
+                    
+                    //const suggestions = await SuggestionRepository.findAllByPersonId(person_id, dateParam);
+                    const mappedSuggestions = allSuggestions.map(suggestion => ({
+                        id: suggestion.id,
+                        title: suggestion.title,
+                        description: suggestion.description,
+                        content: suggestion.content,
+                        status: suggestion.status,
+                        homeId: suggestion.home_id,
+                        home_id: suggestion.home_id,
+                        start_date: suggestion.date,
+                        type: suggestion.typeTask,
+                        taskData: suggestion.taskData,
+                    }));
             // Devolver los datos mapeados
             res
               .status(200)
@@ -496,6 +529,8 @@ const PersonController = {
                 backgroundFamily: mappedBackgroundsFamily,
                 diagnosis: mappedDiagnosis,
                 consultation: mappedMedicalConsultation,
+                suggestions: mappedSuggestions,
+                statusuggestions: translatedSuggestionStatusData
               });
 
         } catch (error) {

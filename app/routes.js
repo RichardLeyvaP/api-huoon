@@ -177,7 +177,7 @@ router.put('/configuration', ConfigurationController.update);
 
 //Rutas Personas
 router.get('/person', PersonController.index);
-router.get('/person-profile', PersonController.getPersonProfile);
+router.post('/person-profile', PersonController.getPersonProfile);
 router.post('/person-show', validateSchema(idPersonSchema), PersonController.show);
 router.post('/person', validateSchema(storePersonSchema), multerCategory('image', 'people'), PersonController.store);
 router.post('/person-update', multerCategory('image', 'people'), validateSchema(updatePersonSchema), PersonController.update);
