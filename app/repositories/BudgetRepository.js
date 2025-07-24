@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Budget, Person, Home, Category } = require("../models");
+const { Budget, Person, Home, Category, Sequelize } = require("../models");
 const logger = require("../../config/logger");
 
 const BudgetRepository = {
@@ -366,6 +366,98 @@ const BudgetRepository = {
         { model: Category, as: "category" },
       ]
     });
+  },
+
+  async getPersonBudgetStats(person_id, home_id = null) {
+
+    // Fechas para el mes actual y el anterior
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    // Filtro base
+    const whereConditions = {
+      person_id: person_id,
+      //status: 'Activo' // Solo presupuestos activos
+    };
+
+    // Consulta para el mes actual
+    const currentMonthData = await Budget.findAll({
+      where: {
+        ...whereConditions,
+        [Op.or]: [
+          {
+            start_date: { [Op.lte]: currentMonthEnd },
+            end_date: { [Op.gte]: currentMonthStart }
+          }
+        ]
+      },
+      attributes: [
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total_budget'],
+        [Sequelize.fn('SUM', Sequelize.col('used_amount')), 'total_used']
+      ],
+      raw: true
+    });
+
+    // Consulta para el mes anterior
+    const lastMonthData = await Budget.findAll({
+      where: {
+        ...whereConditions,
+        [Op.or]: [
+          {
+            start_date: { [Op.lte]: lastMonthEnd },
+            end_date: { [Op.gte]: lastMonthStart }
+          }
+        ]
+      },
+      attributes: [
+        [Sequelize.fn('SUM', Sequelize.col('amount')), 'total_budget'],
+        [Sequelize.fn('SUM', Sequelize.col('used_amount')), 'total_used']
+      ],
+      raw: true
+    });
+
+    // Parsear resultados
+    const currentBudget = parseFloat(currentMonthData[0]?.total_budget || 0);
+    const currentUsed = parseFloat(currentMonthData[0]?.total_used || 0);
+    const currentRemaining = currentBudget - currentUsed;
+
+    const lastBudget = parseFloat(lastMonthData[0]?.total_budget || 0);
+    const lastUsed = parseFloat(lastMonthData[0]?.total_used || 0);
+    const lastRemaining = lastBudget - lastUsed;
+
+    // Calcular diferencias porcentuales
+    const budgetPercentage = lastBudget !== 0
+      ? ((currentBudget - lastBudget) / lastBudget * 100).toFixed(2)
+      : currentBudget !== 0 ? '100.00' : '0.00';
+
+    const usedPercentage = lastUsed !== 0
+      ? ((currentUsed - lastUsed) / lastUsed * 100).toFixed(2)
+      : currentUsed !== 0 ? '100.00' : '0.00';
+
+    const remainingPercentage = lastRemaining !== 0
+      ? ((currentRemaining - lastRemaining) / lastRemaining * 100).toFixed(2)
+      : currentRemaining !== 0 ? '100.00' : '0.00';
+
+    return {
+      currentMonth: {
+        budget: currentBudget,
+        used: currentUsed,
+        remaining: currentRemaining
+      },
+      lastMonth: {
+        budget: lastBudget,
+        used: lastUsed,
+        remaining: lastRemaining
+      },
+      percentages: {
+        budget: budgetPercentage,
+        used: usedPercentage,
+        remaining: remainingPercentage
+      }
+    };
   }
 };
 

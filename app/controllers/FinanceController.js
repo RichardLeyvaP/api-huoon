@@ -434,7 +434,7 @@ const FinanceController = {
     try {
 
        const stats = await FinanceRepository.getPersonFinancialStats(person_id);
-      
+      const budgetStats = await BudgetRepository.getPersonBudgetStats(person_id, home_id);
       /*// 2. Obtener presupuestos actuales
       const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
       
@@ -535,6 +535,15 @@ const FinanceController = {
           current: formatCurrency(stats.currentMonth.balance),
           icon: "mdi-scale-balance",
           color: "blue-darken-2"
+        },
+        budgetCard: {
+          current: formatCurrency(budgetStats.currentMonth.budget),
+          used: formatCurrency(budgetStats.currentMonth.used),
+          remaining: formatCurrency(budgetStats.currentMonth.remaining),
+          percentage: budgetStats.percentages.budget,
+          lastMonth: formatCurrency(budgetStats.lastMonth.budget),
+          icon: "mdi-wallet",
+          color: "blue"
         },
         movementsCard: {
           total: formatCurrency(stats.currentMonth.income - stats.currentMonth.spent),
