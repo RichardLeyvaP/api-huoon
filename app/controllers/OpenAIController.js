@@ -58,6 +58,8 @@ async getAITask(req, res) {
   logger.info(JSON.stringify(req.body));
     const { question, issue } = req.body;
     const userId = req.user.id;
+    const person_id = req.person.id;
+    const home_id = req.body.home_id;
     if (!question) {
       return res.status(400).json({ error: 'Pregunta es requerida' });
     }
@@ -73,15 +75,10 @@ async getAITask(req, res) {
   
     try {
       // Primero detectar si hay intención de crear tarea/meta
-    const intentDetection = await IntentDetectionService.detectarIntentTask(question);
+    const intentDetection = await IntentDetectionService.detectarIntentTask(question, person_id, home_id);
       const MIN_CONFIDENCE = 0.7;
     // Verificar si hay una intención relevante (task o goal creation)
-    if (intentDetection.intent && 
-    (intentDetection.intent.toLowerCase().includes('task') || 
-     intentDetection.intent.toLowerCase().includes('goal') ||
-     intentDetection.intent.toLowerCase().includes('tarea') ||
-     intentDetection.intent.toLowerCase().includes('meta') ||
-     intentDetection.intent.toLowerCase().includes('create')) &&
+    if (intentDetection.intent &&
     intentDetection.confidence >= MIN_CONFIDENCE) {
   
   logger.info(`Intención detectada: ${JSON.stringify(intentDetection)}`);
@@ -98,6 +95,8 @@ async getAITask(req, res) {
     explanation: intentDetection.explanation,
     originalQuestion: question,
     task: intentDetection.taskData || null,
+    finances: intentDetection.financeData || null,
+    budget: intentDetection.budgetData || null
   });
 }
       // Realizar la solicitud a OpenAI

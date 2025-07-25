@@ -1,9 +1,10 @@
 const logger = require('../../config/logger');
 const openai = require('../../config/openaiClient');
-const { PriorityRepository } = require('../repositories');
+const { PriorityRepository, BudgetRepository } = require('../repositories');
 
 // Importar chrono-node para interpretar fechas en español
 const chrono = require('chrono-node');
+const CategoryService = require('./CategoryService');
 
 // Función para interpretar frases de fecha/hora
 function interpretarFecha(texto, now = new Date()) {
@@ -82,9 +83,10 @@ ${textoUsuario}
     }
   },
 
-  async detectarIntentTask(textoUsuario) {
+  async detectarIntentTask(textoUsuario, person_id = null, home_id = null) {
     const priorities = await PriorityRepository.findAll(); // [{id: 1, name: "Alta"}, ...]
-
+    const budgets = await BudgetRepository.findAllByPersonIdHomeId(person_id, home_id);
+    const categories = await CategoryService.getCategories(person_id, "Budget");
     const now = new Date();
 const todayFormatted = now.toISOString().split('T')[0]; // YYYY-MM-DD
 const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // HH:mm
@@ -93,12 +95,16 @@ const prompt = `
 Analiza rigurosamente el siguiente texto del usuario para determinar si expresa una intención clara de:
 - Crear/programar una tarea (Tarea)
 - Establecer una meta (Meta)
+- Registrar un ingreso financiero (Ingreso)
+- Registrar un gasto financiero (Gasto)
+- Registrar un presupuesto financiero (Presupuesto)
 
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
 
-Si hay intención clara, devuelve un objeto JSON con los siguientes campos:
+Si hay intención clara, devuelve un objeto JSON con uno de los siguientes formatos:
 
+Para Tareas/Metas:
 {
   "intent": "Tarea" o "Meta",
   "confidence": número entre 0 y 1,
@@ -116,12 +122,65 @@ Si hay intención clara, devuelve un objeto JSON con los siguientes campos:
   }
 }
 
+Para Finanzas (Ingreso/Gasto):
+{
+  "intent": "Ingreso" o "Gasto",
+  "confidence": número entre 0 y 1,
+  "explanation": breve explicación del análisis,
+  "financeData": {
+    "spent": número (valor del gasto, 0 si es ingreso),
+    "income": número (valor del ingreso, 0 si es gasto),
+    "date": string (YYYY-MM-DD, si no se menciona usar fecha actual),
+    "description": string (descripción breve y útil, no genérica),
+    "type": "Personal" o "Hogar" (inferir del contexto si no se especifica),
+    "budget_id": número o null (solo para gastos, usa uno de los siguientes si coincide con el tipo y descripción: ${budgets.map(b => `${b.id}(${b.name} - ${b.type})`).join(', ')})
+  }
+}
+
+Para Presupuesto:
+{
+  "intent": "Presupuesto",
+  "confidence": número entre 0 y 1,
+  "explanation": breve explicación del análisis,
+  "budgetData": {
+    "category_id": número o null (usa uno de los siguientes que mejor coincida con la descripción: ${categories.map(c => `${c.id}-(${c.name})`).join(', ')}, y si no detecta coincidencia null),
+    "amount": número (monto del presupuesto),
+    "start_date": string (YYYY-MM-DD, si no se menciona usar el primer día del mes actual),
+    "end_date": string (YYYY-MM-DD, si no se menciona usar el último día del mes actual),
+    "budget_type": "Personal" o "Hogar" (inferir del contexto si no se especifica),
+    "description": string (breve, puede ser null),
+    "currency": string (código de moneda, ej. USD, EUR; usar USD si no se menciona)
+  }
+}
+
 Instrucciones adicionales:
+1. Para Tareas/Metas:
 - La descripción NO debe ser solo "realizar una tarea para..." sino que debe ser útil y descriptiva.
 - Si no se especifica una fecha u hora, la IA debe inferir una razonable basada en el contexto actual.
 - Si es una Meta, incluye end_date y end_time razonables si no se especifican.
 - La prioridad debe asignarse en función de la importancia percibida de la tarea/meta.
 - El tiempo estimado debe ser coherente con el tipo de tarea/meta.
+
+2. Para Finanzas:
+- Distinguir claramente entre ingreso (income > 0, spent = 0) y gasto (spent > 0, income = 0).
+- Descripción debe ser específica (ej. "Compra supermercado" en lugar de "gasto").
+- Tipo (Personal/Hogar) debe inferirse del contexto cuando no esté explícito.
+- budget_id: Solo para gastos, asignar el ID del presupuesto que mejor coincida con:
+   * El tipo (Personal/Hogar) del gasto
+   * La descripción del gasto
+   * Si no hay coincidencia clara, usar null
+
+3. Para Presupuesto:
+- category_id: Asignar el ID de categoría que mejor coincida con la descripción del presupuesto o sino null.
+- amount: Monto total del presupuesto.
+- start_date y end_date: Si no se mencionan, usar el primer y último día del mes actual respectivamente.
+- budget_type: "Personal" o "Hogar", inferir del contexto si no se menciona.
+- description: Breve descripción, siempre dar una descripción referente al contexto.
+- currency: Código de moneda (ej. USD), usar USD por defecto si no se menciona.
+
+4. Generales:
+- Confidence debe reflejar la certeza de la intención detectada.
+- Explanation debe justificar claramente la decisión tomada.
 
 Texto a analizar: "${textoUsuario}"
 `;

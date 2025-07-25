@@ -62,6 +62,64 @@ const BudgetRepository = {
     });
   },
 
+  async findAllByPersonIdHomeId(personId, homeId = null) {
+    // Obtener el primer y último día del mes actual
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const whereConditions = {
+      [Op.or]: [
+        { person_id: personId }
+      ]
+    };
+
+    if (homeId) {
+      whereConditions[Op.or].push({
+        home_id: homeId
+      });
+    }
+
+    const budgets = await Budget.findAll({
+      where: {
+        [Op.and]: [
+          whereConditions,
+          {
+            start_date: {
+              [Op.gte]: firstDayOfMonth,
+              [Op.lte]: lastDayOfMonth
+            }
+          }
+        ]
+      },
+      include: [
+        { 
+          model: Category, 
+          as: "category",
+          attributes: ['name']
+        },
+      ],
+      attributes: ['id', 'amount'],
+      order: [
+        ['budget_type', 'ASC'],
+        ['start_date', 'DESC']
+      ]
+    });
+
+    // Eliminamos registros duplicados por ID
+    const uniqueBudgets = budgets.filter((budget, index, self) => 
+      index === self.findIndex(b => b.id === budget.id)
+    );
+
+    // Transformamos los resultados
+    return uniqueBudgets.map(budget => ({
+      id: budget.id,
+      amount: budget.amount,
+      type: budget.type,
+      name: budget.category ? budget.category.name : null
+    }));
+  },
+
   async findAllCurrentByPersonId(personId, homeId = null) {
     const now = new Date();
     const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
