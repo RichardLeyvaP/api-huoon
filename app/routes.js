@@ -468,6 +468,7 @@ router.post('/status-priority-type-apk', WishController.status_priority_type);
 router.post('/get-type-state-severity', validateSchema(typeSchema), PersonalBackgroundController.getTypesByTypeStateSeverity);
 router.post('/get-type-relationship', validateSchema(typeSchema), FamilyBackgroundController.getTypesByTypeRelation);
 router.post('/get-type-diagnoses', validateSchema(typeSchema), DiagnosisController.getTypesByTypeRelation);
+router.post('/get-type-treatment', validateSchema(typeSchema), TreatmentController.getTypesByType);
 router.post('/get-type-consultations', validateSchema(typeSchema), MedicalConsultationController.getTypesByTypeRelation);
 
 module.exports = router;

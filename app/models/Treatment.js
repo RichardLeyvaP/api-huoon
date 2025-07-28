@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'medical_consultation_id', 
         as: 'medicalConsultation' 
       });
+
+      Treatment.belongsTo(models.Type, { 
+        foreignKey: 'type_id', 
+        as: 'type' 
+      });
     }
   }
   Treatment.init({
@@ -34,6 +39,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       references: {
         model: 'MedicalConsultation',
+        key: 'id'
+      },
+      allowNull: true,
+    },
+    type_id: {
+      type: DataTypes.INTEGER, //ENUM('Presuntivo', 'Definitivo', 'Diferencial')
+      references: {
+        model: 'Type',
         key: 'id'
       },
       allowNull: true,

@@ -365,7 +365,7 @@ const PersonController = {
                      };
                    }) : null;
             //Último Tratamiento
-            const treatment = await TreatmentRepository.getLastByPersonId(person_id);
+            /*const treatment = await TreatmentRepository.getActiveTreatments(person_id);
             const mappedTreatment = treatment ? {
                 id: treatment.id,
                 personId: treatment.person_id,
@@ -380,7 +380,40 @@ const PersonController = {
                 purpose: treatment.purpose,
                 startDate: treatment.startDate,
                 endDate: treatment.endDate,
-            }: null;
+            }: null;*/
+
+            const treatments = await TreatmentRepository.getActiveTreatments(person_id);
+            const mappedTreatments = treatments.map(treatment => ({
+            id: treatment.id,
+            personId: treatment.person_id,
+            person_id: treatment.person_id,
+            medicalConsultationId: treatment.medical_consultation_id,
+            medical_consultation_id: treatment.medical_consultation_id,
+            medication: treatment.medication,
+            dosage: treatment.dosage,
+            frequency: treatment.frequency,
+            duration: treatment.duration,
+            instructions: treatment.instructions,
+            purpose: treatment.purpose,
+            startDate: treatment.startDate,
+            endDate: treatment.endDate,
+            typeId: treatment.type_id,
+            type_id: treatment.type_id,
+            typeName: treatment.type?.name ? 
+                (i18n.__(`types.${treatment.type.name}.name`) !== `types.${treatment.type.name}.name`
+                ? i18n.__(`types.${treatment.type.name}.name`)
+                : treatment.type.name)
+                : null,
+                type: treatment.tipe?.name
+            }));
+
+            const treatmentData = mappedTreatments.length === 0 
+            ? null 
+            : mappedTreatments.length === 1 
+                ? mappedTreatments[0] 
+                : mappedTreatments;
+
+
 
             //Antecedentes personales
             const backgroundsPerson = await PersonalBackgroundRepository.findAllByPersonId(person_id);
@@ -524,7 +557,7 @@ const PersonController = {
                 person: mappedPerson,
                 physicalExam: mappedPhysicalExam,
                 medicalExam: mappedExam,
-                treatment: mappedTreatment,
+                treatment: treatmentData,
                 backgroundPerson: mappedBackgroundsPerson,
                 backgroundFamily: mappedBackgroundsFamily,
                 diagnosis: mappedDiagnosis,

@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { Treatment, Person, MedicalConsultation, sequelize } = require("../models");
 const logger = require("../../config/logger");
-const { TreatmentRepository, PersonRepository, MedicalConsultationRepository } = require("../repositories");
+const { TreatmentRepository, PersonRepository, MedicalConsultationRepository, TypeRepository } = require("../repositories");
 const i18n = require("../../config/i18n-config");
 
 const TreatmentController = {
@@ -23,6 +23,8 @@ const TreatmentController = {
         person_id: treatment.person_id,
         medicalConsultationId: treatment.medical_consultation_id,
         medical_consultation_id: treatment.medical_consultation_id,
+        typeId: treatment.type_id,
+        type_id: treatment.type_id,
         medication: treatment.medication,
         dosage: treatment.dosage,
         frequency: treatment.frequency,
@@ -31,6 +33,12 @@ const TreatmentController = {
         purpose: treatment.purpose,
         startDate: treatment.startDate,
         endDate: treatment.endDate,
+        typeName: treatment.type?.name ? 
+                  (i18n.__(`types.${treatment.type.name}.name`) !== `types.${treatment.type.name}.name`
+                    ? i18n.__(`types.${treatment.type.name}.name`)
+                    : treatment.type.name)
+                  : null,
+        type: treatment.tipe?.name
       }));
 
       return res.status(200).json({ treatments: mappedTreatments });
@@ -70,6 +78,14 @@ const TreatmentController = {
         purpose: treatment.purpose,
         startDate: treatment.startDate,
         endDate: treatment.endDate,
+        typeId: treatment.type_id,
+        type_id: treatment.type_id,
+        typeName: treatment.type?.name ? 
+                  (i18n.__(`types.${treatment.type.name}.name`) !== `types.${treatment.type.name}.name`
+                    ? i18n.__(`types.${treatment.type.name}.name`)
+                    : treatment.type.name)
+                  : null,
+        type: treatment.tipe?.name
       };
 
       return res.status(200).json({ treatment: mappedTreatment });
@@ -107,6 +123,14 @@ const TreatmentController = {
         purpose: treatment.purpose,
         startDate: treatment.startDate,
         endDate: treatment.endDate,
+        typeId: treatment.type_id,
+        type_id: treatment.type_id,
+        typeName: treatment.type?.name ? 
+                  (i18n.__(`types.${treatment.type.name}.name`) !== `types.${treatment.type.name}.name`
+                    ? i18n.__(`types.${treatment.type.name}.name`)
+                    : treatment.type.name)
+                  : null,
+        type: treatment.tipe?.name
       }));
 
       return res.status(200).json({ treatments: mappedTreatments });
@@ -135,6 +159,14 @@ const TreatmentController = {
       if (!consultation) {
         logger.error(`Medical consultation not found with ID ${req.body.medical_consultation_id}`);
         return res.status(404).json({ msg: "MedicalConsultationNotFound" });
+      }
+    }
+
+    if (req.body.type_id) {
+      const type = await TypeRepository.findById(req.body.type_id);
+      if (!type) {
+        logger.error(`Type not found with ID ${req.body.type_id}`);
+        return res.status(404).json({ msg: "TypeNotFound" });
       }
     }
 
@@ -177,6 +209,14 @@ const TreatmentController = {
           return res.status(404).json({ msg: "MedicalConsultationNotFound" });
         }
       }
+
+      if (req.body.type_id) {
+      const type = await TypeRepository.findById(req.body.type_id);
+      if (!type) {
+        logger.error(`Type not found with ID ${req.body.type_id}`);
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
+    }
 
       const t = await sequelize.transaction();
       try {
@@ -274,7 +314,51 @@ const TreatmentController = {
       logger.error("TreatmentController->getActiveTreatments: " + errorMsg);
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
-  }
+  },
+
+  async getTypesByType(req, res) {
+    logger.info(`${req.user.name} - Buscando tipos de tipo ${req.body.type}`);
+
+    try {
+      const { type } = req.body; // Supongamos que el tipo viene en el cuerpo de la solicitud
+      const types = await TypeRepository.findByType(type);
+
+      if (!types || types.length === 0) {
+        return res
+          .status(404)
+          .json({
+            message: "No se encontraron tipos para el tipo especificado.",
+          });
+      }
+
+      // Formatear los resultados para traducir name y description
+      const formattedTypes = types.map((typeItem) => {
+        const translatedName = i18n.__(`types.${typeItem.name}.name`) !==
+              `types.${typeItem.name}.name`
+              ? i18n.__(`types.${typeItem.name}.name`)
+              : typeItem.name;
+
+        const translatedDescription = i18n.__(`types.${typeItem.name}.name`) !==
+              `types.${typeItem.name}.name`
+              ? i18n.__(`types.${typeItem.name}.description`)
+              : typeItem.description;
+
+        return {
+          ...typeItem.toJSON(), // Mantener todos los campos originales
+          nameTranslated: translatedName, // Sobrescribir name con la traducción
+          descriptionTranslated: translatedDescription, // Sobrescribir description con la traducción
+        };
+      });
+
+      return res.status(200).json({ types: formattedTypes/*, relationships: translatedFamilyRelationsData*/ });
+    } catch (error) {
+      const errorMsg = error.details
+        ? error.details.map((detail) => detail.message).join(", ")
+        : error.message || "Error desconocido";
+      logger.error("TreatmentController->getTypesByType: " + errorMsg);
+      res.status(500).json({ error: "ServerError", details: errorMsg });
+    }
+  },
 };
 
 module.exports = TreatmentController;

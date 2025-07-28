@@ -441,6 +441,58 @@
   "Otro": {
     "name": "Other",
     "description": "Unspecified consultation type"
+  },
+  "Cada 4 horas": {
+    "name": "Every 4 hours",
+    "description": "Medication to be taken every 4 hours while awake"
+  },
+  "Cada 6 horas": {
+    "name": "Every 6 hours",
+    "description": "Medication to be taken every 6 hours (4 times a day)"
+  },
+  "Cada 8 horas": {
+    "name": "Every 8 hours",
+    "description": "Medication to be taken every 8 hours (3 times a day)"
+  },
+  "Cada 12 horas": {
+    "name": "Every 12 hours",
+    "description": "Medication to be taken every 12 hours (morning and night)"
+  },
+  "Una vez al día": {
+    "name": "Once daily",
+    "description": "Medication to be taken once every 24 hours"
+  },
+  "Cada 48 horas": {
+    "name": "Every 48 hours",
+    "description": "Medication to be taken every two days"
+  },
+  "Cada semana": {
+    "name": "Weekly",
+    "description": "Medication to be taken once per week"
+  },
+  "Cada mes": {
+    "name": "Monthly",
+    "description": "Medication to be taken once a month"
+  },
+  "Antes de comer": {
+    "name": "Before meals",
+    "description": "Medication to be taken 30 minutes before meals"
+  },
+  "Después de comer": {
+    "name": "After meals",
+    "description": "Medication to be taken immediately after eating"
+  },
+  "En ayunas": {
+    "name": "On an empty stomach",
+    "description": "Medication to be taken with empty stomach, when waking up"
+  },
+  "Al acostarse": {
+    "name": "At bedtime",
+    "description": "Medication to be taken right before sleeping"
+  },
+  "Cuando sea necesario": {
+    "name": "As needed",
+    "description": "Medication to be taken only when specific symptoms appear"
   }
   },
   "gender": {

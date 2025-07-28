@@ -441,6 +441,58 @@
   "Otro": {
     "name": "Otro",
     "description": "Otro tipo de consulta no especificada"
+  },
+  "Cada 4 horas": {
+    "name": "Cada 4 horas",
+    "description": "Medicación que debe tomarse cada 4 horas mientras se está despierto"
+  },
+  "Cada 6 horas": {
+    "name": "Cada 6 horas",
+    "description": "Medicación que debe tomarse cada 6 horas (4 veces al día)"
+  },
+  "Cada 8 horas": {
+    "name": "Cada 8 horas",
+    "description": "Medicación que debe tomarse cada 8 horas (3 veces al día)"
+  },
+  "Cada 12 horas": {
+    "name": "Cada 12 horas",
+    "description": "Medicación que debe tomarse cada 12 horas (mañana y noche)"
+  },
+  "Una vez al día": {
+    "name": "Una vez al día",
+    "description": "Medicación que debe tomarse una vez cada 24 horas"
+  },
+  "Cada 48 horas": {
+    "name": "Cada 48 horas",
+    "description": "Medicación que debe tomarse cada dos días"
+  },
+  "Cada semana": {
+    "name": "Cada semana",
+    "description": "Medicación que debe tomarse una vez por semana"
+  },
+  "Cada mes": {
+    "name": "Cada mes",
+    "description": "Medicación que debe tomarse una vez al mes"
+  },
+  "Antes de comer": {
+    "name": "Antes de comer",
+    "description": "Medicación que debe tomarse 30 minutos antes de las comidas"
+  },
+  "Después de comer": {
+    "name": "Después de comer",
+    "description": "Medicación que debe tomarse inmediatamente después de comer"
+  },
+  "En ayunas": {
+    "name": "En ayunas",
+    "description": "Medicación que debe tomarse con el estómago vacío, al levantarse"
+  },
+  "Al acostarse": {
+    "name": "Al acostarse",
+    "description": "Medicación que debe tomarse justo antes de dormir"
+  },
+  "Cuando sea necesario": {
+    "name": "Cuando sea necesario",
+    "description": "Medicación que se toma solo cuando aparecen síntomas específicos"
   }
   },
   "gender": {

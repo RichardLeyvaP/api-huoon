@@ -1,4 +1,4 @@
-const { Treatment, Person, MedicalConsultation, sequelize } = require("../models");
+const { Treatment, Person, MedicalConsultation, Type, sequelize } = require("../models");
 const logger = require("../../config/logger");
 const { Op } = require("sequelize");
 
@@ -9,6 +9,7 @@ const TreatmentRepository = {
         "id",
         "person_id",
         "medical_consultation_id",
+        "type_id",
         "medication",
         "dosage",
         "frequency",
@@ -26,6 +27,10 @@ const TreatmentRepository = {
         {
           model: Person,
           as: "person"
+        },
+        {
+          model: Type,
+          as: "type"
         }
       ],
       order: [['startDate', 'DESC']]
@@ -38,6 +43,7 @@ const TreatmentRepository = {
       attributes: [
         "id",
         "medical_consultation_id",
+        "type_id",
         "medication",
         "dosage",
         "frequency",
@@ -51,6 +57,10 @@ const TreatmentRepository = {
         { 
           model: MedicalConsultation, 
           as: "medicalConsultation" 
+        },
+        {
+          model: Type,
+          as: "type"
         }
       ],
       order: [['startDate', 'DESC']]
@@ -63,6 +73,7 @@ const TreatmentRepository = {
         "id",
         "person_id",
         "medical_consultation_id",
+        "type_id",
         "medication",
         "dosage",
         "frequency",
@@ -80,6 +91,10 @@ const TreatmentRepository = {
         {
           model: Person,
           as: "person"
+        },
+        {
+          model: Type,
+          as: "type"
         }
       ]
     });
@@ -98,7 +113,8 @@ const TreatmentRepository = {
           instructions: body.instructions || null,
           purpose: body.purpose || null,
           startDate: body.startDate || null,
-          endDate: body.endDate || null
+          endDate: body.endDate || null,
+          type_id: body.type_id || null
         },
         { transaction: t }
       );
@@ -120,7 +136,8 @@ const TreatmentRepository = {
       "instructions",
       "purpose",
       "startDate",
-      "endDate"
+      "endDate",
+      "type_id"
     ];
     const updatedData = {};
 
@@ -167,14 +184,29 @@ const TreatmentRepository = {
   },
 
   async getActiveTreatments(person_id) {
+    const today = await this.getCurrentDateWithoutTime(); 
     return await Treatment.findAll({
-      where: { 
-        person_id,
-        [Op.or]: [
-          { endDate: null },
-          { endDate: { [Op.gte]: new Date() } }
-        ]
-      },
+       include: [
+        { 
+          model: MedicalConsultation, 
+          as: "medicalConsultation" 
+        },
+        {
+          model: Person,
+          as: "person"
+        },
+        {
+          model: Type,
+          as: "type"
+        }
+      ],
+       where: { 
+      person_id,
+      [Op.or]: [
+        { endDate: null },
+        { endDate: { [Op.gte]: today } }
+      ]
+    },
       order: [['startDate', 'DESC']],
       attributes: [
         "id",
@@ -182,10 +214,21 @@ const TreatmentRepository = {
         "dosage",
         "frequency",
         "startDate",
-        "endDate"
+        "endDate",
+        "type_id"
       ]
     });
-  }
+  },
+
+  async  getCurrentDateWithoutTime() {
+  const date = new Date();
+  // Ajustamos a la fecha local (sin horas/minutos/segundos)
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  ).toISOString().split('T')[0];
+}
 };
 
 module.exports = TreatmentRepository;

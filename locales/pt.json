@@ -441,6 +441,58 @@
   "Otro": {
     "name": "Outro",
     "description": "Outro tipo de consulta não especificada"
+  },
+  "Cada 4 horas": {
+    "name": "A cada 4 horas",
+    "description": "Medicação a ser tomada a cada 4 horas enquanto estiver acordado"
+  },
+  "Cada 6 horas": {
+    "name": "A cada 6 horas",
+    "description": "Medicação a ser tomada a cada 6 horas (4 vezes ao dia)"
+  },
+  "Cada 8 horas": {
+    "name": "A cada 8 horas",
+    "description": "Medicação a ser tomada a cada 8 horas (3 vezes ao dia)"
+  },
+  "Cada 12 horas": {
+    "name": "A cada 12 horas",
+    "description": "Medicação a ser tomada a cada 12 horas (manhã e noite)"
+  },
+  "Una vez al día": {
+    "name": "Uma vez ao dia",
+    "description": "Medicação a ser tomada uma vez a cada 24 horas"
+  },
+  "Cada 48 horas": {
+    "name": "A cada 48 horas",
+    "description": "Medicação a ser tomada a cada dois dias"
+  },
+  "Cada semana": {
+    "name": "Semanalmente",
+    "description": "Medicação a ser tomada uma vez por semana"
+  },
+  "Cada mes": {
+    "name": "Mensalmente",
+    "description": "Medicação a ser tomada uma vez por mês"
+  },
+  "Antes de comer": {
+    "name": "Antes das refeições",
+    "description": "Medicação a ser tomada 30 minutos antes das refeições"
+  },
+  "Después de comer": {
+    "name": "Após as refeições",
+    "description": "Medicação a ser tomada imediatamente após comer"
+  },
+  "En ayunas": {
+    "name": "Em jejum",
+    "description": "Medicação a ser tomada com o estômago vazio, ao acordar"
+  },
+  "Al acostarse": {
+    "name": "Ao deitar",
+    "description": "Medicação a ser tomada logo antes de dormir"
+  },
+  "Cuando sea necesario": {
+    "name": "Quando necessário",
+    "description": "Medicação a ser tomada apenas quando sintomas específicos aparecem"
   }
   },
   "gender": {

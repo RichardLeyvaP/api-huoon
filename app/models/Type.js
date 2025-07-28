@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'type_id',
         as: 'diagnoses'
       }); 
+      Type.hasMany(models.Treatment, {
+        foreignKey: 'type_id',
+        as: 'treatments'
+      }); 
     }
   }
   Type.init(

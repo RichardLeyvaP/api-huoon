@@ -5,6 +5,9 @@ const storeTreatmentSchema = Joi.object({
   medical_consultation_id: Joi.number().integer().allow(null).optional().messages({
     "number.base": "El ID de la consulta médica debe ser un número",
   }),
+  type_id: Joi.number().integer().allow(null).optional().messages({
+    "number.base": "El ID de la frecuencia debe ser un número",
+  }),
   medication: Joi.string().max(100).allow(null, "").optional().messages({
     "string.base": "El medicamento debe ser una cadena de texto",
     "string.max": "El medicamento no debe exceder los 100 caracteres"
@@ -39,6 +42,9 @@ const storeTreatmentSchema = Joi.object({
 const updateTreatmentSchema = Joi.object({
   medical_consultation_id: Joi.number().integer().allow(null).optional().messages({
     "number.base": "El ID de la consulta médica debe ser un número",
+  }),
+  type_id: Joi.number().integer().allow(null).optional().messages({
+    "number.base": "El ID de la frecuencia debe ser un número",
   }),
   medication: Joi.string().max(100).allow(null, "").optional().messages({
     "string.base": "El medicamento debe ser una cadena de texto",

@@ -26,6 +26,14 @@ module.exports = {
         },
         allowNull: true,
       },
+      type_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "types",
+          key: "id",
+        },
+        allowNull: true,
+      },
       medication: {
         type: Sequelize.STRING(100),
         allowNull: true,
