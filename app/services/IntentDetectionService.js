@@ -1,6 +1,6 @@
 const logger = require('../../config/logger');
 const openai = require('../../config/openaiClient');
-const { PriorityRepository, BudgetRepository } = require('../repositories');
+const { PriorityRepository, BudgetRepository, TypeRepository } = require('../repositories');
 
 // Importar chrono-node para interpretar fechas en español
 const chrono = require('chrono-node');
@@ -87,6 +87,7 @@ ${textoUsuario}
     const priorities = await PriorityRepository.findAll(); // [{id: 1, name: "Alta"}, ...]
     const budgets = await BudgetRepository.findAllByPersonIdHomeId(person_id, home_id);
     const categories = await CategoryService.getCategories(person_id, "Budget");
+    const types = await TypeRepository.findByType('Presupuesto');
     const now = new Date();
 const todayFormatted = now.toISOString().split('T')[0]; // YYYY-MM-DD
 const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // HH:mm
@@ -150,7 +151,8 @@ Para Presupuesto:
     "end_date": string (YYYY-MM-DD, si no se menciona usar el último día del mes actual),
     "budget_type": "Personal" o "Hogar" (inferir del contexto si no se especifica),
     "description": string (breve, puede ser null),
-    "currency": string (código de moneda, ej. USD, EUR; usar USD si no se menciona)
+    "currency": string (código de moneda, ej. USD, EUR, CLP; usar CLP si no se menciona)
+    "type_id": número (usa uno de los siguientes IDs de tipo de presupuesto: ${types.map(t => `${t.id}(${t.name})`).join(', ')}; si no se especifica, la IA debe inferir el más acorde al contexto, pero siempre debe devolver un número válido existente en este listado)
   }
 }
 
@@ -187,6 +189,7 @@ Instrucciones adicionales:
 - budget_type: "Personal" o "Hogar", inferir del contexto si no se menciona.
 - description: Breve descripción, siempre dar una descripción referente al contexto.
 - currency: Código de moneda (ej. USD), usar USD por defecto si no se menciona.
+- type_id: Debe asignarse un número válido de los tipos disponibles (${types.map(t => `${t.id}(${t.name})`).join(', ')}). Si el usuario no especifica un tipo, la IA debe inferir el más adecuado según el contexto (por ejemplo, si es un presupuesto para vacaciones, elegiría un tipo como 'Recreación' o 'Viaje'), pero **siempre debe devolver un valor numérico válido**, nunca null o undefined.
 
 4. Generales:
 - Confidence debe reflejar la certeza de la intención detectada.

@@ -25,6 +25,8 @@ module.exports = {
           model: 'budgets', // El nombre de la tabla de referencia también debe ser en minúsculas
           key: 'id'
         },
+         onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
       },
       home_id: {
         type: Sequelize.BIGINT,

@@ -65,11 +65,12 @@ FORMATO PARA CADA SUGERENCIA (si se generan):
       "description": Mismo que el campo superior,
       "start_date": string (YYYY-MM-DD, si no se menciona, la IA debe sugerir una razonable),
       "start_time": string (HH:mm, si no se menciona, la IA debe sugerir una razonable),
-      "end_date": string (YYYY-MM-DD, solo para Meta, si no se menciona, la IA debe sugerir una razonable),
-      "end_time": string (HH:mm, solo para Meta, si no se menciona, la IA debe sugerir una razonable),
+      "end_date": string (YYYY-MM-DD, si no se menciona, la IA debe sugerir una razonable),
+      "end_time": string (HH:mm, si no se menciona, la IA debe sugerir una razonable),
       "priority_id": número (usa uno de los siguientes: ${priorities.map(p => `${p.id}(${p.name})`).join(', ')}),
       "estimated_time": número (en minutos, si no se menciona, la IA debe sugerir una razonable),
-      "type": "Tarea" o "Meta"
+      "type": "Tarea" o "Meta",
+      "recurrence": string (uno de los siguientes: "Diaria", "Semanal", "Mensual", "Anual", "No se repite"; si no se especifica en el texto, inferir del contexto; si no hay indicios, usar "No se repite")
     }
 }
 
@@ -79,7 +80,15 @@ Instrucciones adicionales:
 - Si es una Meta, incluye end_date y end_time razonables si no se especifican.
 - La prioridad debe asignarse en función de la importancia percibida de la tarea/meta.
 - El tiempo estimado debe ser coherente con el tipo de tarea/meta.
-- ANTES de sugerir cambios en fechas, verifica que exista incoherencia real entre tiempo estimado y periodo planificado.
+- El campo "recurrence" debe reflejar si la tarea se repite:
+   * Valores permitidos: "Diaria", "Semanal", "Mensual", "Anual", "No se repite"
+   * Ejemplos de contexto:
+      - "todos los días", "cada día" → "Diaria"
+      - "cada semana", "los lunes" → "Semanal"
+      - "cada mes", "mensualmente" → "Mensual"
+      - "cada año", "anualmente" → "Anual"
+      - Si no hay indicios de repetición → "No se repite"
+   * Este campo es obligatorio en taskData.
 
 RESPONDER CON JSON que contenga:
 {

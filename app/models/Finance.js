@@ -40,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
+      budget_id: {
+        type: DataTypes.INTEGER, //ENUM('Presuntivo', 'Definitivo', 'Diferencial')
+        references: {
+          model: "Budget",
+          key: "id",
+        },
+        allowNull: true,
+      },
       spent: {
         type: DataTypes.DECIMAL(16, 2),
         allowNull: true,

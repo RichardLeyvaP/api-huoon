@@ -34,6 +34,14 @@ module.exports = {
           key: "id",
         },
       },
+      type_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "types",
+          key: "id",
+        },
+        allowNull: true,
+      },
       amount: {
         type: Sequelize.DECIMAL(16, 2),
         allowNull: true,

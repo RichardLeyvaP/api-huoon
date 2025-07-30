@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "budget_id",
         as: "finances", // Opcional: alias para eager loading
       });
+      Budget.belongsTo(models.Type, { 
+        foreignKey: 'type_id', 
+        as: 'type' 
+      });
     }
   }
   Budget.init(
@@ -64,6 +68,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: true,
       },
+      type_id: {
+      type: DataTypes.INTEGER, //ENUM('Presuntivo', 'Definitivo', 'Diferencial')
+      references: {
+        model: 'Type',
+        key: 'id'
+      },
+      allowNull: true,
+    },
       amount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true,

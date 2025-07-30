@@ -11,6 +11,9 @@ const storeBudgetSchema = Joi.object({
   category_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID de la categoría debe ser un número",
   }),
+   type_id: Joi.number().integer().allow(null).optional().messages({
+      "number.base": "El ID de la frecuencia debe ser un número",
+    }),
   amount: Joi.number().precision(2).allow(null).empty('').optional().positive().messages({
     "number.base": "El monto debe ser un número",
     "number.positive": "El monto debe ser positivo",
@@ -50,6 +53,9 @@ const updateBudgetSchema = Joi.object({
   category_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID de la categoría debe ser un número",
   }),
+  type_id: Joi.number().integer().allow(null).optional().messages({
+      "number.base": "El ID de la frecuencia debe ser un número",
+    }),
   amount: Joi.number().precision(2).allow(null).empty('').optional().positive().messages({
     "number.base": "El monto debe ser un número",
     "number.positive": "El monto debe ser positivo",

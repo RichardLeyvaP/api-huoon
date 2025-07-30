@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
-const { Budget, Person, Home, Category, Sequelize } = require("../models");
+const { Budget, Person, Home, Category, Type, Sequelize } = require("../models");
 const logger = require("../../config/logger");
+const FinanceRepository = require("./FinanceRepository");
 
 const BudgetRepository = {
   /**
@@ -12,6 +13,7 @@ const BudgetRepository = {
         { model: Person, as: "person" },
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [['start_date', 'DESC']]
     });
@@ -54,6 +56,7 @@ const BudgetRepository = {
         { model: Person, as: "person" },
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [
         ['budget_type', 'ASC'],
@@ -98,6 +101,7 @@ const BudgetRepository = {
           as: "category",
           attributes: ['name']
         },
+        { model: Type, as: "type" },
       ],
       attributes: ['id', 'amount'],
       order: [
@@ -152,6 +156,7 @@ const BudgetRepository = {
         { model: Person, as: "person" },
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [
         ['budget_type', 'ASC'],
@@ -172,6 +177,7 @@ const BudgetRepository = {
       include: [
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [['start_date', 'DESC']]
     });
@@ -187,6 +193,7 @@ const BudgetRepository = {
         { model: Person, as: "person" },
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ]
     });
   },
@@ -212,7 +219,8 @@ const BudgetRepository = {
           budget_type: body.budget_type || 'Personal',
           status: body.status || 'Activo',
           description: body.description || null,
-          currency: body.currency || 'USD'
+          currency: body.currency || 'CLP',
+          type_id: body.type_id || null,
         },
         { transaction: t }
       );
@@ -241,7 +249,8 @@ const BudgetRepository = {
       "end_date",
       "status",
       "description",
-      "currency"
+      "currency",
+      "type_id"
     ];
 
     try {
@@ -308,6 +317,7 @@ const BudgetRepository = {
         { model: Person, as: "person" },
         { model: Home, as: "home" },
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [['start_date', 'DESC']]
     });
@@ -333,6 +343,7 @@ const BudgetRepository = {
       where,
       include: [
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [['start_date', 'DESC']]
     });
@@ -362,6 +373,7 @@ const BudgetRepository = {
       where,
       include: [
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ],
       order: [['start_date', 'DESC']]
     });
@@ -422,11 +434,12 @@ const BudgetRepository = {
       where,
       include: [
         { model: Category, as: "category" },
+        { model: Type, as: "type" },
       ]
     });
   },
 
-  async getPersonBudgetStats(person_id, home_id = null) {
+  /*async getPersonBudgetStats(person_id, home_id = null) {
 
     // Fechas para el mes actual y el anterior
     const now = new Date();
@@ -516,7 +529,65 @@ const BudgetRepository = {
         remaining: remainingPercentage
       }
     };
-  }
+  }*/
+ async getPersonBudgetStats(person_id, home_id = null) {
+    // Fechas para el mes actual y el anterior
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    // 1. Obtener todos los budgets de la persona
+    const budgets = await Budget.findAll({
+      where: { person_id },
+      raw: true
+    });
+
+    // 2. Obtener IDs de budgets
+    const budgetIds = budgets.map(b => b.id);
+
+    // 3. Calcular total de budgets
+    const totalBudget = budgets.reduce((sum, b) => sum + parseFloat(b.amount || 0), 0);
+
+    // 4. Obtener gastos por mes usando el repositorio
+    const currentMonthSpent = await FinanceRepository.getSpentSumByBudgetsAndDateRange(
+      budgetIds, 
+      currentMonthStart, 
+      currentMonthEnd
+    );
+    
+    const lastMonthSpent = await FinanceRepository.getSpentSumByBudgetsAndDateRange(
+      budgetIds, 
+      lastMonthStart, 
+      lastMonthEnd
+    );
+
+    // 5. Calcular porcentajes de uso
+    const currentUsagePercentage = totalBudget > 0 
+      ? ((currentMonthSpent / totalBudget) * 100).toFixed(2)
+      : '0.00';
+    
+    const lastUsagePercentage = totalBudget > 0
+      ? ((lastMonthSpent / totalBudget) * 100).toFixed(2)
+      : '0.00';
+    logger.info(`Current usage percentage: ${currentUsagePercentage}`);
+    logger.info(`Last month usage percentage: ${lastUsagePercentage}`);
+    return {
+      currentMonth: {
+        budget: totalBudget,
+        used: currentMonthSpent,
+        remaining: totalBudget - currentMonthSpent,
+        usagePercentage: currentUsagePercentage
+      },
+      lastMonth: {
+        budget: totalBudget,
+        used: lastMonthSpent,
+        remaining: totalBudget - lastMonthSpent,
+        usagePercentage: lastUsagePercentage
+      }
+    };
+}
 };
 
 module.exports = BudgetRepository;

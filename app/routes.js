@@ -259,7 +259,7 @@ router.post('/get-budget-person', BudgetController.getByPersonId);
 router.post('/budget', validateSchema(storeBudgetSchema), BudgetController.store); // Crear nuevo presupuesto
 router.post('/budget-show', validateSchema(idBudgetSchema),BudgetController.show); // Obtener un presupuesto específico
 router.post('/budget-update', validateSchema(updateBudgetSchema), BudgetController.update); // Actualizar presupuesto
-router.delete('/budget', validateSchema(idBudgetSchema), BudgetController.destroy); // Eliminar presupuesto
+router.post('/budget-destroy', validateSchema(idBudgetSchema), BudgetController.destroy); // Eliminar presupuesto
 
 // Ruta para obtener presupuestos por persona
 router.post('/budget-by-person', validateSchema(getBudgetsSchema), BudgetController.getByPersonId);

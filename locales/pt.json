@@ -493,6 +493,22 @@
   "Cuando sea necesario": {
     "name": "Quando necessário",
     "description": "Medicação a ser tomada apenas quando sintomas específicos aparecem"
+  },
+  "Mensual": {
+    "name": "Mensal",
+    "description": "A cada mês"
+  },
+  "Diario": {
+    "name": "Diário",
+    "description": "Todos os dias"
+  },
+  "Anual": {
+    "name": "Anual",
+    "description": "A cada ano"
+  },
+  "Semanal": {
+    "name": "Semanal",
+    "description": "A cada semana"
   }
   },
   "gender": {

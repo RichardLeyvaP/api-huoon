@@ -224,7 +224,7 @@ const TaskRepository = {
     });
   },
 
-  async findAllDateWeb(start_date, personId, homeId) {
+  async findAllDateWeb(start_date = null, personId, homeId) {
     const whereClause = {
       [Op.and]: [
         { home_id: homeId },
@@ -238,14 +238,42 @@ const TaskRepository = {
     };
 
     // Si se proporciona start_date, agregar el filtro por fecha
-    if (start_date) {
-      whereClause[Op.and].push(
-        sequelize.where(
-          sequelize.fn("DATE", sequelize.col("Task.start_date")),
-          start_date
-        )
-      );
-    }
+    // === Filtrar por fecha: única o rango (semana actual) ===
+  if (start_date) {
+    // Caso 1: Fecha específica
+    whereClause[Op.and].push(
+      sequelize.where(
+        sequelize.fn("DATE", sequelize.col("Task.start_date")),
+        start_date
+      )
+    );
+  } else {
+    // Caso 2: No se pasó fecha → buscar semana actual (lunes a domingo)
+    const today = new Date();
+    const day = today.getDay(); // 0 = domingo, 1 = lunes, ..., 6 = sábado
+
+    // Calcular lunes de la semana actual
+    const diffToMonday = today.getDate() - (day === 0 ? 6 : day - 1);
+    const monday = new Date(today);
+    monday.setDate(diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    // Calcular domingo
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const startDateStr = monday.toISOString().split("T")[0]; // YYYY-MM-DD
+    const endDateStr = sunday.toISOString().split("T")[0];
+
+    // Filtrar tareas entre lunes y domingo (inclusive)
+    whereClause[Op.and].push(
+      sequelize.where(
+        sequelize.fn("DATE", sequelize.col("Task.start_date")),
+        { [Op.between]: [startDateStr, endDateStr] }
+      )
+    );
+  }
 
     return await Task.findAll({
       where: whereClause,
@@ -282,17 +310,9 @@ const TaskRepository = {
         { model: Home, as: "home", required: false },
       ],
       order: [
-        [sequelize.literal(`(
-          CASE 
-            WHEN Task.start_time >= NOW() 
-            THEN TIMESTAMPDIFF(SECOND, NOW(), Task.start_time)
-            ELSE TIMESTAMPDIFF(SECOND, Task.start_time, NOW())
-          END
-        )`), 'ASC'],
-        
-        // Orden secundario por fecha+hora
-        ['start_time', 'ASC']
-      ]
+        ["start_date", "DESC"],
+        ["start_time", "ASC"],
+      ],
     });
   },
 

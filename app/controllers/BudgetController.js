@@ -1,5 +1,5 @@
 const logger = require("../../config/logger");
-const { BudgetRepository, CategoryRepository, HomeRepository } = require("../repositories");
+const { BudgetRepository, CategoryRepository, HomeRepository, TypeRepository } = require("../repositories");
 const i18n = require("../../config/i18n-config");
 const { CategoryService } = require("../services");
 
@@ -25,6 +25,8 @@ const BudgetController = {
         homeId: budget.home_id,
         category_id: budget.category_id,
         categoryId: budget.category_id,
+        type_id: budget.type_id,
+        typeId: budget.type_id,
         amount: budget.amount,
         used_amount: budget.used_amount,
         remaining_amount: budget.amount - budget.used_amount,
@@ -36,7 +38,13 @@ const BudgetController = {
         currency: budget.currency,
         categoryName: budget.category?.name,
         personName: budget.person?.name,
-        homeName: budget.home?.name
+        homeName: budget.home?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       }));
 
       return res.status(200).json({ budgets: mappedBudgets });
@@ -73,6 +81,8 @@ const BudgetController = {
         homeId: budget.home_id,
         category_id: budget.category_id,
         categoryId: budget.category_id,
+        type_id: budget.type_id,
+        typeId: budget.type_id,
         amount: budget.amount,
         used_amount: budget.used_amount,
         remaining_amount: budget.amount - budget.used_amount,
@@ -84,7 +94,13 @@ const BudgetController = {
         currency: budget.currency,
         categoryName: budget.category?.name,
         personName: budget.person?.name,
-        homeName: budget.home?.name
+        homeName: budget.home?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       };
 
       return res.status(200).json({ budget: mappedBudget });
@@ -123,6 +139,8 @@ const BudgetController = {
           id: budget.id,
           person_id: budget.person_id,
           category_id: budget.category_id,
+          type_id: budget.type_id,
+          typeId: budget.type_id,
           amount: budget.amount,
           used_amount: budget.used_amount,
           remaining_amount: budget.amount - budget.used_amount,
@@ -133,7 +151,13 @@ const BudgetController = {
           description: budget.description,
           currency: budget.currency,
           categoryName: translatedCategory,
-          categoryOriginal: budget.category?.name
+          categoryOriginal: budget.category?.name,
+          typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+          type: budget.type?.name
         };
       });
 
@@ -181,7 +205,13 @@ const BudgetController = {
           description: budget.description,
           currency: budget.currency,
           categoryName: translatedCategory,
-          categoryOriginal: budget.category?.name
+          categoryOriginal: budget.category?.name,
+          typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
         };
       });
 
@@ -227,7 +257,13 @@ const BudgetController = {
         person_id: budget.person_id,
         home_id: budget.home_id,
         category_id: budget.category_id,
-        categoryName: budget.category?.name
+        categoryName: budget.category?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       }));
 
       return res.status(200).json({ budgets: mappedBudgets });
@@ -269,7 +305,13 @@ const BudgetController = {
         status: budget.status,
         budget_type: budget.budget_type,
         category_id: budget.category_id,
-        categoryName: budget.category?.name
+        categoryName: budget.category?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       }));
 
       return res.status(200).json({ budgets: mappedBudgets });
@@ -311,7 +353,13 @@ const BudgetController = {
         status: budget.status,
         budget_type: budget.budget_type,
         category_id: budget.category_id,
-        categoryName: budget.category?.name
+        categoryName: budget.category?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       }));
 
       return res.status(200).json({ budgets: mappedBudgets });
@@ -353,7 +401,13 @@ const BudgetController = {
         status: budget.status,
         budget_type: budget.budget_type,
         category_id: budget.category_id,
-        categoryName: budget.category?.name
+        categoryName: budget.category?.name,
+        typeName: budget.type?.name ? 
+            (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                ? i18n.__(`types.${budget.type.name}.name`)
+                : budget.type.name)
+                : null,
+        type: budget.tipe?.name
       };
 
       return res.status(200).json({ budget: mappedBudget });
@@ -369,10 +423,11 @@ const BudgetController = {
    */
   async store(req, res) {
     logger.info(`${req.user.name} - Crea un nuevo presupuesto`);
-    logger.info("Datos recibidos:", JSON.stringify(req.body));
+      logger.info("datos recibidos al crear un presupuesto");
+    logger.info(JSON.stringify(req.body));
 
     try {
-      const { category_id, home_id } = req.body;
+      const { category_id, home_id, type_id } = req.body;
 
       // Asignar person_id si no es presupuesto de hogar
 
@@ -395,6 +450,14 @@ const BudgetController = {
         }
       }
 
+      if (type_id) {
+      const type = await TypeRepository.findById(type_id);
+      if (!type) {
+        logger.error(`Type not found with ID ${type_id}`);
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
+    }
+
       const budget = await BudgetRepository.create(req.body);
       res.status(201).json({ budget });
     } catch (error) {
@@ -411,7 +474,7 @@ const BudgetController = {
     logger.info(`${req.user.name} - Actualiza presupuesto con ID ${req.body.id}`);
     logger.info("Datos recibidos:", JSON.stringify(req.body));
 
-    const { id, category_id } = req.body;
+    const { id, category_id, type_id } = req.body;
 
     try {
       const budget = await BudgetRepository.findById(id);
@@ -429,6 +492,13 @@ const BudgetController = {
         }
       }
 
+      if (type_id) {
+      const type = await TypeRepository.findById(type_id);
+      if (!type) {
+        logger.error(`Type not found with ID ${type_id}`);
+        return res.status(404).json({ msg: "TypeNotFound" });
+      }
+    }
       const updatedBudget = await BudgetRepository.update(budget, req.body);
       res.status(200).json({ budget: updatedBudget });
     } catch (error) {
@@ -633,10 +703,27 @@ const BudgetController = {
           name: i18n.__(`typetask.${item.name}.name`), // El nombre traducido
         };
       });*/
+      const types = await TypeRepository.findByType('Presupuesto');
 
+      const formattedTypes = types.map((typeItem) => {
+        const translatedName = i18n.__(`types.${typeItem.name}.name`) !== `types.${typeItem.name}.name`
+          ? i18n.__(`types.${typeItem.name}.name`)
+          : typeItem.name;
+
+        const translatedDescription = i18n.__(`types.${typeItem.name}.description`) !== `types.${typeItem.name}.description`
+          ? i18n.__(`types.${typeItem.name}.description`)
+          : typeItem.description;
+
+        return {
+          ...typeItem.toJSON(),
+          nameTranslated: translatedName,
+          descriptionTranslated: translatedDescription,
+        };
+      });
       res.json({
         categories: categories,
         types: translatedFinanceTypeData,
+        typesPeriodo: formattedTypes
         /*taskpriorities: priorities,
         taskpeople: people,
         taskrecurrences: translatedRecurrenceData,

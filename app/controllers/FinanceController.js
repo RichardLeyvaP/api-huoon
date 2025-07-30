@@ -173,6 +173,8 @@ const FinanceController = {
                 home_id: finance.home_id,
                 personId: finance.person_id,
                 person_id: finance.person_id,
+                budgetId: finance.budget_id,
+                budget_id: finance.budget_id,
                 spent: finance.spent,
                 income: finance.income,
                 date: finance.date,
@@ -186,6 +188,8 @@ const FinanceController = {
                 finance: finance.income ? 'Ingreso' : 'Gasto',
                 idType: finance.type,
                 categoryName: translatedCategory,
+                categoryOriginal: categoryName,
+
             };
         });
 
@@ -537,14 +541,15 @@ const FinanceController = {
           color: "blue-darken-2"
         },
         budgetCard: {
-          current: formatCurrency(budgetStats.currentMonth.budget),
-          used: formatCurrency(budgetStats.currentMonth.used),
-          remaining: formatCurrency(budgetStats.currentMonth.remaining),
-          percentage: budgetStats.percentages.budget,
-          lastMonth: formatCurrency(budgetStats.lastMonth.budget),
-          icon: "mdi-wallet",
-          color: "blue"
-        },
+        current: formatCurrency(budgetStats.currentMonth.budget),
+        used: formatCurrency(budgetStats.currentMonth.used),
+        remaining: formatCurrency(budgetStats.currentMonth.remaining),
+        currentUsage: budgetStats.currentMonth.usagePercentage, // % usado este mes
+        lastUsage: budgetStats.lastMonth.usagePercentage,      // % usado mes anterior
+        lastMonth: formatCurrency(budgetStats.lastMonth.budget),
+        icon: "mdi-wallet",
+        color: "blue"
+      },
         movementsCard: {
           total: formatCurrency(stats.currentMonth.income - stats.currentMonth.spent),
           lastMovement: {
@@ -592,6 +597,7 @@ const FinanceController = {
               id: budget.id,
               person_id: budget.person_id,
               category_id: budget.category_id,
+              type_id: budget.type_id,
               amount: budget.amount,
               used_amount: budget.used_amount,
               remaining_amount: budget.amount - budget.used_amount,
@@ -603,7 +609,13 @@ const FinanceController = {
               currency: budget.currency,
               categoryName: translatedCategory,
               icon: budget.category.icon,
-              categoryOriginal: budget.category?.name
+              categoryOriginal: budget.category?.name,
+              typeName: budget.type?.name ? 
+                          (i18n.__(`types.${budget.type.name}.name`) !== `types.${budget.type.name}.name`
+                              ? i18n.__(`types.${budget.type.name}.name`)
+                              : budget.type.name)
+                              : null,
+                        type: budget.type?.name
             };
           });
 

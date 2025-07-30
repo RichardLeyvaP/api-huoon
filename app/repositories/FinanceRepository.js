@@ -96,6 +96,7 @@ const FinanceRepository = {
         "id",
         "home_id",
         "person_id",
+        "budget_id",
         "spent",
         "income",
         "date",
@@ -203,6 +204,7 @@ const FinanceRepository = {
         "id",
         "home_id",
         "person_id",
+        "budget_id",
         "spent",
         "income",
         "date",
@@ -285,11 +287,19 @@ const FinanceRepository = {
       throw err;
     }
   },
-
+   async getSpentSumByBudgetsAndDateRange(budgetIds, startDate, endDate) {
+    return await Finance.sum('spent', {
+      where: {
+        budget_id: { [Op.in]: budgetIds },
+        date: { [Op.between]: [startDate, endDate] }
+      }
+    }) || 0;
+  },
   async update(finance, body, file, t) {
     // Lista de campos que pueden ser actualizados
     const fieldsToUpdate = [
       "home_id",
+      "budget_id",
       "person_id",
       "spent",
       "income",
