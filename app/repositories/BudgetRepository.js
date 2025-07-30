@@ -1,7 +1,8 @@
 const { Op } = require("sequelize");
-const { Budget, Person, Home, Category, Type, Sequelize } = require("../models");
+const { Budget, Person, Home, Category, Type, Finance, sequelize } = require("../models");
 const logger = require("../../config/logger");
 const FinanceRepository = require("./FinanceRepository");
+const TypeRepository = require("./TypeRepository");
 
 const BudgetRepository = {
   /**
@@ -49,20 +50,45 @@ const BudgetRepository = {
         budget_type: 'Hogar'
       });
     }
+    // 1. Obtener los tipos de presupuesto válidos
+    const validTypes = await TypeRepository.findByType('Presupuesto');
+  const validTypeMap = new Map(validTypes.map(t => [t.id, t.name]));
 
-    return await Budget.findAll({
-      where: whereConditions,
-      include: [
-        { model: Person, as: "person" },
-        { model: Home, as: "home" },
-        { model: Category, as: "category" },
-        { model: Type, as: "type" },
-      ],
-      order: [
-        ['budget_type', 'ASC'],
-        ['start_date', 'DESC']
-      ]
-    });
+  // 2. Obtener los presupuestos con sus relaciones
+  const budgets = await Budget.findAll({
+    where: whereConditions,
+    include: [
+      { model: Person, as: "person" },
+      { model: Home, as: "home" },
+      { model: Category, as: "category" },
+      { model: Type, as: "type" },
+    ],
+    order: [
+      ['budget_type', 'ASC'],
+      ['start_date', 'DESC']
+    ]
+  });
+
+  // 3. Para cada presupuesto, calcular el used_amount usando el método del repositorio
+  const budgetsMapped = await Promise.all(budgets.map(async (budget) => {
+    let used_amount = 0;
+
+    // Solo calcular si el tipo es válido
+    const typeName = validTypeMap.get(budget.type_id);
+    if (typeName && ['Diario', 'Semanal', 'Mensual', 'Anual'].includes(typeName)) {
+      used_amount = await this.getTotalExpensesByBudgetIdAndType(budget.id, budget.type_id);
+    }
+
+    // Convertir a objeto plano y añadir los campos calculados
+    const budgetPlain = budget.get({ plain: true });
+    return {
+      ...budgetPlain,
+      used_amount,
+      remaining_amount: parseFloat(budget.amount) - used_amount
+    };
+  }));
+
+  return budgetsMapped;
   },
 
   async findAllByPersonIdHomeId(personId, homeId = null) {
@@ -587,6 +613,68 @@ const BudgetRepository = {
         usagePercentage: lastUsagePercentage
       }
     };
+},
+async getTotalExpensesByBudgetIdAndType(budgetId, typeId) {
+  // Obtener tipos válidos de presupuesto
+  const validTypes = await TypeRepository.findByType('Presupuesto');
+  const type = validTypes.find(t => t.id === typeId);
+
+  if (!type) {
+    throw new Error(`Tipo de presupuesto inválido o no encontrado: ${typeId}`);
+  }
+
+  const { name } = type;
+  const today = new Date();
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()); // Normaliza sin hora
+
+  let startDate = null;
+  let endDate = todayDate;
+
+  switch (name) {
+    case 'Diario':
+      startDate = todayDate;
+      break;
+
+    case 'Semanal': {
+      const day = today.getDay(); // 0 = domingo
+      // Calcular lunes de la semana actual (lunes = 1, domingo = 0)
+      const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+      startDate = new Date(today.getFullYear(), today.getMonth(), diff);
+      break;
+    }
+
+    case 'Mensual':
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1); // 1 del mes
+      break;
+
+    case 'Anual':
+      startDate = new Date(today.getFullYear(), 0, 1); // 1 de enero
+      break;
+
+    default:
+      return 0; // Tipo no soportado
+  }
+
+  // Aseguramos que las fechas sean solo "día" (sin hora interna que afecte comparación)
+  // Sequelize automáticamente ignora la hora si la columna es DATE
+
+  const result = await Finance.findOne({
+    attributes: [
+      [sequelize.fn('COALESCE', sequelize.fn('SUM', sequelize.col('spent')), 0), 'total']
+    ],
+    where: {
+      budget_id: budgetId,
+      date: {
+        [Op.gte]: startDate,
+        [Op.lte]: endDate
+      },
+      spent: {
+        [Op.gt]: 0 // Solo registros donde epent > 0 (gastos)
+      }
+    }
+  });
+
+  return parseFloat(result.get('total')) || 0;
 }
 };
 
