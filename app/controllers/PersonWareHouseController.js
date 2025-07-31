@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, sequelize } = require('../models');
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
-const { PersonWareHouseRepository, HomeRepository, WareHouseRepository, PersonRepository } = require('../repositories');
+const { PersonWareHouseRepository, HomeRepository, WareHouseRepository, PersonRepository, PersonProductRepository, SuggestionRepository } = require('../repositories');
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
@@ -257,18 +257,59 @@ const PersonWarehouseController = {
             // Consulta para obtener directamente desde PersonWarehouse
         const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, personId);
 
-        // Formatear resultados para el cliente
-        const result = personWarehouses.map((pw) => ({
-            id: pw.id, // ID del almacén
-            warehouse_id: pw.warehouse_id,
-            title: pw.title ? pw.title : "",
-            description: pw.description ? pw.description : "",
-            location: pw.location ? pw.location : "",
-            status: pw.status,
-            creator: pw.person_id === personId // Agrega la propiedad creator
-        }));
+        // Formatear resultados para el cliente // Importar o inyectar el repositorio de productos
+    // Asumiendo que tienes un ProductRepository con el método getTotalQuantityByWarehouse
+    const productCountsPromises = personWarehouses.map(async (pw) => {
+      const count = await PersonProductRepository.getTotalQuantityByWarehouse(home_id, pw.warehouse_id);
+      return {
+        id: pw.id,
+        warehouse_id: pw.warehouse_id,
+        title: pw.title || "",
+        description: pw.description || "",
+        location: pw.location || "",
+        status: pw.status,
+        creator: pw.person_id === personId,
+        productCount: count, // Aquí agregamos la cantidad total de productos
+      };
+    });
+
+    // Esperar a que todas las promesas se resuelvan
+    const result = await Promise.all(productCountsPromises);
+
+     const allSuggestions = await SuggestionRepository.findTodaySuggestions('Almacen', personId, home_id);
+ const suggestionStatusData = [
+        { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
+        { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
+        { id: "Completado", name: "Completado", description: "La sugerencia ha sido resuelta" },
+      ];
+
+      const translatedSuggestionStatusData = suggestionStatusData.map((item) => ({
+        id: item.id,
+        name: i18n.__(`suggestionStatus.${item.id}.name`) !== `suggestionStatus.${item.id}.name`
+          ? i18n.__(`suggestionStatus.${item.id}.name`)
+          : item.name,
+        description: i18n.__(`suggestionStatus.${item.id}.description`) !== `suggestionStatus.${item.id}.description`
+          ? i18n.__(`suggestionStatus.${item.id}.description`)
+          : item.description,
+        statusName: item.name
+      }));
+ const mappedSuggestions = allSuggestions.map(suggestion => ({
+        id: suggestion.id,
+        title: suggestion.title,
+        description: suggestion.description,
+        content: suggestion.content,
+        status: suggestion.status,
+        homeId: suggestion.home_id,
+        home_id: suggestion.home_id,
+        start_date: suggestion.date,
+        type: suggestion.typeTask,
+        taskData: suggestion.taskData,
+      }));
     
-            return res.status(200).json({ store: result });
+            return res.status(200).json({ 
+                store: result, 
+                suggestions: mappedSuggestions,
+                statusuggestions: translatedSuggestionStatusData });
     
         } catch (error) {
             const errorMsg = error.details

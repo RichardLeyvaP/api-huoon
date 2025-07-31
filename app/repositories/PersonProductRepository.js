@@ -132,6 +132,15 @@ const  PersonProductRepository = {
     });
   },
 
+  async getTotalQuantityByWarehouse(homeId, warehouseId) {
+  const result = await PersonHomeWarehouseProduct.sum('quantity', {
+    where: {
+      home_id: homeId,
+      warehouse_id: warehouseId,
+    },
+  });
+  return result || 0; // Si no hay productos, devuelve 0
+},
   async getTotalProductsQuantity(body) {
     const { home_id, warehouse_ids, date } = body;
     
