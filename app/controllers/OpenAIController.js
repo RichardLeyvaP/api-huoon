@@ -96,7 +96,8 @@ async getAITask(req, res) {
     originalQuestion: question,
     task: intentDetection.taskData || null,
     finances: intentDetection.financeData || null,
-    budget: intentDetection.budgetData || null
+    budget: intentDetection.budgetData || null,
+    warehouse: intentDetection.warehouseData || null
   });
 }
       // Realizar la solicitud a OpenAI

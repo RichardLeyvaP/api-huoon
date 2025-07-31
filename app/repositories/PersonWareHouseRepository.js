@@ -141,7 +141,7 @@ const PersonWareHouseRepository = {
           title: title || warehouse.title,
           description: description || warehouse.description,
           location: location || warehouse.location,
-          status: status !== undefined ? status : 0,
+          status: status ?? 0
         },
         transaction: t,
       });

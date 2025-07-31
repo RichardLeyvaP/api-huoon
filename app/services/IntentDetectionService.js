@@ -1,6 +1,6 @@
 const logger = require('../../config/logger');
 const openai = require('../../config/openaiClient');
-const { PriorityRepository, BudgetRepository, TypeRepository } = require('../repositories');
+const { PriorityRepository, BudgetRepository, TypeRepository, WareHouseRepository } = require('../repositories');
 
 // Importar chrono-node para interpretar fechas en español
 const chrono = require('chrono-node');
@@ -88,6 +88,7 @@ ${textoUsuario}
     const budgets = await BudgetRepository.findAllByPersonIdHomeId(person_id, home_id);
     const categories = await CategoryService.getCategories(person_id, "Budget");
     const types = await TypeRepository.findByType('Presupuesto');
+    const warehouses = await WareHouseRepository.findByStatus(1); // [{id: 1, title: "...", description: "...", location: "...", status: 1}, ...]
     const now = new Date();
 const todayFormatted = now.toISOString().split('T')[0]; // YYYY-MM-DD
 const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // HH:mm
@@ -99,6 +100,7 @@ Analiza rigurosamente el siguiente texto del usuario para determinar si expresa 
 - Registrar un ingreso financiero (Ingreso)
 - Registrar un gasto financiero (Gasto)
 - Registrar un presupuesto financiero (Presupuesto)
+- Crear un nuevo almacén en el hogar (Warehouse), como un cuarto, baño, cocina, despensa, bodega, etc.
 
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
@@ -156,6 +158,20 @@ Para Presupuesto:
   }
 }
 
+Para Crear Almacén:
+{
+  "intent": "Warehouse",
+  "confidence": número entre 0 y 1,
+  "explanation": breve explicación del análisis,
+  "warehouseData": {
+    "warehouse_id": número o null (si el almacén mencionado coincide con uno existente activo (${warehouses.map(w => `${w.id}(${w.title} - ${w.location})`).join(', ')}), usar su ID; si no, null),
+    "title": string (título del almacén, ej. "Despensa", "Cocina", "Baño", "Bodega", etc. Si ya existe uno coincidente, usar el mismo título),
+    "description": string (descripción útil del almacén, ej. "Lugar donde se guardan alimentos no perecibles", "Área para productos de limpieza", etc. Si existe coincidencia, usar la misma descripción),
+    "location": string (ubicación dentro del hogar, ej. "planta baja", "segundo piso", "jardín", "pasillo", etc. Si existe coincidencia, usar la misma ubicación),
+    "status": número (0 si es privado, 1 si es público/compartido; inferir del contexto. Ej: "mi bodega personal" → 0, "la despensa de la casa" → 1)
+  }
+}
+
 Instrucciones adicionales:
 1. Para Tareas/Metas:
 - La descripción NO debe ser solo "realizar una tarea para..." sino que debe ser útil y descriptiva.
@@ -191,7 +207,19 @@ Instrucciones adicionales:
 - currency: Código de moneda (ej. USD), usar USD por defecto si no se menciona.
 - type_id: Debe asignarse un número válido de los tipos disponibles (${types.map(t => `${t.id}(${t.name})`).join(', ')}). Si el usuario no especifica un tipo, la IA debe inferir el más adecuado según el contexto (por ejemplo, si es un presupuesto para vacaciones, elegiría un tipo como 'Recreación' o 'Viaje'), pero **siempre debe devolver un valor numérico válido**, nunca null o undefined.
 
-4. Generales:
+4. Para Crear Almacén:
+- El intent debe ser "Warehouse" (exactamente así).
+- warehouse_id: Si el almacén mencionado (por título o ubicación) coincide con uno de los activos (${warehouses.map(w => `${w.id}(${w.title} - ${w.location})`).join(', ')}), usar su ID; si no, null.
+- title: Si se menciona un nombre como "despensa", "bodega", "cuarto de limpieza", etc., usarlo. Si coincide con un almacén existente, mantener el título original.
+- description: Generar una descripción útil basada en el contexto. Si ya existe, usar la descripción existente.
+- location: Indicar dónde está ubicado dentro del hogar (ej. "cocina", "garaje", "pasillo"). Si coincide con uno existente, usar la ubicación registrada.
+- status: Determinar si es un almacén personal (0) o compartido (1). Ejemplos:
+   - "mi armario" → 0
+   - "la despensa de la casa" → 1
+   - "el baño de visitas" → 1 (por defecto si no se especifica privacidad)
+   - Si no se indica, asumir 1 (público/compartido).
+
+5. Generales:
 - Confidence debe reflejar la certeza de la intención detectada.
 - Explanation debe justificar claramente la decisión tomada.
 
