@@ -1,10 +1,11 @@
 const logger = require('../../config/logger');
 const openai = require('../../config/openaiClient');
-const { PriorityRepository, BudgetRepository, TypeRepository, WareHouseRepository } = require('../repositories');
+const { PriorityRepository, BudgetRepository, TypeRepository, WareHouseRepository, PersonWareHouseRepository } = require('../repositories');
 
 // Importar chrono-node para interpretar fechas en español
 const chrono = require('chrono-node');
 const CategoryService = require('./CategoryService');
+const StatusService = require('./StatusService');
 
 // Función para interpretar frases de fecha/hora
 function interpretarFecha(texto, now = new Date()) {
@@ -89,6 +90,9 @@ ${textoUsuario}
     const categories = await CategoryService.getCategories(person_id, "Budget");
     const types = await TypeRepository.findByType('Presupuesto');
     const warehouses = await WareHouseRepository.findByStatus(1); // [{id: 1, title: "...", description: "...", location: "...", status: 1}, ...]
+    const categoriesProduct = await CategoryService.getCategories(person_id, "Product");
+               const statuses = await StatusService.getStatus("Product");
+               const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, person_id);
     const now = new Date();
 const todayFormatted = now.toISOString().split('T')[0]; // YYYY-MM-DD
 const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // HH:mm
@@ -101,6 +105,7 @@ Analiza rigurosamente el siguiente texto del usuario para determinar si expresa 
 - Registrar un gasto financiero (Gasto)
 - Registrar un presupuesto financiero (Presupuesto)
 - Crear un nuevo almacén en el hogar (Warehouse), como un cuarto, baño, cocina, despensa, bodega, etc.
+- Registrar un producto en un almacén (Producto), como alimentos, artículos de limpieza, herramientas, etc., con detalles como nombre, cantidad, precio, fecha de compra, lugar, vencimiento, etc.
 
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
@@ -172,6 +177,26 @@ Para Crear Almacén:
   }
 }
 
+Para Registrar Producto:
+{
+  "intent": "Producto",
+  "confidence": número entre 0 y 1,
+  "explanation": breve explicación del análisis,
+  "productData": {
+    "warehouse_id": número (obtenido de ${personWarehouses.map(w => `${w.id}(${w.title} - ${w.location})`).join(', ')}; usar el ID del almacén que mejor coincida por título o ubicación descrita; si no coincide, null),
+    "name": string (nombre del producto, ej. "Arroz", "Detergente", "Destornillador"),
+    "category_id": número o null (asignar el ID de la categoría que mejor coincida con el nombre o descripción del producto, basado en: ${categoriesProduct.map(c => `${c.id}(${c.name})`).join(', ')}; si no hay coincidencia clara, null),
+    "unit_price": número (precio por unidad; si se da total y cantidad, calcular unit_price = total_price / quantity),
+    "quantity": número (cantidad comprada; debe ser positivo),
+    "total_price": número (importe total; si se da unit_price y quantity, calcular total_price = unit_price * quantity),
+    "purchase_place": string o null (lugar donde se compró, ej. "Líder", "Ferretería Don Pepe"; si no se menciona, null),
+    "purchase_date": string (YYYY-MM-DD; si no se menciona, usar fecha actual: ${todayFormatted}),
+    "expiration_date": string o null (YYYY-MM-DD; si no se menciona y no es relevante (ej. herramientas), null; si es alimento perecible y se menciona vencimiento, usarlo),
+    "status_id": número (obtenido de ${statuses.map(s => `${s.id}(${s.name})`).join(', ')}; si no se especifica, asignar el ID del estado que signifique "En Uso" o similar; si no se encuentra, usar el ID del estado por defecto para productos activos),
+    "additional_notes": string o null (notas adicionales del usuario, si las da; si no, null)
+  }
+}
+
 Instrucciones adicionales:
 1. Para Tareas/Metas:
 - La descripción NO debe ser solo "realizar una tarea para..." sino que debe ser útil y descriptiva.
@@ -219,7 +244,33 @@ Instrucciones adicionales:
    - "el baño de visitas" → 1 (por defecto si no se especifica privacidad)
    - Si no se indica, asumir 1 (público/compartido).
 
-5. Generales:
+5. Para Registrar Producto:
+- El intent debe ser "Producto" (exactamente así).
+- Todos los campos en productData deben inferirse del contexto.
+- Esta intención **tiene prioridad sobre "Gasto"** cuando se menciona un **producto físico específico** (ej. carro, arroz, detergente, refrigerador).
+- Detectar cuando el usuario describe la compra, adquisición o registro de un producto físico con cantidad, precio, lugar, etc.
+- warehouse_id: - Si el usuario menciona un almacén ("despensa", "baño", "bodega"), usar su ID de: ${personWarehouses.map(w => `${w.id}(${w.title})`).join(', ')}.
+   - **Si NO lo menciona, inferir el más adecuado** basado en:
+     - Nombre del producto
+     - Categoría (category_id),
+     - Uso común
+   - Ejemplos de inferencia:
+     - Alimentos (arroz, atún) → "Despensa", "Cocina"
+     - Limpieza (detergente, cloro) → "Limpieza", "Bodega"
+     - Higiene (shampoo, cepillo) → "Baño"
+     - Herramientas → "Taller", "Bodega"
+
+- name: Extraer el nombre del producto mencionado (ej. "compré arroz", → "Arroz").
+- category_id: Usar el servicio de categorías (${categories.map(c => `${c.id}(${c.name})`).join(', ')}) para asignar la más adecuada según nombre o contexto (ej. "arroz" → categoría "Alimentos").
+- unit_price y total_price: Si se da uno y la cantidad, calcular el otro. Si se dan ambos, validar coherencia. Si solo se da uno sin cantidad, no calcular, dejar null si no es posible.
+- quantity: Siempre debe ser un número positivo. Inferir de frases como "5 unidades", "un kilo", etc.
+- purchase_place: Extraer nombres de tiendas, mercados, ferreterías, etc.
+- purchase_date: Si no se especifica, usar ${todayFormatted}.
+- expiration_date: Solo si se menciona explícitamente o se infiere (ej. "caduca en junio", "vence el 15 de julio"). Si no, null.
+- status_id: Si no se menciona, usar el ID del estado que corresponda a "En Uso" (activo). Si no se puede inferir, elegir el estado por defecto para productos recién registrados.
+- additional_notes: Capturar cualquier comentario adicional ("con descuento", "orgánico", "para emergencias", etc.).
+
+6. Generales:
 - Confidence debe reflejar la certeza de la intención detectada.
 - Explanation debe justificar claramente la decisión tomada.
 
