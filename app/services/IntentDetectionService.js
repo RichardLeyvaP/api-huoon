@@ -290,7 +290,7 @@ Texto a analizar: "${textoUsuario}"
     });
 
     const contenido = respuesta.choices[0].message.content;
-    logger.info("IntentDetectionService->detectarIntentTask: Respuesta de OpenAI:", contenido);
+    //logger.info("IntentDetectionService->detectarIntentTask: Respuesta de OpenAI:", contenido);
 
     try {
       const json = JSON.parse(contenido);

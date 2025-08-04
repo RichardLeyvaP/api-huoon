@@ -460,7 +460,7 @@ router.post('/emergency-destroy', validateSchema(idEmergencySchema), EmergencyCo
 
 
 //Rutas Unificadas
-router.get('/productcategory-productstatus-apk', ProductController.category_status);
+router.post('/productcategory-productstatus-apk', ProductController.category_status);
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
 router.post('/category-budgets', BudgetController.category_budgets);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);

@@ -8,6 +8,7 @@ const logger = require('../../config/logger'); // Importa el logger
 const i18n = require('../../config/i18n-config');
 const { CategoryService, StatusService } = require('../services');
 const ProductRepository = require('../repositories/ProductRepository');
+const { PersonWareHouseRepository } = require('../repositories');
 
 const ProductController = {
     // Obtener todos los productos
@@ -127,6 +128,7 @@ const ProductController = {
 
          // Obtén el ID de la persona autenticada
          const personId = req.person.id;
+         
             
          if (!personId) {
              return res.status(400).json({ error: 'Persona no encontrada' });
@@ -134,10 +136,12 @@ const ProductController = {
         try {
            const categories = await CategoryService.getCategories(personId, "Product");
            const statuses = await StatusService.getStatus("Product");
+           const personWarehouses = await PersonWareHouseRepository.gettWarehouses(req.body.home_id, personId);
    
             res.json({
-                productcategories: categories,
-                productstatus: statuses,
+              productcategories: categories,
+              productstatus: statuses,
+              productwarehouses: personWarehouses,
             });
         } catch (error) {
             logger.error('Error al obtener categorías:', error);
