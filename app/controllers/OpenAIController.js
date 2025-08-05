@@ -99,6 +99,7 @@ async getAITask(req, res) {
     budget: intentDetection.budgetData || null,
     warehouse: intentDetection.warehouseData || null,
     product: intentDetection.productData || null,
+    desire: intentDetection.desireData || null,
   });
 }
       // Realizar la solicitud a OpenAI

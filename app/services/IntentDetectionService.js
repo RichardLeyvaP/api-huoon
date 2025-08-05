@@ -106,6 +106,7 @@ Analiza rigurosamente el siguiente texto del usuario para determinar si expresa 
 - Registrar un presupuesto financiero (Presupuesto)
 - Crear un nuevo almacén en el hogar (Warehouse), como un cuarto, baño, cocina, despensa, bodega, etc.
 - Registrar un producto en un almacén (Producto), como alimentos, artículos de limpieza, herramientas, etc., con detalles como nombre, cantidad, precio, fecha de compra, lugar, vencimiento, etc.
+- Expresar un deseo personal o futuro (Deseo)
 
 Fecha actual: ${todayFormatted}
 Hora actual: ${currentTimeFormatted}
@@ -197,6 +198,22 @@ Para Registrar Producto:
   }
 }
 
+Para Deseo:
+{
+  "intent": "Deseo",
+  "confidence": número entre 0 y 1,
+  "explanation": breve explicación del análisis,
+  "desireData": {
+    "name": string (título del deseo, inferido del contexto. Ej: "Comprar un auto", "Viajar a Japón". Si no se especifica, sugerir uno coherente),
+    "description": string (breve descripción descriptiva que amplíe el nombre, haciendo alusión al contexto. Ej: "Adquirir un vehículo 0km para uso familiar"),
+    "type": "Personal" | "Hogar" | "Profesional" (inferir del contexto; si no se especifica, usar "Personal" por defecto),
+    "date": string (YYYY-MM-DD; fecha de inicio o creación del deseo. Si no se menciona, usar fecha actual: ${todayFormatted}),
+    "end": string (YYYY-MM-DD; fecha esperada de cumplimiento. Si no se menciona, sugerir una razonable: ej. +1 meses para deseos pequeños, +3 meses para grandes deseos),
+    "priority_id": número (usar uno de los siguientes: ${priorities.map(p => `${p.id}(${p.name})`).join(', ')}; si no se especifica, asignar prioridad media o alta según urgencia percibida),
+   }
+}
+
+
 Instrucciones adicionales:
 1. Para Tareas/Metas:
 - La descripción NO debe ser solo "realizar una tarea para..." sino que debe ser útil y descriptiva.
@@ -270,7 +287,34 @@ Instrucciones adicionales:
 - status_id: Si no se menciona, usar el ID del estado que corresponda a "En Uso" (activo). Si no se puede inferir, elegir el estado por defecto para productos recién registrados.
 - additional_notes: Capturar cualquier comentario adicional ("con descuento", "orgánico", "para emergencias", etc.).
 
-6. Generales:
+7. Para Deseo:
+- El intent debe ser "Deseo" (exactamente así).
+- Esta intención se activa cuando el usuario expresa un anhelo, sueño, aspiración o objetivo a largo plazo que no necesariamente es una "meta" con acciones concretas inmediatas.
+- Ejemplos de desencadenadores:
+   * "Quiero", "Me gustaría", "Sueño con", "Algún día me encantaría", "Tengo ganas de", "Mi sueño es", "Me propuse tener", etc.
+- name: Debe ser conciso y claro. Ej: "Comprar casa", "Aprender inglés", "Montar mi negocio".
+- description: Debe expandir el nombre con detalles del contexto. No debe repetir el name. Ej: "Adquirir una vivienda en el sur del país para fines de semana".
+- type: Inferir según el contexto:
+   * "Profesional": si involucra carrera, trabajo, emprendimiento.
+   * "Hogar": si involucra vivienda, muebles, remodelación.
+   * "Personal": por defecto (viajes, hobbies, salud, educación personal).
+- date: Fecha de creación del deseo. Si no se menciona, usar ${todayFormatted}.
+- end: Fecha esperada de cumplimiento. Si no se especifica:
+   * Deseos pequeños (ej. comprar objeto): +3 a 6 meses
+   * Deseos grandes (ej. viaje, auto, casa): +1 a 2 años
+   * Si el usuario da indicios ("el año que viene", "en 2025"), respetarlos.
+- priority_id: Asignar basado en entonación:
+   * "realmente quiero", "es muy importante" → prioridad alta (ID de prioridad Alta)
+   * "me gustaría", "sería lindo" → prioridad media (ID Media)
+   * "algún día" → prioridad baja (ID Baja)
+   * Usar siempre un ID válido de: ${priorities.map(p => `${p.id}(${p.name})`).join(', ')}
+
+8. Prioridad de detección:
+- Si el deseo incluye una acción inmediata o plan concreto ("voy a empezar a ahorrar la próxima semana"), podría ser también una Meta → en ese caso, dar prioridad a "Meta".
+- Si el deseo describe una compra específica con producto, cantidad, precio → prioridad a "Producto" o "Gasto".
+- "Deseo" es para aspiraciones generales sin plan de acción inmediato.
+
+9. Generales:
 - Confidence debe reflejar la certeza de la intención detectada.
 - Explanation debe justificar claramente la decisión tomada.
 

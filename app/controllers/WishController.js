@@ -395,7 +395,7 @@ const WishController = {
       const translatedTypeData = typeData.map((item) => {
         return {
           id: item.id, // El identificador único
-          name: i18n.__(`wishes.${item.name}.name`), // La traducción del nombre
+          name: i18n.__(`wishes.${item.name}.name`) || item.name, // La traducción del nombre
         };
       });
 
