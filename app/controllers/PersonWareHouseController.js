@@ -276,7 +276,7 @@ const PersonWarehouseController = {
     // Esperar a que todas las promesas se resuelvan
     const result = await Promise.all(productCountsPromises);
 
-     const allSuggestions = await SuggestionRepository.findTodaySuggestions('Almacen', personId, home_id);
+     const allSuggestions = await SuggestionRepository.findTodaySuggestions('Producto', personId, home_id);
  const suggestionStatusData = [
         { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
         { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
