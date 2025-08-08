@@ -123,7 +123,7 @@ const idTaskSchema = Joi.object({
 });
 
 const getDateTaskSchema = Joi.object({
-  start_date: Joi.date().required(),
+  start_date: Joi.date().allow(null, "").optional().empty(null),
   home_id: Joi.number().integer().allow(null, "").optional().empty(null),
 });
 const home_idTaskSchema = Joi.object({

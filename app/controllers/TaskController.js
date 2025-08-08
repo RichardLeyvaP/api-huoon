@@ -190,7 +190,7 @@ const TaskController = {
       const personId = req.person.id;
       // Obtener solo las tareas principales (sin padre) directamente en la consulta
       const tasks = await TaskRepository.findAllDateWeb(
-        null,
+        req.body.start_date,
         personId,
         req.body.home_id
       );

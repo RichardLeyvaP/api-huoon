@@ -147,7 +147,16 @@ const StatusController = {
                 personId,
                 home_id
             );
-
+            const filteredTasks = tasks.filter(task => 
+                task.type && task.type.toLowerCase() === 'tarea'
+                // O alternativamente si usas typeName:
+                // task.typeName && task.typeName.toLowerCase() === 'tarea'
+            );
+             const filteredGoals = tasks.filter(task => 
+                task.type && task.type.toLowerCase() === 'meta'
+                // O alternativamente si usas typeName:
+                // task.typeName && task.typeName.toLowerCase() === 'tarea'
+            );
             const wishes = await WishRepository.findAllType(personId, home_id, 'Todas', date);
 
             const finances = await FinanceRepository.findAllType(personId, home_id, 'Todas', date);
@@ -167,7 +176,8 @@ const StatusController = {
             const allSuggestions = await SuggestionRepository.findTodaySuggestions(null, personId, home_id);
             res.status(200).json({
               status: statuses,
-              task: tasks.length,
+              task: filteredTasks.length,
+              goals: filteredGoals.length,
               whish: wishes.length,
               finance: finances.length,
               personWarehouses: personWarehouses.length,
