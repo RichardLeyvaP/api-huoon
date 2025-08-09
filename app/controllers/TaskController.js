@@ -136,6 +136,7 @@ const TaskController = {
             notificationDate: task.notificationDate,
             notificationTime: task.notificationTime,
             type: task.type,
+            module: task.module,
             priorityId: task.priority_id,
             priority_id: task.priority_id,
             colorPriority: task.priority?.color,
@@ -216,6 +217,11 @@ const TaskController = {
             notificationDate: task.notificationDate,
             notificationTime: task.notificationTime,
             type: task.type,
+            module: task.module,
+            moduleName: i18n.__(`module.${task.module}.name`) !==
+              `module.${task.module}.name`
+                ? i18n.__(`module.${task.module}.name`)
+                : task.module,
             typeName:
               i18n.__(`typetask.${task.type}.name`) !==
               `typetask.${task.type}.name`
@@ -845,6 +851,7 @@ const TaskController = {
                   ...taskSuggestion,
                   parent_id: task.id,
                   type: "Tarea",
+                  module: "Tarea",
                   home_id: req.body.home_id,
                   people: req.body.people,
                   start_date:

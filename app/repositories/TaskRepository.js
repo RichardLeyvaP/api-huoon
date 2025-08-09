@@ -91,6 +91,7 @@ const TaskRepository = {
             endTime: child.end_time,
             end_time: child.end_time,
             type: child.type,
+            module: child.module,
             priorityId: child.priority_id,
             priority_id: child.priority_id,
             colorPriority: child.priority?.color,
@@ -493,6 +494,7 @@ const TaskRepository = {
           start_time: body.start_time,
           end_time: body.end_time,
           type: body.type,
+          module: body.module,
           priority_id: body.priority_id,
           status_id: body.status_id,
           category_id: body.category_id,
@@ -548,6 +550,7 @@ const TaskRepository = {
       "start_time",
       "end_time",
       "type",
+      "module",
       "notificationDate",
       "notificationTime",
     ];

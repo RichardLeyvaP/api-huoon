@@ -550,5 +550,19 @@
     "name": "Completed",
     "description": "The suggestion has been resolved"
   }
+},
+"modules": {
+  "Logros": { "name": "Achievements" },
+  "Deseos": { "name": "Wishes" },
+  "Metas": { "name": "Goals" },
+  "Tareas": { "name": "Tasks" },
+  "Finanzas": { "name": "Finances" },
+  "Salud": { "name": "Health" },
+  "Nutrición": { "name": "Nutrition" },
+  "Mascotas": { "name": "Pets" },
+  "Hogar": { "name": "Home" },
+  "Productos": { "name": "Warehouses" },
+  "Archivos": { "name": "Files" },
+  "Sugerencias": { "name": "Suggestions" }
 }
 }

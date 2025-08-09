@@ -37,6 +37,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,  // El campo type puede ser nulo
       },
+      module: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo type puede ser nulo
+      },
       priority_id: {
         type: Sequelize.BIGINT,
         allowNull: false,

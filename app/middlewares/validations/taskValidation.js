@@ -14,6 +14,7 @@ const storeTaskSchema = Joi.object({
     .pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/)
     .allow(null), // Formato 24 horas
   type: Joi.string().optional().allow(null, "").empty(null),
+  module: Joi.string().optional().allow(null, "").empty(null),
   priority_id: Joi.number().integer().required(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),
@@ -73,6 +74,7 @@ const updateTaskSchema = Joi.object({
     .pattern(/^([01]?[0-9]|2[0-3]):([0-5][0-9])$/)
     .allow(null), // Formato 24 horas
   type: Joi.string().optional().allow(null, "").empty(null),
+  module: Joi.string().optional().allow(null, "").empty(null),
   priority_id: Joi.number().integer().optional(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),

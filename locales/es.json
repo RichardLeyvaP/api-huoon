@@ -550,5 +550,19 @@
       "name": "Completado",
       "description": "La sugerencia ha sido resuelta"
     }
-  }
+  },
+  "modules": {
+  "Logros": { "name": "Logros" },
+  "Deseos": { "name": "Deseos" },
+  "Meta": { "name": "Metas" },
+  "Tarea": { "name": "Tareas" },
+  "Finanzas": { "name": "Finanzas" },
+  "Salud": { "name": "Salud" },
+  "Nutrición": { "name": "Nutrición" },
+  "Mascotas": { "name": "Mascotas" },
+  "Hogar": { "name": "Hogar" },
+  "Productos": { "name": "Almacenes" },
+  "Archivos": { "name": "Archivos" },
+  "Sugerencias": { "name": "Sugerencias" }
+}
 }

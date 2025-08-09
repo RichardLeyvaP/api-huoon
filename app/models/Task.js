@@ -88,6 +88,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,  // Tipo STRING para almacenar el tipo de tarea
       allowNull: true,         // El campo es opcional
     },
+    module: {
+      type: DataTypes.STRING,  // Tipo STRING para almacenar el tipo de tarea
+      allowNull: true,         // El campo es opcional
+    },
     priority_id: {
       type: DataTypes.BIGINT,
       allowNull: false,

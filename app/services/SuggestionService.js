@@ -32,11 +32,15 @@ const SuggestionService = {
       const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
       const todayFinanceSuggestions = await SuggestionRepository.findTodaySuggestions('Finanzas', person_id, home_id);
       
-      if (todayFinanceSuggestions.length === 0) {
+      //if (todayFinanceSuggestions.length === 0) {
         const financeAIResponse = await FinancialAIService.generateFinancialSuggestions(stats, budgets, todayFinanceSuggestions);
         const financeSuggestions = financeAIResponse.suggestions || [];
         
         for (const suggestion of financeSuggestions) {
+          const financeDataWithModule = {
+              ...(suggestion.taskData || {}), // spread del objeto original
+              module: 'Finanzas'                // nuevo campo o sobrescribe si ya existe
+            };
           await SuggestionRepository.create({
             person_id,
             home_id,
@@ -46,14 +50,14 @@ const SuggestionService = {
             status: 'Pendiente',
             type: 'Finanzas',
             typeTask: suggestion.typeTask || 'Tarea',
-            taskData: suggestion.taskData
+            taskData: financeDataWithModule
           });
         }
         
         totalSuggestions += financeSuggestions.length;
         generatedFinance = true;
         logger.info(`Generadas ${financeSuggestions.length} sugerencias financieras`);
-      }
+      //}
       
       // 2. Generar sugerencias de salud
       const diagnoses = await DiagnosisRepository.findAllByPersonId(person_id);
@@ -66,7 +70,7 @@ const SuggestionService = {
       
       const todayHealthSuggestions = await SuggestionRepository.findTodaySuggestions('Salud', person_id, home_id);
       
-      if (todayHealthSuggestions.length === 0) {
+      //if (todayHealthSuggestions.length === 0) {
         const healthAIResponse = await HealthAIService.generateHealthSuggestions(
           diagnoses,
           backgrounds,
@@ -81,6 +85,10 @@ const SuggestionService = {
         const healthSuggestions = healthAIResponse.suggestions || [];
         
         for (const suggestion of healthSuggestions) {
+           const taskDataWithModule = {
+              ...(suggestion.taskData || {}), // spread del objeto original
+              module: 'Salud'                // nuevo campo o sobrescribe si ya existe
+            };
           await SuggestionRepository.create({
             person_id,
             home_id,
@@ -90,14 +98,14 @@ const SuggestionService = {
             status: 'Pendiente',
             type: 'Salud',
             typeTask: suggestion.typeTask || 'Tarea',
-            taskData: suggestion.taskData
+            taskData: taskDataWithModule
           });
         }
         
         totalSuggestions += healthSuggestions.length;
         generatedHealth = true;
         logger.info(`Generadas ${healthSuggestions.length} sugerencias de salud`);
-      }
+      //}
       const todayProductSuggestions = await SuggestionRepository.findTodaySuggestions('Productos', person_id, home_id);
       const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, person_id);
       
@@ -136,6 +144,10 @@ const SuggestionService = {
 
           // 4. Crear cada sugerencia en la base de datos
           for (const suggestionProduct of productSuggestions) {
+            const productDataWithModule = {
+              ...(suggestion.taskData || {}), // spread del objeto original
+              module: 'Producto'                // nuevo campo o sobrescribe si ya existe
+            };
             await SuggestionRepository.create({
               person_id,
               home_id,
@@ -145,7 +157,7 @@ const SuggestionService = {
               status: 'Pendiente',
               type: 'Producto',
               typeTask: suggestionProduct.typeTask || 'Tarea',
-              taskData: suggestionProduct.taskData // Asegúrate de que es un objeto JSON válido
+              taskData: productDataWithModule // Asegúrate de que es un objeto JSON válido
             });
           }
 
