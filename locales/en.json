@@ -41,65 +41,85 @@
               "description": "Washing clothes"
             },
             "Alquiler": {
-    "name": "Rent",
-    "description": "Rent or mortgage payment"
-  },
-  "Electricidad": {
-    "name": "Electricity",
-    "description": "Electricity bill"
-  },
-  "Agua": {
-    "name": "Water",
-    "description": "Water utility bill"
-  },
-  "Gas": {
-    "name": "Gas",
-    "description": "Natural gas or propane supply"
-  },
-  "Internet": {
-    "name": "Internet",
-    "description": "Internet service"
-  },
-  "Telefonía": {
-    "name": "Phone",
-    "description": "Mobile/cell phone plan"
-  },
-  "Supermercado": {
-    "name": "Groceries",
-    "description": "Basic food shopping"
-  },
-  "Transporte": {
-    "name": "Transportation",
-    "description": "Fuel, tickets or vehicle maintenance"
-  },
-  "Seguros": {
-    "name": "Insurance",
-    "description": "Insurance policies (home, car, health)"
-  },
-  "Salud": {
-    "name": "Healthcare",
-    "description": "Medical and pharmacy expenses"
-  },
-  "Educación": {
-    "name": "Education",
-    "description": "Tuition, books or courses"
-  },
-  "Ahorros": {
-    "name": "Savings",
-    "description": "Monthly savings fund"
-  },
-  "Ocio": {
-    "name": "Leisure",
-    "description": "Entertainment and outings"
-  },
-  "Ropa": {
-    "name": "Clothing",
-    "description": "Apparel and footwear"
-  },
-  "Mantenimiento_Hogar": {
-    "name": "Home Maintenance",
-    "description": "Home repairs and improvements"
-  }
+        "name": "Rent",
+        "description": "Rent or mortgage payment"
+      },
+      "Electricidad": {
+        "name": "Electricity",
+        "description": "Electricity bill"
+      },
+      "Agua": {
+        "name": "Water",
+        "description": "Water utility bill"
+      },
+      "Gas": {
+        "name": "Gas",
+        "description": "Natural gas or propane supply"
+      },
+      "Internet": {
+        "name": "Internet",
+        "description": "Internet service"
+      },
+      "Telefonía": {
+        "name": "Phone",
+        "description": "Mobile/cell phone plan"
+      },
+      "Supermercado": {
+        "name": "Groceries",
+        "description": "Basic food shopping"
+      },
+      "Transporte": {
+        "name": "Transportation",
+        "description": "Fuel, tickets or vehicle maintenance"
+      },
+      "Seguros": {
+        "name": "Insurance",
+        "description": "Insurance policies (home, car, health)"
+      },
+      "Salud": {
+        "name": "Healthcare",
+        "description": "Medical and pharmacy expenses"
+      },
+      "Educación": {
+        "name": "Education",
+        "description": "Tuition, books or courses"
+      },
+      "Ahorros": {
+        "name": "Savings",
+        "description": "Monthly savings fund"
+      },
+      "Ocio": {
+        "name": "Leisure",
+        "description": "Entertainment and outings"
+      },
+      "Ropa": {
+        "name": "Clothing",
+        "description": "Apparel and footwear"
+      },
+      "Mantenimiento_Hogar": {
+        "name": "Home Maintenance",
+        "description": "Home repairs and improvements"
+      },
+      "Perros": {
+      "name": "Dogs",
+      "description": "Dogs category"
+    },
+    "Gatos": {
+      "name": "Cats",
+      "description": "Cats category"
+    },
+    "Aves": {
+      "name": "Birds",
+      "description": "Domestic birds category"
+    },
+    "Peces": {
+      "name": "Fish",
+      "description": "Fish and aquariums category"
+    },
+    "Roedores": {
+      "name": "Rodents",
+      "description": "Domestic rodents category"
+    }
     },
   "priority": {
       "Baja": {
@@ -444,7 +464,7 @@
   },
   "Cada 4 horas": {
     "name": "Every 4 hours",
-    "description": "Medication to be taken every 4 hours while awake"
+    "description": "Medication to be taken every 4 hours (6 times a day)"
   },
   "Cada 6 horas": {
     "name": "Every 6 hours",
@@ -564,5 +584,57 @@
   "Productos": { "name": "Warehouses" },
   "Archivos": { "name": "Files" },
   "Sugerencias": { "name": "Suggestions" }
+},
+"administrationRoutes": {
+  "Oral": {
+    "name": "Oral",
+    "description": "Administration through the mouth"
+  },
+  "Sublingual": {
+    "name": "Sublingual",
+    "description": "Under the tongue"
+  },
+  "Topica": {
+    "name": "Topical",
+    "description": "Applied to skin or mucous membranes"
+  },
+  "Inyectable": {
+    "name": "Injectable",
+    "description": "Injected (intramuscular, intravenous, subcutaneous)"
+  },
+  "Rectal": {
+    "name": "Rectal",
+    "description": "Through the rectum (suppositories)"
+  },
+  "Otica": {
+    "name": "Otic",
+    "description": "In the ear"
+  },
+  "Nasal": {
+    "name": "Nasal",
+    "description": "Through the nose (sprays, drops)"
+  }
+},
+"foodTypes": {
+  "Seco": {
+    "name": "Dry",
+    "description": "Dry food/kibble"
+  },
+  "Humedo": {
+    "name": "Wet",
+    "description": "Canned or pouched food"
+  },
+  "RecetaMedica": {
+    "name": "Prescription",
+    "description": "Veterinary prescribed diet"
+  },
+  "Natural": {
+    "name": "Natural",
+    "description": "Homemade or raw food"
+  },
+  "Snacks": {
+    "name": "Snacks",
+    "description": "Treats or pet snacks"
+  }
 }
 }

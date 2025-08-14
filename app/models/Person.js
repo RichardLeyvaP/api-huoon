@@ -81,22 +81,28 @@ module.exports = (sequelize, DataTypes) => {
           foreignKey: 'person_id',
           as: 'budgets',
         });
+        Person.hasMany(models.Pet, {
+          foreignKey: 'person_id',
+          as: 'pets',
+        });
+        Person.hasMany(models.PetTreatment, {
+          foreignKey: 'person_id',
+          as: 'pettreatments',
+        });
+      Person.hasMany(models.VetVisit, {
+            foreignKey: 'person_id',
+            as: 'vetvisits',
+          });
+      Person.hasMany(models.CurrentMedication, {
+            foreignKey: 'person_id',
+            as: 'currentmedications',
+          });
+      Person.hasMany(models.PetDiet, {
+            foreignKey: 'person_id',
+            as: 'petdiets',
+          });
     }
 
-    /**
-     * Método para encontrar a la persona por user_id
-     */
-    static async findByUserId(userId) {
-      try {
-        return await this.findOne({
-          where: { user_id: userId },
-          include: [{ association: 'user' }],
-        });
-      } catch (error) {
-        logger.error("Error en findByUserId: ", error);
-        throw error;
-      }
-    }
   }
 
   Person.init({

@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "category_id",
         as: "budgets",
       });
+
+      Category.hasMany(models.Pet, {
+        foreignKey: "category_id",
+        as: "pets",
+      });
     }
 
     static async getCategories(personId, type) {

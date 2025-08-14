@@ -41,65 +41,81 @@
           "description": "Lavar la ropa"
         },
         "Alquiler": {
-    "name": "Alquiler",
-    "description": "Pago de alquiler o hipoteca"
-  },
-  "Electricidad": {
-    "name": "Electricidad",
-    "description": "Factura de luz"
-  },
-  "Agua": {
-    "name": "Agua",
-    "description": "Factura de agua"
-  },
-  "Gas": {
-    "name": "Gas",
-    "description": "Suministro de gas natural o bombonas"
-  },
-  "Internet": {
-    "name": "Internet",
-    "description": "Servicio de conexión a internet"
-  },
-  "Telefonía": {
-    "name": "Telefonía",
-    "description": "Plan de celular/teléfono fijo"
-  },
-  "Supermercado": {
-    "name": "Supermercado",
-    "description": "Compra de alimentos básicos"
-  },
-  "Transporte": {
-    "name": "Transporte",
-    "description": "Combustible, pasajes o mantenimiento de vehículo"
-  },
-  "Seguros": {
-    "name": "Seguros",
-    "description": "Pólizas de seguro (hogar, auto, salud)"
-  },
-  "Salud": {
-    "name": "Salud",
-    "description": "Gastos médicos y farmacia"
-  },
-  "Educación": {
-    "name": "Educación",
-    "description": "Colegiatura, libros o cursos"
-  },
-  "Ahorros": {
-    "name": "Ahorros",
-    "description": "Fondo de ahorro mensual"
-  },
-  "Ocio": {
-    "name": "Ocio",
-    "description": "Entretenimiento y salidas"
-  },
-  "Ropa": {
-    "name": "Ropa",
-    "description": "Prendas de vestir y calzado"
-  },
-  "Mantenimiento_Hogar": {
-    "name": "Mantenimiento Hogar",
-    "description": "Reparaciones y mejoras del hogar"
-  }
+        "name": "Alquiler",
+        "description": "Pago de alquiler o hipoteca"
+      },
+      "Electricidad": {
+        "name": "Electricidad",
+        "description": "Factura de luz"
+      },
+      "Agua": {
+        "name": "Agua",
+        "description": "Factura de agua"
+      },
+      "Gas": {
+        "name": "Gas",
+        "description": "Suministro de gas natural o bombonas"
+      },
+      "Internet": {
+        "name": "Internet",
+        "description": "Servicio de conexión a internet"
+      },
+      "Telefonía": {
+        "name": "Telefonía",
+        "description": "Plan de celular/teléfono fijo"
+      },
+      "Supermercado": {
+        "name": "Supermercado",
+        "description": "Compra de alimentos básicos"
+      },
+      "Transporte": {
+        "name": "Transporte",
+        "description": "Combustible, pasajes o mantenimiento de vehículo"
+      },
+      "Seguros": {
+        "name": "Seguros",
+        "description": "Pólizas de seguro (hogar, auto, salud)"
+      },
+      "Salud": {
+        "name": "Salud",
+        "description": "Gastos médicos y farmacia"
+      },
+      "Educación": {
+        "name": "Educación",
+        "description": "Colegiatura, libros o cursos"
+      },
+      "Ahorros": {
+        "name": "Ahorros",
+        "description": "Fondo de ahorro mensual"
+      },
+      "Ocio": {
+        "name": "Ocio",
+        "description": "Entretenimiento y salidas"
+      },
+      "Ropa": {
+        "name": "Ropa",
+        "description": "Prendas de vestir y calzado"
+      },
+      "Mantenimiento_Hogar": {
+        "name": "Mantenimiento Hogar",
+        "description": "Reparaciones y mejoras del hogar"
+      },
+      "Perros": {
+        "name": "Perros",
+        "description": "Categoría de perros"
+      },
+      "Gatos": {
+        "name": "Gatos",
+        "description": "Categoría de gatos"
+      },
+      "Aves": {
+        "name": "Aves",
+        "description": "Categoría de aves domésticas"
+      },
+      "Peces": {
+        "name": "Peces",
+        "description": "Categoría de peces y acuarios"
+      }
       },
     "priority": {
       "Baja": {
@@ -182,37 +198,37 @@
     "name": "Severo",
     "description": "Antecedente de enfermedad con impacto severo en la salud"
   }
-},
-"familyRelations": {
-  "Padre": {
-    "name": "Padre",
-    "description": "Parentesco de padre"
   },
-  "Madre": {
-    "name": "Madre",
-    "description": "Parentesco de madre"
+  "familyRelations": {
+    "Padre": {
+      "name": "Padre",
+      "description": "Parentesco de padre"
+    },
+    "Madre": {
+      "name": "Madre",
+      "description": "Parentesco de madre"
+    },
+    "Hijo/a": {
+      "name": "Hijo/a",
+      "description": "Parentesco de hijo o hija"
+    },
+    "Hermano/a": {
+      "name": "Hermano/a",
+      "description": "Parentesco de hermano o hermana"
+    },
+    "Abuelo/a": {
+      "name": "Abuelo/a",
+      "description": "Parentesco de abuelo o abuela"
+    },
+    "Tío/a": {
+      "name": "Tío/a",
+      "description": "Parentesco de tío o tía"
+    },
+    "Otro": {
+      "name": "Otro",
+      "description": "Otro tipo de parentesco"
+    }
   },
-  "Hijo/a": {
-    "name": "Hijo/a",
-    "description": "Parentesco de hijo o hija"
-  },
-  "Hermano/a": {
-    "name": "Hermano/a",
-    "description": "Parentesco de hermano o hermana"
-  },
-  "Abuelo/a": {
-    "name": "Abuelo/a",
-    "description": "Parentesco de abuelo o abuela"
-  },
-  "Tío/a": {
-    "name": "Tío/a",
-    "description": "Parentesco de tío o tía"
-  },
-  "Otro": {
-    "name": "Otro",
-    "description": "Otro tipo de parentesco"
-  }
-},
   "recurrence": {
     "Diaria": {
       "name": "Diaria"
@@ -444,7 +460,7 @@
   },
   "Cada 4 horas": {
     "name": "Cada 4 horas",
-    "description": "Medicación que debe tomarse cada 4 horas mientras se está despierto"
+    "description": "Medicación que debe tomarse cada 4 horas (6 veces al día)"
   },
   "Cada 6 horas": {
     "name": "Cada 6 horas",
@@ -564,5 +580,57 @@
   "Productos": { "name": "Almacenes" },
   "Archivos": { "name": "Archivos" },
   "Sugerencias": { "name": "Sugerencias" }
+},
+"administrationRoutes": {
+  "Oral": {
+    "name": "Oral",
+    "description": "Vía de administración por boca"
+  },
+  "Sublingual": {
+    "name": "Sublingual",
+    "description": "Bajo la lengua"
+  },
+  "Topica": {
+    "name": "Tópica",
+    "description": "Aplicación en piel o mucosas"
+  },
+  "Inyectable": {
+    "name": "Inyectable",
+    "description": "Por vía inyectable (intramuscular, intravenosa, subcutánea)"
+  },
+  "Rectal": {
+    "name": "Rectal",
+    "description": "Por vía rectal (supositorios)"
+  },
+  "Otica": {
+    "name": "Ótica",
+    "description": "En el oído"
+  },
+  "Nasal": {
+    "name": "Nasal",
+    "description": "Por vía nasal (sprays, gotas)"
+  }
+},
+"foodTypes": {
+  "Seco": {
+    "name": "Seco",
+    "description": "Alimento seco/croquetas"
+  },
+  "Humedo": {
+    "name": "Húmedo",
+    "description": "Alimento enlatado o en sobres"
+  },
+  "RecetaMedica": {
+    "name": "Receta médica",
+    "description": "Alimento formulado para condiciones específicas"
+  },
+  "Natural": {
+    "name": "Natural",
+    "description": "Dieta casera o alimentos naturales"
+  },
+  "Snacks": {
+    "name": "Snacks",
+    "description": "Premios o golosinas para mascotas"
+  }
 }
 }

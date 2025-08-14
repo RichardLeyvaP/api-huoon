@@ -60,6 +60,26 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'home_id',
       as: 'budgets'
     });
+    Home.hasMany(models.Pet, {
+      foreignKey: 'home_id',
+      as: 'pets'
+    });
+    Home.hasMany(models.PetTreatment, {
+          foreignKey: 'home_id',
+          as: 'pettreatments',
+        });
+    Home.hasMany(models.VetVisit, {
+          foreignKey: 'home_id',
+          as: 'vetvisits',
+        });
+    Home.hasMany(models.CurrentMedication, {
+          foreignKey: 'home_id',
+          as: 'currentmedications',
+        });
+    Home.hasMany(models.PetDiet, {
+          foreignKey: 'home_id',
+          as: 'petdiets',
+        });
     }
   }
   Home.init({

@@ -29,7 +29,12 @@ const PsychosocialBackgroundRepository = require('./PsychosocialBackgroundReposi
 const DiagnosisRepository = require('./DiagnosisRepository ');
 const TreatmentRepository = require('./TreatmentRepository');
 const SuggestionRepository = require('./SuggestionRepository');
-const BudgetRepository = require('./BudgetRepository')
+const BudgetRepository = require('./BudgetRepository');
+const PetRepository = require('./PetRepository');
+const PetTreatmentRepository = require('./PetTreatmentRepository');
+const VetVisitRepository = require('./VetVisitRepository');
+const CurrentMedicationRepository = require('./CurrentMedicationRepository');
+const PetDietRepository = require('./PetDietRepository');
 
 module.exports = {
     CategoryRepository,
@@ -63,5 +68,10 @@ module.exports = {
     DiagnosisRepository,
     TreatmentRepository,
     SuggestionRepository,
-    BudgetRepository
+    BudgetRepository,
+    PetRepository,
+    PetTreatmentRepository,
+    VetVisitRepository,
+    CurrentMedicationRepository,
+    PetDietRepository
 };

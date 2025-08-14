@@ -44,6 +44,11 @@ const { storeDiagnosisSchema, updateDiagnosisSchema, idDiagnosisSchema, getDiagn
 const { storeTreatmentSchema, updateTreatmentSchema, idTreatmentSchema, getTreatmentSchema } = require('./middlewares/validations/treatmentValidation');
 const { storeSuggestionSchema, updateSuggestionSchema, idSuggestionSchema, getSuggestionSchema } = require('./middlewares/validations/suggestionValidation');
 const { storeBudgetSchema, updateBudgetSchema, idBudgetSchema, getBudgetsSchema } = require('./middlewares/validations/budgetValidation');
+const { storePetSchema, updatePetSchema, idPetSchema, getPetsSchema} = require("./middlewares/validations/petValidation");
+const { storePetTreatmentSchema, updatePetTreatmentSchema, idPetTreatmentSchema, getPetTreatmentsSchema} = require("./middlewares/validations/pettreatmentValidation");
+const { storeVetVisitSchema, getVetVisitsSchema, idVetVisitSchema, updateVetVisitSchema} = require("./middlewares/validations/vetvisitValidation");
+const { storeCurrentMedicationSchema, getCurrentMedicationsSchema, idCurrentMedicationSchema, updateCurrentMedicationSchema} = require("./middlewares/validations/currentmedicationValidation");
+const { storePetDietSchema, idPetDietSchema, updatePetDietSchema, getPetDietsSchema} = require("./middlewares/validations/petDietValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -82,6 +87,11 @@ const DiagnosisController = require('./controllers/DiagnosisController');
 const TreatmentController = require('./controllers/TreatmentController');
 const SuggestionController = require('./controllers/SuggestionController');
 const BudgetController = require('./controllers/BudgetController');
+const PetController = require('./controllers/PetController');
+const PetTreatmentController = require("./controllers/PetTreatmentController");
+const VetVisitController = require('./controllers/VetVisitController');
+const CurrentMedicationController = require('./controllers/CurrentMedicationController');
+const PetDietController = require('./controllers/PetDietController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -458,15 +468,57 @@ router.post('/emergency-show', validateSchema(idEmergencySchema), EmergencyContr
 router.put('/emergency', validateSchema(updateEmergencySchema), EmergencyController.update);
 router.post('/emergency-destroy', validateSchema(idEmergencySchema), EmergencyController.destroy);
 
+//Rutas Mascotas
+router.get('/pets', PetController.index);
+router.post('/get-pet-person', validateSchema(getPetsSchema), PetController.getByPersonId);
+router.post('/pet', multerCategory('image', 'pets'), validateSchema(storePetSchema), PetController.store);
+router.post('/pet-show', validateSchema(idPetSchema), PetController.show);
+router.post('/pet-update', multerCategory('image', 'pets'), validateSchema(updatePetSchema), PetController.update);
+router.post('/pet-destroy', validateSchema(idPetSchema), PetController.destroy);
+
+//Rutas Vacunación de Mascotas
+router.get("/pet-treatments", PetTreatmentController.index);
+router.post('/get-pet-treatments', validateSchema(getPetTreatmentsSchema), PetTreatmentController.getByPetIdAndType);
+router.post('/pet-treatment',  validateSchema(storePetTreatmentSchema), PetTreatmentController.store);
+router.post('/pet-treatment-show', validateSchema(idPetTreatmentSchema), PetTreatmentController.show);
+router.post('/pet-treatment-update', validateSchema(updatePetTreatmentSchema), PetTreatmentController.update);
+router.post('/pet-treatment-destroy', validateSchema(idPetTreatmentSchema), PetTreatmentController.destroy);
+
+//Rutas Visitas medicas de Mascotas
+router.get("/vet-visits", VetVisitController.index);
+router.post('/get-vet-visits', validateSchema(getVetVisitsSchema), VetVisitController.getByPetId);
+router.post('/vet-visit', multerCategory('image', 'vetvisits'), validateSchema(storeVetVisitSchema), VetVisitController.store);
+router.post('/vet-visit-show', validateSchema(idVetVisitSchema), VetVisitController.show);
+router.post('/vet-visit-update', multerCategory('image', 'vetvisits'), validateSchema(updateVetVisitSchema), VetVisitController.update);
+router.post('/vet-visit-destroy', validateSchema(idVetVisitSchema), VetVisitController.destroy);
+
+//Rutas medicamentos actuales de Mascotas
+router.get("/current-medications", CurrentMedicationController.index);
+router.post('/get-current-medications', validateSchema(getCurrentMedicationsSchema), CurrentMedicationController.getByPetId);
+router.post('/current-medication',  validateSchema(storeCurrentMedicationSchema), CurrentMedicationController.store);
+router.post('/current-medication-show', validateSchema(idCurrentMedicationSchema), CurrentMedicationController.show);
+router.post('/current-medication-update', validateSchema(updateCurrentMedicationSchema), CurrentMedicationController.update);
+router.post('/current-medication-destroy', validateSchema(idCurrentMedicationSchema), CurrentMedicationController.destroy);
+
+//Rutas dietas de Mascotas
+router.get("/pet-diets", PetDietController.index);
+router.post('/get-pet-diets', validateSchema(getPetDietsSchema), PetDietController.getByPetId);
+router.post('/pet-diet',  validateSchema(storePetDietSchema), PetDietController.store);
+router.post('/pet-diet-show', validateSchema(idPetDietSchema), PetDietController.show);
+router.post('/pet-diet-update', validateSchema(updatePetDietSchema), PetDietController.update);
+router.post('/pet-diet-destroy', validateSchema(idPetDietSchema), PetDietController.destroy);
 
 //Rutas Unificadas
 router.post('/productcategory-productstatus-apk', ProductController.category_status);
 router.post('/category-status-priority-apk', validateSchema(home_idTaskSchema), TaskController.category_status_priority);
 router.post('/category-budgets', BudgetController.category_budgets);
+router.post('/category-pets', PetController.category_pets);
 router.get('/hometype-status-people-apk', HomeController.homeType_status_people);
 router.post('/status-priority-type-apk', WishController.status_priority_type);
 router.post('/get-type-state-severity', validateSchema(typeSchema), PersonalBackgroundController.getTypesByTypeStateSeverity);
 router.post('/get-type-relationship', validateSchema(typeSchema), FamilyBackgroundController.getTypesByTypeRelation);
+router.post('/get-type-routes', validateSchema(typeSchema), CurrentMedicationController.getTypesByRoutes);
+router.post('/get-type-food', validateSchema(typeSchema), PetDietController.getTypesByFood);
 router.post('/get-type-diagnoses', validateSchema(typeSchema), DiagnosisController.getTypesByTypeRelation);
 router.post('/get-type-treatment', validateSchema(typeSchema), TreatmentController.getTypesByType);
 router.post('/get-type-consultations', validateSchema(typeSchema), MedicalConsultationController.getTypesByTypeRelation);

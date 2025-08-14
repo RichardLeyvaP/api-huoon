@@ -41,65 +41,85 @@
           "description": "Lavar roupas"
         },
         "Alquiler": {
-    "name": "Aluguel",
-    "description": "Pagamento de aluguel ou hipoteca"
-  },
-  "Electricidad": {
-    "name": "Eletricidade",
-    "description": "Conta de luz"
-  },
-  "Agua": {
-    "name": "Água",
-    "description": "Conta de água"
-  },
-  "Gas": {
-    "name": "Gás",
-    "description": "Gás natural ou botijão"
-  },
-  "Internet": {
-    "name": "Internet",
-    "description": "Serviço de internet"
-  },
-  "Telefonía": {
-    "name": "Telefonia",
-    "description": "Plano de celular/telefone fixo"
-  },
-  "Supermercado": {
-    "name": "Supermercado",
-    "description": "Compra de alimentos básicos"
-  },
-  "Transporte": {
-    "name": "Transporte",
-    "description": "Combustível, passagens ou manutenção de veículo"
-  },
-  "Seguros": {
-    "name": "Seguros",
-    "description": "Apólices de seguro (casa, carro, saúde)"
-  },
-  "Salud": {
-    "name": "Saúde",
-    "description": "Gastos médicos e farmácia"
-  },
-  "Educación": {
-    "name": "Educação",
-    "description": "Mensalidades, livros ou cursos"
-  },
-  "Ahorros": {
-    "name": "Poupança",
-    "description": "Fundo de poupança mensal"
-  },
-  "Ocio": {
-    "name": "Lazer",
-    "description": "Entretenimento e passeios"
-  },
-  "Ropa": {
-    "name": "Roupas",
-    "description": "Vestuário e calçados"
-  },
-  "Mantenimiento_Hogar": {
-    "name": "Manutenção da Casa",
-    "description": "Reparos e melhorias domésticas"
-  }
+        "name": "Aluguel",
+        "description": "Pagamento de aluguel ou hipoteca"
+      },
+      "Electricidad": {
+        "name": "Eletricidade",
+        "description": "Conta de luz"
+      },
+      "Agua": {
+        "name": "Água",
+        "description": "Conta de água"
+      },
+      "Gas": {
+        "name": "Gás",
+        "description": "Gás natural ou botijão"
+      },
+      "Internet": {
+        "name": "Internet",
+        "description": "Serviço de internet"
+      },
+      "Telefonía": {
+        "name": "Telefonia",
+        "description": "Plano de celular/telefone fixo"
+      },
+      "Supermercado": {
+        "name": "Supermercado",
+        "description": "Compra de alimentos básicos"
+      },
+      "Transporte": {
+        "name": "Transporte",
+        "description": "Combustível, passagens ou manutenção de veículo"
+      },
+      "Seguros": {
+        "name": "Seguros",
+        "description": "Apólices de seguro (casa, carro, saúde)"
+      },
+      "Salud": {
+        "name": "Saúde",
+        "description": "Gastos médicos e farmácia"
+      },
+      "Educación": {
+        "name": "Educação",
+        "description": "Mensalidades, livros ou cursos"
+      },
+      "Ahorros": {
+        "name": "Poupança",
+        "description": "Fundo de poupança mensal"
+      },
+      "Ocio": {
+        "name": "Lazer",
+        "description": "Entretenimento e passeios"
+      },
+      "Ropa": {
+        "name": "Roupas",
+        "description": "Vestuário e calçados"
+      },
+      "Mantenimiento_Hogar": {
+        "name": "Manutenção da Casa",
+        "description": "Reparos e melhorias domésticas"
+      },
+      "Perros": {
+        "name": "Cachorros",
+        "description": "Categoria de cachorros"
+      },
+      "Gatos": {
+        "name": "Gatos",
+        "description": "Categoria de gatos"
+      },
+      "Aves": {
+        "name": "Pássaros",
+        "description": "Categoria de pássaros domésticos"
+      },
+      "Peces": {
+        "name": "Peixes",
+        "description": "Categoria de peixes e aquários"
+      },
+      "Roedores": {
+        "name": "Roedores",
+        "description": "Categoria de roedores domésticos"
+      }
     },
   "priority": {
       "Baja": {
@@ -444,7 +464,7 @@
   },
   "Cada 4 horas": {
     "name": "A cada 4 horas",
-    "description": "Medicação a ser tomada a cada 4 horas enquanto estiver acordado"
+    "description": "Medicação a ser tomada a cada 4 horas (6 vezes ao dia)"
   },
   "Cada 6 horas": {
     "name": "A cada 6 horas",
@@ -564,5 +584,57 @@
   "Almacenes": { "name": "Armazéns" },
   "Archivos": { "name": "Arquivos" },
   "Sugerencias": { "name": "Sugestões" }
+},
+"administrationRoutes": {
+  "Oral": {
+    "name": "Oral",
+    "description": "Administração pela boca"
+  },
+  "Sublingual": {
+    "name": "Sublingual",
+    "description": "Sob a língua"
+  },
+  "Topica": {
+    "name": "Tópica",
+    "description": "Aplicação na pele ou mucosas"
+  },
+  "Inyectable": {
+    "name": "Injetável",
+    "description": "Injetado (intramuscular, intravenoso, subcutâneo)"
+  },
+  "Rectal": {
+    "name": "Retal",
+    "description": "Via retal (supositórios)"
+  },
+  "Otica": {
+    "name": "Ótica",
+    "description": "No ouvido"
+  },
+  "Nasal": {
+    "name": "Nasal",
+    "description": "Via nasal (sprays, gotas)"
+  }
+},
+"foodTypes": {
+  "Seco": {
+    "name": "Seco",
+    "description": "Ração seca"
+  },
+  "Humedo": {
+    "name": "Úmido",
+    "description": "Alimento enlatado ou em sachês"
+  },
+  "RecetaMedica": {
+    "name": "Prescrição médica",
+    "description": "Dieta veterinária especializada"
+  },
+  "Natural": {
+    "name": "Natural",
+    "description": "Comida caseira ou natural"
+  },
+  "Snacks": {
+    "name": "Petiscos",
+    "description": "Guloseimas para animais"
+  }
 }
 }
