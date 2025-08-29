@@ -471,6 +471,8 @@ const FinanceController = {
       // 5. Obtener todas las sugerencias (existentes + nuevas)
       const allSuggestions = await SuggestionRepository.findTodaySuggestions('Finanzas', person_id, home_id);
 
+      const financeData = await FinanceRepository.getMonthlyIncomeAndSpentCurrentYear(home_id, person_id);
+
       const suggestionStatusData = [
         { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
         { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
@@ -562,7 +564,8 @@ const FinanceController = {
           color: "amber-darken-2"
         },
         suggestions: mappedSuggestions,
-        statusuggestions: translatedSuggestionStatusData
+        statusuggestions: translatedSuggestionStatusData,
+        financeData: financeData
       };
       res.status(200).json(response);
     } catch (error) {

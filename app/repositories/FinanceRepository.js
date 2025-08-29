@@ -509,7 +509,53 @@ const FinanceRepository = {
         image: lastRecord.image
       } : null
     };
+  },
+  async getMonthlyIncomeAndSpentCurrentYear(homeId = null, personId) {
+  const currentYear = new Date().getFullYear();
+
+  // Construir condiciones dinámicas
+  const whereCondition = {
+    person_id: personId,
+    date: {
+      [Op.gte]: `${currentYear}-01-01`,
+      [Op.lt]: `${currentYear + 1}-01-01`
+    }
+  };
+
+  // Solo agregar home_id al filtro si está definido y no es null
+  if (homeId !== undefined && homeId !== null) {
+    whereCondition.home_id = homeId;
   }
+
+  const results = await Finance.findAll({
+    attributes: [
+      [Sequelize.fn('MONTH', Sequelize.col('date')), 'month'], // Mes 1-12
+      [Sequelize.fn('SUM', Sequelize.col('income')), 'totalIncome'],
+      [Sequelize.fn('SUM', Sequelize.col('spent')), 'totalSpent']
+    ],
+    where: whereCondition,
+    group: [Sequelize.fn('MONTH', Sequelize.col('date'))],
+    raw: true
+  });
+
+  // Inicializar arreglos de 12 meses (índice 0 = enero)
+  const customIncomeData = Array(12).fill(0);
+  const customSpentData = Array(12).fill(0);
+
+  // Llenar los valores: restamos 1 al mes para convertir de 1-12 a 0-11
+  results.forEach(row => {
+    const monthIndex = parseInt(row.month) - 1; // Enero = 1 → índice 0
+    if (monthIndex >= 0 && monthIndex <= 11) {
+      customIncomeData[monthIndex] = parseFloat(row.totalIncome) || 0;
+      customSpentData[monthIndex] = parseFloat(row.totalSpent) || 0;
+    }
+  });
+
+  return {
+    customIncomeData,
+    customSpentData
+  };
+}
 };
 
 module.exports = FinanceRepository;
