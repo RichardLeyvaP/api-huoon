@@ -64,26 +64,6 @@
         "name": "Telefonía",
         "description": "Plan de celular/teléfono fijo"
       },
-      "Supermercado": {
-        "name": "Supermercado",
-        "description": "Compra de alimentos básicos"
-      },
-      "Transporte": {
-        "name": "Transporte",
-        "description": "Combustible, pasajes o mantenimiento de vehículo"
-      },
-      "Seguros": {
-        "name": "Seguros",
-        "description": "Pólizas de seguro (hogar, auto, salud)"
-      },
-      "Salud": {
-        "name": "Salud",
-        "description": "Gastos médicos y farmacia"
-      },
-      "Educación": {
-        "name": "Educación",
-        "description": "Colegiatura, libros o cursos"
-      },
       "Ahorros": {
         "name": "Ahorros",
         "description": "Fondo de ahorro mensual"
@@ -115,7 +95,159 @@
       "Peces": {
         "name": "Peces",
         "description": "Categoría de peces y acuarios"
-      }
+      },
+      "Necesidades básicas": {
+      "name": "Necesidades básicas",
+      "description": "Gastos esenciales para vivir: vivienda, alimentación, transporte y salud."
+    },
+    "Compromisos financieros": {
+      "name": "Compromisos financieros",
+      "description": "Obligaciones económicas como deudas, impuestos y seguros."
+    },
+    "Crecimiento": {
+      "name": "Crecimiento",
+      "description": "Inversiones en educación, ahorro e inversión para el futuro."
+    },
+    "Estilo de vida": {
+      "name": "Estilo de vida",
+      "description": "Gastos relacionados con ocio, compras, mascotas y viajes."
+    },
+    "Vivienda y servicios": {
+      "name": "Vivienda y servicios",
+      "description": "Arriendo, servicios básicos e internet"
+    },
+    "Alimentación": {
+      "name": "Alimentación",
+      "description": "Compras de supermercado y comida fuera de casa"
+    },
+    "Transporte": {
+      "name": "Transporte",
+      "description": "Combustible, transporte público y mantenciones"
+    },
+    "Salud": {
+      "name": "Salud",
+      "description": "Consultas médicas, medicamentos y seguros"
+    },
+    "Arriendo / Hipoteca": {
+      "name": "Arriendo / Hipoteca",
+      "description": "Pago mensual de arriendo o préstamo hipotecario"
+    },
+    "Agua, luz, gas": {
+      "name": "Agua, luz, gas",
+      "description": "Facturas de servicios básicos del hogar"
+    },
+    "Internet, teléfono, TV": {
+      "name": "Internet, teléfono, TV",
+      "description": "Planes de internet, telefonía y televisión por cable"
+    },
+    "Supermercado": {
+      "name": "Supermercado",
+      "description": "Compra de alimentos y productos del hogar"
+    },
+    "Comida fuera de casa": {
+      "name": "Comida fuera de casa",
+      "description": "Restaurantes, cafés, delivery y comida rápida"
+    },
+    "Combustible": {
+      "name": "Combustible",
+      "description": "Gasolina, diésel u otros combustibles"
+    },
+    "Transporte público": {
+      "name": "Transporte público",
+      "description": "Bus, metro, tren, taxi o transporte compartido"
+    },
+    "Mantenciones / seguros": {
+      "name": "Mantenciones / seguros",
+      "description": "Reparaciones, revisiones y seguros de vehículos"
+    },
+    "Consultas médicas": {
+      "name": "Consultas médicas",
+      "description": "Visitas al médico, dentista o especialistas"
+    },
+    "Medicamentos": {
+      "name": "Medicamentos",
+      "description": "Medicinas recetadas y de venta libre"
+    },
+    "Seguros de salud": {
+      "name": "Seguros de salud",
+      "description": "Cobertura médica privada o copagos"
+    },
+    "Educación": {
+  "name": "Educación",
+  "description": "Gastos relacionados con estudios, cursos y desarrollo académico."
+},
+"Colegios / universidades": {
+  "name": "Colegios / universidades",
+  "description": "Matrículas, pensiones y gastos escolares o universitarios"
+},
+"Cursos / capacitaciones": {
+  "name": "Cursos / capacitaciones",
+  "description": "Cursos en línea, talleres, certificaciones y formación profesional"
+},
+"Deudas y obligaciones": {
+  "name": "Deudas y obligaciones",
+  "description": "Pagos de créditos, impuestos y seguros obligatorios."
+},
+"Créditos / préstamos": {
+  "name": "Créditos / préstamos",
+  "description": "Cuotas de préstamos personales, hipotecas o vehículos"
+},
+"Impuestos": {
+  "name": "Impuestos",
+  "description": "Pago de impuestos personales, patrimoniales o vehiculares"
+},
+"Seguros": {
+  "name": "Seguros",
+  "description": "Seguros de vida, hogar, automóvil u otros"
+},
+"Ahorro e inversión": {
+  "name": "Ahorro e inversión",
+  "description": "Reservas para emergencias, ahorro familiar e inversiones financieras."
+},
+"Fondo de emergencia": {
+  "name": "Fondo de emergencia",
+  "description": "Ahorro destinado a imprevistos o situaciones urgentes"
+},
+"Ahorros familiares": {
+  "name": "Ahorros familiares",
+  "description": "Metas de ahorro para proyectos familiares o personales"
+},
+"Inversiones": {
+  "name": "Inversiones",
+  "description": "Acciones, fondos, criptomonedas u otros instrumentos financieros"
+},
+"Ocio y estilo de vida": {
+  "name": "Ocio y estilo de vida",
+  "description": "Actividades de entretenimiento, viajes y hobbies."
+},
+"Entretenimiento": {
+  "name": "Entretenimiento",
+  "description": "Cine, streaming, conciertos y actividades recreativas"
+},
+"Viajes": {
+  "name": "Viajes",
+  "description": "Vacaciones, escapadas y gastos de alojamiento o transporte"
+},
+"Deportes / hobbies": {
+  "name": "Deportes / hobbies",
+  "description": "Membresías, equipos o clases de actividades físicas y recreativas"
+},
+"Compras personales": {
+  "name": "Compras personales",
+  "description": "Gastos en ropa, tecnología y regalos para otros."
+},
+"Ropa y accesorios": {
+  "name": "Ropa y accesorios",
+  "description": "Compra de prendas, calzado, joyas y complementos"
+},
+"Tecnología": {
+  "name": "Tecnología",
+  "description": "Celulares, computadoras, accesorios electrónicos"
+},
+"Regalos": {
+  "name": "Regalos",
+  "description": "Obsequios para cumpleaños, aniversarios u ocasiones especiales"
+}
       },
     "priority": {
       "Baja": {

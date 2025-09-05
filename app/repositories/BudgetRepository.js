@@ -556,17 +556,25 @@ const BudgetRepository = {
       }
     };
   }*/
- async getPersonBudgetStats(person_id, home_id = null) {
+ async getPersonBudgetStats(person_id, home_id = null, type) {
     // Fechas para el mes actual y el anterior
     const now = new Date();
     const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+   const whereCondition = { };
+    if (type === 'Hogar') {
+      whereCondition.home_id = home_id;
+    whereCondition.budget_type = 'Hogar';
+    } else if (type === 'Personal') {
+      whereCondition.person_id = person_id;
+      whereCondition.budget_type = 'Personal';
+    }
 
     // 1. Obtener todos los budgets de la persona
     const budgets = await Budget.findAll({
-      where: { person_id },
+      where: whereCondition,
       raw: true
     });
 

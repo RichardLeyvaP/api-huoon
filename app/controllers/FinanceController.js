@@ -10,6 +10,7 @@ const {
   CategoryRepository,
 } = require("../repositories"); // Asegúrate de que tengas un repositorio para Finance
 const FinancialAIService = require("../services/FinancesSuggestion");
+const CategoryService = require("../services/CategoryService");
 
 const FinanceController = {
   // Obtener todos los registros de finanzas
@@ -434,11 +435,12 @@ const FinanceController = {
     const person_id = req.person.id;
     const dateParam = req.body.date || new Date().toISOString().slice(0, 10);
     const home_id = req.body.home_id;
+    const type = req.body.type || "Personal";
 
     try {
 
-       const stats = await FinanceRepository.getPersonFinancialStats(person_id);
-      const budgetStats = await BudgetRepository.getPersonBudgetStats(person_id, home_id);
+       //const stats = await FinanceRepository.getPersonFinancialStats(person_id);
+      const budgetStats = await BudgetRepository.getPersonBudgetStats(person_id, home_id, type);
       /*// 2. Obtener presupuestos actuales
       const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
       
@@ -471,8 +473,7 @@ const FinanceController = {
       // 5. Obtener todas las sugerencias (existentes + nuevas)
       const allSuggestions = await SuggestionRepository.findTodaySuggestions('Finanzas', person_id, home_id);
 
-      const financeData = await FinanceRepository.getMonthlyIncomeAndSpentCurrentYear(home_id, person_id);
-
+      const financeData = await FinanceRepository.getMonthlyIncomeAndSpentCurrentYear(home_id, person_id, type);
       const suggestionStatusData = [
         { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
         { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
@@ -515,15 +516,248 @@ const FinanceController = {
       };
 
       // Obtener descripción del último movimiento (si existe)
-      let lastMovementDescription = "No hay movimientos";
+      /*let lastMovementDescription = "No hay movimientos";
       if (stats.lastRecord) {
         lastMovementDescription = stats.lastRecord.description || 
           (stats.lastRecord.income ? "Ingreso registrado" : "Gasto registrado");
-      }
+      }*/
 
-      // Construir respuesta específica para la UI
+      //Grafico de pie
+      // Estructura: agrupar por categoría principal y sus subcategorías
+      
+      /*const { expenses, categories } = await FinanceRepository.getAllExpensesByCategory( person_id, null, null);
+      const categoriesMap = new Map();
+
+      const categoryMap = {};
+      categories.forEach(cat => {
+        categoryMap[cat.id] = cat;
+      });
+
+      // Traducción
+      const translateCategory = (name, state) => {
+        if (!name) return "Sin nombre";
+        if (state === 1) {
+          const translated = i18n.__(`category.${name}.name`);
+          return translated !== `category.${name}.name` ? translated : name;
+        }
+        return name;
+      };
+
+      let totalAll = 0;
+
+      // Procesar gastos
+      const processed = expenses.map(exp => {
+        const categoryId = parseInt(exp.categoryId);
+        const parentId = exp.parentId;
+        const spent = parseFloat(exp.total);
+        const mainId = parentId !== null ? parentId : categoryId;
+
+        totalAll += spent;
+
+        const categoryName = categoryMap[categoryId]?.name || exp.categoryName;
+        const state = categoryMap[categoryId]?.state || exp.state;
+        const color = categoryMap[categoryId]?.color || exp.color;
+
+        return {
+          id: categoryId,
+          name: translateCategory(categoryName, state),
+          color: color,
+          parentId,
+          mainId,
+          spent,
+          state,
+        };
+      });
+
+      // Asegurar que todos los mainId tengan su categoría padre en `processed`
+      const allParentIds = [...new Set(processed.map(p => p.mainId))];
+
+      allParentIds.forEach(mainId => {
+        if (isNaN(mainId) || mainId === null) return;
+
+        const exists = processed.some(p => p.id === mainId);
+        if (!exists && categoryMap[mainId]) {
+          const cat = categoryMap[mainId];
+          processed.push({
+            id: cat.id,
+            name: translateCategory(cat.name, cat.state),
+            color: cat.color || "rgba(var(--v-theme-on-surface), .2)",
+            parentId: cat.parent_id,
+            mainId: cat.id,
+            spent: 0,
+            state: cat.state,
+          });
+        }
+      });
+
+      // Agrupar detalles por categoría principal
+      const details = {};
+      processed.forEach(item => {
+        if (!details[item.mainId]) {
+          details[item.mainId] = [];
+        }
+        details[item.mainId].push(item);
+      });
+
+      // Categorías principales (sin padre)
+      const mainCategories = processed
+        .filter(item => item.parentId === null)
+        .map(item => ({
+          id: item.id,
+          title: item.name,
+          value: item.id,
+          color: item.color || "rgba(var(--v-theme-on-surface), .2)",
+        }));
+
+      // Resumen: porcentaje por categoría principal
+      const summary = mainCategories.map(cat => {
+        const children = details[cat.id] || [];
+        const totalCat = children.reduce((sum, child) => sum + child.spent, 0);
+        const percentage = totalAll > 0 ? ((totalCat / totalAll) * 100).toFixed(1) : 0;
+
+        return {
+          id: cat.id,
+          title: cat.title,
+          value: parseFloat(percentage),
+          color: cat.color,
+          total: totalCat.toFixed(2),
+        };
+      });
+
+      // Formatear detalles (para subcategorías)
+      Object.keys(details).forEach(key => {
+  const mainId = parseInt(key);
+  if (isNaN(mainId)) return;
+
+  const children = details[mainId].filter(item => item.id !== mainId);
+
+  details[mainId] = children.map(item => {
+    const percentage = totalAll > 0 ? ((item.spent / totalAll) * 100).toFixed(1) : 0;
+    return {
+      id: item.id,
+      title: item.name,
+      value: parseFloat(percentage),
+      color: item.color || "rgba(var(--v-theme-on-surface), .2)",
+      amount: item.spent.toFixed(2),
+    };
+  });
+});*/
+      const { budgets, expenses } = await FinanceRepository.getAllExpensesAndBudgetCategories(person_id, null, null, home_id, type);
+
+      // Obtener TODAS las categorías de tipo "Budget" (ya traducidas)
+      const allBudgetCategories = await CategoryService.getCategories(person_id, "Budget");
+
+      // Mapeo por ID, usando los campos correctos: nameCategory, colorCategory
+      const categoryMap = {};
+      allBudgetCategories.forEach(cat => {
+        categoryMap[cat.id] = {
+          id: cat.id,
+          name: cat.nameCategory,           // ← clave correcta
+          color: cat.colorCategory,         // ← clave correcta
+          parent_id: cat.parent_id,
+          icon: cat.iconCategory,
+          spent: 0,
+          budgetAmount: 0,
+        };
+      });
+
+      // Llenar presupuestos
+      budgets.forEach(b => {
+        if (categoryMap[b.category.id]) {
+          categoryMap[b.category.id].budgetAmount = parseFloat(b.amount) || 0;
+        }
+      });
+
+      // Llenar gastos
+      expenses.forEach(exp => {
+        const categoryId = parseInt(exp.categoryId);
+        if (categoryMap[categoryId]) {
+          categoryMap[categoryId].spent = parseFloat(exp.total) || 0;
+        }
+      });
+
+      // Obtener categorías padres (sin padre) → para el select y resumen
+      const parentCategories = Object.values(categoryMap)
+        .filter(cat => cat.parent_id === null)
+        .map(cat => ({
+          id: cat.id,
+          title: cat.name, // ← nombre correcto
+          value: cat.id,
+          icon: cat.icon,
+          color: cat.color || "rgba(var(--v-theme-on-surface), .2)",
+        }));
+
+      // Procesar todas las categorías
+      const processed = Object.values(categoryMap).map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color || "rgba(var(--v-theme-on-surface), .2)",
+        icon: cat.icon,
+        parentId: cat.parent_id,
+        mainId: cat.parent_id !== null ? cat.parent_id : cat.id,
+        spent: cat.spent || 0,
+        budgetAmount: cat.budgetAmount || 0,
+      }));
+
+      // Agrupar por mainId
+      const details = {};
+      processed.forEach(item => {
+        if (!details[item.mainId]) details[item.mainId] = [];
+        details[item.mainId].push(item);
+      });
+
+      // Calcular presupuesto total por categoría principal
+      const budgetByMainId = {};
+      parentCategories.forEach(parent => {
+        const children = details[parent.id] || [];
+        const totalBudget = children.reduce((sum, child) => sum + child.budgetAmount, 0);
+        budgetByMainId[parent.id] = totalBudget;
+      });
+
+      // Total global
+      const totalBudgetAll = Object.values(budgetByMainId).reduce((sum, b) => sum + b, 0);
+
+      // --- Generar summary ---
+      const summary = parentCategories.map(parent => {
+        const children = details[parent.id] || [];
+        const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
+        const totalBudget = budgetByMainId[parent.id] || 0;
+        const percentage = totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0;
+
+        return {
+          id: parent.id,
+          title: parent.title,
+          value: parseFloat(percentage),
+          color: parent.color,
+          icon: parent.icon,
+          total: totalSpent.toFixed(2),
+        };
+      });
+
+      // --- Formatear details ---
+      Object.keys(details).forEach(key => {
+        const mainId = parseInt(key);
+        if (isNaN(mainId)) return;
+
+        const items = details[mainId].filter(item => item.id !== mainId);
+        const totalBudgetMain = budgetByMainId[mainId] || 0;
+
+        details[mainId] = items.map(item => {
+          const percentage = totalBudgetMain > 0 ? ((item.spent / totalBudgetMain) * 100).toFixed(1) : 0;
+          return {
+            id: item.id,
+            title: item.name, // ← nombre correcto
+            value: parseFloat(percentage),
+            color: item.color,
+            icon: item.icon,
+            amount: item.spent.toFixed(2),
+            budget: item.budgetAmount.toFixed(2),
+          };
+        });
+      });
+
       const response = {
-        incomeCard: {
+        /*incomeCard: {
           current: formatCurrency(stats.currentMonth.income),
           percentage: stats.percentages.income,
           lastMonth: formatCurrency(stats.lastMonth.income),
@@ -541,7 +775,7 @@ const FinanceController = {
           current: formatCurrency(stats.currentMonth.balance),
           icon: "mdi-scale-balance",
           color: "blue-darken-2"
-        },
+        },*/
         budgetCard: {
         current: formatCurrency(budgetStats.currentMonth.budget),
         used: formatCurrency(budgetStats.currentMonth.used),
@@ -552,7 +786,7 @@ const FinanceController = {
         icon: "mdi-wallet",
         color: "blue"
       },
-        movementsCard: {
+        /*movementsCard: {
           total: formatCurrency(stats.currentMonth.income - stats.currentMonth.spent),
           lastMovement: {
             amount: stats.lastRecord ? formatCurrency(stats.lastRecord.income || stats.lastRecord.spent) : "0",
@@ -562,10 +796,30 @@ const FinanceController = {
           },
           icon: "mdi-calendar-clock",
           color: "amber-darken-2"
-        },
+        },*/
         suggestions: mappedSuggestions,
         statusuggestions: translatedSuggestionStatusData,
-        financeData: financeData
+        financeData: financeData,
+         /*dataSpent: {
+          totalAmount: parseFloat(totalAll.toFixed(2)),
+          currency: "USD",
+          dateRange: {
+            start: null,
+            end: null,
+          },
+          summary,
+          categories: mainCategories,
+          details,
+        },*/
+         dataSpent: {
+          totalAmount: parseFloat(totalBudgetAll.toFixed(2)), // total global
+          totalBudgetByGroup: budgetByMainId,                 // 👈 nuevo: para que el frontend calcule dinámicamente
+          currency: "USD",
+          dateRange: { start: null, end: null },
+          summary,
+          categories: parentCategories,
+          details,
+        },
       };
       res.status(200).json(response);
     } catch (error) {

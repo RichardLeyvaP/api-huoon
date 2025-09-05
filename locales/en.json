@@ -64,26 +64,6 @@
         "name": "Phone",
         "description": "Mobile/cell phone plan"
       },
-      "Supermercado": {
-        "name": "Groceries",
-        "description": "Basic food shopping"
-      },
-      "Transporte": {
-        "name": "Transportation",
-        "description": "Fuel, tickets or vehicle maintenance"
-      },
-      "Seguros": {
-        "name": "Insurance",
-        "description": "Insurance policies (home, car, health)"
-      },
-      "Salud": {
-        "name": "Healthcare",
-        "description": "Medical and pharmacy expenses"
-      },
-      "Educación": {
-        "name": "Education",
-        "description": "Tuition, books or courses"
-      },
       "Ahorros": {
         "name": "Savings",
         "description": "Monthly savings fund"
@@ -119,7 +99,159 @@
     "Roedores": {
       "name": "Rodents",
       "description": "Domestic rodents category"
-    }
+    },
+    "Necesidades básicas": {
+      "name": "Necesidades básicas",
+      "description": "Gastos esenciales para vivir: vivienda, alimentación, transporte y salud."
+    },
+    "Compromisos financieros": {
+      "name": "Compromisos financieros",
+      "description": "Obligaciones económicas como deudas, impuestos y seguros."
+    },
+    "Crecimiento": {
+      "name": "Crecimiento",
+      "description": "Inversiones en educación, ahorro e inversión para el futuro."
+    },
+    "Estilo de vida": {
+      "name": "Estilo de vida",
+      "description": "Gastos relacionados con ocio, compras, mascotas y viajes."
+    },
+    "Vivienda y servicios": {
+      "name": "Housing and Utilities",
+      "description": "Rent, utilities, and internet"
+    },
+    "Alimentación": {
+      "name": "Food",
+      "description": "Groceries and dining out"
+    },
+    "Transporte": {
+      "name": "Transportation",
+      "description": "Fuel, public transit, and vehicle maintenance"
+    },
+    "Salud": {
+      "name": "Health",
+      "description": "Doctor visits, medications, and health insurance"
+    },
+    "Arriendo / Hipoteca": {
+      "name": "Rent / Mortgage",
+      "description": "Monthly rent or mortgage payment"
+    },
+    "Agua, luz, gas": {
+      "name": "Water, electricity, gas",
+      "description": "Home utility bills"
+    },
+    "Internet, teléfono, TV": {
+      "name": "Internet, phone, TV",
+      "description": "Internet, phone, and cable TV plans"
+    },
+    "Supermercado": {
+      "name": "Grocery Shopping",
+      "description": "Food and household supplies"
+    },
+    "Comida fuera de casa": {
+      "name": "Dining Out",
+      "description": "Restaurants, cafes, takeout, and fast food"
+    },
+    "Combustible": {
+      "name": "Fuel",
+      "description": "Gasoline, diesel, or other fuels"
+    },
+    "Transporte público": {
+      "name": "Public Transportation",
+      "description": "Bus, metro, train, taxi, or ride-sharing"
+    },
+    "Mantenciones / seguros": {
+      "name": "Maintenance / Insurance",
+      "description": "Vehicle repairs, inspections, and insurance"
+    },
+    "Consultas médicas": {
+      "name": "Medical Visits",
+      "description": "Doctor, dentist, or specialist appointments"
+    },
+    "Medicamentos": {
+      "name": "Medications",
+      "description": "Prescription and over-the-counter drugs"
+    },
+    "Seguros de salud": {
+      "name": "Health Insurance",
+      "description": "Private health coverage or copays"
+    },
+    "Educación": {
+  "name": "Education",
+  "description": "Expenses related to studies, courses, and academic development."
+},
+"Colegios / universidades": {
+  "name": "Schools / Universities",
+  "description": "Tuition, fees, and school or university expenses"
+},
+"Cursos / capacitaciones": {
+  "name": "Courses / Training",
+  "description": "Online courses, workshops, certifications, and professional training"
+},
+"Deudas y obligaciones": {
+  "name": "Debts and obligations",
+  "description": "Payments for loans, taxes, and mandatory insurance."
+},
+"Créditos / préstamos": {
+  "name": "Loans / Credit",
+  "description": "Installments for personal loans, mortgages, or vehicle financing"
+},
+"Impuestos": {
+  "name": "Taxes",
+  "description": "Personal, property, or vehicle tax payments"
+},
+"Seguros": {
+  "name": "Insurance",
+  "description": "Life, home, auto, or other types of insurance"
+},
+"Ahorro e inversión": {
+  "name": "Savings and investment",
+  "description": "Emergency funds, family savings, and financial investments."
+},
+"Fondo de emergencia": {
+  "name": "Emergency fund",
+  "description": "Savings set aside for unexpected or urgent situations"
+},
+"Ahorros familiares": {
+  "name": "Family savings",
+  "description": "Savings goals for family or personal projects"
+},
+"Inversiones": {
+  "name": "Investments",
+  "description": "Stocks, funds, cryptocurrencies, or other financial instruments"
+},
+"Ocio y estilo de vida": {
+  "name": "Leisure and lifestyle",
+  "description": "Entertainment, travel, and hobby activities."
+},
+"Entretenimiento": {
+  "name": "Entertainment",
+  "description": "Movies, streaming, concerts, and recreational activities"
+},
+"Viajes": {
+  "name": "Travel",
+  "description": "Vacations, getaways, and accommodation or transportation expenses"
+},
+"Deportes / hobbies": {
+  "name": "Sports / Hobbies",
+  "description": "Memberships, equipment, or classes for physical and recreational activities"
+},
+"Compras personales": {
+  "name": "Personal shopping",
+  "description": "Spending on clothing, technology, and gifts for others."
+},
+"Ropa y accesorios": {
+  "name": "Clothing and accessories",
+  "description": "Purchase of clothes, shoes, jewelry, and accessories"
+},
+"Tecnología": {
+  "name": "Technology",
+  "description": "Phones, computers, and electronic accessories"
+},
+"Regalos": {
+  "name": "Gifts",
+  "description": "Presents for birthdays, anniversaries, or special occasions"
+}
     },
   "priority": {
       "Baja": {
@@ -202,37 +334,37 @@
     "name": "Severe",
     "description": "Medical history with severe health impact"
   }
-},
-"familyRelations": {
-  "Padre": {
-    "name": "Father",
-    "description": "Father relationship"
   },
-  "Madre": {
-    "name": "Mother",
-    "description": "Mother relationship"
+  "familyRelations": {
+    "Padre": {
+      "name": "Father",
+      "description": "Father relationship"
+    },
+    "Madre": {
+      "name": "Mother",
+      "description": "Mother relationship"
+    },
+    "Hijo/a": {
+      "name": "Son/Daughter",
+      "description": "Son or daughter relationship"
+    },
+    "Hermano/a": {
+      "name": "Brother/Sister",
+      "description": "Sibling relationship"
+    },
+    "Abuelo/a": {
+      "name": "Grandfather/Grandmother",
+      "description": "Grandparent relationship"
+    },
+    "Tío/a": {
+      "name": "Uncle/Aunt",
+      "description": "Uncle or aunt relationship"
+    },
+    "Otro": {
+      "name": "Other",
+      "description": "Other type of relationship"
+    }
   },
-  "Hijo/a": {
-    "name": "Son/Daughter",
-    "description": "Son or daughter relationship"
-  },
-  "Hermano/a": {
-    "name": "Brother/Sister",
-    "description": "Sibling relationship"
-  },
-  "Abuelo/a": {
-    "name": "Grandfather/Grandmother",
-    "description": "Grandparent relationship"
-  },
-  "Tío/a": {
-    "name": "Uncle/Aunt",
-    "description": "Uncle or aunt relationship"
-  },
-  "Otro": {
-    "name": "Other",
-    "description": "Other type of relationship"
-  }
-},
   "recurrence": {
     "Diaria": {
       "name": "Daily"

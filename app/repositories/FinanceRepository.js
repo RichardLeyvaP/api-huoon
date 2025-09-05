@@ -510,22 +510,27 @@ const FinanceRepository = {
       } : null
     };
   },
-  async getMonthlyIncomeAndSpentCurrentYear(homeId = null, personId) {
+  async getMonthlyIncomeAndSpentCurrentYear(homeId = null, personId, type) {
   const currentYear = new Date().getFullYear();
 
   // Construir condiciones dinámicas
-  const whereCondition = {
-    person_id: personId,
+ const whereCondition = {
     date: {
       [Op.gte]: `${currentYear}-01-01`,
       [Op.lt]: `${currentYear + 1}-01-01`
     }
   };
 
-  // Solo agregar home_id al filtro si está definido y no es null
-  if (homeId !== undefined && homeId !== null) {
+  // Ajustar condiciones según el tipo
+  if (type === 'Personal') {
+    whereCondition.person_id = personId;
+    whereCondition.type = 'Personal';
+  } else if (type === 'Hogar') {
     whereCondition.home_id = homeId;
+    whereCondition.type = 'Hogar';
+    // → No se agrega person_id, ni se filtra por persona
   }
+
 
   const results = await Finance.findAll({
     attributes: [
@@ -555,7 +560,99 @@ const FinanceRepository = {
     customIncomeData,
     customSpentData
   };
-}
+  },
+// En tu repository
+  async getAllExpensesAndBudgetCategories(personId, startDate = null, endDate = null, home_id, type) {
+    if (!startDate || !endDate) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      startDate = new Date(year, month, 1);
+      endDate = new Date(year, month + 1, 0, 23, 59, 59);
+    }
+
+    try {
+      const budgetWhere = {};
+    const expenseWhere = {
+      date: { [Op.between]: [startDate, endDate] },
+      spent: { [Op.gt]: 0 }
+    };
+
+    // Aplicar filtros según el tipo
+    if (type === 'Personal') {
+      budgetWhere.person_id = personId;
+      expenseWhere.person_id = personId;
+    } else if (type === 'Hogar') {
+      budgetWhere.home_id = home_id;
+      expenseWhere.home_id = home_id;
+    }
+
+     budgetWhere.budget_type = type;
+    expenseWhere.type = type;
+      // Paso 1: Obtener todos los presupuestos y sus categorías (padres e hijas)
+      const budgets = await Budget.findAll({
+        where: budgetWhere,
+        include: [
+          {
+            model: Category,
+            as: "category",
+            required: true,
+            attributes: ["id", "name", "color", "parent_id", "state"],
+          },
+        ],
+        raw: true,
+        nest: true,
+      });
+
+      // Extraer todos los IDs de categorías (incluyendo padres e hijos)
+      const categoryIds = [...new Set(budgets.map(b => b.category.id))];
+
+      // Paso 2: Obtener gastos solo para categorías con presupuesto
+      const expenses = await Finance.findAll({
+   where: expenseWhere,
+    attributes: [
+      [Sequelize.fn("SUM", Sequelize.col("Finance.spent")), "total"],
+      [Sequelize.col("budget.category.id"), "categoryId"],
+      [Sequelize.col("budget.category.name"), "categoryName"],
+      [Sequelize.col("budget.category.color"), "color"],
+      [Sequelize.col("budget.category.parent_id"), "parentId"],
+      [Sequelize.col("budget.category.state"), "state"],
+    ],
+    include: [
+      {
+        model: Budget,
+        as: "budget",
+        required: true,
+        include: [
+          {
+            model: Category,
+            as: "category",
+            required: true,
+            where: {
+              id: { [Op.in]: categoryIds }, // ← Filtro aquí, no en el where principal
+            },
+            attributes: [], // no agregamos campos extras
+          },
+        ],
+        attributes: [],
+      },
+    ],
+    group: [
+      "budget.category.id",
+      "budget.category.name",
+      "budget.category.color",
+      "budget.category.parent_id",
+      "budget.category.state",
+    ],
+    raw: true,
+  });
+
+      return { budgets, expenses, categoryIds };
+    } catch (error) {
+      console.error("Error en getAllExpensesAndBudgetCategories:", error);
+      throw error;
+    }
+  }
 };
 
 module.exports = FinanceRepository;

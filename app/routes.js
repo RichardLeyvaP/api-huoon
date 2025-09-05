@@ -406,7 +406,7 @@ router.post('/finance', multerCategory('image', 'finances'), validateSchema(stor
 router.post('/finance-show', validateSchema(idFinanceSchema), FinanceController.show);
 router.post('/finance-update', multerCategory('image', 'finances'), validateSchema(updateFinanceSchema), FinanceController.update);
 router.post('/finance-destroy', validateSchema(idFinanceSchema), FinanceController.destroy);
-router.post('/finance-statistics-month',  FinanceController.getPersonFinancialStats);
+router.post('/finance-statistics-month', FinanceController.getPersonFinancialStats);
 router.post('/get-finances-data',  FinanceController.getFinacesData);
 
 //Rutas Files

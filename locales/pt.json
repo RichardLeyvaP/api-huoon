@@ -64,26 +64,6 @@
         "name": "Telefonia",
         "description": "Plano de celular/telefone fixo"
       },
-      "Supermercado": {
-        "name": "Supermercado",
-        "description": "Compra de alimentos básicos"
-      },
-      "Transporte": {
-        "name": "Transporte",
-        "description": "Combustível, passagens ou manutenção de veículo"
-      },
-      "Seguros": {
-        "name": "Seguros",
-        "description": "Apólices de seguro (casa, carro, saúde)"
-      },
-      "Salud": {
-        "name": "Saúde",
-        "description": "Gastos médicos e farmácia"
-      },
-      "Educación": {
-        "name": "Educação",
-        "description": "Mensalidades, livros ou cursos"
-      },
       "Ahorros": {
         "name": "Poupança",
         "description": "Fundo de poupança mensal"
@@ -119,7 +99,159 @@
       "Roedores": {
         "name": "Roedores",
         "description": "Categoria de roedores domésticos"
-      }
+      },
+      "Necesidades básicas": {
+      "name": "Necesidades básicas",
+      "description": "Gastos esenciales para vivir: vivienda, alimentación, transporte y salud."
+    },
+    "Compromisos financieros": {
+      "name": "Compromisos financieros",
+      "description": "Obligaciones económicas como deudas, impuestos y seguros."
+    },
+    "Crecimiento": {
+      "name": "Crecimiento",
+      "description": "Inversiones en educación, ahorro e inversión para el futuro."
+    },
+    "Estilo de vida": {
+      "name": "Estilo de vida",
+      "description": "Gastos relacionados con ocio, compras, mascotas y viajes."
+    },
+     "Vivienda y servicios": {
+      "name": "Moradia e Serviços",
+      "description": "Aluguel, serviços básicos e internet"
+    },
+    "Alimentación": {
+      "name": "Alimentação",
+      "description": "Compras de supermercado e refeições fora"
+    },
+    "Transporte": {
+      "name": "Transporte",
+      "description": "Combustível, transporte público e manutenção"
+    },
+    "Salud": {
+      "name": "Saúde",
+      "description": "Consultas médicas, medicamentos e seguros"
+    },
+    "Arriendo / Hipoteca": {
+      "name": "Aluguel / Hipoteca",
+      "description": "Pagamento mensal de aluguel ou hipoteca"
+    },
+    "Agua, luz, gas": {
+      "name": "Água, luz, gás",
+      "description": "Contas de serviços básicos da residência"
+    },
+    "Internet, teléfono, TV": {
+      "name": "Internet, telefone, TV",
+      "description": "Planos de internet, telefone e TV a cabo"
+    },
+    "Supermercado": {
+      "name": "Supermercado",
+      "description": "Compras de alimentos e produtos de casa"
+    },
+    "Comida fuera de casa": {
+      "name": "Refeições fora",
+      "description": "Restaurantes, cafés, delivery e fast food"
+    },
+    "Combustible": {
+      "name": "Combustível",
+      "description": "Gasolina, diesel ou outros combustíveis"
+    },
+    "Transporte público": {
+      "name": "Transporte público",
+      "description": "Ônibus, metrô, trem, táxi ou carona"
+    },
+    "Mantenciones / seguros": {
+      "name": "Manutenção / Seguros",
+      "description": "Reparos, revisões e seguros de veículos"
+    },
+    "Consultas médicas": {
+      "name": "Consultas médicas",
+      "description": "Médico, dentista ou especialistas"
+    },
+    "Medicamentos": {
+      "name": "Medicamentos",
+      "description": "Remédios com e sem receita"
+    },
+    "Seguros de salud": {
+      "name": "Seguros de saúde",
+      "description": "Plano de saúde privado ou copagamentos"
+    },
+    "Educación": {
+  "name": "Educação",
+  "description": "Despesas relacionadas a estudos, cursos e desenvolvimento acadêmico."
+},
+"Colegios / universidades": {
+  "name": "Escolas / Universidades",
+  "description": "Matrículas, mensalidades e despesas escolares ou universitárias"
+},
+"Cursos / capacitaciones": {
+  "name": "Cursos / Treinamentos",
+  "description": "Cursos online, workshops, certificações e capacitação profissional"
+},
+"Deudas y obligaciones": {
+  "name": "Dívidas e obrigações",
+  "description": "Pagamentos de empréstimos, impostos e seguros obrigatórios."
+},
+"Créditos / préstamos": {
+  "name": "Empréstimos / Créditos",
+  "description": "Parcelas de empréstimos pessoais, hipotecas ou financiamentos de veículos"
+},
+"Impuestos": {
+  "name": "Impostos",
+  "description": "Pagamentos de impostos pessoais, prediais ou veiculares"
+},
+"Seguros": {
+  "name": "Seguros",
+  "description": "Seguro de vida, residencial, automotivo ou outros"
+},
+"Ahorro e inversión": {
+  "name": "Economia e investimento",
+  "description": "Reservas para emergências, poupança familiar e investimentos financeiros."
+},
+"Fondo de emergencia": {
+  "name": "Fundo de emergência",
+  "description": "Economia destinada a imprevistos ou situações urgentes"
+},
+"Ahorros familiares": {
+  "name": "Poupança familiar",
+  "description": "Metas de economia para projetos familiares ou pessoais"
+},
+"Inversiones": {
+  "name": "Investimentos",
+  "description": "Ações, fundos, criptomoedas ou outros instrumentos financeiros"
+},
+"Ocio y estilo de vida": {
+  "name": "Lazer e estilo de vida",
+  "description": "Atividades de entretenimento, viagens e hobbies."
+},
+"Entretenimiento": {
+  "name": "Entretenimento",
+  "description": "Cinema, streaming, shows e atividades recreativas"
+},
+"Viajes": {
+  "name": "Viagens",
+  "description": "Férias, escapadas e despesas com hospedagem ou transporte"
+},
+"Deportes / hobbies": {
+  "name": "Esportes / Hobbies",
+  "description": "Mensalidades, equipamentos ou aulas de atividades físicas e recreativas"
+},
+"Compras personales": {
+  "name": "Compras pessoais",
+  "description": "Gastos com roupas, tecnologia e presentes para outras pessoas."
+},
+"Ropa y accesorios": {
+  "name": "Roupas e acessórios",
+  "description": "Compra de roupas, calçados, joias e complementos"
+},
+"Tecnología": {
+  "name": "Tecnologia",
+  "description": "Celulares, computadores e acessórios eletrônicos"
+},
+"Regalos": {
+  "name": "Presentes",
+  "description": "Presentes para aniversários, datas comemorativas ou ocasiões especiais"
+}
     },
   "priority": {
       "Baja": {
