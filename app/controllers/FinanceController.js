@@ -524,124 +524,6 @@ const FinanceController = {
 
       //Grafico de pie
       // Estructura: agrupar por categoría principal y sus subcategorías
-      
-      /*const { expenses, categories } = await FinanceRepository.getAllExpensesByCategory( person_id, null, null);
-      const categoriesMap = new Map();
-
-      const categoryMap = {};
-      categories.forEach(cat => {
-        categoryMap[cat.id] = cat;
-      });
-
-      // Traducción
-      const translateCategory = (name, state) => {
-        if (!name) return "Sin nombre";
-        if (state === 1) {
-          const translated = i18n.__(`category.${name}.name`);
-          return translated !== `category.${name}.name` ? translated : name;
-        }
-        return name;
-      };
-
-      let totalAll = 0;
-
-      // Procesar gastos
-      const processed = expenses.map(exp => {
-        const categoryId = parseInt(exp.categoryId);
-        const parentId = exp.parentId;
-        const spent = parseFloat(exp.total);
-        const mainId = parentId !== null ? parentId : categoryId;
-
-        totalAll += spent;
-
-        const categoryName = categoryMap[categoryId]?.name || exp.categoryName;
-        const state = categoryMap[categoryId]?.state || exp.state;
-        const color = categoryMap[categoryId]?.color || exp.color;
-
-        return {
-          id: categoryId,
-          name: translateCategory(categoryName, state),
-          color: color,
-          parentId,
-          mainId,
-          spent,
-          state,
-        };
-      });
-
-      // Asegurar que todos los mainId tengan su categoría padre en `processed`
-      const allParentIds = [...new Set(processed.map(p => p.mainId))];
-
-      allParentIds.forEach(mainId => {
-        if (isNaN(mainId) || mainId === null) return;
-
-        const exists = processed.some(p => p.id === mainId);
-        if (!exists && categoryMap[mainId]) {
-          const cat = categoryMap[mainId];
-          processed.push({
-            id: cat.id,
-            name: translateCategory(cat.name, cat.state),
-            color: cat.color || "rgba(var(--v-theme-on-surface), .2)",
-            parentId: cat.parent_id,
-            mainId: cat.id,
-            spent: 0,
-            state: cat.state,
-          });
-        }
-      });
-
-      // Agrupar detalles por categoría principal
-      const details = {};
-      processed.forEach(item => {
-        if (!details[item.mainId]) {
-          details[item.mainId] = [];
-        }
-        details[item.mainId].push(item);
-      });
-
-      // Categorías principales (sin padre)
-      const mainCategories = processed
-        .filter(item => item.parentId === null)
-        .map(item => ({
-          id: item.id,
-          title: item.name,
-          value: item.id,
-          color: item.color || "rgba(var(--v-theme-on-surface), .2)",
-        }));
-
-      // Resumen: porcentaje por categoría principal
-      const summary = mainCategories.map(cat => {
-        const children = details[cat.id] || [];
-        const totalCat = children.reduce((sum, child) => sum + child.spent, 0);
-        const percentage = totalAll > 0 ? ((totalCat / totalAll) * 100).toFixed(1) : 0;
-
-        return {
-          id: cat.id,
-          title: cat.title,
-          value: parseFloat(percentage),
-          color: cat.color,
-          total: totalCat.toFixed(2),
-        };
-      });
-
-      // Formatear detalles (para subcategorías)
-      Object.keys(details).forEach(key => {
-  const mainId = parseInt(key);
-  if (isNaN(mainId)) return;
-
-  const children = details[mainId].filter(item => item.id !== mainId);
-
-  details[mainId] = children.map(item => {
-    const percentage = totalAll > 0 ? ((item.spent / totalAll) * 100).toFixed(1) : 0;
-    return {
-      id: item.id,
-      title: item.name,
-      value: parseFloat(percentage),
-      color: item.color || "rgba(var(--v-theme-on-surface), .2)",
-      amount: item.spent.toFixed(2),
-    };
-  });
-});*/
       const { budgets, expenses } = await FinanceRepository.getAllExpensesAndBudgetCategories(person_id, null, null, home_id, type);
 
       // Obtener TODAS las categorías de tipo "Budget" (ya traducidas)
@@ -743,7 +625,8 @@ const FinanceController = {
         const totalBudgetMain = budgetByMainId[mainId] || 0;
 
         details[mainId] = items.map(item => {
-          const percentage = totalBudgetMain > 0 ? ((item.spent / totalBudgetMain) * 100).toFixed(1) : 0;
+          //const percentage = totalBudgetMain > 0 ? ((item.spent / totalBudgetMain) * 100).toFixed(1) : 0;
+          const percentage = item.budgetAmount > 0 ? ((item.spent / item.budgetAmount) * 100).toFixed(1) : 0;
           return {
             id: item.id,
             title: item.name, // ← nombre correcto
@@ -756,6 +639,9 @@ const FinanceController = {
         });
       });
 
+      const alertsBudget = FinanceController.generateSpendingAlerts( parentCategories, details, budgetByMainId, totalBudgetAll, type);
+
+      const expenseTrendAlert = await FinanceController.generateExpenseTrendAlert(person_id, home_id, type);
       const response = {
         /*incomeCard: {
           current: formatCurrency(stats.currentMonth.income),
@@ -820,6 +706,8 @@ const FinanceController = {
           categories: parentCategories,
           details,
         },
+        alertsBudget: alertsBudget,
+        alertsSpent: expenseTrendAlert
       };
       res.status(200).json(response);
     } catch (error) {
@@ -831,6 +719,248 @@ const FinanceController = {
     }
   },
   
+  /**
+ * Genera alertas si se está consumiendo el presupuesto demasiado rápido
+ * @param {Array} parentCategories - Categorías principales (padres)
+ * @param {Object} details - Detalles agrupados por mainId
+ * @param {Object} budgetByMainId - Presupuesto total por categoría principal
+ * @param {number} totalBudgetAll - Presupuesto total global
+ * @param {string} type - Tipo: "Personal" o "Hogar"
+ * @returns {Array|null} - Lista de alertas o null si no hay
+ */
+  generateSpendingAlerts(
+    parentCategories,
+    details,
+    budgetByMainId,
+    totalBudgetAll,
+    type
+  ) {
+    const now = new Date();
+    const totalDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const elapsedDays = now.getDate();
+    const progressPercentage = (elapsedDays / totalDays) * 100;
+
+    const SPENT_THRESHOLD = 70;   // Umbral para alertar
+    const TIME_THRESHOLD = 50;    // No alertar si ya pasó más del 50% del mes
+
+    if (progressPercentage >= TIME_THRESHOLD) {
+      return null;
+    }
+
+    const alerts = [];
+
+    // --- 1. Alerta por categoría principal (padre): la más crítica que supere el umbral ---
+    let highestGroupUsage = SPENT_THRESHOLD;
+    let criticalGroup = null;
+
+    parentCategories.forEach((parent) => {
+      const children = details[parent.id] || [];
+      const totalSpent = children.reduce((sum, child) => sum + parseFloat(child.amount), 0);
+      const totalBudget = budgetByMainId[parent.id] || 0;
+
+      if (totalBudget > 0) {
+        const usagePercentage = (totalSpent / totalBudget) * 100;
+        if (usagePercentage > highestGroupUsage) {
+          highestGroupUsage = usagePercentage;
+          criticalGroup = {
+            parent,
+            usagePercentage,
+          };
+        }
+      }
+    });
+
+    // Si encontramos una categoría principal crítica, agregamos la alerta
+    if (criticalGroup) {
+      alerts.push({
+        type: "HIGH_SPENDING_RATE_GROUP",
+        scope: type,
+        category: {
+          id: criticalGroup.parent.id,
+          name: criticalGroup.parent.title,
+          icon: criticalGroup.parent.icon,
+          color: criticalGroup.parent.color,
+        },
+        message: `Estás gastando más rápido de lo esperado en la categoría "${criticalGroup.parent.title}". Considera revisar tus movimientos.`,
+        severity: criticalGroup.usagePercentage > 90 ? "high" : "warning",
+        usagePercentage: parseFloat(criticalGroup.usagePercentage.toFixed(1)),
+        timeProgress: parseFloat(progressPercentage.toFixed(1)),
+      });
+    }
+
+    // --- 2. Alerta por subcategoría individual: la MÁS crítica (mayor % usado) ---
+    let mostCriticalItem = null;
+    let highestItemUsage = SPENT_THRESHOLD;
+
+    Object.values(details).flat().forEach(item => {
+      const spent = parseFloat(item.amount);
+      const budget = parseFloat(item.budget);
+
+      if (budget > 0) {
+        const usagePercentage = (spent / budget) * 100;
+        if (usagePercentage > highestItemUsage) {
+          highestItemUsage = usagePercentage;
+          mostCriticalItem = item;
+        }
+      }
+    });
+
+    // Si hay una subcategoría crítica, agregamos la alerta
+    if (mostCriticalItem) {
+      alerts.push({
+        type: "HIGH_SPENDING_RATE_ITEM",
+        scope: type,
+        category: {
+          id: mostCriticalItem.id,
+          name: mostCriticalItem.title,
+          icon: mostCriticalItem.icon,
+          color: mostCriticalItem.color,
+        },
+        message: `La categoría "${mostCriticalItem.title}" ya ha usado el ${highestItemUsage.toFixed(1)}% de su presupuesto.`,
+        severity: highestItemUsage > 90 ? "high" : "warning",
+        usagePercentage: parseFloat(highestItemUsage.toFixed(1)),
+        timeProgress: parseFloat(progressPercentage.toFixed(1)),
+      });
+    }
+
+    // --- Retornar null si no hay alertas, o máximo 2 ---
+    return alerts.length > 0 ? alerts : null;
+  },
+
+  /**
+ * Genera una alerta si una categoría tiene un aumento significativo en gastos
+ * comparado con el mismo rango del mes anterior.
+ *
+ * @param {number} person_id
+ * @param {number|null} home_id
+ * @param {string} type - "Personal" o "Hogar"
+ * @returns {Object|null} - Alerta o null si no aplica
+ */
+  async generateExpenseTrendAlert(person_id, home_id, type) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  // --- Rango: desde el 1 hasta hoy del mes actual ---
+  const startDateCurrent = new Date(year, month, 1);
+  const endDateCurrent = new Date(now);
+  endDateCurrent.setHours(23, 59, 59);
+
+  // --- Rango del mes anterior: mismo día del mes pasado ---
+  const previousMonth = month === 0 ? 11 : month - 1;
+  const previousYear = month === 0 ? year - 1 : year;
+  const startDatePrevious = new Date(previousYear, previousMonth, 1);
+  const endDatePrevious = new Date(previousYear, previousMonth, now.getDate());
+  endDatePrevious.setHours(23, 59, 59);
+
+  // Ajustar si el día actual no existe en el mes anterior
+  const lastDayPrevMonth = new Date(previousYear, previousMonth + 1, 0).getDate();
+  if (now.getDate() > lastDayPrevMonth) {
+    endDatePrevious.setDate(lastDayPrevMonth);
+  }
+
+  try {
+    // Obtener gastos del rango actual
+    const { expenses: expensesCurrent } = await FinanceRepository.getAllExpensesAndBudgetCategories(
+      person_id,
+      startDateCurrent,
+      endDateCurrent,
+      home_id,
+      type
+    );
+
+    // Obtener gastos del mismo rango del mes anterior
+    const { expenses: expensesPrevious } = await FinanceRepository.getAllExpensesAndBudgetCategories(
+      person_id,
+      startDatePrevious,
+      endDatePrevious,
+      home_id,
+      type
+    );
+
+    // --- Validación: si no hay gastos en el mes actual → no hay nada que alertar
+    if (!expensesCurrent || expensesCurrent.length === 0) {
+      return null;
+    }
+
+    // --- Validación: si no hay gastos en el mes anterior → no hay base
+    if (!expensesPrevious || expensesPrevious.length === 0) {
+      return null;
+    }
+
+    // --- Validación CLAVE: debe haber al menos una categoría en común ---
+    const currentCategories = new Set(expensesCurrent.map(e => e.categoryName));
+    const previousCategories = new Set(expensesPrevious.map(e => e.categoryName));
+
+    const hasCommonCategory = [...currentCategories].some(cat => previousCategories.has(cat));
+
+    if (!hasCommonCategory) {
+      return null; // No hay categorías comparables → no alertar
+    }
+
+    // Mapear por nombre de categoría
+    const currentMap = {};
+    expensesCurrent.forEach(exp => {
+      const name = exp.categoryName;
+      currentMap[name] = (currentMap[name] || 0) + (parseFloat(exp.total) || 0);
+    });
+
+    const previousMap = {};
+    expensesPrevious.forEach(exp => {
+      const name = exp.categoryName;
+      previousMap[name] = (previousMap[name] || 0) + (parseFloat(exp.total) || 0);
+    });
+
+    // Encontrar la categoría con mayor aumento porcentual (solo si hay comparación)
+    let maxGrowthRate = 0;
+    let topCategory = null;
+    const MIN_PERCENTAGE_CHANGE = 10;
+    const MIN_ABSOLUTE_CHANGE = 5;
+
+    Object.keys(currentMap).forEach(name => {
+      const current = currentMap[name];
+      const previous = previousMap[name] || 0;
+
+      // Solo considerar si hubo gasto previo o es un salto significativo
+      if (current <= previous * 1.05 && (current - previous) < MIN_ABSOLUTE_CHANGE) return;
+
+      let growthRate = 0;
+      if (previous > 0) {
+        growthRate = ((current - previous) / previous) * 100;
+      } else if (current >= MIN_ABSOLUTE_CHANGE) {
+        growthRate = 100;
+      }
+
+      if (growthRate >= MIN_PERCENTAGE_CHANGE && growthRate > maxGrowthRate) {
+        maxGrowthRate = growthRate;
+        topCategory = { name, current, previous, growthRate };
+      }
+    });
+
+    // Si no encontramos una categoría con crecimiento significativo
+    if (!topCategory) {
+      return null;
+    }
+
+    // Formatear alerta
+    return {
+      type: "EXPENSE_INCREASE_ALERT",
+      scope: type,
+      category: {
+        name: topCategory.name,
+      },
+      message: `Este mes gastaste ${topCategory.growthRate.toFixed(1)}% más en "${topCategory.name}" que el mes anterior.`,
+      severity: topCategory.growthRate > 50 ? "high" : "warning",
+      growthRate: parseFloat(topCategory.growthRate.toFixed(1)),
+      current: parseFloat(topCategory.current.toFixed(2)),
+      previous: parseFloat(topCategory.previous.toFixed(2)),
+    };
+
+  } catch (error) {
+    console.error("Error en generateExpenseTrendAlert:", error);
+    return null;
+  }
+},
   async getFinacesData(req, res) {
     logger.info(`${req.user.name} - Datos para agregar finanzas`);
     const { home_id } = req.body;
