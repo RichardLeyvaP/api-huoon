@@ -276,7 +276,8 @@ const BudgetRepository = {
       "status",
       "description",
       "currency",
-      "type_id"
+      "type_id",
+      "budget_type"
     ];
 
     try {

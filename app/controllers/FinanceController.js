@@ -975,6 +975,7 @@ const FinanceController = {
 
     try {
     const budgets = await BudgetRepository.findAllByPersonId(person_id, home_id);
+    const dataBalance = await FinanceRepository.getAvailableMoneyCurrentMonth(home_id, person_id);
     const mappedBudgets = budgets.map((budget) => {
             const translatedCategory = i18n.__(`categories.${budget.category?.name}.name`) !== `categories.${budget.category?.name}.name`
               ? i18n.__(`categories.${budget.category?.name}.name`)
@@ -1022,7 +1023,13 @@ const FinanceController = {
         originalName: item.name
       }));
 
-      res.status(200).json({'types': translatedFinanceTypeData, 'budgets': mappedBudgets});
+      res
+        .status(200)
+        .json({
+          types: translatedFinanceTypeData,
+          budgets: mappedBudgets,
+          balance: dataBalance,
+        });
     } catch (error) {
       logger.error("FinanceController->getFinacesData: " + error.message);
       res.status(500).json({ 

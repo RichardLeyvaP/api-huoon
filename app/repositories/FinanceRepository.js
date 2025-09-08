@@ -652,7 +652,82 @@ const FinanceRepository = {
       console.error("Error en getAllExpensesAndBudgetCategories:", error);
       throw error;
     }
+  },
+  async getAvailableMoneyCurrentMonth(homeId = null, personId) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-12
+
+  const startOfMonth = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
+  const endOfMonth = currentMonth === 12
+    ? `${currentYear + 1}-01-01`
+    : `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
+
+  // Construimos condiciones OR: registros del mes actual que sean:
+  // - Personales del usuario (personId) O
+  // - Del hogar (homeId, si no es null)
+  const whereCondition = {
+    date: {
+      [Op.gte]: startOfMonth,
+      [Op.lt]: endOfMonth
+    },
+    [Op.or]: [
+      {
+        type: 'Personal',
+        person_id: personId
+      }
+    ]
+  };
+
+  // Si homeId es válido, agregamos la condición para Hogar
+  if (homeId !== null) {
+    whereCondition[Op.or].push({
+      type: 'Hogar',
+      home_id: homeId
+    });
   }
+
+  // Obtenemos todos los registros relevantes en una sola consulta
+  const records = await Finance.findAll({
+    attributes: ['type', 'income', 'spent'],
+    where: whereCondition,
+    raw: true
+  });
+
+  // Inicializamos acumuladores
+  let personalIncome = 0, personalSpent = 0;
+  let homeIncome = 0, homeSpent = 0;
+
+  // Procesamos cada registro en memoria
+  records.forEach(record => {
+    const income = parseFloat(record.income) || 0;
+    const spent = parseFloat(record.spent) || 0;
+
+    if (record.type === 'Personal') {
+      personalIncome += income;
+      personalSpent += spent;
+    } else if (record.type === 'Hogar') {
+      homeIncome += income;
+      homeSpent += spent;
+    }
+  });
+
+  const personalAvailable = personalIncome - personalSpent;
+  const homeAvailable = homeIncome - homeSpent;
+
+  return {
+    personal: {
+      income: personalIncome,
+      spent: personalSpent,
+      available: personalAvailable
+    },
+    home: homeId !== null ? {
+      income: homeIncome,
+      spent: homeSpent,
+      available: homeAvailable
+    } : null
+  };
+}
 };
 
 module.exports = FinanceRepository;
