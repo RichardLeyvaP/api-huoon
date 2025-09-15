@@ -19,6 +19,7 @@ const FinanceRepository = {
         "type",
         "method",
         "image",
+        "available",
       ],
     });
   },
@@ -104,6 +105,7 @@ const FinanceRepository = {
         "type",
         "method",
         "image",
+        "available"
       ],
       order: [
         ['date', 'DESC'] // Ordenar por fecha descendente
@@ -179,6 +181,7 @@ const FinanceRepository = {
             "type",
             "method",
             "image",
+            "available",
             "budget_id" // Añadir este campo
         ],
         include: [
@@ -225,6 +228,7 @@ const FinanceRepository = {
           person_id: body.person_id,
           spent: body.spent,
           income: body.income,
+          available: body.available,
           date: body.date,
           description: body.description,
           type: body.type,
@@ -307,7 +311,8 @@ const FinanceRepository = {
       "description",
       "type",
       "method",
-      "category_id"
+      "category_id",
+      "available"
     ];
 
     const updatedData = Object.keys(body)
@@ -463,7 +468,8 @@ const FinanceRepository = {
         "description",
         "type",
         "method",
-        "image"
+        "image",
+        "available"
       ]
     });
 
@@ -502,6 +508,7 @@ const FinanceRepository = {
         person_id: lastRecord.person_id,
         spent: lastRecord.spent,
         income: lastRecord.income,
+        available: lastRecord.available,
         date: lastRecord.date,
         description: lastRecord.description,
         type: lastRecord.type,
@@ -654,80 +661,80 @@ const FinanceRepository = {
     }
   },
   async getAvailableMoneyCurrentMonth(homeId = null, personId) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 1-12
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // 1-12
 
-  const startOfMonth = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
-  const endOfMonth = currentMonth === 12
-    ? `${currentYear + 1}-01-01`
-    : `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
+    const startOfMonth = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
+    const endOfMonth = currentMonth === 12
+      ? `${currentYear + 1}-01-01`
+      : `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
 
-  // Construimos condiciones OR: registros del mes actual que sean:
-  // - Personales del usuario (personId) O
-  // - Del hogar (homeId, si no es null)
-  const whereCondition = {
-    date: {
-      [Op.gte]: startOfMonth,
-      [Op.lt]: endOfMonth
-    },
-    [Op.or]: [
-      {
-        type: 'Personal',
-        person_id: personId
-      }
-    ]
-  };
+    // Construimos condiciones OR: registros del mes actual que sean:
+    // - Personales del usuario (personId) O
+    // - Del hogar (homeId, si no es null)
+    const whereCondition = {
+      date: {
+        [Op.gte]: startOfMonth,
+        [Op.lt]: endOfMonth
+      },
+      [Op.or]: [
+        {
+          type: 'Personal',
+          person_id: personId
+        }
+      ]
+    };
 
-  // Si homeId es válido, agregamos la condición para Hogar
-  if (homeId !== null) {
-    whereCondition[Op.or].push({
-      type: 'Hogar',
-      home_id: homeId
-    });
-  }
-
-  // Obtenemos todos los registros relevantes en una sola consulta
-  const records = await Finance.findAll({
-    attributes: ['type', 'income', 'spent'],
-    where: whereCondition,
-    raw: true
-  });
-
-  // Inicializamos acumuladores
-  let personalIncome = 0, personalSpent = 0;
-  let homeIncome = 0, homeSpent = 0;
-
-  // Procesamos cada registro en memoria
-  records.forEach(record => {
-    const income = parseFloat(record.income) || 0;
-    const spent = parseFloat(record.spent) || 0;
-
-    if (record.type === 'Personal') {
-      personalIncome += income;
-      personalSpent += spent;
-    } else if (record.type === 'Hogar') {
-      homeIncome += income;
-      homeSpent += spent;
+    // Si homeId es válido, agregamos la condición para Hogar
+    if (homeId !== null) {
+      whereCondition[Op.or].push({
+        type: 'Hogar',
+        home_id: homeId
+      });
     }
-  });
 
-  const personalAvailable = personalIncome - personalSpent;
-  const homeAvailable = homeIncome - homeSpent;
+    // Obtenemos todos los registros relevantes en una sola consulta
+    const records = await Finance.findAll({
+      attributes: ['type', 'income', 'spent'],
+      where: whereCondition,
+      raw: true
+    });
 
-  return {
-    personal: {
-      income: personalIncome,
-      spent: personalSpent,
-      available: personalAvailable
-    },
-    home: homeId !== null ? {
-      income: homeIncome,
-      spent: homeSpent,
-      available: homeAvailable
-    } : null
-  };
-}
+    // Inicializamos acumuladores
+    let personalIncome = 0, personalSpent = 0;
+    let homeIncome = 0, homeSpent = 0;
+
+    // Procesamos cada registro en memoria
+    records.forEach(record => {
+      const income = parseFloat(record.income) || 0;
+      const spent = parseFloat(record.spent) || 0;
+
+      if (record.type === 'Personal') {
+        personalIncome += income;
+        personalSpent += spent;
+      } else if (record.type === 'Hogar') {
+        homeIncome += income;
+        homeSpent += spent;
+      }
+    });
+
+    const personalAvailable = personalIncome - personalSpent;
+    const homeAvailable = homeIncome - homeSpent;
+
+    return {
+      personal: {
+        income: personalIncome,
+        spent: personalSpent,
+        available: personalAvailable
+      },
+      home: homeId !== null ? {
+        income: homeIncome,
+        spent: homeSpent,
+        available: homeAvailable
+      } : null
+    };
+  }
 };
 
 module.exports = FinanceRepository;

@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { MedicalConsultation, Person, Type } = require("../models"); // Importar los modelos necesarios
+const { MedicalConsultation, Person, Type, Home } = require("../models"); // Importar los modelos necesarios
 const logger = require("../../config/logger"); // Importa el logger
 const ImageService = require("../services/ImageService");
 
@@ -28,6 +28,7 @@ const MedicalConsultationRepository = {
         { model: Person, as: "person" }, // Relación con Person
         { model: Type, as: "type" },
       ],
+       order: [['date', 'DESC']],
     });
   },
 
@@ -250,6 +251,64 @@ const MedicalConsultationRepository = {
       throw err;
     }
   },
+
+  async findFamilyMembersWithConsultationsByHomeId(homeId, startDate, endDate) 
+    {
+    try {
+      // Calcular semana actual si no se pasan fechas
+      if (!startDate || !endDate) {
+        const now = new Date();
+        const dayOfWeek = now.getDay(); // 0 (Domingo) a 6 (Sábado)
+        const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() + diffToMonday);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        endDate.setHours(23, 59, 59, 999);
+      }
+
+      // Validar fechas
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Invalid date range provided');
+      }
+
+      // Consultar personas del hogar con consultas en el rango
+      const familyMembers = await Person.findAll({
+        include: [
+          {
+            model: MedicalConsultation,
+            as: 'medicalconsultations',
+            where: {
+              date: {
+                [Op.between]: [startDate, endDate]
+              },
+            },
+            include: [
+              { model: Type, as: "type" },
+            ],
+            required: false, // Solo personas que TENGAN consultas en el rango
+          },
+          {
+            model: Home,
+            as: 'homePersons',
+            where: { id: homeId },
+            required: true, // Solo personas que PERTENEZCAN al hogar
+          },
+        ],
+        distinct: true, // Evitar duplicados si hay múltiples consultas
+      });
+
+      return familyMembers;
+
+    } catch (error) {
+      logger.error('MedicalConsultationRepository->findFamilyMembersWithConsultationsByHomeId:', error.message);
+      throw new Error(`Error fetching family members with consultations: ${error.message}`);
+    }
+  }
+  
 };
 
 module.exports = MedicalConsultationRepository;

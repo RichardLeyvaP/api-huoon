@@ -28,7 +28,8 @@ const PersonalBackgroundController = {
         severity: background.severity,
         personId: background.person_id,
         person_id: background.person_id,
-        typeName: background.type?.name
+        typeName: background.type?.name,
+        typeDetail: background.typeDetail
       }));
 
       return res.status(200).json({ backgrounds: mappedBackgrounds });
@@ -48,7 +49,7 @@ const PersonalBackgroundController = {
   async show(req, res) {
     logger.info(`${req.user.name} - Busca un antecedente personal`);
     try {
-      const { id } = req.params;
+      const { id } = req.body;
 
       const background = await PersonalBackgroundRepository.findById(id);
 
@@ -69,7 +70,8 @@ const PersonalBackgroundController = {
         severity: background.severity,
         personId: background.person_id,
         person_id: background.person_id,
-        typeName: background.type?.name
+        typeName: background.type?.name,
+        typeDetail: background.typeDetail
       };
 
       return res.status(200).json({ background: mappedBackground });
@@ -89,9 +91,10 @@ const PersonalBackgroundController = {
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Busca antecedentes personales de una persona`);
     try {
+      const { type } = req.body
       const personId = req.person.id;
 
-      const backgrounds = await PersonalBackgroundRepository.findAllByPersonId(personId);
+      const backgrounds = await PersonalBackgroundRepository.findByPersonIdType(personId, type);
 
       if (!backgrounds.length) {
         return res.status(204).json({ msg: "PersonalBackgroundNotFound", backgrounds: [] });
@@ -115,7 +118,8 @@ const PersonalBackgroundController = {
           severity: background.severity,
           personId: background.person_id,
           person_id: background.person_id,
-          typeName: translatedName
+          typeName: translatedName,
+          typeDetail: background.typeDetail
         };
       });
 
@@ -152,7 +156,8 @@ const PersonalBackgroundController = {
         startDate: background.startDate,
         endDate: background.endDate,
         status: background.status,
-        personId: background.person_id
+        personId: background.person_id,
+        typeDetail: background.typeDetail
       }));
 
       return res.status(200).json({ backgrounds: mappedBackgrounds });
@@ -183,7 +188,8 @@ const PersonalBackgroundController = {
         description: background.description,
         startDate: background.startDate,
         status: background.status,
-        personId: background.person_id
+        personId: background.person_id,
+        typeDetail: background.typeDetail
       }));
 
       return res.status(200).json({ backgrounds: mappedBackgrounds });
@@ -199,7 +205,8 @@ const PersonalBackgroundController = {
    */
   async store(req, res) {
     logger.info(`${req.user.name} - Crea un nuevo antecedente personal`);
-    logger.info("Datos recibidos:", JSON.stringify(req.body));
+    logger.info(`Datos recibidos al crear un ${req.body.typeDetail} personal`);
+    logger.info(JSON.stringify(req.body));
 
     try {
       req.body.person_id = req.person.id; // Asignar el ID de la persona
@@ -226,7 +233,8 @@ const PersonalBackgroundController = {
    */
   async update(req, res) {
     logger.info(`${req.user.name} - Actualiza antecedente con ID ${req.body.id}`);
-    logger.info("Datos recibidos:", JSON.stringify(req.body));
+     logger.info(`Datos recibidos al editar un ${req.body.typeDetail} personal`);
+    logger.info(JSON.stringify(req.body));
 
     const { id, type_id } = req.body;
 
@@ -285,8 +293,8 @@ const PersonalBackgroundController = {
     logger.info(`${req.user.name} - Buscando tipos de tipo ${req.body.type}`);
 
     try {
-      const { type } = req.body; // Supongamos que el tipo viene en el cuerpo de la solicitud
-      const types = await TypeRepository.findByType(type);
+      const { type, query } = req.body; // Supongamos que el tipo viene en el cuerpo de la solicitud
+      const types = await TypeRepository.findByTypeAndNameFilter(type, query);
 
       if (!types || types.length === 0) {
         return res

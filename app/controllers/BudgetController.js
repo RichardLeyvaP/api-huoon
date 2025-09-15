@@ -135,6 +135,10 @@ const BudgetController = {
           ? i18n.__(`categories.${budget.category?.name}.name`)
           : budget.category?.name;
 
+          const type = i18n.__(`financeType.${budget.budget_type}.name`) !== `financeType.${budget.budget_type}.name`
+              ? i18n.__(`financeType.${budget.budget_type}.name`)
+              : budget.budget_type;
+
         return {
           id: budget.id,
           person_id: budget.person_id,
@@ -147,6 +151,7 @@ const BudgetController = {
           start_date: budget.start_date,
           end_date: budget.end_date,
           budget_type: budget.budget_type,
+          budgetTypeTranslate: type,
           status: budget.status,
           description: budget.description,
           currency: budget.currency,

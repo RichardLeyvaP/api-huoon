@@ -64,11 +64,11 @@ const PhysicalExamController = {
   // Obtener exámenes físicos por person_id
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Buscando exámenes físicos de una persona`);
-
+    const { query } = req.body
     const person_id = req.person.id;
 
     try {
-      const physicalExams = await PhysicalExamRepository.findAllByPersonId(person_id);
+      const physicalExams = await PhysicalExamRepository.findByPersonId(person_id, query);
 
       if (!physicalExams.length) {
         return res.status(204).json({ msg: "PhysicalExamsNotFound" });

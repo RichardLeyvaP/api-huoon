@@ -72,6 +72,73 @@ const PhysicalExamRepository  = {
     });
   },
 
+  async findByPersonId(person_id, filterAttribute = null) {
+  // Definir atributos base que siempre se devuelven
+  const baseAttributes = ["id", "exam_date"];
+
+  // Si se pasa un filtro, agregar ese atributo y filtrar por NOT NULL
+  let whereClause = { person_id };
+
+  if (filterAttribute) {
+    // Asegurarse de que el atributo existe en el modelo (opcional, para seguridad)
+    const validAttributes = [
+      "blood_pressure",
+      "pulse",
+      "respiratory_rate",
+      "temperature",
+      "weight",
+      "height",
+      "bmi",
+      "neurological_observations",
+      "cardiovascular_observations",
+      "respiratory_observations",
+      "digestive_observations",
+      "urinary_observations",
+      "other_findings"
+    ];
+
+    if (!validAttributes.includes(filterAttribute)) {
+      throw new Error(`Invalid filter attribute: ${filterAttribute}`);
+    }
+
+    // Agregar el atributo al SELECT
+    baseAttributes.push(filterAttribute);
+
+    // Agregar condición: atributo IS NOT NULL
+    whereClause[filterAttribute] = { [Op.not]: null };
+  } else {
+    // Si no hay filtro, devolver todos los atributos como antes
+    baseAttributes.push(
+      "medical_consultation_id",
+      "blood_pressure",
+      "pulse",
+      "respiratory_rate",
+      "temperature",
+      "weight",
+      "height",
+      "bmi",
+      "neurological_observations",
+      "cardiovascular_observations",
+      "respiratory_observations",
+      "digestive_observations",
+      "urinary_observations",
+      "other_findings"
+    );
+  }
+
+  return await PhysicalExam.findAll({
+    where: whereClause,
+    attributes: baseAttributes,
+    include: [
+      {
+        model: MedicalConsultation,
+        as: "medicalConsultation"
+      }
+    ],
+    order: [["exam_date", "DESC"]]
+  });
+},
+
   async findById(id) {
     return await PhysicalExam.findByPk(id, {
       attributes: [
@@ -204,6 +271,24 @@ const PhysicalExamRepository  = {
   } catch (error) {
     logger.error('Error fetching physical exam:', error);
     throw error; // O maneja el error como prefieras
+  }
+},
+async getLastByPersonQuery(person_id, field = null) {
+  try {
+    const whereClause = { person_id };
+
+    // Si se pasa un campo, agregar condición: campo IS NOT NULL
+    if (field) {
+      whereClause[field] = { [Op.not]: null };
+    }
+
+    return await PhysicalExam.findOne({
+      where: whereClause,
+      order: [["exam_date", "DESC"]],
+    });
+  } catch (error) {
+    logger.error("Error fetching physical exam:", error);
+    throw error;
   }
 }
 };

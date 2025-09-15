@@ -34,6 +34,7 @@ const FinanceController = {
           person_id: finance.person_id,
           spent: finance.spent,
           income: finance.income,
+          available: finance.available,
           date: finance.date,
           description: finance.description,
           type:i18n.__(`finances.${finance.type}.name`) !==
@@ -97,6 +98,7 @@ const FinanceController = {
           person_id: finance.person_id,
           spent: finance.spent,
           income: finance.income,
+          available: finance.available,
           date: finance.date,
           description: finance.description,
           type:i18n.__(`finances.${finance.type}.name`) !==
@@ -178,6 +180,7 @@ const FinanceController = {
                 budget_id: finance.budget_id,
                 spent: finance.spent,
                 income: finance.income,
+                available: finance.available,
                 date: finance.date,
                 description: finance.description,
                 type: finance.type,
@@ -227,7 +230,8 @@ const FinanceController = {
       type,
       method,
       image,
-      budget_id
+      budget_id,
+      available
     } = req.body;
 
     // Verificar si la persona existe
@@ -296,6 +300,7 @@ const FinanceController = {
         person_id: finance.person_id,
         spent: finance.spent,
         income: finance.income,
+        available: finance.available,
         date: finance.date,
         description: finance.description,
         type:i18n.__(`finances.${finance.type}.name`) !==
@@ -338,6 +343,7 @@ const FinanceController = {
       type,
       method,
       image,
+      available,
       budget_id
     } = req.body;
 

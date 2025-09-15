@@ -277,7 +277,7 @@ const PersonController = {
         logger.info(`${req.user.name} - Accediendo al perfil de una persona`);
         
         try {
-            const { home_id } = req.body;
+            const { home_id, startDate, endDate } = req.body;
             const person_id = req.person.id;
             // Buscar persona por ID obtenido de req.person
             logger.info('comenzar a optener los datos');
@@ -310,7 +310,7 @@ const PersonController = {
                         await this.getCurrentLocalDate(),
             };
             //Examen Fisico
-            const physicalExam = await PhysicalExamRepository.getLastByPersonId(person_id);
+            /*const physicalExam = await PhysicalExamRepository.getLastByPersonId(person_id);
             const mappedPhysicalExam = physicalExam ? {
                 id: physicalExam.id,
                 personId: physicalExam.person_id,
@@ -339,9 +339,9 @@ const PersonController = {
                 urinary_observations: physicalExam.urinary_observations,
                 otherFindings: physicalExam.other_findings,
                 other_findings: physicalExam.other_findings,
-            }: null;
+            }: null;*/
             //Último examen medico
-             const examMedicals = await MedicalExamRepository.findAllByPersonId(person_id);
+             /*const examMedicals = await MedicalExamRepository.findAllByPersonId(person_id);
              const mappedExam = examMedicals ? examMedicals.map((exam) => {
                      const translatedName =
                        i18n.__(`types.${exam.type.name}.name`) !==
@@ -382,7 +382,7 @@ const PersonController = {
                 endDate: treatment.endDate,
             }: null;*/
 
-            const treatments = await TreatmentRepository.getActiveTreatments(person_id);
+            /*const treatments = await TreatmentRepository.getActiveTreatments(person_id);
             const mappedTreatments = treatments.map(treatment => ({
             id: treatment.id,
             personId: treatment.person_id,
@@ -411,7 +411,7 @@ const PersonController = {
             ? null 
             : mappedTreatments.length === 1 
                 ? mappedTreatments[0] 
-                : mappedTreatments;
+                : mappedTreatments;*/
 
 
 
@@ -465,9 +465,9 @@ const PersonController = {
                   }): null;
 
             //Diagnósticos
-            const diagnosis = await DiagnosisRepository.getLastByPersonId(person_id);
+            /*const diagnosis = await DiagnosisRepository.getLastByPersonId(person_id);
             const mappedDiagnosis = diagnosis ? {
-    // IDs y relaciones
+            // IDs y relaciones
                     id: diagnosis.id,
                     type_id: diagnosis.type_id,
                     typeId: diagnosis.type_id,
@@ -516,7 +516,7 @@ const PersonController = {
                         : null,
                           type: consultation.type?.name,
                         }
-                      : null;
+                      : null;*/
                       //Sugerencias de salud
                       const allSuggestions = await SuggestionRepository.findTodaySuggestions('Salud', person_id, home_id);
 
@@ -551,20 +551,465 @@ const PersonController = {
                         taskData: suggestion.taskData,
                     }));
             // Devolver los datos mapeados
-            res
-              .status(200)
-              .json({
-                person: mappedPerson,
-                physicalExam: mappedPhysicalExam,
-                medicalExam: mappedExam,
-                treatment: treatmentData,
-                backgroundPerson: mappedBackgroundsPerson,
-                backgroundFamily: mappedBackgroundsFamily,
-                diagnosis: mappedDiagnosis,
-                consultation: mappedMedicalConsultation,
-                suggestions: mappedSuggestions,
-                statusuggestions: translatedSuggestionStatusData
-              });
+
+            //Personas con consultas médicas en la semana actual
+             const householdMembers = await MedicalConsultationRepository.findFamilyMembersWithConsultationsByHomeId(
+                home_id,
+                startDate,
+                endDate
+                );
+
+            // Mapear TODOS los miembros (con o sin consultas)
+                const mappedHousehold = householdMembers.map(person => {
+                // Mapear solo si tiene consultas, sino dejar array vacío
+                const consultations = person.medicalconsultations?.map(consultation => {
+                    const translatedTypeName =
+                    i18n.__(`types.${consultation.type?.name}.name`) !==
+                    `types.${consultation.type?.name}.name`
+                        ? i18n.__(`types.${consultation.type?.name}.name`)
+                        : consultation.type?.name;
+
+                    return {
+                    id: consultation.id,
+                    date: consultation.date,
+                    reason: consultation.reason,
+                    diagnosis: consultation.diagnosis,
+                    treatments: Array.isArray(consultation.treatments)
+                        ? consultation.treatments
+                        : JSON.parse(consultation.treatments || "[]"),
+                    medicalNotes: consultation.medicalNotes,
+                    files: Array.isArray(consultation.files)
+                        ? consultation.files
+                        : JSON.parse(consultation.files || "[]"),
+                    professional: consultation.professional,
+                    typeId: consultation.type_id,
+                    typeName: translatedTypeName,
+                    type: consultation.type?.name,
+                    };
+                }) || [];
+
+                return {
+                    id: person.id,
+                    name: person.name,
+                    // Puedes agregar más campos del modelo Person aquí
+                    // email: person.email,
+                    // phone: person.phone,
+                    // birthDate: person.birthDate,
+                    consultations,
+                    hasConsultations: consultations.length > 0, // ← útil para el frontend
+                    totalConsultations: consultations.length,
+                };
+                });
+
+                // personas con plan de vacunación
+                const householdMembersVacuntions = await PersonalBackgroundRepository.findHouseholdVaccinationStatus(home_id);
+
+                // Mapear todos los miembros
+                const mappedHouseholdVacunations = householdMembersVacuntions.map(person => {
+                // Filtrar solo antecedentes de tipo "Vacunación"
+                const vaccinations = person.backgroundPerson?.filter(bg =>
+                    bg.type?.name?.toLowerCase().includes('vacunaci') // fallback JS si iLike falla
+                ) || [];
+
+                // Determinar si tiene vacunas PENDIENTES (status = 'activo')
+                const hasPendingVaccines = vaccinations.some(v => v.status === 'Activo');
+                // Determinar si tiene vacunas COMPLETAS (status = 'resuelto')
+                const hasCompletedVaccines = vaccinations.some(v => v.status === 'Resuelto');
+
+                return {
+                    id: person.id,
+                    name: person.name,
+                    vaccinations, // todas las vacunas de tipo "Vacunación"
+                    hasPendingVaccines,   // boolean
+                    hasCompletedVaccines, // boolean
+                    totalVaccinations: vaccinations.length,
+                };
+                });
+
+            res.status(200).json({
+              person: mappedPerson,
+              //physicalExam: mappedPhysicalExam,
+              //medicalExam: mappedExam,
+              //treatment: treatmentData,
+              backgroundPerson: mappedBackgroundsPerson,
+              backgroundFamily: mappedBackgroundsFamily,
+              //diagnosis: mappedDiagnosis,
+              //consultation: mappedMedicalConsultation,
+              suggestions: mappedSuggestions,
+              statusuggestions: translatedSuggestionStatusData,
+              membersConsultation: mappedHousehold,
+              householdVaccination: mappedHouseholdVacunations,
+            });
+
+        } catch (error) {
+            const errorMsg = error.details
+                ? error.details.map(detail => detail.message).join(', ')
+                : error.message || 'Error desconocido';
+            logger.error('PeopleController->getPersonProfile: ' + errorMsg);
+            return res.status(500).json({ error: 'ServerError', details: errorMsg });
+        }
+    },
+
+    async getPersonProfileVitalSigns(req, res) {
+        logger.info(`${req.user.name} - Accediendo al perfil de una persona para los signos vitales`);
+        
+        try {
+            const { home_id, startDate, endDate } = req.body;
+            const person_id = req.person.id;
+           //Examen Fisico
+            //const physicalExam = await PhysicalExamRepository.getLastByPersonId(person_id);
+            const booldPressure = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'blood_pressure');
+            const mappedBloodPresure = booldPressure ? {
+                id: booldPressure.id,
+                personId: booldPressure.person_id,
+                person_id: booldPressure.person_id,
+                bloodPressure: booldPressure.blood_pressure,
+                examDate: booldPressure.exam_date,
+                exam_date: booldPressure.exam_date,
+            }: null;
+
+            const heartRate = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'pulse');
+            const mappedheartRate = heartRate ? {
+                id: heartRate.id,
+                personId: heartRate.person_id,
+                person_id: heartRate.person_id,
+                pulse: heartRate.pulse,
+                examDate: heartRate.exam_date,
+                exam_date: heartRate.exam_date,
+            }: null;
+
+            const temperature = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'temperature');
+            const mappedTemperature = temperature ? {
+                id: temperature.id,
+                personId: temperature.person_id,
+                person_id: temperature.person_id,
+                temperature: temperature.temperature,
+                examDate: temperature.exam_date,
+                exam_date: temperature.exam_date,
+            }: null;
+
+            const respiratoryRate = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'respiratory_rate');
+            const mappedrespiratoryRate = respiratoryRate ? {
+                id: respiratoryRate.id,
+                personId: respiratoryRate.person_id,
+                person_id: respiratoryRate.person_id,
+                respiratory_rate: respiratoryRate.respiratory_rate,
+                examDate: respiratoryRate.exam_date,
+                exam_date: respiratoryRate.exam_date,
+            }: null;
+
+            const weight = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'weight');
+            const mappedweight = weight ? {
+                id: weight.id,
+                personId: weight.person_id,
+                person_id: weight.person_id,
+                weight: weight.weight,
+                examDate: weight.exam_date,
+                exam_date: weight.exam_date,
+            }: null;
+
+            const treatments = await TreatmentRepository.getActiveTreatments(person_id);
+            const mappedTreatments = treatments.map(treatment => ({
+            id: treatment.id,
+            personId: treatment.person_id,
+            person_id: treatment.person_id,
+            medicalConsultationId: treatment.medical_consultation_id,
+            medical_consultation_id: treatment.medical_consultation_id,
+            medication: treatment.medication,
+            dosage: treatment.dosage,
+            frequency: treatment.frequency,
+            duration: treatment.duration,
+            instructions: treatment.instructions,
+            purpose: treatment.purpose,
+            startDate: treatment.startDate,
+            endDate: treatment.endDate,
+            typeId: treatment.type_id,
+            type_id: treatment.type_id,
+            typeName: treatment.type?.name ? 
+                (i18n.__(`types.${treatment.type.name}.name`) !== `types.${treatment.type.name}.name`
+                ? i18n.__(`types.${treatment.type.name}.name`)
+                : treatment.type.name)
+                : null,
+                type: treatment.tipe?.name
+            }));
+
+            const treatmentData = mappedTreatments.length === 0 
+            ? null 
+            : mappedTreatments.length === 1 
+                ? mappedTreatments[0] 
+                : mappedTreatments;
+
+
+
+              res.status(200).json({
+              //person: mappedPerson,
+              bloodPressure: mappedBloodPresure,
+              heartRate: mappedheartRate,
+              temperature: mappedTemperature,
+              treatment: treatmentData,
+              respiratoryRate: mappedrespiratoryRate,
+              weight: mappedweight
+              /*backgroundPerson: mappedBackgroundsPerson,
+              backgroundFamily: mappedBackgroundsFamily,
+              diagnosis: mappedDiagnosis,
+              consultation: mappedMedicalConsultation,
+              suggestions: mappedSuggestions,
+              statusuggestions: translatedSuggestionStatusData,
+              membersConsultation: mappedHousehold,
+              householdVaccination: mappedHouseholdVacunations,*/
+            });
+
+        } catch (error) {
+            const errorMsg = error.details
+                ? error.details.map(detail => detail.message).join(', ')
+                : error.message || 'Error desconocido';
+            logger.error('PeopleController->getPersonProfile: ' + errorMsg);
+            return res.status(500).json({ error: 'ServerError', details: errorMsg });
+        }
+    },
+
+    async getPersonProfileComplementary(req, res) {
+        logger.info(`${req.user.name} - Accediendo al perfil de una persona para los Datos complementarios`);
+        
+        try {
+            const { home_id, startDate, endDate } = req.body;
+            const person_id = req.person.id;
+           //Examen Fisico
+            //const physicalExam = await PhysicalExamRepository.getLastByPersonId(person_id);
+            const height = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'height');
+            const mappedheight = height ? {
+                id: height.id,
+                personId: height.person_id,
+                person_id: height.person_id,
+                height: height.height,
+                examDate: height.exam_date,
+                exam_date: height.exam_date,
+            }: null;
+
+            const weight = await PhysicalExamRepository.getLastByPersonQuery(person_id, 'weight');
+            const mappedweight = weight ? {
+                id: weight.id,
+                personId: weight.person_id,
+                person_id: weight.person_id,
+                weight: weight.weight,
+                examDate: weight.exam_date,
+                exam_date: weight.exam_date,
+            }: null;
+
+            const backgroundsPerson = await PersonalBackgroundRepository.findByPersonIdType(person_id, 'Vacunacion');
+            const mappedBackgroundsPerson = backgroundsPerson ? backgroundsPerson.map((background) => {
+                    const translatedName = i18n.__(`types.${background.type?.name}.name`) !== `types.${background.type?.name}.name`
+                      ? i18n.__(`types.${background.type?.name}.name`)
+                      : background.type?.name;
+            
+                    return {
+                      id: background.id,
+                      type_id: background.type_id,
+                      typeId: background.type_id,
+                      description: background.description,
+                      details: background.details,
+                      startDate: background.startDate,
+                      endDate: background.endDate,
+                      status: background.status,
+                      severity: background.severity,
+                      personId: background.person_id,
+                      person_id: background.person_id,
+                      typeName: translatedName,
+                      type: background.type?.name,
+                    };
+                  }): null;
+
+
+            let mappedbmi = null;
+
+                if (mappedheight && mappedweight && mappedheight.height > 0 && mappedweight.weight > 0) {
+                logger.info(mappedweight.weight);
+                const bmi = Number((mappedweight.weight / (mappedheight.height * mappedheight.height)).toFixed(1));
+                   // Usamos la fecha del examen más reciente entre altura y peso
+                const latestExamDate = new Date(mappedheight.exam_date) > new Date(mappedweight.exam_date)
+                    ? mappedheight.exam_date
+                    : mappedweight.exam_date;
+
+                mappedbmi = {
+                    id: null, // No se guarda en DB, es calculado
+                    personId: mappedheight.person_id,
+                    person_id: mappedheight.person_id,
+                    bmi: bmi,
+                    examDate: latestExamDate,
+                    exam_date: latestExamDate,
+                };
+                } else {
+                // Si falta altura o peso, no se puede calcular el IMC
+                mappedbmi = null;
+                }
+
+                const diagnosis = await DiagnosisRepository.getLastByPersonId(person_id);
+            const mappedDiagnosis = diagnosis ? {
+            // IDs y relaciones
+                    id: diagnosis.id,
+                    type_id: diagnosis.type_id,
+                    typeId: diagnosis.type_id,
+                    medical_consultation_id: diagnosis.medical_consultation_id,
+                    medicalConsultationId: diagnosis.medical_consultation_id,
+                    
+                    // Información principal del diagnóstico
+                    description: diagnosis.description,
+                    cie10_code: diagnosis.cie10_code,
+                    cie10Code: diagnosis.cie10_code,
+                    notes: diagnosis.notes,
+                    date: diagnosis.date,
+                    
+                    // Información del tipo (con traducción)
+                    typeName: diagnosis.type?.name 
+                        ? (i18n.__(`types.${diagnosis.type.name}.name`) !== `types.${diagnosis.type.name}.name`
+                            ? i18n.__(`types.${diagnosis.type.name}.name`)
+                            : diagnosis.type.name)
+                        : null,
+                    //type: diagnosis.type?.name
+                } : null;
+
+                const consultation = await MedicalConsultationRepository.findLastByPersonId(person_id);
+                    const mappedMedicalConsultation = consultation
+                      ? {
+                          id: consultation.id,
+                          date: consultation.date,
+                          reason: consultation.reason,
+                          diagnosis: consultation.diagnosis,
+                          treatments: Array.isArray(consultation.treatments)
+                            ? consultation.treatments
+                            : JSON.parse(consultation.treatments || "[]"),
+                          medicalNotes: consultation.medicalNotes,
+                          files: Array.isArray(consultation.files)
+                            ? consultation.files
+                            : JSON.parse(consultation.files || "[]"),
+                          personId: consultation.person_id,
+                          person_id: consultation.person_id,
+                          professional: consultation.professional,
+                          typeId: consultation.type_id,
+                          type_id: consultation.type_id,
+                          typeName: consultation.type?.name 
+                        ? (i18n.__(`types.${diagnosis.type.name}.name`) !== `types.${diagnosis.type.name}.name`
+                            ? i18n.__(`types.${diagnosis.type.name}.name`)
+                            : diagnosis.type.name)
+                        : null,
+                        }
+                      : null;
+              res.status(200).json({
+              //person: mappedPerson,
+              height: mappedheight,
+              bmi: mappedbmi,
+              diagnosis: mappedDiagnosis,
+              //treatment: treatmentData,
+              weight: mappedweight,
+              backgroundPerson: mappedBackgroundsPerson,
+              consultation: mappedMedicalConsultation,/*
+              backgroundFamily: mappedBackgroundsFamily,
+              suggestions: mappedSuggestions,
+              statusuggestions: translatedSuggestionStatusData,
+              membersConsultation: mappedHousehold,
+              householdVaccination: mappedHouseholdVacunations,*/
+            });
+
+        } catch (error) {
+            const errorMsg = error.details
+                ? error.details.map(detail => detail.message).join(', ')
+                : error.message || 'Error desconocido';
+            logger.error('PeopleController->getPersonProfile: ' + errorMsg);
+            return res.status(500).json({ error: 'ServerError', details: errorMsg });
+        }
+    },
+
+    async getPersonProfileMedical(req, res) {
+        logger.info(`${req.user.name} - Accediendo al perfil de una persona para la información medica`);
+        
+        try {
+            const { home_id, startDate, endDate } = req.body;
+            const person_id = req.person.id;
+           //Examen Fisico
+            const person = await PersonRepository.findById(person_id);
+              const mappedPerson = {
+                id: person.id,
+                userId: person.user_id,
+                name: person.name,
+                user: person.user.name,
+                language: person.user.language,
+                birthDate: person.birth_date,
+                age: person.age,
+                gender: person.gender,
+                email: person.email,
+                phone: person.phone,
+                address: person.address,
+                image: person.image,
+                emergencyContact: person.emergencyContact,
+                medicalRecordNumber: person.medical_record_number,
+                documentType: person.document_type,
+                documentNumber: person.document_number,
+                healthCoverage: person.health_coverage,
+                coverageName: person.coverage_name,
+                blood_type: person.blood_type,
+                bloodType: person.blood_type,
+                date: person.updatedAt ? 
+                        `${person.updatedAt.getFullYear()}-${String(person.updatedAt.getMonth() + 1).padStart(2, '0')}-${String(person.updatedAt.getDate()).padStart(2, '0')}` : 
+                        await this.getCurrentLocalDate(),
+            };
+           
+
+            const allergyPerson = await PersonalBackgroundRepository.findByPersonIdType(person_id, 'Alergia');
+            const mappedallergyPerson = allergyPerson ? allergyPerson.map((background) => {
+                    const translatedName = i18n.__(`types.${background.type?.name}.name`) !== `types.${background.type?.name}.name`
+                      ? i18n.__(`types.${background.type?.name}.name`)
+                      : background.type?.name;
+            
+                    return {
+                      id: background.id,
+                      type_id: background.type_id,
+                      typeId: background.type_id,
+                      description: background.description,
+                      details: background.details,
+                      startDate: background.startDate,
+                      endDate: background.endDate,
+                      status: background.status,
+                      severity: background.severity,
+                      personId: background.person_id,
+                      person_id: background.person_id,
+                      typeName: translatedName,
+                      type: background.type?.name,
+                    };
+                  }): null;
+            const backgroundsPerson = await PersonalBackgroundRepository.findByPersonIdType(person_id, 'Antecedente');
+            const mappedBackgroundsPerson = backgroundsPerson ? backgroundsPerson.map((background) => {
+                    const translatedName = i18n.__(`types.${background.type?.name}.name`) !== `types.${background.type?.name}.name`
+                      ? i18n.__(`types.${background.type?.name}.name`)
+                      : background.type?.name;
+            
+                    return {
+                      id: background.id,
+                      type_id: background.type_id,
+                      typeId: background.type_id,
+                      description: background.description,
+                      details: background.details,
+                      startDate: background.startDate,
+                      endDate: background.endDate,
+                      status: background.status,
+                      severity: background.severity,
+                      personId: background.person_id,
+                      person_id: background.person_id,
+                      typeName: translatedName,
+                      type: background.type?.name,
+                    };
+                  }): null;
+              res.status(200).json({
+              person: mappedPerson,
+              //height: mappedheight,
+              //bmi: mappedbmi,
+              backgroundPerson: mappedBackgroundsPerson,
+              allergy: mappedallergyPerson,/*
+              backgroundFamily: mappedBackgroundsFamily,
+              suggestions: mappedSuggestions,
+              statusuggestions: translatedSuggestionStatusData,
+              membersConsultation: mappedHousehold,
+              householdVaccination: mappedHouseholdVacunations,*/
+            });
 
         } catch (error) {
             const errorMsg = error.details

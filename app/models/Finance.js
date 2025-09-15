@@ -56,6 +56,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(16, 2),
         allowNull: true,
       },
+      available: {
+        type: DataTypes.DECIMAL(16, 2),
+        allowNull: true,
+      },
       date: {
         // Nuevo campo
         type: DataTypes.DATEONLY,

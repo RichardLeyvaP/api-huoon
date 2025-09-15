@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { PersonalBackground, Person, Type } = require("../models");
+const { PersonalBackground, Person, Type, Home, sequelize } = require("../models");
 const logger = require("../../config/logger");
 
 const PersonalBackgroundRepository = {
@@ -22,7 +22,22 @@ const PersonalBackgroundRepository = {
    */
   async findAllByPersonId(personId) {
     return await PersonalBackground.findAll({
-      where: { person_id: personId },
+      where: { person_id: personId,  },
+      include: [
+        { model: Person, as: "person" },
+        { model: Type, as: "type" },
+      ],
+      order: [['startDate', 'DESC']]
+    });
+  },
+
+  async findByPersonIdType(personId, type) {
+  
+    return await PersonalBackground.findAll({
+      where: { 
+        person_id: personId,
+        typeDetail: type
+      },
       include: [
         { model: Person, as: "person" },
         { model: Type, as: "type" },
@@ -60,7 +75,8 @@ const PersonalBackgroundRepository = {
           startDate: body.startDate,
           endDate: body.endDate,
           status: body.status || 'Activo', // Valor por defecto
-          severity: body.severity
+          severity: body.severity,
+          typeDetail: body.typeDetail || 'Antecedente'
         },
         { transaction: t }
       );
@@ -86,7 +102,8 @@ const PersonalBackgroundRepository = {
       "startDate",
       "endDate",
       "status",
-      "severity"
+      "severity",
+      "typeDetail"
     ];
 
     try {
@@ -137,10 +154,14 @@ const PersonalBackgroundRepository = {
    * @param {number} typeId - ID del tipo de antecedente
    * @param {number} personId - ID de la persona (opcional)
    */
-  async findByType(typeId, personId = null) {
+  async findByType(typeId, personId = null, type = null) {
     const where = { type_id: typeId };
     if (personId) {
       where.person_id = personId;
+    }
+
+    if (type !== null && type !== undefined) {
+      where.typeDetail == type;
     }
 
     return await PersonalBackground.findAll({
@@ -171,7 +192,42 @@ const PersonalBackgroundRepository = {
       ],
       order: [['startDate', 'DESC']]
     });
+  },
+
+  async findHouseholdVaccinationStatus(homeId) {
+  try {
+    // Buscar todos los miembros del hogar con sus antecedentes de tipo "Vacunación"
+    const householdMembers = await Person.findAll({
+      include: [
+        {
+          model: PersonalBackground,
+          as: 'personalBackgrounds',
+          where: {typeDetail: 'Vacunacion'},
+          include: [
+            {
+              model: Type,
+              as: 'type',
+            },
+          ],
+          required: false,
+        },
+        {
+          model: Home,
+          as: 'homePersons',
+          where: { id: homeId },
+          required: true,
+        },
+      ],
+      distinct: true,
+    });
+
+    return householdMembers;
+
+  } catch (error) {
+    logger.error('PersonalBackgroundRepository->findHouseholdVaccinationStatus:', error.message);
+    throw new Error(`Error fetching household vaccination status: ${error.message}`);
   }
+}
 };
 
 module.exports = PersonalBackgroundRepository;

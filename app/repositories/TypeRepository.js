@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Type } = require('../models'); // Usamos el modelo Type
+const { Type, sequelize } = require('../models'); // Usamos el modelo Type
 const logger = require('../../config/logger'); // Logger para seguimiento
 
 const TypeRepository = {
@@ -67,6 +67,81 @@ const TypeRepository = {
       attributes: ['id', 'name', 'description', 'type'],
     });
   },
+
+  async findByTypePersonal(type) {
+      return await Type.findAll({
+        where: {
+          type,
+          // Excluir name que contenga 'vacunacion' o 'alergias' (sin tildes ni distinción de mayúsculas)
+          [Op.and]: [
+            sequelize.where(
+              sequelize.fn(
+                'LOWER',
+                sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.col('name'), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')
+              ),
+              { [Op.notLike]: `%vacunacion%` }
+            ),
+            sequelize.where(
+              sequelize.fn(
+                'LOWER',
+                sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.col('name'), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')
+              ),
+              { [Op.notLike]: `%alergias%` }
+            )
+          ]
+        },
+        attributes: ['id', 'name', 'description', 'type'],
+      });
+    },
+  
+    async findByTypeAndNameFilter(type, query = null) {
+      const whereClause = { type };
+  
+      if (query) {
+        // Normalizamos el término de búsqueda (sin tildes)
+        const normalizedQuery = query
+          .toLowerCase()
+          .replace(/á/g, 'a')
+          .replace(/é/g, 'e')
+          .replace(/í/g, 'i')
+          .replace(/ó/g, 'o')
+          .replace(/ú/g, 'u');
+  
+        // Aplicamos filtro sobre name normalizado
+        whereClause[Op.and] = [
+          sequelize.where(
+            sequelize.fn(
+              'LOWER',
+              sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.col('name'), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')
+            ),
+            { [Op.like]: `%${normalizedQuery}%` }
+          )
+        ];
+      } else {
+        // Si no hay query, aplicamos exclusión de vacunacion/alergias (igual que antes)
+        whereClause[Op.and] = [
+          sequelize.where(
+            sequelize.fn(
+              'LOWER',
+              sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.col('name'), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')
+            ),
+            { [Op.notLike]: `%vacunacion%` }
+          ),
+          sequelize.where(
+            sequelize.fn(
+              'LOWER',
+              sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.fn('REPLACE', sequelize.col('name'), 'á', 'a'), 'é', 'e'), 'í', 'i'), 'ó', 'o'), 'ú', 'u')
+            ),
+            { [Op.notLike]: `%alergia%` }
+          )
+        ];
+      }
+  
+      return await Type.findAll({
+        where: whereClause,
+        attributes: ['id', 'name', 'description', 'type'],
+      });
+    },
 };
 
 module.exports = TypeRepository;

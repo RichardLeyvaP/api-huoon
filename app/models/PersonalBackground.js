@@ -68,7 +68,12 @@ module.exports = (sequelize, DataTypes) => {
     severity: {
       type: DataTypes.STRING, //('Leve', 'Moderado', 'Severo')
       allowNull: true,
-    }
+    },
+    typeDetail: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: 'Antecedente'
+    },
   }, {
     sequelize,
     modelName: 'PersonalBackground',

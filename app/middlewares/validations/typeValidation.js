@@ -21,7 +21,8 @@ const idTypeSchema = Joi.object({
 });
 
 const typeSchema = Joi.object({
-    type: Joi.string().required()
+    type: Joi.string().required(),
+    query: Joi.string().allow(null).empty('').optional(),
 });
 
 module.exports = {

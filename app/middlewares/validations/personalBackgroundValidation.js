@@ -9,6 +9,10 @@ const storePersonalBackgroundSchema = Joi.object({
     "string.base": "La descripción debe ser una cadena de texto",
     "string.max": "La descripción no debe exceder los 200 caracteres"
   }),
+  typeDetail: Joi.string().optional().allow(null, "").empty("").default(null).messages({
+    "string.base": "La descripción debe ser una cadena de texto",
+    "string.max": "La descripción no debe exceder los 50 caracteres"
+  }),
   details: Joi.string().optional().allow(null, "").empty("").default(null).messages({
     "string.base": "Los detalles deben ser una cadena de texto",
   }),
@@ -36,6 +40,10 @@ const updatePersonalBackgroundSchema = Joi.object({
   description: Joi.string().optional().allow(null, "").empty("").default(null).messages({
     "string.base": "La descripción debe ser una cadena de texto",
     "string.max": "La descripción no debe exceder los 200 caracteres"
+  }),
+  typeDetail: Joi.string().optional().allow(null, "").empty("").default(null).messages({
+    "string.base": "La descripción debe ser una cadena de texto",
+    "string.max": "La descripción no debe exceder los 50 caracteres"
   }),
   details: Joi.string().optional().allow(null, "").empty("").default(null).messages({
     "string.base": "Los detalles deben ser una cadena de texto",

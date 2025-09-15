@@ -236,10 +236,10 @@ const DiagnosisController = {
    * Delete a diagnosis
    */
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Deleting diagnosis with ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Deleting diagnosis with ID ${req.body.id}`);
 
     try {
-      const diagnosis = await DiagnosisRepository.findById(req.params.id);
+      const diagnosis = await DiagnosisRepository.findById(req.body.id);
 
       if (!diagnosis) {
         return res.status(404).json({ msg: "DiagnosisNotFound" });

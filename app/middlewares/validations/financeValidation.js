@@ -19,6 +19,9 @@ const storeFinanceSchema = Joi.object({
         'number.base': '"income" debe ser un número',
         'number.precision': '"income" debe tener como máximo 2 decimales',
     }),
+     available: Joi.number().precision(2).allow(null).empty('').optional().custom((value, helpers) => {
+        return value === "" ? null : value;
+    }),
     date: Joi.date().required().messages({
         'date.base': '"date" debe ser una fecha válida',
         'any.required': '"date" es un campo obligatorio',
@@ -57,6 +60,9 @@ const updateFinanceSchema = Joi.object({
         return value === "" ? null : value;
     }),
     income: Joi.number().precision(2).allow(null).empty('').optional().custom((value, helpers) => {
+        return value === "" ? null : value;
+    }),
+     available: Joi.number().precision(2).allow(null).empty('').optional().custom((value, helpers) => {
         return value === "" ? null : value;
     }),
     date: Joi.date().allow(null).empty('').optional(),
