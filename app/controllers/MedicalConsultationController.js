@@ -119,8 +119,9 @@ const MedicalConsultationController = {
    */
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Busca las consultas médicas de una persona`); // Registro de la acción
+    const { person_id: bodyPersonId } = req.body;
+        const personId = bodyPersonId || req.person.id;
     try {
-      const personId = req.person.id;
 
       // Consulta las consultas médicas por el ID de la persona
       const medicalConsultations = await MedicalConsultationRepository.findAllByPersonId(personId);
@@ -180,8 +181,9 @@ const MedicalConsultationController = {
     logger.info("Datos recibidos al crear una consulta médica");
     logger.info(JSON.stringify(req.body));
 
-    const { type_id} = req.body;
-    const personId = req.person.id;
+   const { type_id, person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id;
      if (type_id) {
       const type = await TypeRepository.findById(type_id);
       if (!type) {
@@ -192,7 +194,7 @@ const MedicalConsultationController = {
       }
     }
     try {
-      const medicalConsultation = await MedicalConsultationRepository.create(req.body, personId, req.files);
+      const medicalConsultation = await MedicalConsultationRepository.create(req.body, req.files);
       res.status(201).json({ medicalConsultation });
     } catch (error) {
       const errorMsg = error.message || "Error desconocido";

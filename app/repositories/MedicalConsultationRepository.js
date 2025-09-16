@@ -63,7 +63,7 @@ const MedicalConsultationRepository = {
    * @param {number} personId - ID de la persona asociada.
    * @param {object} t - Transacción de Sequelize (opcional).
    */
-  async create(body, personId, files = [], t = null) {
+  async create(body, files = [], t = null) {
     try {
       // Crear la consulta médica sin los archivos
       const newFile = await MedicalConsultation.create(
@@ -74,7 +74,7 @@ const MedicalConsultationRepository = {
           treatments: body.treatments,
           medicalNotes: body.medicalNotes,
           files: [], // Inicialmente, los archivos están vacíos
-          person_id: personId,
+          person_id: body.person_id,
           type_id: body.type_id,
           professional: body.professional
         },

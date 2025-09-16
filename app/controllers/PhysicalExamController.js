@@ -64,8 +64,8 @@ const PhysicalExamController = {
   // Obtener exámenes físicos por person_id
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Buscando exámenes físicos de una persona`);
-    const { query } = req.body
-    const person_id = req.person.id;
+    const { query , person_id: bodyPersonId } = req.body;
+    const person_id = bodyPersonId || req.person.id;
 
     try {
       const physicalExams = await PhysicalExamRepository.findByPersonId(person_id, query);
@@ -121,8 +121,9 @@ const PhysicalExamController = {
   async store(req, res) {
     logger.info(`${req.user.name} - Creando nuevo examen físico`);
     logger.debug("Datos recibidos:", req.body);
-
-    req.body.person_id = req.person.id; // Asignar el ID de la persona autenticada
+    const { person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id; // Asignar el ID de la persona autenticada
 
     // Verificar si la consulta médica existe si se proporciona
     if (req.body.medical_consultation_id) {

@@ -70,7 +70,7 @@ const FamilyBackgroundRepository = {
           disease: body.disease,
           details: body.details || null,
           diagnosis_age: body.diagnosis_age || null,
-          date: body.date || await getCurrentDate()
+          date: body.date || this.getCurrentDate()
         },
         { transaction: t }
       );
@@ -81,7 +81,7 @@ const FamilyBackgroundRepository = {
     }
   },
 
-  async getCurrentDate() {
+  getCurrentDate() {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

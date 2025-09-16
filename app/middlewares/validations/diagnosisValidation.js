@@ -2,6 +2,9 @@ const Joi = require("joi");
 
 // Schema for creating a new diagnosis
 const storeDiagnosisSchema = Joi.object({
+   person_id: Joi.number().integer().allow(null).optional().messages({
+          "number.base": '"person_id" debe ser un número válido',
+        }),
   medical_consultation_id: Joi.number().integer().allow(null).optional().messages({
     "number.base": "El ID de la consulta médica debe ser un número",
   }),
@@ -25,6 +28,9 @@ const storeDiagnosisSchema = Joi.object({
 
 // Schema for updating a diagnosis
 const updateDiagnosisSchema = Joi.object({
+   person_id: Joi.number().integer().allow(null).optional().messages({
+          "number.base": '"person_id" debe ser un número válido',
+        }),
   medical_consultation_id: Joi.number().integer().allow(null).optional().messages({
     "number.base": "El ID de la consulta médica debe ser un número",
   }),

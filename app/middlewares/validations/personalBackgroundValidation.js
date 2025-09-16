@@ -2,6 +2,9 @@ const Joi = require("joi");
 
 // Esquema para crear un nuevo antecedente personal
 const storePersonalBackgroundSchema = Joi.object({
+  person_id: Joi.number().integer().allow(null).optional().messages({
+        "number.base": '"person_id" debe ser un número válido',
+      }),
   type_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID del tipo debe ser un número",
   }),
@@ -34,6 +37,9 @@ const storePersonalBackgroundSchema = Joi.object({
 
 // Esquema para actualizar un antecedente personal
 const updatePersonalBackgroundSchema = Joi.object({
+  person_id: Joi.number().integer().allow(null).optional().messages({
+        "number.base": '"person_id" debe ser un número válido',
+      }),
   type_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID del tipo debe ser un número",
   }),

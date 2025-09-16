@@ -104,8 +104,10 @@ const TreatmentController = {
    */
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Searching treatments for person`);
+    const { person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
     try {
-      const treatments = await TreatmentRepository.findAllByPersonId(req.person.id);
+      const treatments = await TreatmentRepository.findAllByPersonId(person_id);
 
       if (!treatments.length) {
         return res.status(204).json({ msg: "TreatmentsNotFound", treatments: [] });
@@ -148,10 +150,11 @@ const TreatmentController = {
    * Create a new treatment
    */
   async store(req, res) {
-    logger.info(`${req.user.name} - Creating new treatment`);
-    logger.debug("Received data:", req.body);
-
-    req.body.person_id = req.person.id;
+    logger.info(`${req.user.name} - Creando nuevo tratamiento`);
+    logger.debug("Datos recibidos:", req.body);
+    const { person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id; // Asignar el ID de la persona autenticada
 
     // Verify medical consultation exists if provided
     if (req.body.medical_consultation_id) {

@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { Role, Home, HomePerson, Person } = require("../models");
+const { Role, Home, HomePerson, Person, User } = require("../models");
 const logger = require("../../config/logger"); // Logger para seguimiento
 
 const HomePersonRepository = {
@@ -220,6 +220,86 @@ const HomePersonRepository = {
       logger.error(`Error al obtener personas por home_id: ${error.message}`);
       throw error;
     }
+  },
+
+  async getPersonByHomeId(homeId) {
+  try {
+    const homePeople = await HomePerson.findAll({
+      where: { home_id: homeId },
+      include: [
+        {
+          model: Person,
+          as: "person", // ← ¡Asegúrate de que esto coincida con el modelo!
+          attributes: [
+            'id', 'user_id', 'name', 'birth_date', 'age', 'gender',
+            'email', 'phone', 'address', 'image', 'emergencyContact',
+            'medical_record_number', 'document_type', 'document_number',
+            'health_coverage', 'coverage_name', 'blood_type', 'updatedAt'
+          ],
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['name', 'language'],
+            },
+          ],
+        },
+      ],
+      order: [["points", "DESC"]], // Puedes mantenerlo si quieres ordenar por puntos, pero no afecta la salida
+    });
+
+    // 👇 Aquí está la clave: Solo mapeamos la persona, NADA MÁS
+    const mappedPeople = homePeople
+      .filter(homePerson => homePerson.person) // Filtrar si no hay persona asociada
+      .map(homePerson => this.mapPersonData(homePerson.person)); // Mapear directamente
+
+    return mappedPeople;
+
+  } catch (error) {
+    logger.error(`Error al obtener personas por home_id: ${error.message}`);
+    throw error;
+  }
+},
+
+  mapPersonData(person) {
+  // Asegurarse de que person.user exista (puede ser null si no se incluyó)
+    const user = person.user || {};
+
+    return {
+      id: person.id,
+      userId: person.user_id,
+      name: person.name,
+      user: user.name || '', // Evitar undefined
+      language: user.language || '',
+      birthDate: person.birth_date,
+      age: person.age,
+      gender: person.gender,
+      email: person.email,
+      phone: person.phone,
+      address: person.address,
+      image: person.image,
+      emergencyContact: person.emergencyContact,
+      medicalRecordNumber: person.medical_record_number,
+      documentType: person.document_type,
+      documentNumber: person.document_number,
+      healthCoverage: person.health_coverage,
+      coverageName: person.coverage_name,
+      blood_type: person.blood_type,
+      bloodType: person.blood_type,
+      date: person.updatedAt
+        ? `${person.updatedAt.getFullYear()}-${String(
+            person.updatedAt.getMonth() + 1
+          ).padStart(2, "0")}-${String(person.updatedAt.getDate()).padStart(2, "0")}`
+        : this.getCurrentLocalDate(), // Asegúrate de que getCurrentLocalDate() esté disponible en este contexto
+    };
+  },
+
+  async getCurrentLocalDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   },
 
    async findLatestHomeByPersonId(personId) {

@@ -96,8 +96,10 @@ const DiagnosisController = {
    */
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Searching diagnoses for person`);
+    const { person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
     try {
-      const diagnoses = await DiagnosisRepository.findAllByPersonId(req.person.id);
+      const diagnoses = await DiagnosisRepository.findAllByPersonId(person_id);
 
       if (!diagnoses.length) {
         return res.status(204).json({ msg: "DiagnosesNotFound", diagnoses: [] });
@@ -136,13 +138,15 @@ const DiagnosisController = {
    * Create a new diagnosis
    */
   async store(req, res) {
-    logger.info(`${req.user.name} - Creating new diagnosis`);
-    logger.debug("Received data:", req.body);
+    logger.info(`${req.user.name} - Crea un nuevo diagnóstico`);
+    logger.info(JSON.stringify(req.body));
 
-    req.body.person_id = req.person.id;
+    const { type_id, person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id;
 
     // Verify type exists if provided
-    if (req.body.type_id) {
+    if (type_id) {
       const type = await TypeRepository.findById(req.body.type_id);
       if (!type) {
         logger.error(`Type not found with ID ${req.body.type_id}`);

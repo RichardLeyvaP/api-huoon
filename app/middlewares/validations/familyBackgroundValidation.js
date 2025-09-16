@@ -2,6 +2,9 @@ const Joi = require("joi");
 
 // Esquema para crear un nuevo antecedente familiar
 const storeFamilyBackgroundSchema = Joi.object({
+   person_id: Joi.number().integer().allow(null).optional().messages({
+          "number.base": '"person_id" debe ser un número válido',
+        }),
   home_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID del hogar debe ser un número",
   }),
@@ -29,6 +32,9 @@ const storeFamilyBackgroundSchema = Joi.object({
 
 // Esquema para actualizar un antecedente familiar
 const updateFamilyBackgroundSchema = Joi.object({
+   person_id: Joi.number().integer().allow(null).optional().messages({
+          "number.base": '"person_id" debe ser un número válido',
+        }),
   home_id: Joi.number().integer().allow(null, "").optional().empty(null).messages({
     "number.base": "El ID del hogar debe ser un número",
   }),

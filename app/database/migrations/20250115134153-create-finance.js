@@ -45,6 +45,11 @@ module.exports = {
         type: Sequelize.DECIMAL(16, 2),
         allowNull: true,
       },
+       available: {
+        type: Sequelize.DECIMAL(16, 2),
+        allowNull: true,
+        comment: 'Saldo disponible después de ingresos y gastos'
+      },
       date: {
         type: Sequelize.DATEONLY,
         allowNull: false,

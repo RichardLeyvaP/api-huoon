@@ -50,6 +50,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      typeDetail: {
+        type: Sequelize.STRING,
+        defaultValue: 'Antecedente',
+        allowNull: true,
+        comment: 'Tipo de antecedente (por defecto: "Antecedente")',
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

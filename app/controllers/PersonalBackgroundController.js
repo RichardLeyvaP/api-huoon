@@ -91,8 +91,8 @@ const PersonalBackgroundController = {
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Busca antecedentes personales de una persona`);
     try {
-      const { type } = req.body
-      const personId = req.person.id;
+      const { type, person_id: bodyPersonId } = req.body;
+        const personId = bodyPersonId || req.person.id;
 
       const backgrounds = await PersonalBackgroundRepository.findByPersonIdType(personId, type);
 
@@ -209,8 +209,9 @@ const PersonalBackgroundController = {
     logger.info(JSON.stringify(req.body));
 
     try {
-      req.body.person_id = req.person.id; // Asignar el ID de la persona
-      const { type_id } = req.body;
+     const { type_id, person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id; // Asignar el ID de la persona autenticada
 
       // Verificar si el tipo existe
       const type = await TypeRepository.findById(type_id);

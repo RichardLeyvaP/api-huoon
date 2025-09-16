@@ -93,7 +93,8 @@ const FamilyBackgroundController = {
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Busca antecedentes familiares de una persona`);
     try {
-      const personId = req.person.id;
+     const { person_id: bodyPersonId } = req.body;
+        const personId = bodyPersonId || req.person.id;
 
       const backgrounds = await FamilyBackgroundRepository.findAllByPersonId(personId);
 
@@ -244,11 +245,13 @@ const FamilyBackgroundController = {
    */
   async store(req, res) {
     logger.info(`${req.user.name} - Crea un nuevo antecedente familiar`);
-    logger.info("Datos recibidos:", JSON.stringify(req.body));
+    logger.info("Datos recibidos:");
+    logger.info(JSON.stringify(req.body));
 
     try {
-      req.body.person_id = req.person.id; // Asignar el ID de la persona
-      const { type_id, home_id } = req.body;
+      const { type_id, home_id, person_id: bodyPersonId } = req.body;
+        const person_id = bodyPersonId || req.person.id;
+    req.body.person_id = person_id;
 
       // Verificar si el tipo existe (si se proporciona)
       if (type_id) {

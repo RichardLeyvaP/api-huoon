@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { PhysicalExam, Person, MedicalConsultation, sequelize } = require("../models");
+const { PhysicalExam, Person, MedicalConsultation, Home, sequelize } = require("../models");
 const logger = require("../../config/logger");
 const { Op } = require("sequelize");
 const ImageService = require("../services/ImageService");
@@ -289,6 +289,153 @@ async getLastByPersonQuery(person_id, field = null) {
   } catch (error) {
     logger.error("Error fetching physical exam:", error);
     throw error;
+  }
+},
+async findHouseholdHealthMetrics(homeId) {
+  try {
+    logger.info(`Buscando métricas de salud para hogar ID: ${homeId}`);
+
+    const personIds = await Person.findAll({
+      attributes: ['id'],
+      include: [
+        {
+          model: Home,
+          as: 'homePersons',
+          where: { id: homeId },
+          required: true,
+        },
+      ],
+      raw: true,
+      nest: true,
+    }).then(rows => rows.map(row => row.id));
+
+
+    if (personIds.length === 0) {
+      return {
+        totalMembers: 0,
+        countNormalBloodPressure: 0,
+        countHealthyWeight: 0,
+      };
+    }
+
+    const sequelize = PhysicalExam.sequelize;
+
+    // ✅ CONSULTA 1: ÚLTIMO EXAMEN CON blood_pressure NO NULL (por persona)
+    const bpQuery = `
+      SELECT person_id, blood_pressure, exam_date
+      FROM (
+        SELECT person_id, blood_pressure, exam_date,
+               ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY exam_date DESC) as rn
+        FROM physical_exams
+        WHERE person_id IN (${personIds.join(',')})
+          AND blood_pressure IS NOT NULL
+      ) ranked
+      WHERE rn = 1
+    `;
+    const lastBPExamsRaw = await sequelize.query(bpQuery, {
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // ✅ CONSULTA 2: ÚLTIMO EXAMEN CON weight NO NULL (por persona)
+    const weightQuery = `
+      SELECT person_id, weight, exam_date
+      FROM (
+        SELECT person_id, weight, exam_date,
+               ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY exam_date DESC) as rn
+        FROM physical_exams
+        WHERE person_id IN (${personIds.join(',')})
+          AND weight IS NOT NULL
+      ) ranked
+      WHERE rn = 1
+    `;
+    const lastWeightExamsRaw = await sequelize.query(weightQuery, {
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // ✅ CONSULTA 3: ÚLTIMO EXAMEN CON height NO NULL (por persona)
+    const heightQuery = `
+      SELECT person_id, height, exam_date
+      FROM (
+        SELECT person_id, height, exam_date,
+               ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY exam_date DESC) as rn
+        FROM physical_exams
+        WHERE person_id IN (${personIds.join(',')})
+          AND height IS NOT NULL
+      ) ranked
+      WHERE rn = 1
+    `;
+    const lastHeightExamsRaw = await sequelize.query(heightQuery, {
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // Convertir a Map
+    const bpMap = new Map(lastBPExamsRaw.map(exam => [exam.person_id, exam]));
+    const weightMap = new Map(lastWeightExamsRaw.map(exam => [exam.person_id, exam]));
+    const heightMap = new Map(lastHeightExamsRaw.map(exam => [exam.person_id, exam]));
+
+    let countNormalBloodPressure = 0;
+    let countHealthyWeight = 0;
+
+    for (const personId of personIds) {
+      const bpExam = bpMap.get(personId);
+      const weightExam = weightMap.get(personId);
+      const heightExam = heightMap.get(personId);
+      // ✅ Presión arterial normal
+      if (bpExam && bpExam.blood_pressure !== null) {
+        let systolic, diastolic;
+        const rawBP = bpExam.blood_pressure;
+
+        if (typeof rawBP === 'string') {
+          const parts = rawBP.split('/').map(p => p.trim());
+          systolic = parseInt(parts[0], 10);
+          diastolic = parseInt(parts[1], 10);
+        } else if (Array.isArray(rawBP)) {
+          [systolic, diastolic] = rawBP;
+        } else if (typeof rawBP === 'object' && rawBP !== null) {
+          systolic = rawBP.systolic || rawBP.sys || rawBP.systolicValue || 0;
+          diastolic = rawBP.diastolic || rawBP.dia || rawBP.diastolicValue || 0;
+        } else {
+          systolic = Number(rawBP);
+          diastolic = 0;
+        }
+
+        if (!isNaN(systolic) && !isNaN(diastolic)) {
+          if (systolic <= 120 && diastolic <= 80) {
+            countNormalBloodPressure++;
+          }
+        }
+      }
+
+      // ✅ IMC (peso saludable)
+      if (weightExam && heightExam) {
+        const weight = weightExam.weight;
+        const height = heightExam.height;
+
+        // ✅ IMPORTANTE: height YA ESTÁ EN METROS (1.50), NO EN CM
+        const heightInMeters = height; // 👈 ¡NO DIVIDES POR 100!
+        const bmi = weight / (heightInMeters * heightInMeters);
+
+        if (isNaN(bmi)) {
+        } else if (bmi >= 18.5 && bmi <= 24.9) {
+          countHealthyWeight++;
+        } 
+      }
+    }
+
+    logger.info(`📊 RESULTADO FINAL:`);
+    logger.info(`   Total de miembros: ${personIds.length}`);
+    logger.info(`   Presión arterial normal: ${countNormalBloodPressure}`);
+    logger.info(`   Peso saludable: ${countHealthyWeight}`);
+
+    return {
+      totalMembers: personIds.length,
+      countNormalBloodPressure,
+      countHealthyWeight,
+    };
+
+  } catch (error) {
+    logger.error('PhysicalExamRepository->findHouseholdHealthMetrics:', error.message);
+    throw new Error(`Error fetching household health metrics: ${error.message}`);
   }
 }
 };
