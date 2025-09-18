@@ -230,6 +230,72 @@ const PetTreatmentRepository = {
     });
   },
 
+  getWeekRange() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 (Domingo) - 6 (Sábado)
+    // Ajustamos para que Lunes = 0, Domingo = 6
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Si es domingo, restamos 6 días para llegar a lunes
+
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() + diffToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Formateamos a YYYY-MM-DD
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return {
+      startOfWeek: formatDate(startOfWeek),
+      endOfWeek: formatDate(endOfWeek)
+    };
+  },
+
+  async countPetsWithUpToDateVaccinations(petIds) {
+  const { startOfWeek } = this.getWeekRange();
+
+  const result = await PetTreatment.sequelize.query(`
+    SELECT COUNT(DISTINCT pt.pet_id) as count
+    FROM pet_treatments pt
+    INNER JOIN (
+      SELECT pet_id, MAX(date) as max_date
+      FROM pet_treatments
+      WHERE type = 'vaccination' AND pet_id IN (:petIds)
+      GROUP BY pet_id
+    ) latest ON pt.pet_id = latest.pet_id AND pt.date = latest.max_date
+    WHERE pt.type = 'vaccination'
+      AND pt.next_date >= :startOfWeek
+  `, {
+    replacements: { petIds, startOfWeek },
+    type: PetTreatment.sequelize.QueryTypes.SELECT
+  });
+
+  return parseInt(result[0].count) || 0;
+},
+
+// Contar mascotas con controles pendientes (next_date < inicio de esta semana)
+async countPetsWithPendingControls(petIds) {
+  const { startOfWeek } = this.getWeekRange();
+
+  const result = await PetTreatment.findAll({
+    where: {
+      pet_id: petIds,
+      type: ['vaccination', 'deworming'],
+      next_date: { [Op.lt]: startOfWeek }
+    },
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('pet_id')), 'pet_id']],
+    raw: true
+  });
+
+  return result.length;
+},
   /**
    * Buscar tratamientos por mascota y tipo
    */

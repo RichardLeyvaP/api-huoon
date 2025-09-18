@@ -251,6 +251,52 @@ const VetVisitRepository = {
     });
   },
 
+  getWeekRange() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 (Domingo) - 6 (Sábado)
+    // Ajustamos para que Lunes = 0, Domingo = 6
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Si es domingo, restamos 6 días para llegar a lunes
+
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() + diffToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Formateamos a YYYY-MM-DD
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    return {
+      startOfWeek: formatDate(startOfWeek),
+      endOfWeek: formatDate(endOfWeek)
+    };
+  },
+
+  async countPetsWithUpcomingVetVisits(petIds) {
+  const { startOfWeek, endOfWeek } = this.getWeekRange();
+
+  const result = await VetVisit.findAll({
+    where: {
+      pet_id: petIds,
+      next_visit: {
+        [Op.gte]: startOfWeek,
+        [Op.lte]: endOfWeek
+      }
+    },
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('pet_id')), 'pet_id']],
+    raw: true
+  });
+
+  return result.length;
+},
+
   /**
    * Buscar visitas próximas
    */

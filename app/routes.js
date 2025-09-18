@@ -474,6 +474,7 @@ router.post('/emergency-destroy', validateSchema(idEmergencySchema), EmergencyCo
 //Rutas Mascotas
 router.get('/pets', PetController.index);
 router.post('/get-pet-person', validateSchema(getPetsSchema), PetController.getByPersonId);
+router.post('/get-pet', validateSchema(getPetsSchema), PetController.getByPetId);
 router.post('/pet', multerCategory('image', 'pets'), validateSchema(storePetSchema), PetController.store);
 router.post('/pet-show', validateSchema(idPetSchema), PetController.show);
 router.post('/pet-update', multerCategory('image', 'pets'), validateSchema(updatePetSchema), PetController.update);

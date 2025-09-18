@@ -72,6 +72,14 @@ const FileController = {
         return res.status(204).json({ msg: "FilesNotFound" });
       }
 
+       const getTranslatedFinanceType = (personalValue) => {
+      const key = personalValue === 1 ? "Personal" : "Hogar";
+      // Si tu i18n no tiene soporte para .__(key), usa .t(key) o como esté configurado
+      const translated = i18n.__(`financeType.${key}.name`);
+      // Si la traducción no existe, devolver el nombre original
+      return translated !== `financeType.${key}.name` ? translated : key;
+    };
+
       const mappedFiles = files.map(file => ({
         id: file.id,
         name: file.name,
@@ -85,6 +93,7 @@ const FileController = {
         homeId: file.home_id,
         home_id: file.home_id,
         personal: file.personal,
+        personalTranslated: getTranslatedFinanceType(file.personal),
       }));
 
       res.status(200).json({ files: mappedFiles });

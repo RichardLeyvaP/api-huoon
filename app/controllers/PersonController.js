@@ -18,7 +18,6 @@ const {
   SuggestionRepository,
   HomePersonRepository,
 } = require("../repositories");
-const Module = require("module");
 
 const PersonController = {
   async index(req, res) {
@@ -499,6 +498,23 @@ const PersonController = {
 
       //Datos para la presion y el peso
       const healthMetrics = await PhysicalExamRepository.findHouseholdHealthMetrics(home_id);
+
+      const typeData = [
+              { id: "Personal", name: "Personal", description: "Registro financiero personal" },
+              { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
+                ];
+      
+                const translatedTypeData = typeData.map((item) => ({
+              id: item.id,
+              name: i18n.__(`financeType.${item.id}.name`) !== `financeType.${item.id}.name`
+                    ? i18n.__(`financeType.${item.id}.name`)
+                    : item.name,
+              description: i18n.__(`financeType.${item.id}.description`) !== `financeType.${item.id}.description`
+                    ? i18n.__(`financeType.${item.id}.description`)
+                    : item.description,
+              originalName: item.name
+            }));
+
       res.status(200).json({
         person: mappedPerson,
         homeperson: homePerson,
@@ -506,10 +522,11 @@ const PersonController = {
         statusuggestions: translatedSuggestionStatusData,
         membersConsultation: mappedHousehold,
         householdVaccination: {
-    data: mappedHouseholdVacunations,
-    totalPeopleWithPendingVaccines,
-  },
-        healthMetrics: healthMetrics
+          data: mappedHouseholdVacunations,
+          totalPeopleWithPendingVaccines,
+        },
+        healthMetrics: healthMetrics,
+        types: translatedTypeData
       });
     } catch (error) {
       const errorMsg = error.details

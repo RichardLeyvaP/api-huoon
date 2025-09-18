@@ -142,6 +142,7 @@ const idPetSchema = Joi.object({
 
 const getPetsSchema = Joi.object({
   home_id: Joi.number().integer().allow(null, '').optional(),
+  pet_id: Joi.number().integer().allow(null, '').optional(),
   person_id: Joi.number().integer().allow(null, '').optional(),
   category_id: Joi.number().integer().allow(null, '').optional(),
   type: Joi.string().valid('Personal', 'Hogar').allow(null, '').optional(),

@@ -182,33 +182,6 @@ const PetController = {
     };
       const mappedPets = await Promise.all(
         pets.map(async (pet) => {
-          // Obtener tratamientos, visitas, medicamentos y dietas
-          const treatments = await PetTreatmentRepository.findByPetId(pet.id);
-          const vetVisits = await VetVisitRepository.findByPetId(pet.id);
-          const currentMedications = await CurrentMedicationRepository.findByPetId(pet.id);
-          const petDiets = await PetDietRepository.findByPetId(pet.id);
-
-          // Filtrar tratamientos
-          const vaccinations = treatments.filter((t) => t.type === 'vaccination');
-          const dewormings = treatments.filter((t) => t.type === 'deworming');
-
-          // Ordenar por fecha (más reciente primero)
-          const sortedVaccinations = vaccinations.sort((a, b) => new Date(b.date) - new Date(a.date));
-          const sortedDewormings = dewormings.sort((a, b) => new Date(b.date) - new Date(a.date));
-          const sortedMedications = currentMedications.sort(
-            (a, b) => new Date(b.start_date) - new Date(a.start_date)
-          );
-          const sortedDiets = petDiets.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          ); // Puedes usar start_date si lo tienes
-
-          // Últimos registros
-          const lastVaccination = sortedVaccinations.length > 0 ? sortedVaccinations[0] : null;
-          const lastDeworming = sortedDewormings.length > 0 ? sortedDewormings[0] : null;
-          const lastVetVisit = vetVisits.length > 0 ? vetVisits[0] : null;
-          const lastMedication = sortedMedications.length > 0 ? sortedMedications[0] : null;
-          const lastDiet = sortedDiets.length > 0 ? sortedDiets[0] : null; // 🔹 Última dieta
-
           // Traducciones seguras
           const categoryNameTranslated = pet.category?.name
             ? i18n.__(`categories.${pet.category.name}.name`) !== `categories.${pet.category.name}.name`
@@ -248,47 +221,165 @@ const PetController = {
             personId: pet.person_id,
             personName: pet.person?.name || null,
             image: pet.image,
-
-            vaccinations: {
-              name: lastVaccination ? lastVaccination.name : null,
-              date: lastVaccination ? lastVaccination.date : null,
-              count: vaccinations.length,
-            },
-
-            dewormings: {
-              name: lastDeworming ? lastDeworming.name : null,
-              date: lastDeworming ? lastDeworming.date : null,
-              count: dewormings.length,
-            },
-
-            vetvisits: {
-              name: lastVetVisit ? lastVetVisit.reason : null,
-              date: lastVetVisit ? lastVetVisit.date : null,
-              count: vetVisits.length,
-            },
-
-            medications: {
-              name: lastMedication ? lastMedication.name : null,
-              date: lastMedication ? lastMedication.start_date : null,
-              count: currentMedications.length,
-            },
-
-            diets: {
-              name: lastDiet ? lastDiet.name : null, // Nombre descriptivo de la dieta
-              date: lastDiet ? formatDateToYYYYMMDD(lastDiet.createdAt) : null,
-              count: petDiets.length, // Total de dietas registradas
-            },
           };
         })
       );
-
-      return res.status(200).json({ pets: mappedPets });
+      const petIds = pets.map(p => p.id);
+      const [
+        upToDateVaccinations,
+        pendingControls,
+        upcomingVetVisits
+      ] = await Promise.all([
+        PetTreatmentRepository.countPetsWithUpToDateVaccinations(petIds),
+        PetTreatmentRepository.countPetsWithPendingControls(petIds),
+        VetVisitRepository.countPetsWithUpcomingVetVisits(petIds)
+      ]);
+      return res.status(200).json({ 
+        pets: mappedPets,       
+        stats: {
+          totalPets: mappedPets.length,
+          upToDateVaccinations,
+          pendingControls,
+          upcomingVetVisits,
+        }      
+      });
     } catch (error) {
       const errorMsg = error.message || "Error desconocido";
       logger.error("PetController->getByPersonId: " + errorMsg);
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
+
+  async getByPetId(req, res) {
+  logger.info(`${req.user.name} - Busca mascota por ID`);
+
+  try {
+    const personId = req.person.id;
+    const { home_id, pet_id } = req.body || {}; // opcional, si aún lo necesitas
+
+    // Buscar la mascota por ID y verificar que pertenece a la persona (y opcionalmente al hogar)
+    const pet = await PetRepository.findById(pet_id);
+
+    if (!pet) {
+      return res.status(404).json({ error: "PetNotFound" });
+    }
+
+    // Función para formatear fechas (la reutilizamos)
+    const formatDateToYYYYMMDD = (date) => {
+      if (!date) return null;
+      const d = new Date(date);
+      const year = d.getUTCFullYear();
+      const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    // Obtener datos relacionados
+    const treatments = await PetTreatmentRepository.findByPetId(pet.id);
+    const vetVisits = await VetVisitRepository.findByPetId(pet.id);
+    const currentMedications = await CurrentMedicationRepository.findByPetId(pet.id);
+    const petDiets = await PetDietRepository.findByPetId(pet.id);
+
+    // Filtrar y ordenar
+    const vaccinations = treatments.filter((t) => t.type === 'vaccination');
+    const dewormings = treatments.filter((t) => t.type === 'deworming');
+
+    const sortedVaccinations = vaccinations.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedDewormings = dewormings.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedMedications = currentMedications.sort(
+      (a, b) => new Date(b.start_date) - new Date(a.start_date)
+    );
+    const sortedDiets = petDiets.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    // Últimos registros
+    const lastVaccination = sortedVaccinations[0] || null;
+    const lastDeworming = sortedDewormings[0] || null;
+    const lastVetVisit = vetVisits[0] || null;
+    const lastMedication = sortedMedications[0] || null;
+    const lastDiet = sortedDiets[0] || null;
+
+    // Traducciones
+    const categoryNameTranslated = pet.category?.name
+      ? i18n.__(`categories.${pet.category.name}.name`) !== `categories.${pet.category.name}.name`
+        ? i18n.__(`categories.${pet.category.name}.name`)
+        : pet.category.name
+      : null;
+
+    const sexTranslated = i18n.__(`gender.${pet.sex}.name`) !== `gender.${pet.sex}.name`
+      ? i18n.__(`gender.${pet.sex}.name`)
+      : pet.sex;
+
+    const typeName = i18n.__(`typetask.${pet.type}.name`) !== `typetask.${pet.type}.name`
+      ? i18n.__(`typetask.${pet.type}.name`)
+      : pet.type;
+
+    // Construir objeto de respuesta
+    const mappedPet = {
+      id: pet.id,
+      name: pet.name,
+      categoryId: pet.category_id,
+      category_id: pet.category_id,
+      categoryName: pet.category?.name || null,
+      categoryNameTranslated,
+      breed: pet.breed,
+      sex: pet.sex,
+      sexTranslated,
+      age: pet.age,
+      dateBirth: pet.date_birth,
+      date_birth: pet.date_birth,
+      color: pet.color,
+      microchip: pet.microchip,
+      signs: pet.signs,
+      type: pet.type,
+      typeName,
+      homeId: pet.home_id,
+      home_id: pet.home_id,
+      homeName: pet.home?.name || null,
+      personId: pet.person_id,
+      personName: pet.person?.name || null,
+      image: pet.image,
+
+      vaccinations: {
+        name: lastVaccination?.name || null,
+        date: lastVaccination?.date || null,
+        count: vaccinations.length,
+      },
+
+      dewormings: {
+        name: lastDeworming?.name || null,
+        date: lastDeworming?.date || null,
+        count: dewormings.length,
+      },
+
+      vetvisits: {
+        name: lastVetVisit?.reason || null,
+        date: lastVetVisit?.date || null,
+        count: vetVisits.length,
+      },
+
+      medications: {
+        name: lastMedication?.name || null,
+        date: lastMedication?.start_date || null,
+        count: currentMedications.length,
+      },
+
+      diets: {
+        name: lastDiet?.name || null,
+        date: lastDiet ? formatDateToYYYYMMDD(lastDiet.createdAt) : null,
+        count: petDiets.length,
+      },
+    };
+
+    return res.status(200).json({ pet: mappedPet });
+
+  } catch (error) {
+    const errorMsg = error.message || "Error desconocido";
+    logger.error("PetController->getByPetId: " + errorMsg);
+    res.status(500).json({ error: "ServerError", details: errorMsg });
+  }
+},
   /**
    * Obtener mascotas por tipo (Personal o Hogar)
    */
