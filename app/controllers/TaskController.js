@@ -477,6 +477,7 @@ const TaskController = {
           "create",
           req.user.id,
           JSON.stringify(task),
+          task.home_id,
           { transaction: t }
         );
 
@@ -695,7 +696,8 @@ const TaskController = {
         task.id,
         "create",
         req.user.id,
-        JSON.stringify(task)
+        JSON.stringify(task),
+        task.home_id,
       );
 
       //Logica de empleo de la IA, para sugerir nuevas tareas
@@ -921,6 +923,7 @@ const TaskController = {
         "create",
         req.user.id,
         JSON.stringify(activityData),
+        task.home_id,
         { transaction: t } // Aquí pasas la transacción
       );
       if (tokensData.length) {
@@ -1273,7 +1276,8 @@ const TaskController = {
         task.id,
         "update",
         req.user.id,
-        JSON.stringify(activityData)
+        JSON.stringify(activityData),
+        task.home_id,
       );
       await t.commit();
       res.status(200).json({ task: task });
@@ -1460,7 +1464,8 @@ const TaskController = {
         task.id,
         "delete",
         req.user.id,
-        JSON.stringify(task)
+        JSON.stringify(task),
+        task.home_id
       );
 
       await t.commit();

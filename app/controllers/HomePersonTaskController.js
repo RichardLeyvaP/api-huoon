@@ -138,7 +138,8 @@ const HomePersonTaskController = {
         task.id,
         "create",
         req.user.id,
-        JSON.stringify(activityData)
+        JSON.stringify(activityData),
+        home_id
       );
       //logica de notificaciones
       const { tokens, userTokens } =
@@ -445,6 +446,7 @@ const HomePersonTaskController = {
         "create",
         req.user.id,
         JSON.stringify(activityData),
+        task.home_id,
         { transaction: t } // Aquí pasas la transacción
       );
 

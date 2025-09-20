@@ -11,50 +11,13 @@ const {
   PersonHomeWarehouseProduct,
   Status,
   Category,
+  PersonWarehouse,
   sequelize,
 } = require("../models");
 const logger = require("../../config/logger");
 const ProductRepository = require("./ProductRepository");
 
 const  PersonProductRepository = {
-  /*async findAll() {
-    return await PersonHomeWarehouseProduct.findAll({
-      include: [
-        {
-          model: Home,
-          as: "home", // Asociación con el modelo Home
-          attributes: ["id", "name"], // Ajusta los atributos de Home que quieres devolver
-        },
-        {
-          model: Person,
-          as: "person", // Asociación con el modelo Person
-          attributes: ["id", "name", "email"], // Ajusta los atributos de Person según sea necesario
-        },
-        {
-          model: Warehouse,
-          as: "warehouse", // Asociación con el modelo Warehouse
-          attributes: ["id", "title"], // Ajusta los atributos de Warehouse según sea necesario
-        },
-        {
-          model: Product,
-          as: "product", // Asociación con el modelo Product
-          attributes: ["id", "name"], // Ajusta los atributos de Product según sea necesario
-          include: [
-            {
-              model: Category,
-              as: "category", // Asociación con el modelo Category
-              attributes: ["id", "name"], // Ajusta los atributos de Category según sea necesario
-            },
-          ],
-        },
-        {
-          model: Status,
-          as: "status", // Asociación con el modelo Status
-          attributes: ["id", "name"], // Ajusta los atributos de Status según sea necesario
-        },
-      ],
-    });
-  }*/
   async findAll() {
 
     return await PersonHomeWarehouseProduct.findAll({
@@ -99,6 +62,7 @@ const  PersonProductRepository = {
       where: {
         home_id: body.home_id,
         warehouse_id: body.warehouse_id,
+        quantity: { [Op.gt]: 0 },
       },
       include: [
         {
@@ -141,6 +105,148 @@ const  PersonProductRepository = {
   });
   return result || 0; // Si no hay productos, devuelve 0
 },
+
+/*async getVisibleWarehouseIds(homeId, personId, type = null) {
+  const warehouses = await PersonWarehouse.findAll({
+    attributes: ['warehouse_id'], // Solo necesitamos los IDs
+   where: {
+      home_id: homeId, // Solo registros de este hogar
+      [Op.or]: [
+        // 1. Son míos → los muestro sin importar el status (0,1,2)
+        {
+          person_id: personId,
+          status: { [Op.in]: [0, 1, 2] },
+        },
+        // 2. Son de otros → solo los muestro si status es 1 o 2
+        {
+          person_id: { [Op.ne]: personId },
+          status: { [Op.in]: [1, 2] },
+        },
+      ],
+    },
+    raw: true
+  });
+
+  return warehouses.map(w => w.warehouse_id);
+},*/
+async getVisibleWarehouseIds(homeId, personId, type = null) {
+  let whereCondition = {
+    home_id: homeId,
+  };
+
+  if (type === 'Personal') {
+    // ✅ SOLO almacenes PRIVADOS del usuario (status = 0)
+    whereCondition = {
+      ...whereCondition,
+      person_id: personId,
+      status: 0,
+    };
+  } else if (type === 'Hogar') {
+    // ✅ SOLO almacenes del HOGAR (status 1 o 2), excluyendo los privados del usuario
+    whereCondition = {
+      ...whereCondition,
+      status: { [Op.in]: [1, 2] },
+    };
+  } else {
+    // Comportamiento original (todos los que la persona puede ver)
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [
+        {
+          person_id: personId,
+          status: { [Op.in]: [0, 1, 2] },
+        },
+        {
+          //person_id: { [Op.ne]: personId },
+          status: { [Op.in]: [1, 2] },
+        },
+      ],
+    };
+  }
+
+  const warehouses = await PersonWarehouse.findAll({
+    attributes: ['warehouse_id'],
+    where: whereCondition,
+    raw: true
+  });
+
+  return warehouses.map(w => w.warehouse_id);
+},
+async getTotalQuantityByCategories(homeId, personId, type) {
+  // Obtener IDs de almacenes visibles para esta persona
+  const visibleWarehouseIds = await this.getVisibleWarehouseIds(homeId, personId, type);
+
+  if (visibleWarehouseIds.length === 0) {
+    return []; // Si no hay almacenes visibles, devolver vacío
+  }
+
+  const results = await PersonHomeWarehouseProduct.findAll({
+    attributes: [
+      [sequelize.col('product.category_id'), 'category_id'],
+      [sequelize.fn('SUM', sequelize.col('quantity')), 'total_quantity']
+    ],
+    include: [{
+      model: Product,
+      as: "product",
+      attributes: [],
+      required: true
+    }],
+    where: {
+      home_id: homeId,
+      warehouse_id: { [Op.in]: visibleWarehouseIds } // ✅ Filtrar solo almacenes visibles
+    },
+    group: [sequelize.col('product.category_id')],
+    raw: true
+  });
+
+  return results.map(r => ({
+    category_id: parseInt(r.category_id),
+    total_quantity: parseInt(r.total_quantity) || 0
+  }));
+},
+/*async getTotalQuantityByCategories(homeId, personId) { // ← ¡Agregamos personId como parámetro!
+  const results = await PersonHomeWarehouseProduct.findAll({
+    attributes: [
+      [sequelize.col('Product.category_id'), 'category_id'],
+      [sequelize.fn('SUM', sequelize.col('PersonHomeWarehouseProduct.quantity')), 'total_quantity']
+    ],
+    include: [
+      {
+        model: Product,
+        as: "product",
+        attributes: [],
+        required: true
+      },
+      {
+        model: PersonWarehouse, // ← JOIN con PersonWarehouse para verificar visibilidad
+        as: "personWarehouse", // ← Asegúrate de que la asociación esté definida así
+        required: true,
+        where: {
+          home_id: homeId, // Redundante, pero por seguridad
+          [Op.or]: [
+            {
+              person_id: personId, // Es mío → cualquier status
+              status: { [Op.in]: [0, 1, 2] }
+            },
+            {
+              person_id: { [Op.ne]: personId }, // Es de otro → solo status 1 o 2
+              status: { [Op.in]: [1, 2] }
+            }
+          ]
+        },
+        attributes: [] // No necesitamos datos, solo para filtrar
+      }
+    ],
+    where: { home_id: homeId },
+    group: [sequelize.col('Product.category_id')],
+    raw: true
+  });
+
+  return results.map(r => ({
+    category_id: parseInt(r.category_id),
+    total_quantity: parseInt(r.total_quantity) || 0
+  }));
+},*/
   async getTotalProductsQuantity(body) {
     const { home_id, warehouse_ids, date } = body;
     
@@ -217,7 +323,7 @@ const  PersonProductRepository = {
     });
   },
 
-  async create(body, file, t, person_id) {
+  /*async create(body, file, t, person_id) {
     const {
       home_id,
       warehouse_id,
@@ -283,6 +389,107 @@ const  PersonProductRepository = {
       logger.error(`Error en PersonProductRepository->store: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
     }
+  },*/
+
+  async create(body, file, t, person_id) {
+    const {
+      home_id,
+      warehouse_id,
+      product_id,
+      status_id,
+      unit_price,
+      total_price,
+      quantity,
+      purchase_date,
+      purchase_place,
+      expiration_date,
+      brand,
+      additional_notes,
+      maintenance_date,
+      due_date,
+      frequency,
+      type,
+      image,
+      category_id,
+      name,
+    } = body;
+
+    try {
+      // 1. Buscar o crear el registro
+      const [personHomeWarehouseProduct, created] =
+        await PersonHomeWarehouseProduct.findOrCreate({
+          where: {
+            warehouse_id: warehouse_id,
+            home_id: home_id,
+            person_id: person_id,
+            product_id: product_id,
+          },
+          defaults: {
+            status_id: status_id,
+            unit_price: unit_price,
+            total_price: total_price,
+            purchase_date: purchase_date || new Date(),
+            purchase_place: purchase_place,
+            expiration_date: expiration_date,
+            brand: brand,
+            quantity: quantity, // ← solo en creación
+            additional_notes: additional_notes,
+            maintenance_date: maintenance_date,
+            due_date: due_date,
+            frequency: frequency,
+            type: type,
+            image: "personProducts/default.jpg",
+          },
+          transaction: t,
+        });
+
+      // 2. Si YA EXISTE → sumar la cantidad (no reemplazar)
+      if (!created) {
+        await personHomeWarehouseProduct.update(
+          {
+            // Actualiza todos los campos EXCEPTO quantity
+            status_id: status_id,
+            unit_price: unit_price,
+            total_price: total_price,
+            purchase_date: purchase_date || personHomeWarehouseProduct.purchase_date,
+            purchase_place: purchase_place,
+            expiration_date: expiration_date,
+            brand: brand,
+            additional_notes: additional_notes,
+            maintenance_date: maintenance_date,
+            due_date: due_date,
+            frequency: frequency,
+            type: type,
+            // ¡NO actualizamos quantity aquí!
+          },
+          { transaction: t }
+        );
+
+        // Sumar la nueva cantidad a la existente
+        await personHomeWarehouseProduct.update(
+          {
+            quantity: personHomeWarehouseProduct.quantity + (quantity || 0),
+          },
+          { transaction: t }
+        );
+      }
+
+      // 3. Manejo de imagen (solo si es nuevo y hay archivo)
+      if (file && created) {
+        const newFilename = ImageService.generateFilename(
+          "personProducts",
+          personHomeWarehouseProduct.id,
+          file.originalname
+        );
+        const imagePath = await ImageService.moveFile(file, newFilename);
+        await personHomeWarehouseProduct.update({ image: imagePath }, { transaction: t });
+      }
+
+      return personHomeWarehouseProduct;
+    } catch (err) {
+      logger.error(`Error en PersonProductRepository->create: ${err.message}`);
+      throw err;
+    }
   },
 
   async update(personHomeWarehouseProduct, body, file, t) {
@@ -342,6 +549,66 @@ const  PersonProductRepository = {
     } catch (err) {
       logger.error(`Error en PersonProductRepository->update: ${err.message}`);
       throw err; // Propagar el error para que el rollback se ejecute
+    }
+  },
+
+  async moveProduct(body, t) {
+    const { id, warehouse_id: target_warehouse_id, product_id, quantity_mov } = body;
+
+    try {
+      // 1. Obtener el registro original (de donde se mueve el producto)
+      const originalRecord = await PersonHomeWarehouseProduct.findByPk(id, { transaction: t });
+      if (!originalRecord) {
+        throw new Error('Original record not found');
+      }
+
+      // Validar que hay suficiente stock
+      if (originalRecord.quantity < quantity_mov) {
+        throw new Error('Insufficient quantity to move');
+      }
+
+      // 2. Decrementar la cantidad en el registro original
+      originalRecord.quantity -= quantity_mov;
+      await originalRecord.save({ transaction: t });
+
+      // 3. Buscar o crear el registro destino (en el almacén destino)
+      const [targetRecord, created] = await PersonHomeWarehouseProduct.findOrCreate({
+        where: {
+          warehouse_id: target_warehouse_id,
+          home_id: originalRecord.home_id, // mismo hogar
+          person_id: originalRecord.person_id, // misma persona
+          product_id: product_id,
+        },
+        defaults: {
+          status_id: originalRecord.status_id,
+          unit_price: originalRecord.unit_price,
+          total_price: originalRecord.unit_price * quantity_mov,
+          purchase_date: originalRecord.purchase_date,
+          expiration_date: originalRecord.expiration_date,
+          brand: originalRecord.brand,
+          quantity: quantity_mov, // nueva cantidad
+          additional_notes: originalRecord.additional_notes,
+          maintenance_date: originalRecord.maintenance_date,
+          due_date: originalRecord.due_date,
+          frequency: originalRecord.frequency,
+          type: originalRecord.type,
+          image: originalRecord.image,
+        },
+        transaction: t,
+      });
+
+      // 4. Si ya existía, incrementar la cantidad
+      if (!created) {
+        targetRecord.quantity += quantity_mov;
+        targetRecord.total_price += targetRecord.unit_price * targetRecord.quantity;
+        await targetRecord.save({ transaction: t });
+      }
+
+      logger.info(`Producto movido exitosamente: ${quantity_mov} unidades de registro ${id} a almacén ${target_warehouse_id}`);
+      return { originalRecord, targetRecord };
+    } catch (err) {
+      logger.error(`Error en PersonProductRepository->moveProduct: ${err.message}`);
+      throw err;
     }
   },
 

@@ -24,6 +24,8 @@ const {
   PersonRepository,
   ProductRepository
 } = require("../repositories");
+const WarehouseRepository = require("../repositories/WareHouseRepository");
+const { ActivityLogService } = require("../services");
 
 const PersonHomeWarehouseProductController = {
   // Listar todos los productos por personas y almacenes
@@ -527,222 +529,65 @@ const PersonHomeWarehouseProductController = {
         .json({ error: "ServerError", details: error.message });
     }
   },
-  /*async update(req, res) {
-        logger.info(`${req.user.name} - Inicia actualización de relación en person_home_warehouse_products`);
-        logger.info('datos recibidos al editar un producto en un almacen');
-        logger.info(JSON.stringify(req.body));
+  async move(req, res) {
+    logger.info(`${req.user.name} - Inicia el proceso de mover un producto entre almacenes`);
+    logger.info("Datos recibidos al mover un producto de almacén");
+    logger.info(JSON.stringify(req.body));
+    const { id, warehouse_id, product_id, quantity_mov, unit_price, total_price } = req.body;
 
-        // Validación de entrada
-        const { error, value } = schema.validate(req.body);
-        if (error) {
-            const errorMsg = error.details.map(detail => detail.message).join(', ');
-            logger.error('Error en PersonHomeWarehouseProductsController->update: ' + errorMsg);
-            return res.status(400).json({ error: 'ValidationError', details: errorMsg });
-        }
-    
-        // Desestructuración de valores del cuerpo de la solicitud
-        const {
-            home_id, warehouse_id, product_id, status_id, unit_price, total_price,
-            quantity, purchase_date, expiration_date, purchase_place, brand, additional_notes,
-            maintenance_date, due_date, frequency, type, image, category_id, name
-        } = value;
-    
-        const home = await Home.findByPk(home_id);
-        if (!home) {
-            logger.error(`PersonHomeWarehouseProductsController->update: Hogar no encontrado con ID ${home_id}`);
-            return res.status(204).json({ msg: 'HomeNotFound' });
-        }
-        // Obtener el ID de la persona del usuario autenticado
-        const person_id = req.person.id;
-        
-        // Verificar si la persona está asociada con el hogar
-        const person = await Person.findByPk(person_id, {
-            include: [{
-                model: HomePerson,
-                as: 'homePeople',
-                where: { home_id: home_id },  // Filtra por el home_id que buscas
-                required: true  // Esto asegura que solo se devuelvan personas que tengan esa relación
-            }]
-        });
 
-        if (!person) {
-            logger.error(`PersonHomeWarehouseController->show: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
-            return res.status(204).json({ msg: 'PersonNotAssociatedWithHome' });
-        }
-    
-        const warehouse = await Warehouse.findByPk(warehouse_id);
-        if (!warehouse) {
-            logger.error(`PersonHomeWarehouseProductsController->update: Almacén no encontrado con ID ${warehouse_id}`);
-            return res.status(204).json({ msg: 'WarehouseNotFound' });
-        }
-    
-        const status = await Status.findByPk(status_id);
-        if (!status) {
-            logger.error(`PersonHomeWarehouseProductsController->update: Estado no encontrado con ID ${status_id}`);
-            return res.status(204).json({ msg: 'StatusNotFound' });
-        }
-    
-        let product;
-        let filename;
-        if (product_id && product_id !== 0) {
-            product = await Product.findByPk(product_id);
-            if (!product) {
-                logger.error(`PersonHomeWarehouseProductsController->update: Producto no encontrado con ID ${product_id}`);
-                return res.status(204).json({ msg: 'ProductNotFound' });
-            }
-        } else {
-            filename = product.image;
-        }
+    const t = await sequelize.transaction();
+    try {
+      const result = await PersonProductRepository.moveProduct(req.body, t);
+      const original_warehouse = await PersonProductRepository.findById(id);
+      if (!original_warehouse) {
+         logger.error(
+            `PersonHomeWarehouseProductsController->move: producto en almacén no encontrado con ID ${id}`
+          );
+      throw new Error("Registro de producto en almacén no encontrado");
+    }
+    const destination_warehouse = await WarehouseRepository.findById(warehouse_id);
+    if (!destination_warehouse) {
+         logger.error(
+            `PersonHomeWarehouseProductsController->move: almacén a mover producto no encontrado con ID ${warehouse_id}`
+          );
+      throw new Error("Almacén a mover producto no encontrado");
+    }
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(now.getUTCDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
+    const activityData = {
+      ...req.body,
+      originalWarehouse: original_warehouse.warehouse.title,
+      original_id: original_warehouse.warehouse_id,
+      destinationWarehouse: destination_warehouse.title,
+      productName: original_warehouse.product.name,
+      productImage: original_warehouse.image,
+      quantity_moved: quantity_mov,
+      personName: req.person.name,
+      personImage: req.person.image,
+      date: today
+    };
 
-        // Verificar si la categoría existe
-        if (category_id && category_id !== 0) {
-            const category = await Category.findByPk(category_id);
-            if (!category) {
-                logger.error(`HomeWarehouseProductController->store: Categoría no encontrado con ID ${category_id}`);
-                return res.status(204).json({ msg: 'CategoryNotFound' });
-            }
-        }
-    
-        // Iniciar una transacción para asegurar la atomicidad
-        const t = await sequelize.transaction();
-        try {
-
-            if (!product) {
-                logger.info('HomeWarehouseProductController->store: Creando nuevo producto');
-                filename = 'products/default.jpg'; // Imagen por defecto
-                product = await Product.create({
-                    name: name,
-                    category_id: category_id,
-                    image: filename
-                }, {transaction: t});
-
-                // Manejo del archivo de icono (si se ha subido)
-                if (req.file) {
-                    const extension = path.extname(req.file.originalname);
-                    const newFilename = `products/${product.id}${extension}`;
-                    
-                    try {
-                        // Mover el archivo a la carpeta pública
-                        const oldPath = req.file.path;
-                        const newPath = path.join(__dirname, '..', '..', 'public', newFilename);
-                
-                        await fs.promises.rename(oldPath, newPath); // Usa await para esperar hasta que se mueva
-                
-                        // Actualizar el registro con la ruta del archivo
-                        await product.update({ image: newFilename }, { transaction: t });
-                        filename = newFilename;
-                    } catch (err) {
-                        logger.error('Error al mover la imagen: ' + err.message);
-                        throw new Error('Error al mover la imagen'); // Esto permitirá que el catch lo maneje y haga rollback
-                    }
-                }
-            }
-            // Crear o actualizar la relación `person_home_warehouse_product`
-            const [personHomeWarehouseProduct, created] = await PersonHomeWarehouseProduct.findOrCreate({
-                where: { person_id, home_id, warehouse_id, product_id: product.id },
-                defaults: {
-                    status_id, unit_price, total_price, quantity,
-                    purchase_date: purchase_date || new Date(),
-                    expiration_date, purchase_place, brand, additional_notes,
-                    maintenance_date, due_date, frequency, type, image: product.image
-                },
-                transaction: t
-            });
-             // Paso 2: Copiar la imagen a la nueva carpeta con el ID de `homeWarehouseProduct`
-             if (req.file && created) {
-                const extension = path.extname(req.file.originalname);
-                const newImagePath = `personHomeWarehoseProducts/${personHomeWarehouseProduct.id}${extension}`;
-                const destinationPath = path.join(__dirname, '..', '..', 'public', newImagePath);
-
-                try {
-                    // Copiar el archivo desde `products` a la carpeta `images` con el ID de `homeWarehouseProduct`
-                    const tempPath = path.join(__dirname, '..', '..', 'public', filename);
-                    await fs.promises.copyFile(tempPath, destinationPath);
-
-                    // Actualizar el registro de `homeWarehouseProduct` con la nueva ruta
-                    await personHomeWarehouseProduct.update({ image: newImagePath }, { transaction: t });
-
-                } catch (err) {
-                    logger.error('Error al copiar la imagen a la carpeta de destino: ' + err.message);
-                    throw new Error('Error al copiar la imagen'); // Esto permitirá que el catch lo maneje y haga rollback
-                }
-            }
-            
-            const updatedData = Object.keys(req.body)
-                    .filter(key => [
-                        'home_id', 'warehouse_id', 'product_id', 'status_id', 'unit_price', 'total_price', 'quantity', 'purchase_date', 
-                        'purchase_place', 'expiration_date', 'brand', 'additional_notes', 'maintenance_date', 
-                        'due_date', 'frequency', 'type', 'image', 'category_id', 'name', 'person_id'
-                    ].includes(key) && req.body[key] !== undefined)
-                    .reduce((obj, key) => ({ ...obj, [key]: req.body[key] }), {});
-    
-             // Actualizar solo los campos enviados si el producto ya existía
-             if (!created) {
-                // Procesar la actualización del icono
-                if (req.file) {
-                   // Si se envía un archivo nuevo
-                   const extension = path.extname(req.file.originalname);
-                   const newFilename = `personHomeWarehoseProducts/${personHomeWarehouseProduct.id}${extension}`;
-
-                   // Eliminar el icono anterior si existe y no es el predeterminado
-                   if (personHomeWarehouseProduct.image !== 'personHomeWarehoseProducts/default.jpg') {
-                       const oldIconPath = path.join(__dirname, '../../public', personHomeWarehouseProduct.image);
-                       try {
-                           await fs.promises.unlink(oldIconPath);
-                           logger.info(`Imagen anterior eliminada: ${oldIconPath}`);
-                       } catch (error) {
-                           logger.error(`Error al eliminar la imagen anterior: ${error.message}`);
-                       }
-                   }
-
-                   // Mover el nuevo archivo a la carpeta pública
-                   const newPath = path.join(__dirname, '../../public', newFilename);
-                   await fs.promises.rename(req.file.path, newPath);
-                   updatedData.image = newFilename;
-
-               }
-               
-               if (Object.keys(updatedData).length > 0) {
-                   await PersonHomeWarehouseProduct.update(updatedData, {
-                       where: { product_id: product.id, warehouse_id: warehouse_id, home_id: home_id, person_id: person_id },
-                       transaction: t
-                   });
-                   logger.info(`Campos actualizados en HomeWarehouseProduct para producto ID ${product.id}`);
-               }
-           }
-   
-           // Obtener la relación actualizada
-           const updatedPersonWarehouse = await PersonHomeWarehouseProduct.findOne({
-               where: { product_id: product.id, warehouse_id: warehouse_id, home_id: home_id, person_id: person_id },
-               transaction: t
-           });
-    
-            // Confirmar la transacción
-            await t.commit();
-    
-            // Obtener la relación actualizada para devolverla en la respuesta
-            const updatedRecord = await PersonHomeWarehouseProduct.findOne({
-                where: { person_id, home_id, warehouse_id, product_id: product.id },
-                include: [
-                    { model: Person, as: 'person', attributes: ['id', 'name'] },
-                    { model: Home, as: 'home', attributes: ['id', 'name'] },
-                    { model: Warehouse, as: 'warehouse', attributes: ['id', 'title', 'description', 'status'] },
-                    { model: Product, as: 'product', attributes: ['id', 'name'], 
-                      include: [{ model: Category, as: 'category', attributes: ['name'] }]
-                    },
-                    { model: Status, as: 'status', attributes: ['id', 'name'] }
-                ]
-            });
-    
-            return res.status(200).json(updatedRecord);
-        } catch (error) {
-            await t.rollback();
-            const errorMsg = error.message || 'Error desconocido';
-            logger.error(`Error en PersonHomeWarehouseProductsController->update: ${errorMsg}`);
-            return res.status(500).json({ error: 'ServerError', details: errorMsg });
-        }
-    },*/
-
+    await ActivityLogService.createActivityLog(
+      "PersonHomeWarehouseProduct", // o el nombre que uses para este modelo
+      id, // ID del registro afectado
+      "move", // tipo de acción
+      req.user.id,
+      JSON.stringify(activityData, null, 2), // datos personalizados
+      original_warehouse.home_id,
+      { transaction: t }
+    );
+      await t.commit();
+      res.status(200).json({ success: true, data: result });
+    } catch (error) {
+      await t.rollback();
+      logger.error(`Error en PersonHomeWarehouseController->move: ${error.message}`);
+      res.status(500).json({ error: 'ServerError', details: error.message });
+    }
+  },
   // Eliminar un producto de un almacen en un hogar
   async destroy(req, res) {
     logger.info(

@@ -21,6 +21,16 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER
       },
+      home_id: {
+        type: Sequelize.BIGINT,
+        allowNull: true, // ← permitimos null al principio
+        references: {
+          model: 'homes', // ← ¡ajusta este nombre si tu tabla se llama diferente!
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL', // ← si se borra el home, home_id se pone en NULL
+      },
       newData: {
         type: Sequelize.TEXT
       },

@@ -57,17 +57,17 @@ const PersonWareHouseRepository = {
   return warehouses;
   },*/
 
-  async gettWarehouses(home_id, personId) {
+  /*async gettWarehouses(home_id, personId, type = null) {
     const warehouses = await PersonWarehouse.findAll({
       where: {
-        home_id, // Relacionado al hogar
+        home_id: home_id, // Solo registros de este hogar
         [Op.or]: [
-          // Relación directa con la persona y el hogar (todos los estados)
+          // 1. Son míos → los muestro sin importar el status (0,1,2)
           {
             person_id: personId,
             status: { [Op.in]: [0, 1, 2] },
           },
-          // Relación indirecta (otra persona), pero con status 1 o 2
+          // 2. Son de otros → solo los muestro si status es 1 o 2
           {
             person_id: { [Op.ne]: personId },
             status: { [Op.in]: [1, 2] },
@@ -82,19 +82,82 @@ const PersonWareHouseRepository = {
         "location",
         "status",
         "person_id",
-      ], // Incluye los datos relevantes
+        "home_id", // Opcional: para depuración
+      ],
       include: [
         {
           model: Warehouse,
-          as: "warehouse", // Relación con Warehouse para obtener información adicional si es necesario
-          attributes: [], // Si no necesitas datos de Warehouse, omítelos
+          as: "warehouse",
+          attributes: [],
         },
       ],
     });
 
     return warehouses;
-  },
+  },*/
 
+  async gettWarehouses(home_id, personId, type = null) {
+  let whereCondition = {
+    home_id: home_id,
+  };
+
+  if (type === 'Personal') {
+    // ✅ SOLO almacenes PRIVADOS del usuario (status = 0)
+    whereCondition = {
+      ...whereCondition,
+      person_id: personId,
+      status: 0, // ← ¡Clave! Solo los privados
+    };
+  } else if (type === 'Hogar') {
+    // ✅ SOLO almacenes del HOGAR (status 1 o 2), excluyendo los privados del usuario
+    whereCondition = {
+      ...whereCondition,
+      status: { [Op.in]: [1, 2] }, // ← Solo públicos/compartidos
+      // Opcional: si quieres EXCLUIR explícitamente los privados del usuario, añade:
+      // [Op.or]: [
+      //   { person_id: { [Op.ne]: personId } },
+      //   { person_id: personId, status: { [Op.in]: [1, 2] } } // Incluye los tuyos si son públicos
+      // ]
+    };
+  } else {
+    // Comportamiento original (todos los que la persona puede ver)
+    whereCondition = {
+      ...whereCondition,
+      [Op.or]: [
+        {
+          person_id: personId,
+          status: { [Op.in]: [0, 1, 2] }, // El usuario ve todos sus almacenes
+        },
+        {
+          status: { [Op.in]: [1, 2] }, // Ve almacenes de otros solo si son públicos
+        },
+      ],
+    };
+  }
+
+  const warehouses = await PersonWarehouse.findAll({
+    where: whereCondition,
+    attributes: [
+      "id",
+      "warehouse_id",
+      "title",
+      "description",
+      "location",
+      "status",
+      "person_id",
+      "home_id",
+    ],
+    include: [
+      {
+        model: Warehouse,
+        as: "warehouse",
+        attributes: [],
+      },
+    ],
+  });
+
+  return warehouses;
+},
   // Buscar un almacén por ID
   async findById(id) {
     return await PersonWarehouse.findByPk(id, {

@@ -1,7 +1,7 @@
 {
     "category": {
         "Limpieza": {
-          "name": "Limpieza",
+          "name": "Higiene/Limpieza",
           "description": "Categoría de limpieza"
         },
         "Cocina": {
@@ -15,6 +15,14 @@
         "Alimentos": {
           "name": "Alimentos",
           "description": "Productos para cocinar"
+        },
+        "Mascotas": {
+          "name": "Mascotas",
+          "description": "Categoría de alimentos y productos para mascotas"
+        },
+        "Medicamento": {
+        "name": "Medicamentos",
+        "description": "Categoría de medicamentos y productos farmacéuticos"
         },
         "Electrónicos": {
           "name": "Electrónicos",

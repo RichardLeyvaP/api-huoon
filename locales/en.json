@@ -1,7 +1,7 @@
 {
     "category": {
             "Limpieza": {
-              "name": "Cleaning",
+              "name": "Hygiene/Cleaning",
               "description": "Cleaning category"
             },
             "Cocina": {
@@ -15,6 +15,10 @@
             "Alimentos": {
               "name": "Food",
               "description": "Products for cooking"
+            },
+            "Mascotas": {
+               "name": "Pet",
+              "description": "Pet food and supplies category"
             },
             "Electrónicos": {
               "name": "Electronics",
@@ -172,6 +176,10 @@
       "name": "Medications",
       "description": "Prescription and over-the-counter drugs"
     },
+    "Medicamento": {
+      "name": "Medications",
+      "description": "Medications and pharmaceutical products category"
+        },
     "Seguros de salud": {
       "name": "Health Insurance",
       "description": "Private health coverage or copays"

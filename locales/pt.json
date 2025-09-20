@@ -1,7 +1,7 @@
 {
     "category": {
         "Limpieza": {
-        "name": "Limpeza",
+        "name": "Higiene/Limpeza",
         "description": "Categoria de limpeza"
         },
         "Cocina": {
@@ -11,6 +11,10 @@
         "Mantenimiento": {
           "name": "Manutenção",
           "description": "Categoria de manutenção"
+        },
+        "Mascotas": {
+          "name": "Pet",
+          "description": "Categoria de alimentos e produtos para animais de estimação"
         },
         "Alimentos": {
           "name": "Alimentos",
@@ -172,6 +176,10 @@
       "name": "Medicamentos",
       "description": "Remédios com e sem receita"
     },
+    "Medicamento": {
+      "name": "Medicamentos",
+    "description": "Categoria de medicamentos e produtos farmacêuticos"
+        },
     "Seguros de salud": {
       "name": "Seguros de saúde",
       "description": "Plano de saúde privado ou copagamentos"

@@ -35,6 +35,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true, // Puede ser nulo si no siempre se registra un usuario
     },
+    home_id: {
+        type: DataTypes.BIGINT,
+        references: {
+          model: "Home",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+        allowNull: true,
+      },
     newData: {
       type: DataTypes.TEXT,
       allowNull: true, // Puede ser nulo si no siempre se registra información nueva

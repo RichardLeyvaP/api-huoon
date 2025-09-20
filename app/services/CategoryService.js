@@ -67,6 +67,7 @@ class CategoryService {
 
       flatList.push({
         id: category.id,
+        name: category.name,
         nameCategory: translatedName, // sin indentación de texto
         descriptionCategory: translatedDescription,
         iconCategory: category.icon,

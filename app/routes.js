@@ -21,7 +21,7 @@ const { storeRoleSchema, updateRoleSchema, idRoleSchema } = require('./middlewar
 const { storeStatusSchema, updateStatusSchema, idStatusSchema, typeStatusSchema } = require('./middlewares/validations/statusValidation');
 const { storeHomePersonSchema, updateHomePersonSchema, idHomePersonSchema, assignPeopleSchema } = require('./middlewares/validations/homePersonValidation');
 const { storeWareHouseSchema, updateWareHouseSchema, idWareHouseSchema } = require('./middlewares/validations/warehouseValidation');
-const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema } = require('./middlewares/validations/personWareHouseValidation');
+const { storePersonWareHouseSchema, updatePersonWareHouseSchema, idPersonWareHouseSchema, getWarehouseSchema, moveProductSchema } = require('./middlewares/validations/personWareHouseValidation');
 const { storePersonSchema, updatePersonSchema, idPersonSchema } = require('./middlewares/validations/personValidation');
 const { storeHomePersonTaskSchema, updateHomePersonTaskSchema, idHomePersonTaskSchema, assignPeopleTaskSchema } = require('./middlewares/validations/homePersonTaskValidation');
 const { storeTaskSchema, updateTaskSchema, idTaskSchema, getDateTaskSchema, home_idTaskSchema, updatePointsAndTasksSchema } = require('./middlewares/validations/taskValidation');
@@ -92,6 +92,7 @@ const PetTreatmentController = require("./controllers/PetTreatmentController");
 const VetVisitController = require('./controllers/VetVisitController');
 const CurrentMedicationController = require('./controllers/CurrentMedicationController');
 const PetDietController = require('./controllers/PetDietController');
+const ActivityLogController = require('./controllers/ActivityLogController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -400,6 +401,7 @@ router.post('/person-home-warehouse-products', validateSchema(getPersonHomeProdu
 router.post('/person-home-warehouse-product-update', multerCategory('image', 'personProducts'), validateSchema(updatePersonProductSchema), PersonHomeWarehouseProductController.update);
 router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
 router.post("/process-ocr", validateSchema(ocrStringSchema), PersonHomeWarehouseProductController.processOCR);
+router.post('/warehouse-product-move', validateSchema(moveProductSchema), PersonHomeWarehouseProductController.move);
 
 //Rutas Finanzas
 router.get('/finance', FinanceController.index);
@@ -526,5 +528,7 @@ router.post('/get-type-food', validateSchema(typeSchema), PetDietController.getT
 router.post('/get-type-diagnoses', validateSchema(typeSchema), DiagnosisController.getTypesByTypeRelation);
 router.post('/get-type-treatment', validateSchema(typeSchema), TreatmentController.getTypesByType);
 router.post('/get-type-consultations', validateSchema(typeSchema), MedicalConsultationController.getTypesByTypeRelation);
+router.post('/activity-log-model', ActivityLogController.getActivityLogsByModel);
+
 
 module.exports = router;

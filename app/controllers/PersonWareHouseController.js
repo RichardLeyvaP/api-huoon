@@ -3,6 +3,7 @@ const { Warehouse, Home, PersonWarehouse, Person, HomePerson, HomeWarehouse, seq
 const logger = require('../../config/logger');
 const i18n = require('../../config/i18n-config');
 const { PersonWareHouseRepository, HomeRepository, WareHouseRepository, PersonRepository, PersonProductRepository, SuggestionRepository } = require('../repositories');
+const { CategoryService } = require('../services');
 
 const PersonWarehouseController = {
     // Listar todos los almacenes
@@ -234,10 +235,9 @@ const PersonWarehouseController = {
 
     async getWarehouses(req, res) {
         logger.info(`${req.user.name} - Entra a buscar los almacenes asociados a él`);
-    
-        const personId = req.person.id;
-        const { home_id } = req.body; // Suponemos que `home_id` se pasa en el cuerpo de la solicitud
-    
+
+        const { home_id, person_id: bodyPersonId, type } = req.body;
+        const person_id = bodyPersonId || req.person.id;
         try {
             // Verificar si el hogar existe
             const home = await HomeRepository.findById(home_id);
@@ -247,15 +247,15 @@ const PersonWarehouseController = {
             }
     
             // Verificar si la persona existe
-            const person = await PersonRepository.getPersonHouse(personId, home_id);
+            const person = await PersonRepository.getPersonHouse(person_id, home_id);
             if (!person) {
-                logger.error(`PersonWarehouseController->getWarehouses: La persona con ID ${personId} no está asociada con el hogar con ID ${home_id}`);
+                logger.error(`PersonWarehouseController->getWarehouses: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`);
                 return res.status(204).json({ msg: 'PersonNotFound' });
             }
     
             // Obtener los almacenes que tienen status 1 o 0 relacionados con la persona o el hogar
             // Consulta para obtener directamente desde PersonWarehouse
-        const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, personId);
+        const personWarehouses = await PersonWareHouseRepository.gettWarehouses(home_id, person_id, type);
 
         // Formatear resultados para el cliente // Importar o inyectar el repositorio de productos
     // Asumiendo que tienes un ProductRepository con el método getTotalQuantityByWarehouse
@@ -268,7 +268,7 @@ const PersonWarehouseController = {
         description: pw.description || "",
         location: pw.location || "",
         status: pw.status,
-        creator: pw.person_id === personId,
+        creator: pw.person_id === person_id,
         productCount: count, // Aquí agregamos la cantidad total de productos
       };
     });
@@ -276,12 +276,12 @@ const PersonWarehouseController = {
     // Esperar a que todas las promesas se resuelvan
     const result = await Promise.all(productCountsPromises);
 
-     const allSuggestions = await SuggestionRepository.findTodaySuggestions('Producto', personId, home_id);
- const suggestionStatusData = [
-        { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
-        { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
-        { id: "Completado", name: "Completado", description: "La sugerencia ha sido resuelta" },
-      ];
+     const allSuggestions = await SuggestionRepository.findTodaySuggestions('Producto', person_id, home_id);
+    const suggestionStatusData = [
+            { id: "Pendiente", name: "Pendiente", description: "La sugerencia está en espera de revisión" },
+            { id: "Revisado", name: "Revisado", description: "La sugerencia ha sido revisada" },
+            { id: "Completado", name: "Completado", description: "La sugerencia ha sido resuelta" },
+        ];
 
       const translatedSuggestionStatusData = suggestionStatusData.map((item) => ({
         id: item.id,
@@ -305,11 +305,33 @@ const PersonWarehouseController = {
         type: suggestion.typeTask,
         taskData: suggestion.taskData,
       }));
+
+      const categoryAvailability = await PersonWarehouseController.getCategoryAvailability(home_id, person_id, type);
+
+       const typeData = [
+              { id: "Personal", name: "Personal", description: "Registro financiero personal" },
+              { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
+                ];
+      
+                const translatedTypeData = typeData.map((item) => ({
+              id: item.id,
+              name: i18n.__(`financeType.${item.id}.name`) !== `financeType.${item.id}.name`
+                    ? i18n.__(`financeType.${item.id}.name`)
+                    : item.name,
+              description: i18n.__(`financeType.${item.id}.description`) !== `financeType.${item.id}.description`
+                    ? i18n.__(`financeType.${item.id}.description`)
+                    : item.description,
+              originalName: item.name
+            }));
+      
     
             return res.status(200).json({ 
                 store: result, 
                 suggestions: mappedSuggestions,
-                statusuggestions: translatedSuggestionStatusData });
+                statusuggestions: translatedSuggestionStatusData,
+                categoryAvailability,
+                types: translatedTypeData
+            });
     
         } catch (error) {
             const errorMsg = error.details
@@ -363,7 +385,44 @@ const PersonWarehouseController = {
             logger.error('Error en PersonWarehouseController->selectWarehouses: ' + errorMsg);
             res.status(500).json({ error: 'ServerError', details: errorMsg });
         }
-    }  
+    },
+
+    async getCategoryAvailability(homeId, personId, type) {
+    try {
+        // 1. Obtener categorías traducidas
+        const categories = await CategoryService.getCategories(personId, "Product");
+
+        // 2. Obtener totales por categoría en TODO el hogar
+        const categoryTotals = await PersonProductRepository.getTotalQuantityByCategories(homeId, personId, type);
+
+        // 3. Calcular total general de productos en el hogar
+        const totalGeneral = categoryTotals.reduce((sum, cat) => sum + cat.total_quantity, 0);
+
+        // 4. Mapear con nombres traducidos (¡usando nameCategory!) y porcentajes, y filtrar > 0
+        return categories
+            .map(cat => {
+                const found = categoryTotals.find(ct => ct.category_id === cat.id);
+                const quantity = found ? found.total_quantity : 0;
+                const percentage = totalGeneral > 0 
+                    ? parseFloat(((quantity / totalGeneral) * 100).toFixed(2)) 
+                    : 0;
+
+                return {
+                    id: cat.id,
+                    nameCategory: cat.nameCategory || `Categoría ${cat.id}`, // ✅ ¡CORREGIDO! nameCategory
+                    name: cat.name || `Categoría ${cat.id}`, // ✅ ¡CORREGIDO! nameCategory
+                    totalQuantity: quantity,
+                    percentage: percentage
+                };
+            })
+            .filter(cat => cat.totalQuantity > 0) // ✅ Solo con productos
+            .sort((a, b) => b.percentage - a.percentage); // ✅ Opcional: ordenar por porcentaje descendente
+
+    } catch (error) {
+        logger.error(`Error en getCategoryAvailability: ${error.message}`);
+        throw new Error('Error al calcular disponibilidad por categoría a nivel de hogar');
+    }
+}
 }
 
 module.exports = PersonWarehouseController;
