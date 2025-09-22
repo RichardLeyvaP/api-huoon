@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon app/server.js",
-    "start": "pm2 start app/server.js --name 'huoon-api'"
+    "start": "npx pm2 start app/server.js --name 'huoon-api'"
   },
   "keywords": [],
   "author": "",

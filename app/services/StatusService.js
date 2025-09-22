@@ -23,7 +23,8 @@ class StatusService {
                 `status.${status.name}.description`
                   ? i18n.__(`status.${status.name}.description`) : status.description,
                 colorStatus: status.color,
-                iconStatus: status.icon
+                iconStatus: status.icon,
+                name: status.name
             };
         });
     } catch (error) {

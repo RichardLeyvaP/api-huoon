@@ -388,41 +388,80 @@ const PersonWarehouseController = {
     },
 
     async getCategoryAvailability(homeId, personId, type) {
-    try {
-        // 1. Obtener categorías traducidas
-        const categories = await CategoryService.getCategories(personId, "Product");
+        try {
+            // 1. Obtener categorías traducidas
+            const categories = await CategoryService.getCategories(personId, "Product");
 
-        // 2. Obtener totales por categoría en TODO el hogar
-        const categoryTotals = await PersonProductRepository.getTotalQuantityByCategories(homeId, personId, type);
+            // 2. Obtener totales por categoría en TODO el hogar
+            const categoryTotals = await PersonProductRepository.getTotalQuantityByCategories(homeId, personId, type);
 
-        // 3. Calcular total general de productos en el hogar
-        const totalGeneral = categoryTotals.reduce((sum, cat) => sum + cat.total_quantity, 0);
+            // 3. Calcular total general de productos en el hogar
+            const totalGeneral = categoryTotals.reduce((sum, cat) => sum + cat.total_quantity, 0);
 
-        // 4. Mapear con nombres traducidos (¡usando nameCategory!) y porcentajes, y filtrar > 0
-        return categories
+            // 4. Mapear con nombres traducidos y porcentajes, y filtrar > 0
+            const categoryAvailability = categories
             .map(cat => {
                 const found = categoryTotals.find(ct => ct.category_id === cat.id);
                 const quantity = found ? found.total_quantity : 0;
-                const percentage = totalGeneral > 0 
-                    ? parseFloat(((quantity / totalGeneral) * 100).toFixed(2)) 
-                    : 0;
+                const percentage = totalGeneral > 0
+                ? parseFloat(((quantity / totalGeneral) * 100).toFixed(2))
+                : 0;
 
                 return {
-                    id: cat.id,
-                    nameCategory: cat.nameCategory || `Categoría ${cat.id}`, // ✅ ¡CORREGIDO! nameCategory
-                    name: cat.name || `Categoría ${cat.id}`, // ✅ ¡CORREGIDO! nameCategory
-                    totalQuantity: quantity,
-                    percentage: percentage
+                id: cat.id,
+                nameCategory: cat.nameCategory || `Categoría ${cat.id}`,
+                name: cat.name || `Categoría ${cat.id}`,
+                totalQuantity: quantity,
+                percentage: percentage
                 };
             })
-            .filter(cat => cat.totalQuantity > 0) // ✅ Solo con productos
-            .sort((a, b) => b.percentage - a.percentage); // ✅ Opcional: ordenar por porcentaje descendente
+            .sort((a, b) => b.percentage - a.percentage);
 
-    } catch (error) {
-        logger.error(`Error en getCategoryAvailability: ${error.message}`);
-        throw new Error('Error al calcular disponibilidad por categoría a nivel de hogar');
+            // 🆕 5. Obtener alertas
+            const alerts = [];
+
+            // Alerta 1: Producto con stock más bajo
+            const lowestStockProduct = await PersonProductRepository.getProductWithLowestStock(homeId, personId, type);
+            if (lowestStockProduct) {
+                const firstMessage = lowestStockProduct.quantity === 1 ? "tiene" : "solo tiene";
+                const secondMessage = lowestStockProduct.quantity === 1 ? "unidad" : "unidades";
+                alerts.push
+            alerts.push({
+              message: `⚠️ Stock crítico: "${lowestStockProduct.productName} ${firstMessage}" ${lowestStockProduct.quantity} ${secondMessage} de stock.`,
+            });
+            }
+
+            // Alerta 2: Productos que vencen este mes
+            /*const expiringCount = await PersonProductRepository.getExpiringProductsCountThisMonth(homeId, personId, type);
+            if (expiringCount > 0) {
+            alerts.push({
+                message: `📅 ¡Atención! ${expiringCount} unidades de productos vencen este mes.`
+            });
+            }*/
+           const { productCount, unitCount } = await PersonProductRepository.getExpiringProductsSummaryThisMonth(homeId, personId, type);
+
+            if (productCount > 0) {
+            const productWord = productCount === 1 ? "producto" : "productos";
+            const productWordMesasage = productCount === 1 ? "vence" : "distintos vencen";
+            const unitWord = unitCount === 1 ? "unidad" : "unidades";
+
+            alerts.push({
+                type: "expiring",
+                message: `📅 ¡Atención! ${productCount} ${productWord} ${productWordMesasage} este mes (${unitCount} ${unitWord} en total).`
+            });
+            }
+
+            // ✅ Devolver ambos: categorías y alertas
+            return {
+            categories: categoryAvailability,
+            alerts // Array de objetos { message: string }
+            };
+
+            } catch (error) {
+                logger.error(`Error en getCategoryAvailability: ${error.message}`);
+                throw new Error('Error al calcular disponibilidad por categoría a nivel de hogar');
+            }
     }
-}
 }
 
 module.exports = PersonWarehouseController;

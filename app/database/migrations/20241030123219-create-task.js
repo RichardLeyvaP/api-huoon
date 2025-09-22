@@ -119,9 +119,14 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      c: {
+      notificationTime: {
         type: Sequelize.STRING,
         allowNull: true,  // El campo end_time puede ser nulo
+      },
+      task_type: {
+        type: Sequelize.STRING,
+        allowNull: true,  // El campo end_time puede ser nulo
+        defaultValue: 'Personal'
       },
       createdAt: {
         type: Sequelize.DATE,

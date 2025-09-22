@@ -152,7 +152,7 @@ const TaskRepository = {
     });
   },
 
-  async findAllDate(start_date, personId, homeId) {
+  /*async findAllDate(start_date, personId, homeId, task_type = null) {
     return await Task.findAll({
       where: {
         [Op.and]: [
@@ -223,9 +223,85 @@ const TaskRepository = {
         },
       ],
     });
-  },
+  },*/
 
-  async findAllDateWeb(start_date = null, personId, homeId) {
+  async findAllDate(start_date, personId, homeId, task_type = null, type = null) {
+  const conditions = [];
+
+  // 1. Filtro por fecha (siempre)
+  conditions.push(
+    sequelize.where(
+      sequelize.fn("DATE", sequelize.col("Task.start_date")),
+      start_date
+    )
+  );
+
+  // 2. Filtro por homeId (solo si se pasa)
+  if (homeId) {
+    conditions.push({ home_id: homeId });
+  }
+
+  // 3. SIEMPRE: Filtro por relación con la persona (directa o vía home_person_task)
+  conditions.push({
+    [Op.or]: [
+      { person_id: personId },
+      sequelize.literal(`EXISTS (
+        SELECT 1
+        FROM home_person_task
+        WHERE home_person_task.task_id = Task.id
+        AND home_person_task.person_id = ${personId}
+      )`),
+    ],
+  });
+
+  // 4. Filtro por task_type (solo si se pasa)
+  if (task_type) {
+    conditions.push({ task_type });
+  }
+
+  if (type) {
+    conditions.push({ type });
+  }
+
+  return await Task.findAll({
+    where: {
+      [Op.and]: conditions,
+    },
+    include: [
+      {
+        model: HomePersonTask,
+        as: "homePersonTasks",
+        required: false,
+      },
+      {
+        model: Task,
+        as: "children",
+        include: [
+          {
+            model: HomePersonTask,
+            as: "homePersonTasks",
+            required: false,
+            where: {
+              person_id: personId, // Siempre filtrar hijos por persona
+            },
+          },
+          { model: Priority, as: "priority" },
+          { model: Status, as: "status" },
+          { model: Category, as: "category" },
+          { model: Person, as: "person", required: false },
+          { model: Home, as: "home", required: false },
+        ],
+        required: false,
+      },
+      { model: Priority, as: "priority" },
+      { model: Status, as: "status" },
+      { model: Category, as: "category" },
+      { model: Person, as: "person", required: false },
+      { model: Home, as: "home", required: false },
+    ],
+  });
+},
+  /*async findAllDateWeb(start_date = null, personId, homeId, task_type = null) {
     const whereClause = {
       [Op.and]: [
         { home_id: homeId },
@@ -315,8 +391,145 @@ const TaskRepository = {
         ["start_time", "ASC"],
       ],
     });
-  },
+  },*/
 
+async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type = null, statuses = null) {
+  const conditions = [];
+
+  // Extraer ID de "Completada" si se pasa el array de statuses
+  let COMPLETED_ID = null;
+  if (statuses && Array.isArray(statuses)) {
+    const completedStatus = statuses.find(s => s.name === 'Completada');
+    COMPLETED_ID = completedStatus ? completedStatus.id : null;
+  }
+
+  // 1. Filtro por homeId (solo si se pasa)
+  if (homeId) {
+    conditions.push({ home_id: homeId });
+  }
+
+  // 2. SIEMPRE: Filtro por relación con la persona
+  conditions.push({
+    [Op.or]: [
+      { person_id: personId },
+      { "$homePersonTasks.person_id$": personId },
+    ],
+  });
+
+  // 3. Filtro por task_type
+  if (task_type) {
+    conditions.push({ task_type });
+  }
+
+  // 4. Filtro por type
+  if (type) {
+    conditions.push({ type });
+  }
+
+  // 5. Filtro por fecha
+  if (start_date) {
+    conditions.push(
+      sequelize.where(
+        sequelize.fn("DATE", sequelize.col("Task.start_date")),
+        start_date
+      )
+    );
+  } else {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0 = enero, 11 = diciembre
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0); // Último día del mes
+
+    const startDateStr = firstDayOfMonth.toISOString().split("T")[0];
+    const endDateStr = lastDayOfMonth.toISOString().split("T")[0];
+
+    // Condición: Incluir si:
+    // - start_date está en el mes → siempre
+    // - O end_date está en el mes → solo si NO está completada
+    const startInRange = sequelize.where(
+      sequelize.fn("DATE", sequelize.col("Task.start_date")),
+      { [Op.between]: [startDateStr, endDateStr] }
+    );
+
+    if (COMPLETED_ID !== null) {
+      // end_date en rango Y estado ≠ Completada
+      const endInRangeAndNotCompleted = {
+        [Op.and]: [
+          sequelize.where(
+            sequelize.fn("DATE", sequelize.col("Task.end_date")),
+            { [Op.between]: [startDateStr, endDateStr] }
+          ),
+          {
+            status_id: { [Op.ne]: COMPLETED_ID }
+          }
+        ]
+      };
+
+      conditions.push({
+        [Op.or]: [
+          startInRange,
+          endInRangeAndNotCompleted
+        ]
+      });
+    } else {
+      // Si no tenemos COMPLETED_ID, filtramos por ambas fechas sin excluir nada
+      conditions.push({
+        [Op.or]: [
+          startInRange,
+          sequelize.where(
+            sequelize.fn("DATE", sequelize.col("Task.end_date")),
+            { [Op.between]: [startDateStr, endDateStr] }
+          )
+        ]
+      });
+    }
+  }
+
+  // 6. Ejecutar consulta
+  return await Task.findAll({
+    where: {
+      [Op.and]: conditions,
+    },
+    include: [
+      {
+        model: HomePersonTask,
+        as: "homePersonTasks",
+        required: false,
+      },
+      {
+        model: Task,
+        as: "children",
+        include: [
+          {
+            model: HomePersonTask,
+            as: "homePersonTasks",
+            required: false,
+            where: {
+              person_id: personId,
+            },
+          },
+          { model: Priority, as: "priority" },
+          { model: Status, as: "status" },
+          { model: Category, as: "category" },
+          { model: Person, as: "person", required: false },
+          { model: Home, as: "home", required: false },
+        ],
+        required: false,
+      },
+      { model: Priority, as: "priority" },
+      { model: Status, as: "status" },
+      { model: Category, as: "category" },
+      { model: Person, as: "person", required: false },
+      { model: Home, as: "home", required: false },
+    ],
+    order: [
+      ["start_date", "DESC"],
+      ["start_time", "ASC"],
+    ],
+  });
+},
   async getTaskPeople(taskId) {
     try {
       // Realizar la consulta a la base de datos
@@ -495,6 +708,7 @@ const TaskRepository = {
           end_time: body.end_time,
           type: body.type,
           module: body.module,
+          task_type: body.task_type,
           priority_id: body.priority_id,
           status_id: body.status_id,
           category_id: body.category_id,
@@ -551,6 +765,7 @@ const TaskRepository = {
       "end_time",
       "type",
       "module",
+      "task_type",
       "notificationDate",
       "notificationTime",
     ];
@@ -931,6 +1146,215 @@ const TaskRepository = {
       throw error;
     }
   },
+
+  async getGoalSummary(personId, homeId = null, task_type = null, type = null, statuses) {
+    const today = new Date();
+
+
+    // Extraer IDs por nombre lógico
+    let COMPLETED_ID = null;
+    let IN_PROGRESS_ID = null;
+    let PENDING_ID = null;
+  statuses.forEach(status => {
+    if (status.name === 'Completada') COMPLETED_ID = status.id;
+    if (status.name === 'En Progreso') IN_PROGRESS_ID = status.id;
+    if (status.name === 'Pendiente') PENDING_ID = status.id;
+  });
+
+    if (!COMPLETED_ID || !IN_PROGRESS_ID || !PENDING_ID) {
+      throw new Error("Required statuses not found: 'Completada', 'En Progreso', 'Pendiente'");
+    }
+
+  // 2. Rango del MES ACTUAL
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const monthStartStr = firstDayOfMonth.toISOString().split("T")[0];
+  const monthEndStr = lastDayOfMonth.toISOString().split("T")[0];
+
+  // 3. Rango de la SEMANA ACTUAL (para "próximas a vencer")
+  const day = today.getDay();
+  const diffToMonday = today.getDate() - (day === 0 ? 6 : day - 1);
+  const monday = new Date(today);
+  monday.setDate(diffToMonday);
+  monday.setHours(0, 0, 0, 0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  const weekStartStr = monday.toISOString().split("T")[0];
+  const weekEndStr = sunday.toISOString().split("T")[0];
+
+  // 4. Construir condiciones
+  const conditions = [];
+
+  if (homeId) conditions.push({ home_id: homeId });
+
+  conditions.push({
+    [Op.or]: [
+      { person_id: personId },
+      { "$homePersonTasks.person_id$": personId },
+    ],
+  });
+
+  if (task_type) {
+    conditions.push({ task_type });
+  }
+
+  if (type) {
+    conditions.push({ type });
+  }
+
+  // 5. Filtro: tareas que INICIEN en el mes (siempre) o TERMINEN en el mes (solo si NO están completadas)
+  const startInRange = sequelize.where(
+    sequelize.fn("DATE", sequelize.col("Task.start_date")),
+    { [Op.between]: [monthStartStr, monthEndStr] }
+  );
+
+  if (COMPLETED_ID !== null) {
+    const endInRangeAndNotCompleted = {
+      [Op.and]: [
+        sequelize.where(
+          sequelize.fn("DATE", sequelize.col("Task.end_date")),
+          { [Op.between]: [monthStartStr, monthEndStr] }
+        ),
+        {
+          status_id: { [Op.ne]: COMPLETED_ID }
+        }
+      ]
+    };
+
+    conditions.push({
+      [Op.or]: [
+        startInRange,
+        endInRangeAndNotCompleted
+      ]
+    });
+  } else {
+    // Fallback si por alguna razón no tenemos COMPLETED_ID
+    conditions.push({
+      [Op.or]: [
+        startInRange,
+        sequelize.where(
+          sequelize.fn("DATE", sequelize.col("Task.end_date")),
+          { [Op.between]: [monthStartStr, monthEndStr] }
+        )
+      ]
+    });
+  }
+
+  // 6. Obtener tareas
+  const tasks = await Task.findAll({
+    where: { [Op.and]: conditions },
+    include: [
+      {
+        model: HomePersonTask,
+        as: "homePersonTasks",
+        required: false,
+      },
+      {
+        model: Status,
+        as: "status",
+        required: true,
+      }
+    ],
+    attributes: [
+      'id',
+      'start_date',
+      'end_date',
+      'start_time',
+      'end_time',
+      'status_id'
+    ]
+  });
+
+    // 7. Clasificar + Acumular IDs
+  const activas = [];
+  const completadas = [];
+  const retrasadas = [];
+  const proximasVencer = [];
+
+  tasks.forEach(task => {
+    const statusId = task.status_id;
+    const taskId = task.id;
+
+    const endDateTime = new Date(`${task.end_date}T${task.end_time || '23:59:59'}`);
+    const startDateTime = new Date(`${task.start_date}T${task.start_time || '00:00:00'}`);
+
+    // Completadas
+    if (statusId === COMPLETED_ID) {
+      completadas.push(taskId);
+      return;
+    }
+
+    // Solo considerar Pendientes y En Progreso para las demás categorías
+    if (statusId !== PENDING_ID && statusId !== IN_PROGRESS_ID) {
+      return;
+    }
+
+    // Retrasadas: fecha de fin ya pasó
+    if (today > endDateTime) {
+      retrasadas.push(taskId);
+    }
+    // Próximas a vencer: fecha de fin está en la semana actual
+    else if (endDateTime > today) {
+      const taskEndDate = new Date(task.end_date);
+      if (taskEndDate >= monday && taskEndDate <= sunday) {
+        proximasVencer.push(taskId);
+      }
+    }
+
+    // Activas: solo si están "En Progreso"
+    if (statusId === IN_PROGRESS_ID) {
+      activas.push(taskId);
+    }
+  });
+
+  // 8. Calcular porcentajes
+  const total = tasks.length;
+  const calcPercentage = (value) => total === 0 ? 0 : Math.round((value / total) * 100);
+
+  // 9. Función auxiliar para nombres amigables
+  const getFriendlyName = (id) => {
+    const status = statuses.find(s => s.id === id);
+    return status ? status.nameStatus : "Desconocido";
+  };
+
+  // 10. Devolver respuesta
+  return {
+    summary: [
+      {
+        id: "active",
+        name: getFriendlyName(IN_PROGRESS_ID),
+        totalQuantity: activas.length,
+        percentage: calcPercentage(activas.length),
+        taskIds: activas  // ✅ Array de IDs
+      },
+      {
+        id: "completed",
+        name: getFriendlyName(COMPLETED_ID),
+        totalQuantity: completadas.length,
+        percentage: calcPercentage(completadas.length),
+        taskIds: completadas  // ✅ Array de IDs
+      },
+      {
+        id: "delayed",
+        name: "Retrasadas",
+        totalQuantity: retrasadas.length,
+        percentage: calcPercentage(retrasadas.length),
+        taskIds: retrasadas  // ✅ Array de IDs
+      },
+      {
+        id: "dueSoon",
+        name: "Próximas a vencer",
+        totalQuantity: proximasVencer.length,
+        percentage: calcPercentage(proximasVencer.length),
+        taskIds: proximasVencer  // ✅ Array de IDs
+      }
+    ],
+    totalTasks: total
+  };
+}
 };
 
 module.exports = TaskRepository;

@@ -204,6 +204,115 @@ async getTotalQuantityByCategories(homeId, personId, type) {
     total_quantity: parseInt(r.total_quantity) || 0
   }));
 },
+async getProductWithLowestStock(homeId, personId, type) {
+  const visibleWarehouseIds = await this.getVisibleWarehouseIds(homeId, personId, type);
+
+  if (visibleWarehouseIds.length === 0) {
+    return null;
+  }
+
+  const product = await PersonHomeWarehouseProduct.findOne({
+    attributes: [
+      [sequelize.col('product.name'), 'productName'],
+      [sequelize.col('quantity'), 'quantity'],
+      [sequelize.col('product.id'), 'productId']
+    ],
+    include: [{
+      model: Product,
+      as: "product",
+      attributes: [],
+      required: true
+    }],
+    where: {
+      home_id: homeId,
+      warehouse_id: { [Op.in]: visibleWarehouseIds },
+      quantity: { [Op.gt]: 0 } // Solo productos con stock > 0
+    },
+    order: [[sequelize.col('quantity'), 'ASC']],
+    raw: true
+  });
+
+  return product;
+},
+/*async getExpiringProductsCountThisMonth(homeId, personId, type) {
+  const visibleWarehouseIds = await this.getVisibleWarehouseIds(homeId, personId, type);
+
+  if (visibleWarehouseIds.length === 0) {
+    return 0;
+  }
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  const result = await PersonHomeWarehouseProduct.sum('quantity', {
+    where: {
+      home_id: homeId,
+      warehouse_id: { [Op.in]: visibleWarehouseIds },
+      expiration_date: {
+        [Op.gte]: startOfMonth,
+        [Op.lte]: endOfMonth
+      },
+      quantity: { [Op.gt]: 0 }
+    }
+  });
+
+  return result || 0;
+}*/
+
+async getExpiringProductsSummaryThisMonth(homeId, personId, type) {
+  const visibleWarehouseIds = await this.getVisibleWarehouseIds(homeId, personId, type);
+
+  if (visibleWarehouseIds.length === 0) {
+    return { productCount: 0, unitCount: 0 };
+  }
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+  // 1. Contar unidades totales que vencen
+  const unitCount = await PersonHomeWarehouseProduct.sum('quantity', {
+    where: {
+      home_id: homeId,
+      warehouse_id: { [Op.in]: visibleWarehouseIds },
+      expiration_date: {
+        [Op.gte]: startOfMonth,
+        [Op.lte]: endOfMonth
+      },
+      quantity: { [Op.gt]: 0 }
+    }
+  });
+
+  // 2. Contar productos DISTINTOS (usando COUNT DISTINCT directamente)
+  const productCountResult = await PersonHomeWarehouseProduct.sequelize.query(
+    `
+    SELECT COUNT(DISTINCT product_id) as productCount
+    FROM person_home_warehouse_products
+    WHERE home_id = :homeId
+      AND warehouse_id IN (:warehouseIds)
+      AND expiration_date >= :startOfMonth
+      AND expiration_date <= :endOfMonth
+      AND quantity > 0
+    `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: {
+        homeId,
+        warehouseIds: visibleWarehouseIds,
+        startOfMonth,
+        endOfMonth
+      }
+    }
+  );
+
+  const productCount = productCountResult[0]?.productCount || 0;
+
+  return {
+    productCount: parseInt(productCount, 10) || 0,
+    unitCount: parseInt(unitCount, 10) || 0
+  };
+},
 /*async getTotalQuantityByCategories(homeId, personId) { // ← ¡Agregamos personId como parámetro!
   const results = await PersonHomeWarehouseProduct.findAll({
     attributes: [

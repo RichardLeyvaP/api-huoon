@@ -112,7 +112,8 @@ const TaskController = {
       const tasks = await TaskRepository.findAllDate(
         req.body.start_date,
         personId,
-        req.body.home_id
+        req.body.home_id,
+        req.body.task_type
       );
 
       if (!tasks.length) {
@@ -137,6 +138,8 @@ const TaskController = {
             notificationTime: task.notificationTime,
             type: task.type,
             module: task.module,
+            taskType: task.task_type,
+            task_type: task.task_type,
             priorityId: task.priority_id,
             priority_id: task.priority_id,
             colorPriority: task.priority?.color,
@@ -162,8 +165,15 @@ const TaskController = {
           };
         })
       );
-
-      return res.status(200).json({ tasks: mappedTasks }); // Tareas encontradas
+      const statuses = await StatusService.getStatus("Task");
+      const sumaryData = await TaskRepository.getGoalSummary(
+        personId,
+        req.body.home_id,
+        req.body.task_type,
+        req.body.type,
+        statuses
+      )
+      return res.status(200).json({ tasks: mappedTasks, status: statuses, sumaryData: sumaryData }); // Tareas encontradas
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
@@ -189,16 +199,20 @@ const TaskController = {
         return res.status(204).json({ msg: "TaskNotFound", tasks: [] });
       }
       const personId = req.person.id;
+      const statuses = await StatusService.getStatus("Task");
       // Obtener solo las tareas principales (sin padre) directamente en la consulta
       const tasks = await TaskRepository.findAllDateWeb(
         req.body.start_date,
         personId,
-        req.body.home_id
+        req.body.home_id,
+        req.body.task_type,
+        req.body.type,
+        statuses
       );
 
-      if (!tasks.length) {
+      /*if (!tasks.length) {
         return res.status(204).json({ msg: "TaskNotFound", tasks: tasks });
-      }
+      }*/
       // Mapear las tareas
       const mappedTasks = await Promise.all(
         tasks.map(async (task) => {
@@ -217,7 +231,9 @@ const TaskController = {
             notificationDate: task.notificationDate,
             notificationTime: task.notificationTime,
             type: task.type,
-            module: task.module,
+            module: task.module,            
+            taskType: task.task_type,
+            task_type: task.task_type,
             moduleName: i18n.__(`module.${task.module}.name`) !==
               `module.${task.module}.name`
                 ? i18n.__(`module.${task.module}.name`)
@@ -263,8 +279,14 @@ const TaskController = {
           };
         })
       );
-      const statuses = await StatusService.getStatus("Task");
-      return res.status(200).json({ tasks: mappedTasks, status: statuses }); // Tareas encontradas
+      const sumaryData = await TaskRepository.getGoalSummary(
+        personId,
+        req.body.home_id,
+        req.body.task_type,
+        req.body.type,
+        statuses
+      )
+      return res.status(200).json({ tasks: mappedTasks, status: statuses, sumaryData: sumaryData }); // Tareas encontradas
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
@@ -301,124 +323,6 @@ const TaskController = {
             logger.error('TaskController->mapParent', error.message);
         }
     },*/
-  /*async storeBulk(req, res){
-   logger.info(`${req.user.name} - Crea nuevas tareas`);
-    logger.info("Datos recibidos al crear tareas");
-    logger.info(JSON.stringify(req.body));
-    
-    const personId = req.person.id;
-    const tasksToCreate = req.body.tasks || [req.body]; // Acepta array o objeto único
-    
-    if (!tasksToCreate.length) {
-        logger.error("No se recibieron tareas para crear");
-        return res.status(400).json({ msg: "NoTasksProvided" });
-    }
-
-    // Iniciar la transacción
-    const t = await sequelize.transaction();
-    try {
-        const createdTasks = [];
-        
-        for (const taskData of tasksToCreate) {
-            // Validación básica de datos requeridos
-            if (!taskData.title || !taskData.type || !taskData.home_id) {
-                logger.error(`Faltan datos requeridos en la tarea: ${JSON.stringify(taskData)}`);
-                continue; // O podrías devolver error inmediatamente
-            }
-
-            // Determinar el estado basado en fechas (similar al original)
-            const type = taskData.type;
-            const statuses = await StatusRepository.findByType(type);
-            
-            if (!statuses || statuses.length === 0) {
-                logger.error(`No se encontraron estados para el tipo: ${type}`);
-                continue;
-            }
-
-            const now = new Date();
-            const currentDate = now.toISOString().split('T')[0];
-            const currentTime = now.toTimeString().split(' ')[0].substring(0, 5);
-            
-            const { start_date, start_time } = taskData;
-            let status;
-
-            if (start_date > currentDate) {
-                status = statuses.find((s) => s.name === "Pendiente");
-            } else if (start_date === currentDate) {
-                if (currentTime < start_time) {
-                    status = statuses.find((s) => s.name === "Pendiente");
-                } else {
-                    status = statuses.find((s) => s.name === "En Progreso");
-                }
-            } else {
-                status = statuses.find((s) => s.name === "Completada");
-            }
-
-            if (!status) {
-                logger.error(`No se encontró estado válido para fecha ${start_date} y hora ${start_time}`);
-                continue;
-            }
-
-            taskData.status_id = status.id;
-
-            // Filtrar personas con role_id != 0 (si existen)
-            let filteredPeople = [];
-            if (taskData.people && taskData.people.length > 0) {
-                filteredPeople = taskData.people.filter(
-                    (person) => parseInt(person.role_id) !== 0
-                );
-            }
-
-            // Crear la tarea
-            const task = await TaskRepository.create(taskData, null, personId, t);
-            createdTasks.push(task);
-
-            // Registrar la creación en el log de actividades
-            await ActivityLogService.createActivityLog(
-                "Task",
-                task.id,
-                "create",
-                req.user.id,
-                JSON.stringify(task),
-                { transaction: t }
-            );
-
-            // Crear asociaciones con personas (si existen)
-            if (filteredPeople.length > 0) {
-                for (const person of filteredPeople) {
-                    await HomePersonTask.create(
-                        {
-                            task_id: task.id,
-                            person_id: person.person_id,
-                            role_id: person.role_id,
-                            home_id: person.home_id
-                        },
-                        { transaction: t }
-                    );
-                }
-            }
-        }
-
-        // Confirmar la transacción
-        await t.commit();
-        
-        res.status(201).json({ 
-            success: true,
-            createdTasks: createdTasks.length,
-            tasks: createdTasks
-        });
-        
-    } catch (error) {
-        // Revertir la transacción si ocurre un error
-        await t.rollback();
-        const errorMsg = error.message || "Error desconocido";
-        logger.error("TaskController->store (simplified): " + errorMsg);
-        res.status(500).json({ 
-            error: "ServerError", 
-            details: errorMsg 
-        });
-    }
-  },*/
   async storeBulk(req, res) {
     logger.info(`${req.user.name} - Crea nuevas tareas`);
     logger.info("Datos recibidos al crear tareas");
@@ -853,7 +757,9 @@ const TaskController = {
                   ...taskSuggestion,
                   parent_id: task.id,
                   type: "Tarea",
-                  module: "Tarea",
+                  module: "Tarea",                  
+                  taskType: task.task_type,
+                  task_type: task.task_type,
                   home_id: req.body.home_id,
                   people: req.body.people,
                   start_date:
@@ -1534,6 +1440,22 @@ const TaskController = {
         };
       });
 
+      const typeData = [
+                   { id: "Personal", name: "Personal", description: "Registro financiero personal" },
+                   { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
+                     ];
+           
+                     const translatedTypeData = typeData.map((item) => ({
+                   id: item.id,
+                   name: i18n.__(`financeType.${item.id}.name`) !== `financeType.${item.id}.name`
+                         ? i18n.__(`financeType.${item.id}.name`)
+                         : item.name,
+                   description: i18n.__(`financeType.${item.id}.description`) !== `financeType.${item.id}.description`
+                         ? i18n.__(`financeType.${item.id}.description`)
+                         : item.description,
+                   originalName: item.name
+                 }));
+
       res.json({
         taskcategories: categories,
         taskstatus: statuses,
@@ -1542,6 +1464,7 @@ const TaskController = {
         taskrecurrences: translatedRecurrenceData,
         taskroles: roles,
         tasktype: translatedTypeTaskData,
+        tasktypetask: translatedTypeData,
       });
     } catch (error) {
       logger.error("Error al obtener categorías:", error);

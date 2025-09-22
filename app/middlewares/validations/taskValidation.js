@@ -15,6 +15,7 @@ const storeTaskSchema = Joi.object({
     .allow(null), // Formato 24 horas
   type: Joi.string().optional().allow(null, "").empty(null),
   module: Joi.string().optional().allow(null, "").empty(null),
+  task_type: Joi.string().optional().allow(null, "").empty(null),
   priority_id: Joi.number().integer().required(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),
@@ -75,6 +76,7 @@ const updateTaskSchema = Joi.object({
     .allow(null), // Formato 24 horas
   type: Joi.string().optional().allow(null, "").empty(null),
   module: Joi.string().optional().allow(null, "").empty(null),
+  task_type: Joi.string().optional().allow(null, "").empty(null),
   priority_id: Joi.number().integer().optional(),
   parent_id: Joi.number().integer().allow(null, "").optional().empty(null),
   status_id: Joi.number().integer().optional(),
@@ -127,6 +129,8 @@ const idTaskSchema = Joi.object({
 const getDateTaskSchema = Joi.object({
   start_date: Joi.date().allow(null, "").optional().empty(null),
   home_id: Joi.number().integer().allow(null, "").optional().empty(null),
+  task_type: Joi.string().optional().allow(null, "").empty(null),
+  type: Joi.string().optional().allow(null, "").empty(null),
 });
 const home_idTaskSchema = Joi.object({
   home_id: Joi.number().required(),

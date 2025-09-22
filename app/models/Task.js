@@ -148,6 +148,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    task_type: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'Personal'
+    },
   }, {
     sequelize,
     modelName: 'Task',
