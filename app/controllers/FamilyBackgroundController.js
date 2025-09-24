@@ -345,7 +345,7 @@ const FamilyBackgroundController = {
 
     try {
       const { type } = req.body; // Supongamos que el tipo viene en el cuerpo de la solicitud
-      const types = await TypeRepository.findByType(type);
+      /*const types = await TypeRepository.findByType(type);
 
       if (!types || types.length === 0) {
         return res
@@ -372,7 +372,7 @@ const FamilyBackgroundController = {
           nameTranslated: translatedName, // Sobrescribir name con la traducción
           descriptionTranslated: translatedDescription, // Sobrescribir description con la traducción
         };
-      });
+      });*/
 
       const familyRelationsData = [
         { id: "Padre", name: "Padre", description: "Parentesco de padre" },
@@ -397,7 +397,7 @@ const FamilyBackgroundController = {
         relationName: item.name
       }));
 
-      return res.status(200).json({ types: formattedTypes, relationships: translatedFamilyRelationsData });
+      return res.status(200).json({ relationships: translatedFamilyRelationsData });
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")

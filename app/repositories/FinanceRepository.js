@@ -113,24 +113,25 @@ const FinanceRepository = {
     });
   },
 
-  async findAllTypeRange(id, home_id = null, type, dateRange = {}) {
+  async findAllTypeRange(person_id, home_id, type, dateRange = {}) {
     const whereConditions = {};
-    
+
     // Configuración según tipo
-    if (type === "Hogar") {
-        whereConditions.type = type;
-        whereConditions.home_id = id;
-    } else if (type === "Personal") {
-        whereConditions.type = type;
-        whereConditions.person_id = id;
+    if (type === "Personal") {
+        whereConditions.type = "Personal";
+        whereConditions.person_id = person_id;
+    } else if (type === "Hogar") {
+        whereConditions.type = "Hogar";
+        whereConditions.home_id = home_id;
     } else {
+        // Tipo no especificado o inválido: traer ambos
         whereConditions[Op.or] = [
-            { home_id: home_id, type: "Hogar" },
-            { person_id: id, type: "Personal" }
+            { person_id: person_id, type: "Personal" },
+            { home_id: home_id, type: "Hogar" }
         ];
     }
 
-    // Función para normalizar fechas (maneja Date objetos o strings YYYY-MM-DD)
+    // Función para normalizar fechas
     const normalizeDate = (date) => {
         if (!date) return null;
         if (date instanceof Date) return date;
@@ -146,12 +147,11 @@ const FinanceRepository = {
         const endDate = normalizeDate(dateRange.endDate);
 
         whereConditions.date = {};
-        
+
         if (startDate) {
             whereConditions.date[Op.gte] = startDate;
         }
         if (endDate) {
-            // Asegurar que incluya todo el día
             const endOfDay = new Date(endDate);
             endOfDay.setHours(23, 59, 59, 999);
             whereConditions.date[Op.lte] = endOfDay;
@@ -161,8 +161,8 @@ const FinanceRepository = {
         const now = new Date();
         const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
         const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        endDate.setHours(23, 59, 59, 999); // Fin del día
-        
+        endDate.setHours(23, 59, 59, 999);
+
         whereConditions.date = {
             [Op.between]: [startDate, endDate]
         };
@@ -182,7 +182,7 @@ const FinanceRepository = {
             "method",
             "image",
             "available",
-            "budget_id" // Añadir este campo
+            "budget_id"
         ],
         include: [
             {
@@ -197,10 +197,11 @@ const FinanceRepository = {
             }
         ],
         order: [
-            ['date', 'DESC']
+            ['date', 'DESC'],
+            ['createdAt', 'DESC'] // 👈 ¡Ahora también ordena por createdAt!
         ]
     });
-  },
+},
   async findById(id) {
     return await Finance.findByPk(id, {
       attributes: [
@@ -726,12 +727,14 @@ const FinanceRepository = {
       personal: {
         income: personalIncome,
         spent: personalSpent,
-        available: personalAvailable
+        available: personalAvailable,
+        spentPercentage: personalIncome > 0 ? parseFloat(((personalSpent / personalIncome) * 100).toFixed(2)) : 0
       },
       home: homeId !== null ? {
         income: homeIncome,
         spent: homeSpent,
-        available: homeAvailable
+        available: homeAvailable,
+        spentPercentage: homeIncome > 0 ? parseFloat(((homeSpent / homeIncome) * 100).toFixed(2)) : 0
       } : null
     };
   }

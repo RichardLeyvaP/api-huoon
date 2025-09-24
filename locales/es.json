@@ -618,6 +618,10 @@
     "name": "Una vez al día",
     "description": "Medicación que debe tomarse una vez cada 24 horas"
   },
+  "Cada 2 horas": {
+  "name": "Cada 2 horas",
+  "description": "Medicación que debe tomarse cada 2 horas (12 veces al día)"
+},
   "Cada 48 horas": {
     "name": "Cada 48 horas",
     "description": "Medicación que debe tomarse cada dos días"

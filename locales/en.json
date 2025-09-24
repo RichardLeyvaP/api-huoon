@@ -622,6 +622,10 @@
     "name": "Once daily",
     "description": "Medication to be taken once every 24 hours"
   },
+  "Cada 2 horas": {
+   "name": "Every 2 hours",
+  "description": "Medication to be taken every 2 hours (12 times per day)"
+},
   "Cada 48 horas": {
     "name": "Every 48 hours",
     "description": "Medication to be taken every two days"

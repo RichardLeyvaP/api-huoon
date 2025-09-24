@@ -29,7 +29,7 @@ const FamilyBackgroundRepository = {
         { model: Home, as: "home" },
         { model: Type, as: "type" },
       ],
-      order: [['diagnosis_age', 'DESC']]
+      order: [['date', 'DESC']]
     });
   },
 

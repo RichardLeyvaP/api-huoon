@@ -144,13 +144,8 @@ const FinanceController = {
         if (endDate) dateRange.endDate = endDate;
 
         let finances = [];
-        if (type === 'Hogar') {
-            finances = await FinanceRepository.findAllTypeRange(home_id, null, type, dateRange);
-        } else if (type === 'Personal') {
-            finances = await FinanceRepository.findAllTypeRange(person_id, null, type, dateRange);
-        } else {
-            finances = await FinanceRepository.findAllTypeRange(person_id, home_id, type, dateRange);
-        }
+        
+        finances = await FinanceRepository.findAllTypeRange(person_id, home_id, type, dateRange);
 
         if (!finances.length) {
             logger.info('No se encontraron registros financieros');
@@ -446,7 +441,7 @@ const FinanceController = {
     try {
 
        //const stats = await FinanceRepository.getPersonFinancialStats(person_id);
-      const budgetStats = await BudgetRepository.getPersonBudgetStats(person_id, home_id, type);
+      //const budgetStats = await BudgetRepository.getPersonBudgetStats(person_id, home_id, type);
       /*// 2. Obtener presupuestos actuales
       const budgets = await BudgetRepository.findAllCurrentByPersonId(person_id, home_id);
       
@@ -475,7 +470,7 @@ const FinanceController = {
           });
         }
       }*/
-      
+      const dataBalance = await FinanceRepository.getAvailableMoneyCurrentMonth(home_id, person_id);
       // 5. Obtener todas las sugerencias (existentes + nuevas)
       const allSuggestions = await SuggestionRepository.findTodaySuggestions('Finanzas', person_id, home_id);
 
@@ -521,13 +516,7 @@ const FinanceController = {
         }).format(amount);
       };
 
-      // Obtener descripción del último movimiento (si existe)
-      /*let lastMovementDescription = "No hay movimientos";
-      if (stats.lastRecord) {
-        lastMovementDescription = stats.lastRecord.description || 
-          (stats.lastRecord.income ? "Ingreso registrado" : "Gasto registrado");
-      }*/
-
+      const totalIncome = type === 'Personal' ? dataBalance.personal.income : dataBalance.home.income;
       //Grafico de pie
       // Estructura: agrupar por categoría principal y sus subcategorías
       const { budgets, expenses } = await FinanceRepository.getAllExpensesAndBudgetCategories(person_id, null, null, home_id, type);
@@ -595,123 +584,73 @@ const FinanceController = {
       });
 
       // Calcular presupuesto total por categoría principal
-      const budgetByMainId = {};
-      parentCategories.forEach(parent => {
-        const children = details[parent.id] || [];
-        const totalBudget = children.reduce((sum, child) => sum + child.budgetAmount, 0);
-        budgetByMainId[parent.id] = totalBudget;
-      });
+      const spentByMainId = {};
+parentCategories.forEach(parent => {
+  const children = details[parent.id] || [];
+  const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
+  spentByMainId[parent.id] = totalSpent;
+});
 
-      // Total global
-      const totalBudgetAll = Object.values(budgetByMainId).reduce((sum, b) => sum + b, 0);
+// ✅ CAMBIO 2: totalAmount ahora es totalIncome (no totalBudgetAll)
+// const totalBudgetAll = Object.values(budgetByMainId).reduce((sum, b) => sum + b, 0); // ❌ BORRAR
 
-      // --- Generar summary ---
-      const summary = parentCategories.map(parent => {
-        const children = details[parent.id] || [];
-        const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
-        const totalBudget = budgetByMainId[parent.id] || 0;
-        const percentage = totalBudget > 0 ? ((totalSpent / totalBudget) * 100).toFixed(1) : 0;
+// --- Generar summary ---
+const summary = parentCategories.map(parent => {
+  const children = details[parent.id] || [];
+  const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
+  // ✅ CAMBIO 3: Porcentaje contra total ingresado (income), no contra presupuesto
+  const percentage = totalIncome > 0 ? ((totalSpent / totalIncome) * 100).toFixed(1) : 0;
 
-        return {
-          id: parent.id,
-          title: parent.title,
-          value: parseFloat(percentage),
-          color: parent.color,
-          icon: parent.icon,
-          total: totalSpent.toFixed(2),
-        };
-      });
+  return {
+    id: parent.id,
+    title: parent.title,
+    value: parseFloat(percentage),
+    color: parent.color,
+    icon: parent.icon,
+    total: totalSpent.toFixed(2),
+  };
+});
 
-      // --- Formatear details ---
-      Object.keys(details).forEach(key => {
-        const mainId = parseInt(key);
-        if (isNaN(mainId)) return;
+// --- Formatear details ---
+Object.keys(details).forEach(key => {
+  const mainId = parseInt(key);
+  if (isNaN(mainId)) return;
 
-        const items = details[mainId].filter(item => item.id !== mainId);
-        const totalBudgetMain = budgetByMainId[mainId] || 0;
+  const items = details[mainId].filter(item => item.id !== mainId);
+  const parentSpent = spentByMainId[mainId] || 0; // ← gasto total del padre
 
-        details[mainId] = items.map(item => {
-          //const percentage = totalBudgetMain > 0 ? ((item.spent / totalBudgetMain) * 100).toFixed(1) : 0;
-          const percentage = item.budgetAmount > 0 ? ((item.spent / item.budgetAmount) * 100).toFixed(1) : 0;
-          return {
-            id: item.id,
-            title: item.name, // ← nombre correcto
-            value: parseFloat(percentage),
-            color: item.color,
-            icon: item.icon,
-            amount: item.spent.toFixed(2),
-            budget: item.budgetAmount.toFixed(2),
-          };
-        });
-      });
+  details[mainId] = items.map(item => {
+    const percentage = parentSpent > 0 ? ((item.spent / parentSpent) * 100).toFixed(1) : 0;
+    return {
+      id: item.id,
+      title: item.name,
+      value: parseFloat(percentage),
+      color: item.color,
+      icon: item.icon,
+      amount: item.spent.toFixed(2),
+      budget: parentSpent.toFixed(2), // ✅ ¡CAMBIO CLAVE! Ahora es el gasto del padre
+    };
+  });
+});
 
-      const alertsBudget = FinanceController.generateSpendingAlerts( parentCategories, details, budgetByMainId, totalBudgetAll, type);
+
+      const alertsBudget = FinanceController.generateSpendingAlerts( parentCategories, details, spentByMainId, totalIncome, type);
 
       const expenseTrendAlert = await FinanceController.generateExpenseTrendAlert(person_id, home_id, type);
       const response = {
-        /*incomeCard: {
-          current: formatCurrency(stats.currentMonth.income),
-          percentage: stats.percentages.income,
-          lastMonth: formatCurrency(stats.lastMonth.income),
-          icon: "mdi-cash",
-          color: "green"
-        },
-        spentCard: {
-          current: formatCurrency(stats.currentMonth.spent),
-          percentage: stats.percentages.spent,
-          lastMonth: formatCurrency(stats.lastMonth.spent),
-          icon: "mdi-cart",
-          color: "red"
-        },
-        balanceCard: {
-          current: formatCurrency(stats.currentMonth.balance),
-          icon: "mdi-scale-balance",
-          color: "blue-darken-2"
-        },*/
-        budgetCard: {
-        current: formatCurrency(budgetStats.currentMonth.budget),
-        used: formatCurrency(budgetStats.currentMonth.used),
-        remaining: formatCurrency(budgetStats.currentMonth.remaining),
-        currentUsage: budgetStats.currentMonth.usagePercentage, // % usado este mes
-        lastUsage: budgetStats.lastMonth.usagePercentage,      // % usado mes anterior
-        lastMonth: formatCurrency(budgetStats.lastMonth.budget),
-        icon: "mdi-wallet",
-        color: "blue"
-      },
-        /*movementsCard: {
-          total: formatCurrency(stats.currentMonth.income - stats.currentMonth.spent),
-          lastMovement: {
-            amount: stats.lastRecord ? formatCurrency(stats.lastRecord.income || stats.lastRecord.spent) : "0",
-            description: lastMovementDescription,
-            icon: stats.lastRecord?.income ? "mdi-cash" : "mdi-cart",
-            type: stats.lastRecord?.income ? "income" : "spent"
-          },
-          icon: "mdi-calendar-clock",
-          color: "amber-darken-2"
-        },*/
+        balance: type === 'Personal' ? dataBalance.personal : dataBalance.home,
         suggestions: mappedSuggestions,
         statusuggestions: translatedSuggestionStatusData,
         financeData: financeData,
-         /*dataSpent: {
-          totalAmount: parseFloat(totalAll.toFixed(2)),
-          currency: "USD",
-          dateRange: {
-            start: null,
-            end: null,
-          },
-          summary,
-          categories: mainCategories,
-          details,
-        },*/
          dataSpent: {
-          totalAmount: parseFloat(totalBudgetAll.toFixed(2)), // total global
-          totalBudgetByGroup: budgetByMainId,                 // 👈 nuevo: para que el frontend calcule dinámicamente
-          currency: "USD",
-          dateRange: { start: null, end: null },
-          summary,
-          categories: parentCategories,
-          details,
-        },
+    totalAmount: parseFloat(totalIncome.toFixed(2)), // ✅ ¡AHORA ES INCOME!
+    totalBudgetByGroup: spentByMainId,               // ✅ ¡AHORA ES GASTO POR GRUPO!
+    currency: "CLP",
+    dateRange: { start: null, end: null },
+    summary,
+    categories: parentCategories,
+    details,
+  },
         alertsBudget: alertsBudget,
         alertsSpent: expenseTrendAlert
       };

@@ -37,7 +37,7 @@ const BudgetRepository = {
       order: [['start_date', 'DESC']]
     });
   },*/
-  async findAllByPersonId(personId, homeId = null) {
+  /*async findAllByPersonId(personId, homeId = null) {
     const whereConditions = {
       [Op.or]: [
         { person_id: personId, budget_type: 'Personal' }
@@ -89,8 +89,76 @@ const BudgetRepository = {
   }));
 
   return budgetsMapped;
-  },
+  },*/
+  async findAllByPersonId(personId, homeId = null, type = null) {
+    // 1. Construir condiciones WHERE según el valor de `type`
+    let whereConditions = {};
 
+    if (type === 'Personal') {
+      // Solo presupuestos personales
+      whereConditions = {
+        person_id: personId,
+        budget_type: 'Personal'
+      };
+    } else if (type === 'Hogar') {
+      whereConditions = {
+        home_id: homeId,
+        budget_type: 'Hogar'
+      };
+    } else {
+      // Comportamiento original: Personal siempre + Hogar si homeId existe
+      whereConditions = {
+        [Op.or]: [
+          { person_id: personId, budget_type: 'Personal' }
+        ]
+      };
+
+      if (homeId) {
+        whereConditions[Op.or].push({
+          home_id: homeId,
+          budget_type: 'Hogar'
+        });
+      }
+    }
+
+    // 2. Obtener los tipos de presupuesto válidos
+    const validTypes = await TypeRepository.findByType('Presupuesto');
+    const validTypeMap = new Map(validTypes.map(t => [t.id, t.name]));
+
+    // 3. Obtener los presupuestos con sus relaciones
+    const budgets = await Budget.findAll({
+      where: whereConditions, // 👈 Aquí aplicamos la condición dinámica
+      include: [
+        { model: Person, as: "person" },
+        { model: Home, as: "home" },
+        { model: Category, as: "category" },
+        { model: Type, as: "type" },
+      ],
+      order: [
+        ['budget_type', 'ASC'],
+        ['start_date', 'DESC']
+      ]
+    });
+
+    // 4. Calcular used_amount y remaining_amount
+    const budgetsMapped = await Promise.all(budgets.map(async (budget) => {
+      let used_amount = 0;
+
+      const typeName = validTypeMap.get(budget.type_id);
+      if (typeName && ['Diario', 'Semanal', 'Mensual', 'Anual'].includes(typeName)) {
+        used_amount = await this.getTotalExpensesByBudgetIdAndType(budget.id, budget.type_id);
+      }
+
+      const budgetPlain = budget.get({ plain: true });
+      return {
+        ...budgetPlain,
+        used_amount,
+        remaining_amount: parseFloat(budget.amount) - used_amount
+      };
+    }));
+
+    return budgetsMapped;
+  },
   async findAllByPersonIdHomeId(personId, homeId = null) {
     // Obtener el primer y último día del mes actual
     const now = new Date();

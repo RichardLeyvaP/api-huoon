@@ -120,10 +120,10 @@ const BudgetController = {
   async getByPersonId(req, res) {
     logger.info(`${req.user.name} - Busca presupuestos de una persona`);
     try {
-      const { home_id } = req.body;
+      const { home_id, type } = req.body;
       const personId = req.person.id;
 
-      const budgets = await BudgetRepository.findAllByPersonId(personId, home_id);
+      const budgets = await BudgetRepository.findAllByPersonId(personId, home_id, type);
 
       if (!budgets.length) {
         return res.status(204).json({ msg: "BudgetNotFound", budgets: [] });

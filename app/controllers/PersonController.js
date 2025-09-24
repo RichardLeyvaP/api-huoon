@@ -652,8 +652,6 @@ const PersonController = {
       const treatmentData =
         mappedTreatments.length === 0
           ? null
-          : mappedTreatments.length === 1
-          ? mappedTreatments[0]
           : mappedTreatments;
 
       res.status(200).json({
@@ -826,10 +824,10 @@ const PersonController = {
             typeId: consultation.type_id,
             type_id: consultation.type_id,
             typeName: consultation.type?.name
-              ? i18n.__(`types.${diagnosis.type.name}.name`) !==
-                `types.${diagnosis.type.name}.name`
-                ? i18n.__(`types.${diagnosis.type.name}.name`)
-                : diagnosis.type.name
+              ? i18n.__(`types.${consultation.type.name}.name`) !==
+                `types.${consultation.type.name}.name`
+                ? i18n.__(`types.${consultation.type.name}.name`)
+                : consultation.type.name
               : null,
           }
         : null;

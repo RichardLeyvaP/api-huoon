@@ -275,10 +275,10 @@ const PhysicalExamController = {
 
   // Eliminar un examen físico
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Eliminando examen físico con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Eliminando examen físico con ID ${req.body.id}`);
 
     try {
-      const physicalExam = await PhysicalExamRepository.findById(req.params.id);
+      const physicalExam = await PhysicalExamRepository.findById(req.body.id);
 
       if (!physicalExam) {
         return res.status(404).json({ msg: "PhysicalExamNotFound" });

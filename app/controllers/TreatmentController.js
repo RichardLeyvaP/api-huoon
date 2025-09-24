@@ -334,6 +334,16 @@ const TreatmentController = {
           });
       }
 
+      const frequencyMap = {
+        "Cada 1 hora": 1,
+        "Cada 2 horas": 2,
+        "Cada 4 horas": 4,
+        "Cada 6 horas": 6,
+        "Cada 8 horas": 8,
+        "Cada 12 horas": 12,
+        "Una vez al día": 24,
+        "Cada 48 horas": 48,
+      };
       // Formatear los resultados para traducir name y description
       const formattedTypes = types.map((typeItem) => {
         const translatedName = i18n.__(`types.${typeItem.name}.name`) !==
@@ -353,7 +363,13 @@ const TreatmentController = {
         };
       });
 
-      return res.status(200).json({ types: formattedTypes/*, relationships: translatedFamilyRelationsData*/ });
+      const sortedTypes = formattedTypes.sort((a, b) => {
+        const hoursA = frequencyMap[a.name] || 9999;
+        const hoursB = frequencyMap[b.name] || 9999;
+        return hoursA - hoursB;
+      });
+
+      return res.status(200).json({ types: sortedTypes/*, relationships: translatedFamilyRelationsData*/ });
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
