@@ -290,6 +290,7 @@ const MedicalConsultationRepository = {
               { model: Type, as: "type" },
             ],
             required: false, // Solo personas que TENGAN consultas en el rango
+            order: [['startDate', 'DESC']],
           },
           {
             model: Home,

@@ -210,6 +210,7 @@ const PersonalBackgroundRepository = {
             },
           ],
           required: false,
+          order: [['startDate', 'DESC']],
         },
         {
           model: Home,

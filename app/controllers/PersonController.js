@@ -448,6 +448,7 @@ const PersonController = {
         return {
           id: person.id,
           name: person.name,
+          image: person.image,
           // Puedes agregar más campos del modelo Person aquí
           // email: person.email,
           // phone: person.phone,
@@ -468,10 +469,7 @@ const PersonController = {
       const mappedHouseholdVacunations = householdMembersVacuntions.map(
         (person) => {
           // Filtrar solo antecedentes de tipo "Vacunación"
-          const vaccinations =
-            person.backgroundPerson?.filter(
-              (bg) => bg.type?.name?.toLowerCase().includes("vacunaci") // fallback JS si iLike falla
-            ) || [];
+          const vaccinations = person.personalBackgrounds || [];
 
           // Determinar si tiene vacunas PENDIENTES (status = 'activo')
           const hasPendingVaccines = vaccinations.some(
@@ -485,6 +483,7 @@ const PersonController = {
           return {
             id: person.id,
             name: person.name,
+            image: person.image,
             vaccinations, // todas las vacunas de tipo "Vacunación"
             hasPendingVaccines, // boolean
             hasCompletedVaccines, // boolean

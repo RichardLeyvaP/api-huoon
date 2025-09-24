@@ -291,7 +291,7 @@ async getLastByPersonQuery(person_id, field = null) {
     throw error;
   }
 },
-async findHouseholdHealthMetrics(homeId) {
+/*async findHouseholdHealthMetrics(homeId) {
   try {
     logger.info(`Buscando métricas de salud para hogar ID: ${homeId}`);
 
@@ -431,6 +431,199 @@ async findHouseholdHealthMetrics(homeId) {
       totalMembers: personIds.length,
       countNormalBloodPressure,
       countHealthyWeight,
+    };
+
+  } catch (error) {
+    logger.error('PhysicalExamRepository->findHouseholdHealthMetrics:', error.message);
+    throw new Error(`Error fetching household health metrics: ${error.message}`);
+  }
+}*/
+async findHouseholdHealthMetrics(homeId) {
+  try {
+    logger.info(`Buscando métricas de salud para hogar ID: ${homeId}`);
+
+    const persons = await Person.findAll({
+      attributes: ['id', 'name', 'image'],
+      include: [
+        {
+          model: Home,
+          as: 'homePersons',
+          where: { id: homeId },
+          required: true,
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
+
+    const personIds = persons.map(p => p.id);
+    const personMap = new Map(persons.map(p => [p.id, { name: p.name, imageUrl: p.imageUrl }]));
+
+    // Si no hay miembros, retornamos vacío
+    if (personIds.length === 0) {
+      return {
+        totalMembers: 0,
+        countNormalBloodPressure: 0,
+        countHealthyWeight: 0,
+        healthyWeightMembers: [],
+        normalBloodPressureMembers: [],
+      };
+    }
+
+    const sequelize = PhysicalExam.sequelize;
+
+    // Helper para construir consultas seguras con replacements
+    const buildQuery = (field) => `
+      SELECT person_id, ${field}, exam_date
+      FROM (
+        SELECT person_id, ${field}, exam_date,
+               ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY exam_date DESC) as rn
+        FROM physical_exams
+        WHERE person_id IN (${personIds.map(() => '?').join(',')})
+          AND ${field} IS NOT NULL
+      ) ranked
+      WHERE rn = 1
+    `;
+
+    // Ejecutar queries con replacements (seguro contra inyección)
+    const replacements = personIds;
+
+    const lastBPExamsRaw = await sequelize.query(buildQuery('blood_pressure'), {
+      replacements,
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    const lastWeightExamsRaw = await sequelize.query(buildQuery('weight'), {
+      replacements,
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    const lastHeightExamsRaw = await sequelize.query(buildQuery('height'), {
+      replacements,
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    // Convertir a Map
+    const bpMap = new Map(lastBPExamsRaw.map(exam => [exam.person_id, exam]));
+    const weightMap = new Map(lastWeightExamsRaw.map(exam => [exam.person_id, exam]));
+    const heightMap = new Map(lastHeightExamsRaw.map(exam => [exam.person_id, exam]));
+
+    let countNormalBloodPressure = 0;
+    let countHealthyWeight = 0;
+
+    const healthyWeightMembers = [];
+    const normalBloodPressureMembers = [];
+
+    // Iterar sobre todos los miembros del hogar
+    for (const person of persons) {
+      const { id: personId, name, image } = person;
+
+      // ───────────────────────────────
+      // PRESIÓN ARTERIAL
+      // ───────────────────────────────
+      const bpExam = bpMap.get(personId);
+      if (bpExam && bpExam.blood_pressure != null) {
+        let systolic, diastolic;
+        const rawBP = bpExam.blood_pressure;
+
+        if (typeof rawBP === 'string') {
+          const parts = rawBP.split('/').map(p => p.trim());
+          systolic = parseInt(parts[0], 10);
+          diastolic = parseInt(parts[1], 10);
+        } else if (Array.isArray(rawBP)) {
+          [systolic, diastolic] = rawBP.map(Number);
+        } else if (typeof rawBP === 'object' && rawBP !== null) {
+          systolic = Number(rawBP.systolic || rawBP.sys || rawBP.systolicValue || 0);
+          diastolic = Number(rawBP.diastolic || rawBP.dia || rawBP.diastolicValue || 0);
+        } else {
+          systolic = Number(rawBP);
+          diastolic = 0;
+        }
+
+        const isNormal = !isNaN(systolic) && !isNaN(diastolic) && systolic <= 120 && diastolic <= 80;
+
+        normalBloodPressureMembers.push({
+          name,
+          image,
+          bloodPressure: rawBP,
+          isNormalBloodPressure: isNormal,
+          hasData: true,
+        });
+
+        if (isNormal) countNormalBloodPressure++;
+      } else {
+        // ❌ No tiene datos de presión
+        normalBloodPressureMembers.push({
+          name,
+          image,
+          bloodPressure: null,
+          isNormalBloodPressure: false,
+          hasData: false,
+        });
+      }
+
+      // ───────────────────────────────
+      // PESO SALUDABLE (IMC)
+      // ───────────────────────────────
+      const weightExam = weightMap.get(personId);
+      const heightExam = heightMap.get(personId);
+
+      if (weightExam && heightExam) {
+        const weight = parseFloat(weightExam.weight);
+        const height = parseFloat(heightExam.height);
+
+        if (!isNaN(weight) && !isNaN(height) && height > 0) {
+          const bmi = weight / (height * height);
+          const isHealthy = bmi >= 18.5 && bmi <= 24.9;
+
+          healthyWeightMembers.push({
+            name,
+            image,
+            weight,
+            height,
+            bmi: parseFloat(bmi.toFixed(2)),
+            isHealthyWeight: isHealthy,
+            hasData: true,
+          });
+
+          if (isHealthy) countHealthyWeight++;
+        } else {
+          // Datos inválidos (ej. altura = 0)
+          healthyWeightMembers.push({
+            name,
+            image,
+            weight: null,
+            height: null,
+            bmi: null,
+            isHealthyWeight: false,
+            hasData: false,
+          });
+        }
+      } else {
+        // ❌ Falta peso o altura
+        healthyWeightMembers.push({
+          name,
+          image,
+          weight: null,
+          height: null,
+          bmi: null,
+          isHealthyWeight: false,
+          hasData: false,
+        });
+      }
+    }
+
+    logger.info(`📊 RESULTADO FINAL:`);
+    logger.info(`   Total de miembros: ${persons.length}`);
+    logger.info(`   Presión arterial normal: ${countNormalBloodPressure}`);
+    logger.info(`   Peso saludable: ${countHealthyWeight}`);
+
+    return {
+      totalMembers: persons.length,
+      countNormalBloodPressure,
+      countHealthyWeight,
+      healthyWeightMembers,
+      normalBloodPressureMembers,
     };
 
   } catch (error) {
