@@ -213,10 +213,10 @@ const PsychosocialBackgroundController = {
 
   // Delete a psychosocial background record
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Deleting psychosocial background with ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Deleting psychosocial background with ID ${req.body.id}`);
 
     try {
-      const record = await PsychosocialBackgroundRepository.findById(req.params.id);
+      const record = await PsychosocialBackgroundRepository.findById(req.body.id);
 
       if (!record) {
         return res.status(404).json({ msg: "PsychosocialBackgroundNotFound" });

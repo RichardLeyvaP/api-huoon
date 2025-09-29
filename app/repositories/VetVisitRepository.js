@@ -297,6 +297,28 @@ const VetVisitRepository = {
   return result.length;
 },
 
+async getUpcomingVetVisitDetailsForPets(petIds) {
+  const { startOfWeek, endOfWeek } = this.getWeekRange();
+
+  const records = await VetVisit.findAll({
+    where: {
+      pet_id: petIds,
+      next_visit: {
+        [Op.gte]: startOfWeek,
+        [Op.lte]: endOfWeek
+      }
+    },
+    attributes: ['id', 'pet_id', 'vet_name', 'date', 'next_visit', 'clinic', 'reason'],
+    raw: true
+  });
+
+  // Renombrar next_visit → next_date para consistencia si quieres
+  return records.map(r => ({
+    ...r,
+    next_date: r.next_visit
+  }));
+},
+
   /**
    * Buscar visitas próximas
    */

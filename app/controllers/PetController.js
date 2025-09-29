@@ -226,6 +226,87 @@ const PetController = {
       );
       const petIds = pets.map(p => p.id);
       const [
+        vaccinationDetails,
+        pendingControlDetails,
+        vetVisitDetails
+      ] = await Promise.all([
+        PetTreatmentRepository.getVaccinationDetailsForPets(petIds),
+        PetTreatmentRepository.getPendingControlDetailsForPets(petIds),
+        VetVisitRepository.getUpcomingVetVisitDetailsForPets(petIds)
+      ]);
+      // Función auxiliar para agrupar por pet_id
+      const groupByPetId = (records) => {
+        const map = new Map();
+        records.forEach(record => {
+          if (!map.has(record.pet_id)) {
+            map.set(record.pet_id, []);
+          }
+          map.get(record.pet_id).push(record);
+        });
+        return map;
+      };
+
+      const vaccinationMap = groupByPetId(vaccinationDetails);
+      const pendingControlMap = groupByPetId(pendingControlDetails);
+      const vetVisitMap = groupByPetId(vetVisitDetails);
+      const upToDateVaccinations = mappedPets.map(pet => {
+        const records = vaccinationMap.get(pet.id) || [];
+        return {
+          id: pet.id,
+          name: pet.name,
+          image: pet.image,
+          vaccinations: records.map(r => ({
+            id: r.id,
+            name: r.name,
+            date: formatDateToYYYYMMDD(r.date),
+            next_date: formatDateToYYYYMMDD(r.next_date),
+            notes: r.notes
+          })),
+          hasVaccinations: records.length > 0,
+          totalVaccinations: records.length
+        };
+      });
+      const pendingControls = mappedPets.map(pet => {
+        const records = pendingControlMap.get(pet.id) || [];
+        return {
+          id: pet.id,
+          name: pet.name,
+          image: pet.image,
+          controls: records.map(r => ({
+            id: r.id,
+            name: r.name,
+            type: r.type, // vaccination o deworming
+            date: formatDateToYYYYMMDD(r.date),
+            next_date: formatDateToYYYYMMDD(r.next_date),
+            notes: r.notes,
+            dosage: r.dosage,
+            unit: r.unit,
+            type: r.type
+          })),
+          hasControls: records.length > 0,
+          totalControls: records.length
+        };
+      });
+
+      const upcomingVetVisits = mappedPets.map(pet => {
+        const records = vetVisitMap.get(pet.id) || [];
+        return {
+          id: pet.id,
+          name: pet.name,
+          image: pet.image,
+          vetVisits: records.map(r => ({
+            id: r.id,
+            vet_name: r.vet_name,
+            date: formatDateToYYYYMMDD(r.date),
+            next_date: formatDateToYYYYMMDD(r.next_date),
+            clinic: r.clinic,
+            reason: r.reason
+          })),
+          hasVetVisits: records.length > 0,
+          totalVetVisits: records.length
+        };
+      });
+      /*const [
         upToDateVaccinations,
         pendingControls,
         upcomingVetVisits
@@ -233,15 +314,20 @@ const PetController = {
         PetTreatmentRepository.countPetsWithUpToDateVaccinations(petIds),
         PetTreatmentRepository.countPetsWithPendingControls(petIds),
         VetVisitRepository.countPetsWithUpcomingVetVisits(petIds)
-      ]);
+      ]);*/
       return res.status(200).json({ 
         pets: mappedPets,       
         stats: {
-          totalPets: mappedPets.length,
-          upToDateVaccinations,
-          pendingControls,
-          upcomingVetVisits,
-        }      
+        totalPets: mappedPets.length,
+        upToDateVaccinations: upToDateVaccinations.filter(p => p.hasVaccinations).length,
+        pendingControls: pendingControls.filter(p => p.hasControls).length,
+        upcomingVetVisits: upcomingVetVisits.filter(p => p.hasVetVisits).length,
+      },
+      details: {
+        upToDateVaccinations,
+        pendingControls,
+        upcomingVetVisits
+      }  
       });
     } catch (error) {
       const errorMsg = error.message || "Error desconocido";

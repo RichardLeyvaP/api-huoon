@@ -104,6 +104,30 @@
         "name": "Peces",
         "description": "Categoría de peces y acuarios"
       },
+      "Roedores": {
+        "name": "Roedores",
+        "description": "Categoría de roedores como hámsters, cobayos y ratones"
+      },
+      "Reptiles": {
+        "name": "Reptiles",
+        "description": "Categoría de reptiles como lagartos, tortugas y serpientes"
+      },
+      "Conejos": {
+        "name": "Conejos",
+        "description": "Categoría de conejos domésticos"
+      },
+      "Hurones": {
+        "name": "Hurones",
+        "description": "Categoría de hurones como mascotas"
+      },
+      "Anfibios": {
+        "name": "Anfibios",
+        "description": "Categoría de anfibios como ranas y salamandras"
+      },
+      "Insectos": {
+        "name": "Insectos",
+        "description": "Categoría de insectos y artrópodos como grillos, escarabajos y arácnidos"
+      },
       "Necesidades básicas": {
       "name": "Necesidades básicas",
       "description": "Gastos esenciales para vivir: vivienda, alimentación, transporte y salud."

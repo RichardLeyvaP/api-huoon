@@ -302,7 +302,7 @@ const HomePersonController = {
       const homePerson = await HomePerson.findByPk(req.body.id);
       if (!homePerson) {
         logger.error(
-          `HomePersonController->destroy: Relación no encontrada con ID ${req.params.id}`
+          `HomePersonController->destroy: Relación no encontrada con ID ${req.body.id}`
         );
         return res.status(404).json({ msg: "HomePersonNotFound" });
       }

@@ -194,10 +194,13 @@ const PersonalBackgroundRepository = {
     });
   },
 
-  async findHouseholdVaccinationStatus(homeId) {
+  async findHouseholdVaccinationStatus(homeId, personId = null) {
   try {
+    const whereHome = { id: homeId };
+    const wherePerson = personId ? { id: personId } : {};
     // Buscar todos los miembros del hogar con sus antecedentes de tipo "Vacunación"
     const householdMembers = await Person.findAll({
+      where: wherePerson,
       include: [
         {
           model: PersonalBackground,

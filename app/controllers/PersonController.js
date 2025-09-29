@@ -310,8 +310,8 @@ const PersonController = {
     logger.info(`${req.user.name} - Accediendo al perfil de una persona`);
 
     try {
-      const { home_id, startDate, endDate, person_id: bodyPersonId } = req.body;
-        const person_id = bodyPersonId || req.person.id;
+      const { home_id, startDate, endDate, person_id: bodyPersonId, type } = req.body;
+        let person_id = bodyPersonId || req.person.id;
       // Buscar persona por ID obtenido de req.person
       logger.info("comenzar a optener los datos");
       const person = await PersonRepository.findById(person_id);
@@ -406,13 +406,16 @@ const PersonController = {
         taskData: suggestion.taskData,
       }));
       // Devolver los datos mapeados
-
+      if(type === 'Hogar'){
+        person_id = null
+      }
       //Personas con consultas médicas en la semana actual
       const householdMembers =
         await MedicalConsultationRepository.findFamilyMembersWithConsultationsByHomeId(
           home_id,
           startDate,
-          endDate
+          endDate,
+          person_id
         );
 
       // Mapear TODOS los miembros (con o sin consultas)
@@ -462,7 +465,8 @@ const PersonController = {
       // personas con plan de vacunación
       const householdMembersVacuntions =
         await PersonalBackgroundRepository.findHouseholdVaccinationStatus(
-          home_id
+          home_id,
+          person_id
         );
 
       // Mapear todos los miembros
@@ -496,7 +500,7 @@ const PersonController = {
     ).length;
 
       //Datos para la presion y el peso
-      const healthMetrics = await PhysicalExamRepository.findHouseholdHealthMetrics(home_id);
+      const healthMetrics = await PhysicalExamRepository.findHouseholdHealthMetrics(home_id, person_id);
 
       const typeData = [
               { id: "Personal", name: "Personal", description: "Registro financiero personal" },

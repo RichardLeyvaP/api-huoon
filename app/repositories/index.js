@@ -35,6 +35,7 @@ const PetTreatmentRepository = require('./PetTreatmentRepository');
 const VetVisitRepository = require('./VetVisitRepository');
 const CurrentMedicationRepository = require('./CurrentMedicationRepository');
 const PetDietRepository = require('./PetDietRepository');
+const InitiativeRepository = require('./InitiativeRepository');
 
 module.exports = {
     CategoryRepository,
@@ -73,5 +74,6 @@ module.exports = {
     PetTreatmentRepository,
     VetVisitRepository,
     CurrentMedicationRepository,
-    PetDietRepository
+    PetDietRepository,
+    InitiativeRepository
 };

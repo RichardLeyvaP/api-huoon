@@ -438,12 +438,13 @@ async getLastByPersonQuery(person_id, field = null) {
     throw new Error(`Error fetching household health metrics: ${error.message}`);
   }
 }*/
-async findHouseholdHealthMetrics(homeId) {
+async findHouseholdHealthMetrics(homeId, personId) {
   try {
     logger.info(`Buscando métricas de salud para hogar ID: ${homeId}`);
 
     const persons = await Person.findAll({
       attributes: ['id', 'name', 'image'],
+      where: personId ? { id: personId } : {},
       include: [
         {
           model: Home,

@@ -280,6 +280,29 @@ const PetTreatmentRepository = {
   return parseInt(result[0].count) || 0;
 },
 
+async getVaccinationDetailsForPets(petIds) {
+  const { startOfWeek } = this.getWeekRange();
+
+  // Obtener la última vacuna por mascota
+  const result = await PetTreatment.sequelize.query(`
+    SELECT pt.id, pt.pet_id, pt.name, pt.date, pt.next_date, pt.notes, pt.dosage, pt.unit
+    FROM pet_treatments pt
+    INNER JOIN (
+      SELECT pet_id, MAX(date) as max_date
+      FROM pet_treatments
+      WHERE type = 'vaccination' AND pet_id IN (:petIds)
+      GROUP BY pet_id
+    ) latest ON pt.pet_id = latest.pet_id AND pt.date = latest.max_date
+    WHERE pt.type = 'vaccination'
+      AND pt.next_date >= :startOfWeek
+  `, {
+    replacements: { petIds, startOfWeek },
+    type: PetTreatment.sequelize.QueryTypes.SELECT
+  });
+
+  return result;
+},
+
 // Contar mascotas con controles pendientes (next_date < inicio de esta semana)
 async countPetsWithPendingControls(petIds) {
   const { startOfWeek } = this.getWeekRange();
@@ -287,7 +310,7 @@ async countPetsWithPendingControls(petIds) {
   const result = await PetTreatment.findAll({
     where: {
       pet_id: petIds,
-      type: ['vaccination', 'deworming'],
+      type: ['deworming'],
       next_date: { [Op.lt]: startOfWeek }
     },
     attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('pet_id')), 'pet_id']],
@@ -295,6 +318,21 @@ async countPetsWithPendingControls(petIds) {
   });
 
   return result.length;
+},
+async getPendingControlDetailsForPets(petIds) {
+  const today = new Date(new Date().toISOString().split('T')[0]);
+
+  const records = await PetTreatment.findAll({
+    where: {
+      pet_id: petIds,
+      type: ['vaccination', 'deworming'],
+      next_date: { [Op.lt]: today }
+    },
+    attributes: ['id', 'pet_id', 'name', 'date', 'next_date', 'notes', 'dosage', 'unit', 'type' ],
+    raw: true
+  });
+
+  return records;
 },
   /**
    * Buscar tratamientos por mascota y tipo

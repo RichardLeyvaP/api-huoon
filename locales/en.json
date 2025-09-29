@@ -102,7 +102,27 @@
     },
     "Roedores": {
       "name": "Rodents",
-      "description": "Domestic rodents category"
+      "description": "Category for rodents such as hamsters, guinea pigs, and mice"
+    },
+    "Reptiles": {
+      "name": "Reptiles",
+      "description": "Category for reptiles such as lizards, turtles, and snakes"
+    },
+    "Conejos": {
+      "name": "Rabbits",
+      "description": "Category for domestic rabbits"
+    },
+    "Hurones": {
+      "name": "Ferrets",
+      "description": "Category for ferrets as pets"
+    },
+    "Anfibios": {
+      "name": "Amphibians",
+      "description": "Category for amphibians such as frogs and salamanders"
+    },
+    "Insectos": {
+      "name": "Insects",
+      "description": "Category for insects and arthropods such as crickets, beetles, and arachnids"
     },
     "Necesidades básicas": {
       "name": "Necesidades básicas",

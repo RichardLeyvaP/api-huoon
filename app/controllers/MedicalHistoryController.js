@@ -156,7 +156,7 @@ const MedicalHistoryController = {
    * Actualizar un historial médico existente.
    */
   async update(req, res) {
-    logger.info(`${req.user.name} - Actualiza el historial médico con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Actualiza el historial médico con ID ${req.body.id}`);
     logger.info("Datos recibidos al editar un historial médico");
     logger.info(JSON.stringify(req.body));
 
@@ -186,9 +186,9 @@ const MedicalHistoryController = {
    * Eliminar un historial médico.
    */
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Elimina historial médico con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Elimina historial médico con ID ${req.body.id}`);
 
-    const { id } = req.params;
+    const { id } = req.body;
 
     // Buscar el historial médico por ID
     const medicalHistory = await MedicalHistoryRepository.findById(id);

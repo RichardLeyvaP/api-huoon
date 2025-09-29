@@ -49,6 +49,7 @@ const { storePetTreatmentSchema, updatePetTreatmentSchema, idPetTreatmentSchema,
 const { storeVetVisitSchema, getVetVisitsSchema, idVetVisitSchema, updateVetVisitSchema} = require("./middlewares/validations/vetvisitValidation");
 const { storeCurrentMedicationSchema, getCurrentMedicationsSchema, idCurrentMedicationSchema, updateCurrentMedicationSchema} = require("./middlewares/validations/currentmedicationValidation");
 const { storePetDietSchema, idPetDietSchema, updatePetDietSchema, getPetDietsSchema} = require("./middlewares/validations/petDietValidation");
+const { storeInitiativeSchema, idInitiativeSchema, updateInitiativeSchema, personStatusInitiativeSchema} = require("./middlewares/validations/initiativeValidation");
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -93,6 +94,7 @@ const VetVisitController = require('./controllers/VetVisitController');
 const CurrentMedicationController = require('./controllers/CurrentMedicationController');
 const PetDietController = require('./controllers/PetDietController');
 const ActivityLogController = require('./controllers/ActivityLogController');
+const InitiativeController = require('./controllers/InitiativeController');
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -513,6 +515,14 @@ router.post('/pet-diet',  validateSchema(storePetDietSchema), PetDietController.
 router.post('/pet-diet-show', validateSchema(idPetDietSchema), PetDietController.show);
 router.post('/pet-diet-update', validateSchema(updatePetDietSchema), PetDietController.update);
 router.post('/pet-diet-destroy', validateSchema(idPetDietSchema), PetDietController.destroy);
+
+//Rutas Iniciativas de metas
+router.get("/initiative", InitiativeController.index);
+router.post('/initiative',  validateSchema(storeInitiativeSchema), InitiativeController.store);
+router.post('/initiative-show', validateSchema(idInitiativeSchema), InitiativeController.show);
+router.post('/initiative-update', validateSchema(updateInitiativeSchema), InitiativeController.update);
+router.post('/initiative-destroy', validateSchema(idInitiativeSchema), InitiativeController.destroy);
+router.post('/get-active-initiative', validateSchema(personStatusInitiativeSchema), InitiativeController.getActiveInitiatives);
 
 //Rutas Unificadas
 router.post('/productcategory-productstatus-apk', ProductController.category_status);

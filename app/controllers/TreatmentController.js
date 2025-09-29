@@ -151,7 +151,8 @@ const TreatmentController = {
    */
   async store(req, res) {
     logger.info(`${req.user.name} - Creando nuevo tratamiento`);
-    logger.debug("Datos recibidos:", req.body);
+    logger.info("Datos recibidos:", req.body);
+    logger.info(JSON.stringify(req.body));
     const { person_id: bodyPersonId } = req.body;
         const person_id = bodyPersonId || req.person.id;
     req.body.person_id = person_id; // Asignar el ID de la persona autenticada
@@ -195,7 +196,8 @@ const TreatmentController = {
    */
   async update(req, res) {
     logger.info(`${req.user.name} - Updating treatment with ID ${req.body.id}`);
-    logger.debug("Received data:", req.body);
+    logger.info("Received data:");
+    logger.info(JSON.stringify(req.body));
 
     try {
       const treatment = await TreatmentRepository.findById(req.body.id);
@@ -249,10 +251,10 @@ const TreatmentController = {
    * Delete a treatment
    */
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Deleting treatment with ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Deleting treatment with ID ${req.body.id}`);
 
     try {
-      const treatment = await TreatmentRepository.findById(req.params.id);
+      const treatment = await TreatmentRepository.findById(req.body.id);
 
       if (!treatment) {
         return res.status(404).json({ msg: "TreatmentNotFound" });

@@ -170,7 +170,7 @@ const EmergencyController = {
    * Actualizar una emergencia existente.
    */
   async update(req, res) {
-    logger.info(`${req.user.name} - Actualiza la emergencia con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Actualiza la emergencia con ID ${req.body.id}`);
     logger.info("Datos recibidos al editar una emergencia");
     logger.info(JSON.stringify(req.body));
 
@@ -213,9 +213,9 @@ const EmergencyController = {
    * Eliminar una emergencia.
    */
   async destroy(req, res) {
-    logger.info(`${req.user.name} - Elimina emergencia con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Elimina emergencia con ID ${req.body.id}`);
 
-    const { id } = req.params;
+    const { id } = req.body;
 
     try {
       // Buscar la emergencia por ID

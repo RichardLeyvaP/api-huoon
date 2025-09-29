@@ -102,7 +102,27 @@
       },
       "Roedores": {
         "name": "Roedores",
-        "description": "Categoria de roedores domésticos"
+        "description": "Categoria de roedores como hamsters, porquinhos-da-índia e ratos"
+      },
+      "Reptiles": {
+        "name": "Répteis",
+        "description": "Categoria de répteis como lagartos, tartarugas e cobras"
+      },
+      "Conejos": {
+        "name": "Coelhos",
+        "description": "Categoria de coelhos domésticos"
+      },
+      "Hurones": {
+        "name": "Furões",
+        "description": "Categoria de furões como animais de estimação"
+      },
+      "Anfibios": {
+        "name": "Anfíbios",
+        "description": "Categoria de anfíbios como rãs e salamandras"
+      },
+      "Insectos": {
+        "name": "Insetos",
+        "description": "Categoria de insetos e artrópodes como grilos, besouros e aracnídeos"
       },
       "Necesidades básicas": {
       "name": "Necesidades básicas",

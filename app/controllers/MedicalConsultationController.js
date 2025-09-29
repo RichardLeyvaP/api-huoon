@@ -207,7 +207,7 @@ const MedicalConsultationController = {
    * Actualizar una consulta médica existente.
    */
   async update(req, res) {
-    logger.info(`${req.user.name} - Actualiza la consulta médica con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Actualiza la consulta médica con ID ${req.body.id}`);
     logger.info("Datos recibidos al editar una consulta médica");
     logger.info(JSON.stringify(req.body));
 

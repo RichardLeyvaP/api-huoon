@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'wishes',
         onDelete: 'CASCADE'
     });
+     Priority.hasMany(models.Initiative, {
+        foreignKey: 'priority_id',
+        as: 'initiatives',
+        onDelete: 'SET NULL'
+    });
     }
   }
   Priority.init({

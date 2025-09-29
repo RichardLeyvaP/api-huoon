@@ -252,7 +252,7 @@ const MedicalConsultationRepository = {
     }
   },
 
-  async findFamilyMembersWithConsultationsByHomeId(homeId, startDate, endDate) 
+  async findFamilyMembersWithConsultationsByHomeId(homeId, startDate, endDate, personId = null) 
     {
     try {
       // Calcular semana actual si no se pasan fechas
@@ -270,13 +270,11 @@ const MedicalConsultationRepository = {
         endDate.setHours(23, 59, 59, 999);
       }
 
-      // Validar fechas
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        throw new Error('Invalid date range provided');
-      }
-
+       const whereHome = { id: homeId };
+      const wherePerson = personId ? { id: personId } : {};
       // Consultar personas del hogar con consultas en el rango
       const familyMembers = await Person.findAll({
+        where: wherePerson,
         include: [
           {
             model: MedicalConsultation,

@@ -517,6 +517,7 @@ const FinanceController = {
       };
 
       const totalIncome = type === 'Personal' ? dataBalance.personal.income : dataBalance.home.income;
+      const totalSpentType = type === 'Personal' ? dataBalance.personal.spent : dataBalance.home.spent;
       //Grafico de pie
       // Estructura: agrupar por categoría principal y sus subcategorías
       const { budgets, expenses } = await FinanceRepository.getAllExpensesAndBudgetCategories(person_id, null, null, home_id, type);
@@ -585,72 +586,75 @@ const FinanceController = {
 
       // Calcular presupuesto total por categoría principal
       const spentByMainId = {};
-parentCategories.forEach(parent => {
-  const children = details[parent.id] || [];
-  const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
-  spentByMainId[parent.id] = totalSpent;
-});
+      parentCategories.forEach(parent => {
+        const children = details[parent.id] || [];
+        const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
+        spentByMainId[parent.id] = totalSpent;
+      });
 
-// ✅ CAMBIO 2: totalAmount ahora es totalIncome (no totalBudgetAll)
-// const totalBudgetAll = Object.values(budgetByMainId).reduce((sum, b) => sum + b, 0); // ❌ BORRAR
+      // ✅ CAMBIO 2: totalAmount ahora es totalIncome (no totalBudgetAll)
+      // const totalBudgetAll = Object.values(budgetByMainId).reduce((sum, b) => sum + b, 0); // ❌ BORRAR
 
-// --- Generar summary ---
-const summary = parentCategories.map(parent => {
-  const children = details[parent.id] || [];
-  const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
-  // ✅ CAMBIO 3: Porcentaje contra total ingresado (income), no contra presupuesto
-  const percentage = totalIncome > 0 ? ((totalSpent / totalIncome) * 100).toFixed(1) : 0;
+      // --- Generar summary ---
+      const summary = parentCategories.map(parent => {
+        const children = details[parent.id] || [];
+        const totalSpent = children.reduce((sum, child) => sum + child.spent, 0);
+        // ✅ CAMBIO 3: Porcentaje contra total ingresado (income), no contra presupuesto
+        const percentage = totalSpentType > 0 ? ((totalSpent / totalSpentType) * 100).toFixed(1) : 0;
 
-  return {
-    id: parent.id,
-    title: parent.title,
-    value: parseFloat(percentage),
-    color: parent.color,
-    icon: parent.icon,
-    total: totalSpent.toFixed(2),
-  };
-});
+        return {
+          id: parent.id,
+          title: parent.title,
+          value: parseFloat(percentage),
+          color: parent.color,
+          icon: parent.icon,
+          total: totalSpent.toFixed(2),
+        };
+      });
 
-// --- Formatear details ---
-Object.keys(details).forEach(key => {
-  const mainId = parseInt(key);
-  if (isNaN(mainId)) return;
+      // --- Formatear details ---
+      Object.keys(details).forEach(key => {
+        const mainId = parseInt(key);
+        if (isNaN(mainId)) return;
 
-  const items = details[mainId].filter(item => item.id !== mainId);
-  const parentSpent = spentByMainId[mainId] || 0; // ← gasto total del padre
+        const items = details[mainId].filter(item => item.id !== mainId);
+        const parentSpent = spentByMainId[mainId] || 0; // ← gasto total del padre
 
-  details[mainId] = items.map(item => {
-    const percentage = parentSpent > 0 ? ((item.spent / parentSpent) * 100).toFixed(1) : 0;
-    return {
-      id: item.id,
-      title: item.name,
-      value: parseFloat(percentage),
-      color: item.color,
-      icon: item.icon,
-      amount: item.spent.toFixed(2),
-      budget: parentSpent.toFixed(2), // ✅ ¡CAMBIO CLAVE! Ahora es el gasto del padre
-    };
-  });
-});
+        details[mainId] = items.map(item => {
+          const percentage = parentSpent > 0 ? ((item.spent / parentSpent) * 100).toFixed(1) : 0;
+          return {
+            id: item.id,
+            title: item.name,
+            value: parseFloat(percentage),
+            color: item.color,
+            icon: item.icon,
+            amount: item.spent.toFixed(2),
+            budget: parentSpent.toFixed(2), // ✅ ¡CAMBIO CLAVE! Ahora es el gasto del padre
+          };
+        });
+      });
 
+      const percentage = type === 'Personal' ? dataBalance.personal.spentPercentage : dataBalance.home.spentPercentage;
+      const status = FinanceController.getFinancialStatus(percentage);
 
       const alertsBudget = FinanceController.generateSpendingAlerts( parentCategories, details, spentByMainId, totalIncome, type);
 
       const expenseTrendAlert = await FinanceController.generateExpenseTrendAlert(person_id, home_id, type);
       const response = {
         balance: type === 'Personal' ? dataBalance.personal : dataBalance.home,
+        statusFinance: status,
         suggestions: mappedSuggestions,
         statusuggestions: translatedSuggestionStatusData,
         financeData: financeData,
          dataSpent: {
-    totalAmount: parseFloat(totalIncome.toFixed(2)), // ✅ ¡AHORA ES INCOME!
-    totalBudgetByGroup: spentByMainId,               // ✅ ¡AHORA ES GASTO POR GRUPO!
-    currency: "CLP",
-    dateRange: { start: null, end: null },
-    summary,
-    categories: parentCategories,
-    details,
-  },
+          totalAmount: parseFloat(totalSpentType.toFixed(2)), // ✅ ¡AHORA ES INCOME!
+          totalBudgetByGroup: spentByMainId,               // ✅ ¡AHORA ES GASTO POR GRUPO!
+          currency: "CLP",
+          dateRange: { start: null, end: null },
+          summary,
+          categories: parentCategories,
+          details,
+        },
         alertsBudget: alertsBudget,
         alertsSpent: expenseTrendAlert
       };
@@ -982,7 +986,50 @@ Object.keys(details).forEach(key => {
         message: "Error al obtener estadísticas financieras personales" 
       });
     }
+  },
+  getFinancialStatus(percentage) {
+    if (percentage <= 50) {
+    return {
+      level: 'excellent',
+      levelLabel: 'Excelente',
+      message: 'Ahorras y gastas de forma equilibrada',
+      icon: 'mdi-emoticon-excited',
+      color: 'teal'
+    };
+  } else if (percentage <= 75) {
+    return {
+      level: 'good',
+      levelLabel: 'Bueno',
+      message: 'Tienes control, con algunos ajustes posibles',
+      icon: 'mdi-emoticon-happy',
+      color: 'teal'
+    };
+  } else if (percentage <= 100) {
+    return {
+      level: 'acceptable',
+      levelLabel: 'Aceptable',
+      message: 'Tus gastos casi igualan tus ingresos',
+      icon: 'mdi-emoticon-neutral',
+      color: 'orange-darken-2'
+    };
+  } else if (percentage <= 150) {
+    return {
+      level: 'at-risk',
+      levelLabel: 'En riesgo',
+      message: 'Tus gastos superan lo que ganas',
+      icon: 'mdi-alert',
+      color: 'orange-darken-4'
+    };
+  } else {
+    return {
+      level: 'critical',
+      levelLabel: 'Crítico',
+      message: 'Alta probabilidad de problemas financieros',
+      icon: 'mdi-siren',
+      color: 'red-darken-3'
+    };
   }
+}
 };
 
 module.exports = FinanceController;

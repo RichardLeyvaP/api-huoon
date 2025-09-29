@@ -183,7 +183,7 @@ const BudgetController = {
   async getByHomeId(req, res) {
     logger.info(`${req.user.name} - Busca presupuestos de un hogar`);
     try {
-      const homeId = req.params.homeId;
+      const homeId = req.body.home_id;
 
       const budgets = await BudgetRepository.findAllByHomeId(homeId);
 
@@ -544,10 +544,10 @@ const BudgetController = {
    * Agregar monto utilizado a un presupuesto
    */
   async addExpense(req, res) {
-    logger.info(`${req.user.name} - Agrega gasto a presupuesto con ID ${req.params.id}`);
+    logger.info(`${req.user.name} - Agrega gasto a presupuesto con ID ${req.body.id}`);
     logger.info("Monto:", req.body.amount);
 
-    const { id } = req.params;
+    const { id } = req.body;
     const { amount } = req.body;
 
     try {
