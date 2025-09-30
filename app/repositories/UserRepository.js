@@ -132,7 +132,7 @@ class UserRepository {
         const userTokenArray = [];
     
         users.forEach((user) => {
-          if (user.configurations?.length > 0 && user.configurations[0]?.tokenNotification) {
+          if (user.configurations?.length > 0) {
               // Buscar el rol correspondiente en el array de `people`
               const personRole = people.find(
                 (person) => parseInt(person.person_id) === user.person.id

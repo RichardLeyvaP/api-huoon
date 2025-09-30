@@ -99,6 +99,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    reset_expire: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    }
   }, {
     sequelize,
     modelName: 'User',

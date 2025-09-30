@@ -91,7 +91,7 @@ const PORT = process.env.PORT || 8000;
 
 // Lista de orígenes permitidos
 const allowedOrigins = [
-  'https://huoon.wezen.cl', 
+  'https://huoon.klint.cl', 
   'http://localhost:3000', 
   'http://localhost:3001',
   'http://127.0.0.1:3000',  // Agregar explícitamente 127.0.0.1

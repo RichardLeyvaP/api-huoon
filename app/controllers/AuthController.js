@@ -19,6 +19,7 @@ const { pipeline } = require("stream/promises");
 const moment = require("moment"); // Usamos moment.js para facilitar el manejo de fechas
 const SuggestionService = require("../services/SuggestionService");
 const { HomePersonRepository } = require("../repositories");
+const { sendEmail } = require("../services/EmailService");
 // Esquema de validación para el registro de usuario
 
 const schema = Joi.object({
@@ -414,7 +415,10 @@ const AuthController = {
           where: {
             email: email,
           },
-          include: [{ model: Person, as: "person" }],
+          include: [
+          { model: Person, as: "person" },
+          { model: Configuration, as: "configurations" },
+          ],
         });
 
         if (user) {
@@ -470,6 +474,8 @@ const AuthController = {
       } else {
         person = user.person;
       }
+
+      let home = await AuthController.getPreferredOrLatestHome(user);
       const userNew = {
         id: user.id,
         email: user.email,
@@ -509,9 +515,6 @@ const AuthController = {
         await AuthController.handleImageUpdate(imageUpdateData);
       }
 
-      let home = [];
-      home = user.configurations ? user.configurations[0].home : null;
-
       const userData = {
         id: userNew.id,
         userName: userNew.name,
@@ -526,7 +529,7 @@ const AuthController = {
       };
 
       const userDataString = encodeURIComponent(JSON.stringify(userData));
-      return res.redirect(`http://huoon.wezen.cl?user=${userDataString}`);
+      return res.redirect(`https://huoon.klint.cl?user=${userDataString}`);
     } catch (error) {
       if (!t.finished) {
         await t.rollback();
@@ -932,5 +935,97 @@ const AuthController = {
       res.status(500).json({ error: "Error en el servidor" });
     }
   },
+
+  async forgotPassword(req, res) {
+    logger.info(`${req.body.email} - solicita recuperar contraseña`);
+    const t = await sequelize.transaction();
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } }, {transaction : t});
+    
+    // Para evitar enumeración, responde éxito incluso si no existe
+    if (!user) {
+      await t.commit();
+      return res.status(204).json({ success: true, message: "Si el correo existe, recibirás un código." });
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
+    const hashedCode = bcrypt.hashSync(code, parseInt(authConfig.rounds));
+
+    // Opcional: guardar expiración
+    await user.update({
+      password: hashedCode,
+      reset_expire: Date.now() + 60 * 1000 // 10 min
+    }, { transaction: t});
+
+    // Enviar correo
+    await sendEmail({
+      to: email,
+      subject: "Recuperación de contraseña - Huoon",
+      text: `Tu código es: ${code}`,
+      html: `<p>Tu código de recuperación es: <strong>${code}</strong></p>`
+    }, {transaction: t});
+    await t.commit();
+    res.status(200).json({ success: true, message: "Código enviado" });
+  } catch (error) {
+     if (!t.finished) {
+        await t.rollback();
+      }
+    logger.error("Error en forgotPassword:", error);
+    res.status(500).json({ success: false, message: "Error interno" });
+  }
+},
+async verifyCode(req, res) {
+  try {
+    const { email, code } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(204).json({ success: false, message: "Usuario no encontrado" });
+    }
+
+    const isMatch = await bcrypt.compare(code, user.password);
+    if (!isMatch) {
+      return res.status(204).json({ success: false, message: "Código incorrecto" });
+    }
+
+    // Opcional: verificar expiración
+    if (user.reset_expire < Date.now()) {
+       return res.status(204).json({ success: false, message: "Código expirado" });
+     }
+
+    res.status(200).json({
+      success: true,
+      userId: user.id,
+      email: user.email
+    });
+  } catch (error) {
+    logger.error("Error en verifyCode:", error);
+    res.status(500).json({ success: false, message: "Error interno" });
+  }
+},
+async resetPassword(req, res) {
+  try {
+    const { user_id, newPassword } = req.body;
+
+    const user = await User.findByPk(user_id);
+    if (!user) {
+      return res.json({ success: false, message: "Usuario no encontrado" });
+    }
+
+    const hashedPassword = bcrypt.hashSync(
+        newPassword,
+        Number.parseInt(authConfig.rounds)
+      );
+
+
+    await user.update({ password: hashedPassword, reset_expire: null });
+
+    res.json({ success: true, message: "Contraseña actualizada" });
+  } catch (error) {
+    logger.error("Error en resetPassword:", error);
+    res.status(500).json({ success: false, message: "Error interno" });
+  }
+}
 };
 module.exports = AuthController;

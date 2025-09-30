@@ -1099,9 +1099,6 @@ const TaskController = {
             .json({ msg: "No se han proporcionado personas válidas." });
         }
 
-        logger.info("datos filteredPeople");
-        logger.info(JSON.stringify(filteredPeople));
-
         const personIds = filteredPeople.map((person) =>
           parseInt(person.person_id)
         );

@@ -42,6 +42,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      reset_expire: {
+        type: DataTypes.BIGINT,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

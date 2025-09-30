@@ -24,10 +24,8 @@ const NotificationRepository = {
   },
 
   async create(body, t = null) {
-    logger.info(
-      "Creando notificación con los siguientes datos:",
-      JSON.stringify(body, null, 2)
-    ); // Serializa body para logging
+    logger.info("Creando notificación con los siguientes datos:"); // Serializa body para logging
+    logger.info(JSON.stringify(body, null, 2)); // Serializa body para logging
 
     const {
       home_id,
@@ -118,26 +116,6 @@ const NotificationRepository = {
       logger.error("Error en getNotificationsByUser:", error);
       throw error;
     }
-    /*try {
-      const notifications = await Notification.findAll({
-        where: { user_id: userId },
-        order: [['createdAt', 'DESC']] // Ordenar por las más recientes
-      });
-  
-      // Convertir `data` de string JSON a objeto y extraer `nameHome`
-    return notifications.map(notification => {
-      const parsedData = notification.data ? JSON.parse(notification.data) : {};
-
-      return {
-        ...notification.toJSON(),
-        data: parsedData, // Mantiene el objeto `data`
-        nameHome: parsedData.nameHome || null // Extrae `nameHome` afuera
-      };
-    });
-    } catch (error) {
-      logger.error(`Error en NotificationRepository->getUserNotifications: ${error.message}`);
-      throw error;
-    }*/
   },
 
   async sendNotificationMultiCast(notifications) {

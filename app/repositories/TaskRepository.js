@@ -847,6 +847,9 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
         personIds,
         peopleArray
       );
+      logger.info('Tokens de notificación recuperados');
+       logger.info(JSON.stringify(tokens));
+       logger.info(JSON.stringify(userTokens));
     // Recorremos las nuevas asociaciones para determinar si agregar o actualizar
     Object.keys(newMap).forEach((key) => {
       const incoming = newMap[key];

@@ -102,7 +102,10 @@ router.get('/', (req, res) => res.json({ hello: "World" }));
 router.post('/login', validateSchema(loginSchema), AuthController.login);
 router.post('/login-apk', validateSchema(loginSchema), AuthController.loginApk);
 router.post('/register', validateSchema(registerSchema), AuthController.register);
-router.post('/send-notification', NotificationController.sendNotification)
+router.post('/send-notification', NotificationController.sendNotification);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.post('/verify-code', AuthController.verifyCode);
+router.post('/reset-password', AuthController.resetPassword);
 
 // Rutas de autenticación
 router.get('/login-google', passport.authenticate('google', { scope: ['profile', 'email'] }));

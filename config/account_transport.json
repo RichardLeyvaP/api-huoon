@@ -1,0 +1,9 @@
+{
+  "service": "gmail",
+        "auth": {
+            "type": "OAuth2",
+            "user": "yasmany891230@gmail.com",
+           
+            "redirectUri": "https://developers.google.com/oauthplayground"
+        }
+}

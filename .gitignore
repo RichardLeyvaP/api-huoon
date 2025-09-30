@@ -8,6 +8,8 @@ public/
 
 config/serviceAccountKey.json
 
+cconfig/account_transport.json
+
 
 combined.log
 error.log
