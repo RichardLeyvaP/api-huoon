@@ -1025,7 +1025,7 @@ const FinanceController = {
       level: 'critical',
       levelLabel: 'Crítico',
       message: 'Alta probabilidad de problemas financieros',
-      icon: 'mdi-siren',
+      icon: 'mdi-alert-octagram',
       color: 'red-darken-3'
     };
   }

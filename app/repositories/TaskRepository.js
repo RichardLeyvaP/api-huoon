@@ -263,41 +263,66 @@ const TaskRepository = {
     conditions.push({ type });
   }
 
-  return await Task.findAll({
-    where: {
-      [Op.and]: conditions,
+   return await Task.findAll({
+  where: { [Op.and]: conditions },
+  include: [
+    // Relaciones de la tarea raíz
+    { model: Priority, as: "priority" },
+    { model: Status, as: "status" },
+    { model: Category, as: "category" },
+    { model: Person, as: "person", required: false },
+    { model: Home, as: "home", required: false },
+    {
+      model: HomePersonTask,
+      as: "homePersonTasks",
+      required: false,
+      include: [
+        { model: Role, as: "role", required: false },
+        { model: Person, as: "person", required: true }
+      ]
     },
-    include: [
-      {
-        model: HomePersonTask,
-        as: "homePersonTasks",
-        required: false,
-      },
-      {
-        model: Task,
-        as: "children",
-        include: [
-          {
-            model: HomePersonTask,
-            as: "homePersonTasks",
-            required: false,
-            where: {
-              person_id: personId, // Siempre filtrar hijos por persona
-            },
-          },
-          { model: Priority, as: "priority" },
-          { model: Status, as: "status" },
-          { model: Category, as: "category" },
-          { model: Person, as: "person", required: false },
-          { model: Home, as: "home", required: false },
-        ],
-        required: false,
-      },
-      { model: Priority, as: "priority" },
-      { model: Status, as: "status" },
-      { model: Category, as: "category" },
-      { model: Person, as: "person", required: false },
-      { model: Home, as: "home", required: false },
+    // Hijos (con sus propias relaciones completas)
+    {
+      model: Task,
+      as: "children",
+      include: [
+        { model: Priority, as: "priority" },
+        { model: Status, as: "status" },
+        { model: Category, as: "category" },
+        { model: Person, as: "person", required: false },
+        { model: Home, as: "home", required: false },
+        {
+          model: HomePersonTask,
+          as: "homePersonTasks",
+          required: false,
+          include: [
+            { model: Role, as: "role", required: false },
+            { model: Person, as: "person", required: true }
+          ]
+        },
+        // ¡Y sus hijos también! (hasta 2 niveles, o más si lo necesitas)
+        {
+          model: Task,
+          as: "children",
+          include: [
+            { model: Priority, as: "priority" },
+            { model: Status, as: "status" },
+            { model: Category, as: "category" },
+            { model: HomePersonTask, as: "homePersonTasks", required: false, include: [
+              { model: Role, as: "role", required: false },
+              { model: Person, as: "person", required: true }
+            ]}
+            // Puedes ir más profundo si es necesario, pero normalmente 2-3 niveles son suficientes
+          ],
+          required: false
+        }
+      ],
+      required: false
+    }
+  ],
+    order: [
+      ["start_date", "DESC"],
+      ["start_time", "ASC"],
     ],
   });
 },
@@ -397,11 +422,11 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
   const conditions = [];
 
   // Extraer ID de "Completada" si se pasa el array de statuses
-  let COMPLETED_ID = null;
+  /*let COMPLETED_ID = null;
   if (statuses && Array.isArray(statuses)) {
     const completedStatus = statuses.find(s => s.name === 'Completada');
     COMPLETED_ID = completedStatus ? completedStatus.id : null;
-  }
+  }*/
 
   // 1. Filtro por homeId (solo si se pasa)
   if (homeId) {
@@ -427,7 +452,7 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
   }
 
   // 5. Filtro por fecha
-  if (start_date) {
+  /*if (start_date) {
     conditions.push(
       sequelize.where(
         sequelize.fn("DATE", sequelize.col("Task.start_date")),
@@ -485,45 +510,66 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
         ]
       });
     }
-  }
+  }*/
 
   // 6. Ejecutar consulta
   return await Task.findAll({
-    where: {
-      [Op.and]: conditions,
+  where: { [Op.and]: conditions },
+  include: [
+    // Relaciones de la tarea raíz
+    { model: Priority, as: "priority" },
+    { model: Status, as: "status" },
+    { model: Category, as: "category" },
+    { model: Person, as: "person", required: false },
+    { model: Home, as: "home", required: false },
+    {
+      model: HomePersonTask,
+      as: "homePersonTasks",
+      required: false,
+      include: [
+        { model: Role, as: "role", required: false },
+        { model: Person, as: "person", required: true }
+      ]
     },
-    include: [
-      {
-        model: HomePersonTask,
-        as: "homePersonTasks",
-        required: false,
-      },
-      {
-        model: Task,
-        as: "children",
-        include: [
-          {
-            model: HomePersonTask,
-            as: "homePersonTasks",
-            required: false,
-            where: {
-              person_id: personId,
-            },
-          },
-          { model: Priority, as: "priority" },
-          { model: Status, as: "status" },
-          { model: Category, as: "category" },
-          { model: Person, as: "person", required: false },
-          { model: Home, as: "home", required: false },
-        ],
-        required: false,
-      },
-      { model: Priority, as: "priority" },
-      { model: Status, as: "status" },
-      { model: Category, as: "category" },
-      { model: Person, as: "person", required: false },
-      { model: Home, as: "home", required: false },
-    ],
+    // Hijos (con sus propias relaciones completas)
+    {
+      model: Task,
+      as: "children",
+      include: [
+        { model: Priority, as: "priority" },
+        { model: Status, as: "status" },
+        { model: Category, as: "category" },
+        { model: Person, as: "person", required: false },
+        { model: Home, as: "home", required: false },
+        {
+          model: HomePersonTask,
+          as: "homePersonTasks",
+          required: false,
+          include: [
+            { model: Role, as: "role", required: false },
+            { model: Person, as: "person", required: true }
+          ]
+        },
+        // ¡Y sus hijos también! (hasta 2 niveles, o más si lo necesitas)
+        {
+          model: Task,
+          as: "children",
+          include: [
+            { model: Priority, as: "priority" },
+            { model: Status, as: "status" },
+            { model: Category, as: "category" },
+            { model: HomePersonTask, as: "homePersonTasks", required: false, include: [
+              { model: Role, as: "role", required: false },
+              { model: Person, as: "person", required: true }
+            ]}
+            // Puedes ir más profundo si es necesario, pero normalmente 2-3 niveles son suficientes
+          ],
+          required: false
+        }
+      ],
+      required: false
+    }
+  ],
     order: [
       ["start_date", "DESC"],
       ["start_time", "ASC"],
@@ -1209,7 +1255,7 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
   }
 
   // 5. Filtro: tareas que INICIEN en el mes (siempre) o TERMINEN en el mes (solo si NO están completadas)
-  const startInRange = sequelize.where(
+  /*const startInRange = sequelize.where(
     sequelize.fn("DATE", sequelize.col("Task.start_date")),
     { [Op.between]: [monthStartStr, monthEndStr] }
   );
@@ -1244,7 +1290,7 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
         )
       ]
     });
-  }
+  }*/
 
   // 6. Obtener tareas
   const tasks = await Task.findAll({
