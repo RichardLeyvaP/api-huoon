@@ -252,16 +252,13 @@ const HomeRepository = {
       home_type_id,
       status_id,
       person_id,
-      code
+      code,
+      status
     } = body;
     let hashedCode = null;
-  if (code) {
-   const baseKey = "huoon"; // Usa el string que desees
-
-      // Generar la clave de 32 bytes con SHA-256
-      const secretKey = crypto.createHash("sha256").update(baseKey).digest();
-      hashedCode = await this.encryptData(code, secretKey);
-  }
+    if (code) {
+        hashedCode = Math.floor(100000 + Math.random() * 900000).toString();
+    }
     const home = await Home.create(
       {
         name,
@@ -274,6 +271,8 @@ const HomeRepository = {
         person_id,
         code: hashedCode,
         image: "homes/default.jpg", // Imagen predeterminada
+        status,
+        reset_code: Date.now() + 3 * 60 * 1000 // 3 min
       },
       { transaction: t }
     );
@@ -312,11 +311,11 @@ const HomeRepository = {
         return obj;
       }, {});
         // Manejo seguro del código
-  if (Object.prototype.hasOwnProperty.call(body, 'code')) {
+  /*if (Object.prototype.hasOwnProperty.call(body, 'code')) {
     updatedData.code = (body.code && typeof body.code === 'string' && body.code.trim() !== '')
       ? bcrypt.hashSync(body.code.trim(), Number.parseInt(authConfig.rounds))
       : null;
-  }
+  }*/
 
     try {
       // Manejar el archivo si se proporciona
@@ -345,34 +344,37 @@ const HomeRepository = {
     }
   },
   
- async verifyHomeCode(codeToVerify) {
-  try {
-    // 1. Generar el hash del código a verificar (con los mismos rounds)
-    const baseKey = "bulletin"; // Usa el string que desees
+  async verifyHomeCode(codeToVerify) {
+    try {
+      // 1. Generar el hash del código a verificar (con los mismos rounds)
+      /*const baseKey = "bulletin"; // Usa el string que desees
 
-      // Generar la clave de 32 bytes con SHA-256
-      const secretKey = crypto.createHash("sha256").update(baseKey).digest();
-      let hashedCode = await this.encryptData(codeToVerify, secretKey);
-    logger.info(hashedCode);
-    // 2. Búsqueda directa en la DB (solo 1 query)
-    const home = await Home.findOne({
-      where: {
-        code: hashedCode // Busca el hash completo directamente
+        // Generar la clave de 32 bytes con SHA-256
+        const secretKey = crypto.createHash("sha256").update(baseKey).digest();
+        let hashedCode = await this.encryptData(codeToVerify, secretKey);*/
+      //logger.info(hashedCode);
+      // 2. Búsqueda directa en la DB (solo 1 query)
+      const home = await Home.findOne({
+        where: {
+          code: codeToVerify, // Busca el hash completo directamente
+          reset_code: {
+            [Op.gt]: Date.now() // Solo registros donde reset_expire > ahora
+          }
+        }
+      });
+
+      if (home) {
+        // Guardar en caché para futuras búsquedas
+        return { found: true, home: home };
       }
-    });
 
-    if (home) {
-      // Guardar en caché para futuras búsquedas
-      return { found: true, home: home };
+      return { found: false, home: null };
+
+    } catch (error) {
+      logger.error(`Error en verifyHomeCode: ${error.message}`);
+      return { found: false, home: null };
     }
-
-    return { found: false, home: null };
-
-  } catch (error) {
-    logger.error(`Error en verifyHomeCode: ${error.message}`);
-    return { found: false, home: null };
-  }
-},
+  },
 
   async syncHomePeople(homeId, peopleArray, t, home = null) {
     // Obtener las asociaciones actuales para la tarea especificada
@@ -615,6 +617,34 @@ const HomeRepository = {
       logger.error(`Error al buscar hogares por IDs: ${error.message}`);
       throw error;
     }
+  },
+  async generateAndSaveCode(home_id, t = null) {
+    logger.info(`🔍 Iniciando generateAndSaveCode para home_id: ${home_id}`);
+    // 1. Generar código de 6 dígitos
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // Ej: "123456"
+
+    // 2. Hashear el código (nunca guardes en texto plano)
+    //const hashedCode = bcrypt.hashSync(code, parseInt(authConfig.rounds));
+
+    // 3. Actualizar el hogar con el código y expiración (3 minutos)
+    const [updatedRows] = await Home.update(
+    {
+      code: code,
+      reset_code: Date.now() + 3 * 60 * 1000
+    },
+    {
+      where: { id: home_id },
+      transaction: t || undefined // 👈 dentro del mismo objeto
+    }
+  );
+
+    // 4. Verificar que se actualizó
+    if (updatedRows === 0) {
+      throw new Error('Hogar no encontrado');
+    }
+
+    // 5. Devolver el código en texto plano (solo para uso inmediato)
+    return code;
   }
 };
 

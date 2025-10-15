@@ -102,7 +102,15 @@ module.exports = (sequelize, DataTypes) => {
     reset_expire: {
       type: DataTypes.BIGINT,
       allowNull: true,
-    }
+    },
+     reset_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    onboarding_status: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'User',

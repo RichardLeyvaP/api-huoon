@@ -518,6 +518,34 @@ const PersonController = {
               originalName: item.name
             }));
 
+            let healthScore = 0;
+
+        if (type === 'Personal') {
+          const hasHealthyWeight = healthMetrics.healthyWeightMembers[0]?.isHealthyWeight || false;
+          const hasNormalBP = healthMetrics.normalBloodPressureMembers[0]?.isNormalBloodPressure || false;
+          const hasNoPendingVaccines = !mappedHouseholdVacunations[0]?.hasPendingVaccines;
+          
+          // Cada factor vale 33.3 puntos (total 100)
+          healthScore = (hasHealthyWeight ? 33.3 : 0) + 
+                        (hasNormalBP ? 33.3 : 0) + 
+                        (hasNoPendingVaccines ? 33.3 : 0);
+        } else {
+          // Modo Hogar: usar porcentajes
+          const healthyWeightPct = healthMetrics.totalMembers 
+            ? (healthMetrics.countHealthyWeight / healthMetrics.totalMembers) * 100 
+            : 0;
+          const normalBPPct = healthMetrics.totalMembers 
+            ? (healthMetrics.countNormalBloodPressure / healthMetrics.totalMembers) * 100 
+            : 0;
+          const vaccinatedPct = healthMetrics.totalMembers 
+            ? ((healthMetrics.totalMembers - totalPeopleWithPendingVaccines) / healthMetrics.totalMembers) * 100 
+            : 0;
+
+          healthScore = (healthyWeightPct + normalBPPct + vaccinatedPct) / 3;
+        }
+
+        const healthStatus = PersonController.getHealthStatus(healthScore);
+
       res.status(200).json({
         person: mappedPerson,
         homeperson: homePerson,
@@ -529,7 +557,8 @@ const PersonController = {
           totalPeopleWithPendingVaccines,
         },
         healthMetrics: healthMetrics,
-        types: translatedTypeData
+        types: translatedTypeData,
+        healthStatus: healthStatus
       });
     } catch (error) {
       const errorMsg = error.details
@@ -539,6 +568,39 @@ const PersonController = {
       return res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
+
+  getHealthStatus (score) {
+  if (score >= 80) return { 
+    level: 'Excelente', 
+    message: 'Te sientes lleno/a de energía',
+    icon: 'mdi-emoticon-excited',
+    color: 'green'
+  };
+  if (score >= 60) return { 
+    level: 'Bueno', 
+    message: 'Tu salud está en buen estado',
+    icon: 'mdi-emoticon-happy',
+    color: 'amber'
+  };
+  if (score >= 40) return { 
+    level: 'Aceptable', 
+    message: 'Algunos hábitos o síntomas a mejorar',
+    icon: 'mdi-emoticon-neutral',
+    color: 'orange'
+  };
+  if (score >= 20) return { 
+    level: 'En riesgo', 
+    message: 'Estrés, cansancio o molestias frecuentes',
+    icon: 'mdi-emoticon-sad',
+    color: 'red'
+  };
+  return { 
+    level: 'Crítico', 
+    message: 'Necesitas atención médica o cambios urgentes',
+    icon: 'mdi-emoticon-dead',
+    color: 'red'
+  };
+},
 
   async getPersonProfileVitalSigns(req, res) {
     logger.info(

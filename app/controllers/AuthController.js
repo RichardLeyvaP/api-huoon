@@ -156,6 +156,7 @@ const AuthController = {
         userName: user.name,
         email: user.email,
         language: user.language,
+        onboarding_status: user.onboarding_status?? 0,
         home: home,
         token: token,
         personId: user.person.id,
@@ -253,6 +254,7 @@ const AuthController = {
         userName: user.name,
         email: user.email,
         language: user.language,
+        onboarding_status: user.onboarding_status?? 0,
         token: token,
         personId: user.person.id,
         personName: user.person.name,
@@ -375,6 +377,7 @@ const AuthController = {
         userName: userNew.name,
         email: userNew.email,
         language: userNew.language,
+        onboarding_status: user.onboarding_status?? 0, // Idioma del usuario
         home: null,
         token: token,
         personId: userNew.person.id,
@@ -954,8 +957,8 @@ const AuthController = {
 
     // Opcional: guardar expiración
     await user.update({
-      password: hashedCode,
-      reset_expire: Date.now() + 60 * 1000 // 10 min
+      reset_token: hashedCode,
+      reset_expire: Date.now() + 3 * 60 * 1000 // 3 min
     }, { transaction: t});
 
     // Enviar correo
@@ -984,7 +987,7 @@ async verifyCode(req, res) {
       return res.status(204).json({ success: false, message: "Usuario no encontrado" });
     }
 
-    const isMatch = await bcrypt.compare(code, user.password);
+    const isMatch = await bcrypt.compare(code, user.reset_token);
     if (!isMatch) {
       return res.status(204).json({ success: false, message: "Código incorrecto" });
     }
@@ -1019,7 +1022,7 @@ async resetPassword(req, res) {
       );
 
 
-    await user.update({ password: hashedPassword, reset_expire: null });
+    await user.update({ password: hashedPassword, reset_expire: null, reset_token: null });
 
     res.json({ success: true, message: "Contraseña actualizada" });
   } catch (error) {

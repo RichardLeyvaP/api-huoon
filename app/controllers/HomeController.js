@@ -10,7 +10,10 @@ const {
   UserRepository,
   NotificationRepository,
   RoleRepository,
+  HomePersonRepository,
+  HouseholdRequestRepository,
 } = require("../repositories");
+const { sendEmail } = require("../services/EmailService");
 
 const HomeController = {
   // Obtener todas las casas
@@ -349,62 +352,338 @@ const HomeController = {
     }
   },      
 
- async verifyCode(req, res) {
+  async verifyCode(req, res) {
     logger.info(`${req.user.name} - Verificando código de hogar`);
-  logger.info("Código recibido");
+    logger.info("Código recibido");
     logger.info(JSON.stringify(req.body));
-  try {
-    const { code } = req.body;
-    
-    if (!code) {
-      return res.status(400).json({
-        error: "missing_code",
-        message: "El código es requerido"
-      });
-    }
 
-    const { found, home } = await HomeRepository.verifyHomeCode(code);
-    
-    if (!found) {
-      return res.status(404).json({
-        error: "invalid_code",
-        message: "Código no válido o hogar no encontrado"
-      });
-    }
-    const user = req.user; // Supone que tienes el ID del usuario en `req.user`.
-        // Obtener la configuración por defecto del sistema
-        const defaultConfig = await Configuration.findOne({ where: { isDefault: true } });
+    const transaction = await sequelize.transaction(); // Opcional: si usas transacciones
 
-        // Intentar encontrar la configuración del usuario
-        let userConfig = await Configuration.findOne({ where: { user_id: user.id } });
+    try {
+      const { code } = req.body;
 
-        // Si no existe, crear una nueva configuración para el usuario usando los valores por defecto
-        if (!userConfig) {
-            userConfig = await Configuration.create({ user_id: user.id, language: user.language, home: home.id });
-        }
-        // Si existe pero home es null, actualizarlo
-        else if (userConfig.home === null || userConfig.home === undefined) {
-          await userConfig.update({
-            home: home.id
-          });
-        }
-    // Resto de la lógica (asignar rol, etc.)...
-    return res.status(200).json({
-      success: true,
-      home: {
-        id: home.id,
-        name: home.name
+      if (!code) {
+        await transaction.rollback(); // si usas transacción
+        return res.status(400).json({
+          error: "missing_code",
+          message: "El código es requerido"
+        });
       }
-    });
 
-  } catch (error) {
-    logger.error(`verifyCode error: ${error.message}`);
-    return res.status(500).json({
-      error: "server_error",
-      message: "Error al verificar el código"
+      //const { found, home } = await HomeRepository.verifyHomeCode(code);
+      const { found, data } = await HouseholdRequestRepository.verifyCode(code);
+      if (!found) {
+        await transaction.rollback();
+        return res.status(404).json({
+          error: "invalid_code",
+          message: "Código no válido o hogar no encontrado"
+        });
+      }
+
+      const user = req.user;
+      const person_id = req.person.id; // Asumiendo que req.user.id es el person_id
+      const home_id = data.id;
+      // 1. Actualizar onboarding_status del usuario
+    // await UserRepository.update({ id: person_id }, { onboarding_status: 1 });
+
+      // 2. Crear o actualizar configuración del usuario
+      let userConfig = await Configuration.findOne({ where: { user_id: user.id } });
+      if (!userConfig) {
+        userConfig = await Configuration.create({
+          user_id: user.id,
+          language: user.language,
+          home: home_id
+        }, { transaction });
+      } else if (userConfig.home == null) {
+        await userConfig.update({ home: home_id }, { transaction });
+      }
+
+      // 3. ✅ Crear la relación HomePerson usando el nuevo método
+      await HomePersonRepository.createHomePerson({
+        home_id,
+        person_id
+      });
+
+      const userOnboarding = await UserRepository.findById(user.id);
+        await UserRepository.update(userOnboarding, { onboarding_status: 2 });
+
+      // Confirmar transacción si la usas
+      await transaction.commit();
+
+      return res.status(200).json({
+        success: true,
+        home: {
+          id: data.id,
+          name: data.name
+        }
+      });
+
+    } catch (error) {
+      // Revertir transacción si algo falla
+      if (transaction && !transaction.finished) {
+        await transaction.rollback();
+      }
+
+      logger.error(`verifyCode error: ${error.message}`);
+      return res.status(500).json({
+        error: "server_error",
+        message: "Error al verificar el código"
+      });
+    }
+  },
+
+  async inviteCreateHome(req, res) {
+    logger.info(`Enviando solicitud de creación de hogar por menor`);
+    logger.info("Datos recibidos:");
+    logger.info(JSON.stringify(req.body));
+
+    const { homeName, minorName, guardianEmail, minorEmail } = req.body;
+
+    // ✅ Buscar si el guardián ya está registrado
+    const userTutor = await UserRepository.findByEmail(guardianEmail);
+    const register = !userTutor; // true = debe registrarse, false = ya está registrado
+
+    // Validaciones
+    if (!homeName || !minorName || !guardianEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Faltan datos requeridos."
+      });
+    }
+
+    if (!/^.+@.+\..+$/.test(guardianEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: "Formato de correo inválido."
+      });
+    }
+      const user = req.user;
+      let t = await sequelize.transaction();
+    try {
+      const request = await HouseholdRequestRepository.create({
+        userId: user.id,
+        targetUserId: userTutor.id,
+        userEmail: user.email,
+        targetUserEmail: userTutor.email,
+        type: 'Create',
+        module: 'House',
+      }, t);
+      const dataApprove = encodeURIComponent(JSON.stringify({
+        minorEmail,
+        action: 'approve',
+        register,        // ✅ Ahora tiene el valor correcto
+        homeName,
+        minorName,
+        user_id: user.id,
+        request_id: request.id
+      }));
+
+      const dataReject = encodeURIComponent(JSON.stringify({
+        minorEmail,
+        action: 'reject',
+        register,        // ✅ Igual aquí
+        homeName,
+        minorName,
+        user_id: user.id,
+        request_id: request.id
+      }));
+
+      const emailText = `👋 Hola, tu hijo(a) ${minorName} desea crear un hogar en Huoon.\nPara aprobar, haz clic en [Aprobar hogar] o [Rechazar].`;
+
+      const emailHtml = `
+        <p>👋 Hola,</p>
+        <p>Tu hijo(a) <strong>${minorName}</strong> desea crear un hogar en <strong>Huoon</strong>.</p>
+        <p>
+          Para aprobar, haz clic en 
+          <a href="http://localhost:3000/?approval=${dataApprove}">
+            <strong>[Aprobar hogar]</strong>
+          </a> 
+          o 
+          <a href="http://localhost:3000/?approval=${dataReject}">
+            <strong>[Rechazar]</strong>
+          </a>.
+        </p>
+      `;
+
+      await sendEmail({
+        to: guardianEmail,
+        subject: "Solicitud de creación de hogar - Huoon",
+        text: emailText,
+        html: emailHtml
+      });
+
+      const userOnboarding = await UserRepository.findById(user.id, t);
+       if (!userOnboarding) {
+        await t.rollback();
+        return res.status(404).json({
+          success: false,
+          message: "Usuario no encontrado."
+        });
+      }
+      await UserRepository.update(userOnboarding, { onboarding_status: 1 }, t);
+      await t.commit();
+      return res.status(200).json({
+        success: true,
+        message: "Invitación enviada con éxito."
+      });
+
+    } catch (error) {
+       if (t) {
+      await t.rollback();
+    }
+      logger.error("Error al enviar invitación:", error);
+      return res.status(500).json({
+        success: false,
+        message: "No se pudo enviar la invitación. Por favor, inténtalo más tarde."
+      });
+    }
+  },
+
+  async sendCodeHome(req, res) {
+    logger.info(`Enviando códido para unir a hogar`);
+    logger.info("Datos recibidos:");
+    logger.info(JSON.stringify(req.body));
+
+    const { homeName, minorName, guardianEmail, minorEmail, home_id, user_id, request_id } = req.body;
+
+    let t = await sequelize.transaction();
+    try {
+      const code = await HouseholdRequestRepository.generateAndSetCode(request_id, home_id, t);
+      //const code = await HomeRepository.generateAndSaveCode(home_id);
+      const emailHtml = `
+          <p>👋 ¡Hola! ${ minorName }</p>
+          <p>Has recibido el siguiente código de <strong>${req.person.name}</strong> para unirte al hogar:</p>
+          
+          <div style="text-align: center; margin: 20px 0;">
+            <div style="font-size: 28px; font-weight: bold; letter-spacing: 8px; color: #006064; background: #f0f9f9; padding: 12px 24px; border-radius: 8px; display: inline-block;">
+              ${code}
+            </div>
+          </div>
+
+          <p><strong>Hogar:</strong> ${homeName}</p>
+          <p>🏠 <em>Únete a tu familia en Huoon</em></p>
+
+          <p style="margin-top: 24px; font-size: 13px; color: #666;">
+            ⏱️ Este código es válido por <strong>48 hrs</strong>.<br>
+            Si no esperabas este mensaje, puedes ignorarlo.
+          </p>
+        `;
+
+      await sendEmail({
+        to: minorEmail,
+        subject: "🏡 Código para unirte a tu hogar en Huoon",
+        text: `Has recibido el código ${code} de ${req.person.name} para unirte al hogar "${homeName}" en Huoon.\n\nIngresa este código en la app. Es válido por 3 minutos.`,
+        html: emailHtml
+      });
+      await t.commit();
+      return res.status(200).json({
+        success: true,
+        message: "Código enviado con éxito."
+      });
+
+    } catch (error) {
+       if (t) {
+      await t.rollback();
+    }
+      logger.error("Error al enviar codigo:", error);
+      return res.status(500).json({
+        success: false,
+        message: "No se pudo enviar el código. Por favor, inténtalo más tarde."
+      });
+    }
+  },
+
+  async approveHome(req, res) {
+    logger.info(`${req.user.name} creando un hogar y generando códido para unir al hogar`);
+    logger.info("Datos recibidos:");
+    logger.info(JSON.stringify(req.body));
+
+    let approvalData = req.body.approvalData;
+    if (typeof approvalData === 'string') {
+      try {
+        approvalData = JSON.parse(approvalData);
+      } catch (e) {
+        logger.error("Error al parsear approvalData:", e.message);
+        return res.status(400).json({ success: false, message: "approvalData inválido" });
+      }
+    }
+    const {  
+      name,
+      address,
+      home_type_id,
+      residents,
+      geo_location,
+      timezone,
+      status_id,
+      image,
+      people,
+      code} = req.body;
+      const personId = req.person.id;
+      req.body.person_id = personId;
+       const homeType = await HomeTypeRepository.findById(home_type_id);
+      if (!homeType) {
+        logger.error(
+          `HomeController->approveHome: Typo de Hogar no encontrado con ID ${home_type_id}`
+        );
+        return res.status(404).json({ msg: "TypeHomeNotFound" });
+      }
+      // Verificar si el estado exista
+      const status = await StatusRepository.findById(status_id);
+      if (!status) {
+        logger.error(
+          `HomeController->approveHome: Estado no encontrado con ID ${status_id}`
+        );
+        return res.status(404).json({ msg: "StatusNotFound" });
+      }
+    let t = await sequelize.transaction();
+    try {
+      const home = await HomeRepository.create(req.body, req.file, t);
+      await HomePersonRepository.createHomePersons(home.id, people, t);
+      const code = await HouseholdRequestRepository.generateAndSetCode(approvalData.request_id, home.id, t);
+      //const code = await HomeRepository.generateAndSaveCode(home.id, t);
+      const emailHtml = `
+      <p>👋 ¡Hola, ${approvalData.minorName}!</p>
+      <p>Tu hogar en Huoon ha sido creado y estás a un paso de unirte.</p>
+      <p>Recibiste el siguiente código de <strong>${req.person.name}</strong> para unirte al hogar:</p>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <div style="font-size: 28px; font-weight: bold; letter-spacing: 8px; color: #006064; background: #f0f9f9; padding: 12px 24px; border-radius: 8px; display: inline-block;">
+          ${code}
+        </div>
+      </div>
+
+      <p><strong>Hogar:</strong> ${name}</p>
+      <p>🏠 <em>Únete a tu familia en Huoon</em></p>
+
+      <p style="margin-top: 24px; font-size: 13px; color: #666;">
+        ⏱️ Este código es válido por <strong>48 hrs</strong>.<br>
+        Si no esperabas este mensaje, puedes ignorarlo.
+      </p>
+    `;
+
+    await sendEmail({
+      to: approvalData.minorEmail,
+      subject: "🏡 Código para unirte a tu hogar en Huoon",
+      text: `Tu hogar en Huoon ha sido creado. Recibiste el código ${code} de ${req.person.name} para unirte al hogar "${name}".\n\nIngresa este código en la app. Es válido por 3 minutos.`,
+      html: emailHtml
     });
-  }
-},
+      await t.commit();
+      return res.status(200).json({
+        success: true,
+        message: "Código enviado con éxito."
+      });
+
+    } catch (error) {
+       if (t) {
+      await t.rollback();
+    }
+      logger.error("Error al enviar codigo:", error);
+      return res.status(500).json({
+        success: false,
+        message: "No se pudo enviar el código. Por favor, inténtalo más tarde."
+      });
+    }
+  },
   // Actualizar una casa
   async update(req, res) {
     logger.info(`${req.user.name} - Actualiza el home con ID ${req.body.id}`);

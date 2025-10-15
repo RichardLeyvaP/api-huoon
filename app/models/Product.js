@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Product.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category', onDelete: 'CASCADE' });
       Product.hasMany(models.HomeWarehouseProduct, { foreignKey: 'product_id', as: 'warehouseStocks', onDelete: 'CASCADE' });
       Product.hasMany(models.PersonHomeWarehouseProduct, { foreignKey: 'product_id', as: 'homeWarehouseProducts', onDelete: 'CASCADE' });
+      Product.hasMany(models.RecipeProduct, { foreignKey: 'product_id', as: 'recipProducts',  onDelete: 'CASCADE' });
     }
   }
   Product.init({

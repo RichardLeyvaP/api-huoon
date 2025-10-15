@@ -50,6 +50,12 @@ const { storeVetVisitSchema, getVetVisitsSchema, idVetVisitSchema, updateVetVisi
 const { storeCurrentMedicationSchema, getCurrentMedicationsSchema, idCurrentMedicationSchema, updateCurrentMedicationSchema} = require("./middlewares/validations/currentmedicationValidation");
 const { storePetDietSchema, idPetDietSchema, updatePetDietSchema, getPetDietsSchema} = require("./middlewares/validations/petDietValidation");
 const { storeInitiativeSchema, idInitiativeSchema, updateInitiativeSchema, personStatusInitiativeSchema} = require("./middlewares/validations/initiativeValidation");
+const { storeNutritionProfileSchema, updateNutritionProfileSchema, idNutritionProfileSchema, getNutritionProfileByPersonSchema } = require('./middlewares/validations/nutritionProfileValidation');
+const { storeDailyLogSchema, updateDailyLogSchema, idDailyLogSchema, getDailyLogByPersonAndDateSchema } = require('./middlewares/validations/dailyLogValidation');
+const { storeRecipeSchema, updateRecipeSchema, idRecipeSchema, getRecipesByPersonSchema } = require('./middlewares/validations/recipeValidation');
+const { storeRecipeProductSchema, updateRecipeProductSchema, idRecipeProductSchema, getRecipeProductsByRecipeSchema } = require('./middlewares/validations/recipeProductValidation');
+const { storeMealEntrySchema, updateMealEntrySchema, idMealEntrySchema, getMealEntriesByDailyLogSchema } = require('./middlewares/validations/mealEntryValidation');
+const { storeMealRecipeSchema, updateMealRecipeSchema, idMealRecipeSchema, getMealRecipesByMealEntrySchema } = require('./middlewares/validations/mealRecipeValidation');
 
 const AuthController = require('./controllers/AuthController');
 const ConfigurationController = require('./controllers/ConfigurationController');
@@ -95,6 +101,13 @@ const CurrentMedicationController = require('./controllers/CurrentMedicationCont
 const PetDietController = require('./controllers/PetDietController');
 const ActivityLogController = require('./controllers/ActivityLogController');
 const InitiativeController = require('./controllers/InitiativeController');
+const NutritionProfileController = require('./controllers/NutritionProfileController');
+const DailyLogController = require('./controllers/DailyLogController');
+const RecipeController = require('./controllers/RecipeController');
+const RecipeProductController = require('./controllers/RecipeProductController');
+const MealEntryController = require('./controllers/MealEntryController');
+const MealRecipeController = require('./controllers/MealRecipeController');
+
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
 
@@ -104,7 +117,7 @@ router.post('/login-apk', validateSchema(loginSchema), AuthController.loginApk);
 router.post('/register', validateSchema(registerSchema), AuthController.register);
 router.post('/send-notification', NotificationController.sendNotification);
 router.post('/forgot-password', AuthController.forgotPassword);
-router.post('/verify-code', AuthController.verifyCode);
+router.post('/verify-code-password', AuthController.verifyCode);
 router.post('/reset-password', AuthController.resetPassword);
 
 // Rutas de autenticación
@@ -326,6 +339,9 @@ router.post('/home', multerCategory('image', 'homes'), validateSchema(storeHomeS
 router.post('/home-show', validateSchema(idHomeSchema), HomeController.show);
 router.post('/home-update', multerCategory('image', 'homes'), validateSchema(updateHomeSchema), HomeController.update);
 router.post('/home-destroy', validateSchema(idHomeSchema), HomeController.destroy);
+router.post('/invite-create-home', HomeController.inviteCreateHome);
+router.post('/send-code-home', HomeController.sendCodeHome);
+router.post('/home-approve',  multerCategory('image', 'homes'), HomeController.approveHome);
 
 //Rutas HomePerson
 router.get('/home-person', HomePersonController.index);
@@ -526,6 +542,54 @@ router.post('/initiative-show', validateSchema(idInitiativeSchema), InitiativeCo
 router.post('/initiative-update', validateSchema(updateInitiativeSchema), InitiativeController.update);
 router.post('/initiative-destroy', validateSchema(idInitiativeSchema), InitiativeController.destroy);
 router.post('/get-active-initiative', validateSchema(personStatusInitiativeSchema), InitiativeController.getActiveInitiatives);
+
+// Rutas para Nutrition Profile
+router.get('/nutrition-profiles', NutritionProfileController.index);
+router.post('/nutrition-profile', validateSchema(storeNutritionProfileSchema), NutritionProfileController.store);
+router.post('/nutrition-profile-show', validateSchema(idNutritionProfileSchema), NutritionProfileController.show);
+router.post('/nutrition-profile-by-person', validateSchema(getNutritionProfileByPersonSchema), NutritionProfileController.getByPersonId);
+router.post('/nutrition-profile-update', validateSchema(updateNutritionProfileSchema), NutritionProfileController.update);
+router.post('/nutrition-profile-delete',validateSchema(idNutritionProfileSchema), NutritionProfileController.destroy);
+router.post('/get-person-profile-nutrition', NutritionProfileController.getPersonProfileNutrition);
+router.post('/nutrition-by-person', NutritionProfileController.getNutritionProfileByPersonId);
+
+router.get('/daily-logs', DailyLogController.index);
+router.post('/daily-logs-person', DailyLogController.getByPersonId);
+router.post('/daily-log-show', validateSchema(idDailyLogSchema), DailyLogController.show);
+router.post('/daily-log-by-date', validateSchema(getDailyLogByPersonAndDateSchema), DailyLogController.getByPersonIdAndDate);
+router.post('/daily-log', validateSchema(storeDailyLogSchema), DailyLogController.store);
+router.post('/daily-log-update', validateSchema(updateDailyLogSchema), DailyLogController.update);
+router.post('/daily-log-delete', validateSchema(idDailyLogSchema), DailyLogController.destroy);
+
+//recipe rutas
+router.get('/recipes', RecipeController.index);
+router.post('/recipes-person', validateSchema(getRecipesByPersonSchema), RecipeController.getByPersonId);
+router.post('/recipe-show', validateSchema(idRecipeSchema), RecipeController.show);
+router.post('/recipe', validateSchema(storeRecipeSchema), RecipeController.store);
+router.post('/recipe-update', validateSchema(updateRecipeSchema), RecipeController.update);
+router.post('/recipe-delete', validateSchema(idRecipeSchema), RecipeController.destroy);
+
+//recipe-products
+router.post('/recipe-ingredients', validateSchema(getRecipeProductsByRecipeSchema), RecipeProductController.getByRecipeId);
+router.post('/recipe-ingredient-show', validateSchema(idRecipeProductSchema), RecipeProductController.show);
+router.post('/recipe-ingredient', validateSchema(storeRecipeProductSchema), RecipeProductController.store);
+router.post('/recipe-ingredient-update', validateSchema(updateRecipeProductSchema), RecipeProductController.update);
+router.post('/recipe-ingredient-delete', validateSchema(idRecipeProductSchema), RecipeProductController.destroy);
+
+// MealEntry
+router.get('/meal-entries', MealEntryController.index);
+router.post('/meal-entries-by-daily-log', validateSchema(getMealEntriesByDailyLogSchema), MealEntryController.getByDailyLogId);
+router.post('/meal-entry-show', validateSchema(idMealEntrySchema), MealEntryController.show);
+router.post('/meal-entry', validateSchema(storeMealEntrySchema), MealEntryController.store);
+router.post('/meal-entry-update', validateSchema(updateMealEntrySchema), MealEntryController.update);
+router.post('/meal-entry-delete', validateSchema(idMealEntrySchema), MealEntryController.destroy);
+
+// MealRecipe
+router.post('/meal-recipes-by-meal-entry', validateSchema(getMealRecipesByMealEntrySchema), MealRecipeController.getByMealEntryId);
+router.post('/meal-recipe-show', validateSchema(idMealRecipeSchema), MealRecipeController.show);
+router.post('/meal-recipe', validateSchema(storeMealRecipeSchema), MealRecipeController.store);
+router.post('/meal-recipe-update', validateSchema(updateMealRecipeSchema), MealRecipeController.update);
+router.post('/meal-recipe-delete', validateSchema(idMealRecipeSchema), MealRecipeController.destroy);
 
 //Rutas Unificadas
 router.post('/productcategory-productstatus-apk', ProductController.category_status);

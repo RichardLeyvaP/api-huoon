@@ -1,8 +1,53 @@
 const { Op } = require("sequelize");
 const { Role, Home, HomePerson, Person, User } = require("../models");
 const logger = require("../../config/logger"); // Logger para seguimiento
+const RoleRepository = require("./RoleRepository");
 
 const HomePersonRepository = {
+  async createHomePerson(body) {
+    const { home_id, person_id } = body;
+
+    try {
+      // Obtener el rol "Miembro" del repositorio de roles
+      const role = await RoleRepository.findHomeMemberRole();
+      if (!role) {
+        throw new Error('Rol "Miembro" no encontrado en la base de datos');
+      }
+
+      const homePerson = await HomePerson.create({
+        home_id,
+        person_id,
+        role_id: role.id,
+      });
+
+      return homePerson;
+    } catch (error) {
+      // Puedes loguear aquí si usas un logger
+      throw new Error(`Error al crear HomePerson: ${error.message}`);
+    }
+  },
+
+  async createHomePersons(homeId, people, transaction = null) {
+    if (!Array.isArray(people) || people.length === 0) {
+      throw new Error('El array "people" es requerido y no puede estar vacío');
+    }
+
+    // Normalizar los datos: asegurar que IDs sean números
+    const homePersonsData = people.map(person => ({
+      home_id: Number(homeId),
+      person_id: Number(person.person_id || person.id),
+      role_id: Number(person.role_id || person.roleId)
+    }));
+
+    // Usar bulkCreate para eficiencia
+    const created = await HomePerson.bulkCreate(homePersonsData, {
+      transaction,
+      validate: true, // opcional, si tienes validaciones en el modelo
+      individualHooks: false // mejora rendimiento
+    });
+
+    return created;
+  },
   async addPointsToPersonInHome(home_id, person_id, points) {
     try {
       // Busca el registro en la tabla home_person

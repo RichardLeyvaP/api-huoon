@@ -34,6 +34,16 @@ const ProductRepository = {
     });
   },
 
+  // Dentro de ProductRepository
+async findByIds(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return [];
+  }
+  return await Product.findAll({
+    where: { id: ids }
+  });
+},
+
   // Crear un nuevo producto con manejo de imágenes
   async create(body, file, t) {
     const { name, category_id } = body;

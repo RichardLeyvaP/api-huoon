@@ -36,6 +36,13 @@ const VetVisitRepository = require('./VetVisitRepository');
 const CurrentMedicationRepository = require('./CurrentMedicationRepository');
 const PetDietRepository = require('./PetDietRepository');
 const InitiativeRepository = require('./InitiativeRepository');
+const NutritionProfileRepository = require('./NutritionProfileRepository');
+const DailyLogRepository = require('./DailyLogRepository');
+const RecipeRepository = require('./RecipeRepository');
+const RecipeProductRepository = require('./RecipeProductRepository');
+const MealEntryRepository = require('./MealEntryRepository');
+const MealRecipeRepository = require('./MealRecipeRepository');
+const HouseholdRequestRepository = require('./HouseholdRequestRepository;');
 
 module.exports = {
     CategoryRepository,
@@ -75,5 +82,12 @@ module.exports = {
     VetVisitRepository,
     CurrentMedicationRepository,
     PetDietRepository,
-    InitiativeRepository
+    InitiativeRepository,
+    NutritionProfileRepository,
+    DailyLogRepository,
+    RecipeRepository,
+    RecipeProductRepository,
+    MealEntryRepository,
+    MealRecipeRepository,
+    HouseholdRequestRepository
 };

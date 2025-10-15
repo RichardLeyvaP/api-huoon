@@ -64,6 +64,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      status_approval: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      reset_code: {
+        type: Sequelize.BIGINT,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

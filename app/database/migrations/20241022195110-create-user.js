@@ -46,6 +46,14 @@ module.exports = {
         type: DataTypes.BIGINT,
         allowNull: true
       },
+      reset_token: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      onboarding_status: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

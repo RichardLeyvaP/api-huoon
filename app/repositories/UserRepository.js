@@ -8,11 +8,22 @@ class UserRepository {
     return await User.findAll();
   }
 
-  async findById(id) {
-    return await User.findByPk(id);
+  async findById(id, t = null) {
+    return await User.findByPk(id, { t });
   }
 
-  async create(body, t) {
+  async findByEmail(email) {
+    return await User.findOne({
+      where: {
+        email: email, // Busca el hash completo directamente
+        /*reset_code: {
+          [Op.gt]: Date.now() // Solo registros donde reset_expire > ahora
+        }*/
+      }
+    });
+  }
+
+  async create(body, t = null) {
     try {
       let hashedPassword = bcrypt.hashSync(
         body.password,
@@ -36,10 +47,10 @@ class UserRepository {
     }
   }
 
-  async update(user, body, t) {
+  async update(user, body, t = null) {
     try {
       // Lista de campos que pueden ser actualizados
-      const fieldsToUpdate = ["name", "email", "language"];
+      const fieldsToUpdate = ["name", "email", "language", "onboarding_status"];
 
       // Filtrar los campos presentes en req.body y construir el objeto updatedData
       const updatedData = Object.keys(body)

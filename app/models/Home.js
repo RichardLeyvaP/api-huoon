@@ -145,6 +145,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    status_approval: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    reset_code: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'Home',

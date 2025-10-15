@@ -57,51 +57,19 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.MedicalExam, { foreignKey: 'person_id', as: 'medicalexams', onDelete: 'CASCADE' });
         Person.hasMany(models.Emergency, { foreignKey: 'person_id', as: 'emergencies', onDelete: 'CASCADE' });
         Person.hasMany(models.Initiative, { foreignKey: 'person_id', as: 'initiatives', onDelete: 'SET NULL' });
-        Person.hasMany(models.PersonalBackground, {
-        foreignKey: 'person_id',
-        as: 'personalBackgrounds', // Cambiado de 'emergencies' a 'backgrounds' para mayor claridad
-        onDelete: 'CASCADE' // Elimina los antecedentes si se elimina la persona
-        });
-        Person.hasMany(models.FamilyBackground, {
-        foreignKey: 'person_id',
-        as: 'familyBackgrounds'
-        });
-        Person.hasMany(models.PhysicalExam, {
-        foreignKey: 'person_id',
-        as: 'physicalExams'
-        });
-        Person.hasMany(models.PsychosocialBackground, {
-        foreignKey: 'person_id',
-        as: 'psychosocialBackgrounds'
-        });
-        Person.hasMany(models.Diagnosis, {
-        foreignKey: 'person_id',
-        as: 'diagnoses'
-        });
-        Person.hasMany(models.Budget, {
-          foreignKey: 'person_id',
-          as: 'budgets',
-        });
-        Person.hasMany(models.Pet, {
-          foreignKey: 'person_id',
-          as: 'pets',
-        });
-        Person.hasMany(models.PetTreatment, {
-          foreignKey: 'person_id',
-          as: 'pettreatments',
-        });
-      Person.hasMany(models.VetVisit, {
-            foreignKey: 'person_id',
-            as: 'vetvisits',
-          });
-      Person.hasMany(models.CurrentMedication, {
-            foreignKey: 'person_id',
-            as: 'currentmedications',
-          });
-      Person.hasMany(models.PetDiet, {
-            foreignKey: 'person_id',
-            as: 'petdiets',
-          });
+        Person.hasMany(models.PersonalBackground, { foreignKey: 'person_id', as: 'personalBackgrounds',  onDelete: 'CASCADE' });
+        Person.hasMany(models.FamilyBackground, { foreignKey: 'person_id', as: 'familyBackgrounds' });
+        Person.hasMany(models.PhysicalExam, { foreignKey: 'person_id', as: 'physicalExams' });
+        Person.hasMany(models.PsychosocialBackground, { foreignKey: 'person_id', as: 'psychosocialBackgrounds' });
+        Person.hasMany(models.Diagnosis, { foreignKey: 'person_id', as: 'diagnoses' });
+        Person.hasMany(models.Budget, { foreignKey: 'person_id', as: 'budgets', });
+        Person.hasMany(models.Pet, { foreignKey: 'person_id', as: 'pets', });
+        Person.hasMany(models.PetTreatment, { foreignKey: 'person_id', as: 'pettreatments', });
+        Person.hasMany(models.VetVisit, { foreignKey: 'person_id', as: 'vetvisits', });
+        Person.hasMany(models.CurrentMedication, { foreignKey: 'person_id', as: 'currentmedications', });
+        Person.hasMany(models.PetDiet, { foreignKey: 'person_id', as: 'petdiets', });
+        Person.hasOne(models.NutritionProfile, { foreignKey: 'person_id', as: 'nutritionProfile',  onDelete: 'CASCADE' });
+        Person.hasMany(models.DailyLog, { foreignKey: 'person_id', as: 'dailylogs',  onDelete: 'CASCADE' });
     }
 
   }
