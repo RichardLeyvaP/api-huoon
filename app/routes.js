@@ -423,6 +423,7 @@ router.post('/person-home-warehouse-product-update', multerCategory('image', 'pe
 router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonProductSchema), PersonHomeWarehouseProductController.destroy);
 router.post("/process-ocr", validateSchema(ocrStringSchema), PersonHomeWarehouseProductController.processOCR);
 router.post('/warehouse-product-move', validateSchema(moveProductSchema), PersonHomeWarehouseProductController.move);
+router.post('/available-products', PersonHomeWarehouseProductController.getAllProductsForRecipe);
 
 //Rutas Finanzas
 router.get('/finance', FinanceController.index);
@@ -565,8 +566,8 @@ router.post('/daily-log-delete', validateSchema(idDailyLogSchema), DailyLogContr
 router.get('/recipes', RecipeController.index);
 router.post('/recipes-person', validateSchema(getRecipesByPersonSchema), RecipeController.getByPersonId);
 router.post('/recipe-show', validateSchema(idRecipeSchema), RecipeController.show);
-router.post('/recipe', validateSchema(storeRecipeSchema), RecipeController.store);
-router.post('/recipe-update', validateSchema(updateRecipeSchema), RecipeController.update);
+router.post('/recipe', multerCategory('image', 'recipes'), validateSchema(storeRecipeSchema), RecipeController.store);
+router.post('/recipe-update', multerCategory('image', 'recipes'), validateSchema(updateRecipeSchema), RecipeController.update);
 router.post('/recipe-delete', validateSchema(idRecipeSchema), RecipeController.destroy);
 
 //recipe-products

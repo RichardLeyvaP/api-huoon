@@ -1,6 +1,7 @@
 const logger = require("../../config/logger");
 const { RecipeRepository, HomeRepository, RecipeProductRepository, ProductRepository } = require("../repositories");
 const { sequelize } = require('../models');
+const { json } = require("sequelize");
 
 const RecipeController = {
   async index(req, res) {
@@ -33,7 +34,7 @@ const RecipeController = {
           person_home_warehouse_product_id: warehouseItem ? warehouseItem.id : null,
           name: rp.product.name,
           image: rp.product.image,
-          quantity_in_recipe: rp.quantity,
+          quantity: rp.quantity,
           unit: rp.unit,
           calories_per_unit: rp.calories_per_unit,
           protein_per_unit: rp.protein_per_unit,
@@ -72,7 +73,7 @@ const RecipeController = {
     }
   },
 
-  async store(req, res) {
+  /*async store(req, res) {
     logger.info(`${req.user.name} - Crea receta`);
     logger.info("datos recibidos:");
     logger.info(JSON.stringify(req.body));
@@ -130,8 +131,94 @@ const RecipeController = {
       logger.error("RecipeController->store: " + err.message);
       res.status(500).json({ error: "ServerError", details: err.message });
     }
-  },
+  },*/
+  async store(req, res) {
+    logger.info(`${req.user.name} - Crea receta`);
+    logger.info("datos recibidos:");
+    logger.info(JSON.stringify(req.body));
 
+    const { person_id: bodyPersonId, products } = req.body;
+    const person_id = bodyPersonId || req.person?.id;
+
+    // ✅ Eliminar los campos nutricionales del body si hay productos
+    // para forzar el cálculo desde los ingredientes
+    const recipeData = { ...req.body };
+    recipeData.person_id = person_id;
+
+    // Si hay productos, ignoramos los nutrientes enviados y los calcularemos
+    if (products && Array.isArray(products) && products.length > 0) {
+      // Eliminar campos nutricionales del body para evitar conflictos
+      delete recipeData.calories;
+      delete recipeData.protein;
+      delete recipeData.carbs;
+      delete recipeData.fats;
+      delete recipeData.fiber;
+      delete recipeData.sugar;
+      delete recipeData.saturated_fats;
+    }
+
+    if (recipeData.home_id) {
+      const home = await HomeRepository.findById(recipeData.home_id);
+      if (!home) {
+        logger.error(`RecipeController->create: Hogar no encontrado con ID ${recipeData.home_id}`);
+        return res.status(404).json({ msg: "HomeNotFound" });
+      }
+    }
+
+    const t = await sequelize.transaction();
+    try {
+      // Crear la receta SIN los nutrientes si hay productos
+      const recipe = await RecipeRepository.create(recipeData, req.file, t);
+
+      let nutrients = {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        fiber: 0,
+        sugar: 0,
+        saturated_fats: 0
+      };
+
+      // ✅ Procesar productos y calcular nutrientes
+      if (products && Array.isArray(products) && products.length > 0) {
+        const productIds = products.map(p => Number(p.product_id));
+        const dbProducts = await ProductRepository.findByIds(productIds);
+        const foundIds = new Set(dbProducts.map(p => p.id));
+        const missing = productIds.filter(id => !foundIds.has(id));
+
+        if (missing.length > 0) {
+          await t.rollback();
+          return res.status(400).json({ msg: `Productos no encontrados: ${missing.join(', ')}` });
+        }
+
+        // 👇 Este método debe devolver los nutrientes TOTALES calculados
+        nutrients = await RecipeProductRepository.upsertForRecipe(recipe, products, t);
+      } else {
+        // Si NO hay productos, usar los valores del body (si existen)
+        nutrients = {
+          calories: req.body.calories || 0,
+          protein: req.body.protein || 0,
+          carbs: req.body.carbs || 0,
+          fats: req.body.fats || 0,
+          fiber: req.body.fiber || 0,
+          sugar: req.body.sugar || 0,
+          saturated_fats: req.body.saturated_fats || 0
+        };
+      }
+
+      // Actualizar la receta con los nutrientes calculados
+      await recipe.update(nutrients, { transaction: t });
+
+      await t.commit();
+      const fullRecipe = await RecipeRepository.findById(recipe.id);
+      res.status(201).json({ recipe: fullRecipe });
+    } catch (err) {
+      await t.rollback();
+      logger.error("RecipeController->store: " + err.message);
+      res.status(500).json({ error: "ServerError", details: err.message });
+    }
+  },
   async update(req, res) {
   logger.info(`${req.user?.name || 'Anonymous'} - Edita una receta con ID ${req.body.id}`);
   logger.info("datos recibidos:");
@@ -150,7 +237,7 @@ const RecipeController = {
 
       if (hasProductsField) {
         if (Array.isArray(products) && products.length > 0) {
-          const productIds = products.map(p => p.product_id);
+          const productIds = products.map(p => Number(p.product_id));
           const dbProducts = await ProductRepository.findByIds(productIds);
           const foundIds = new Set(dbProducts.map(p => p.id));
           const missing = productIds.filter(id => !foundIds.has(id));
@@ -171,7 +258,7 @@ const RecipeController = {
       const updated = await RecipeRepository.update(recipe, updateData, req.file, t);
       
       await t.commit();
-      res.status(200).json({ recipe: updated });
+      res.status(200).json({ message: 'Receta Actualizada correctamente', recipe: updated });
     } catch (err) {
       await t.rollback();
       throw err;

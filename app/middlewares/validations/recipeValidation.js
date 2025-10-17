@@ -75,6 +75,10 @@ const storeRecipeSchema = Joi.object({
       "number.base": '"product_id" debe ser un número válido',
       "any.required": '"product_id" es requerido'
     }),
+     person_id: Joi.number().integer().positive().allow(null).optional().messages({
+      "number.base": '"person_id" debe ser un número válido',
+      "number.positive": '"person_id" debe ser un número positivo'
+    }),
     quantity: Joi.number().precision(3).min(0.001).required().messages({
       "number.base": '"quantity" debe ser un número',
       "number.min": '"quantity" debe ser mayor a 0',
@@ -129,11 +133,15 @@ const updateRecipeSchema = Joi.object({
   is_private: Joi.boolean().optional(),
   products: Joi.array().items(
   Joi.object({
-    product_id: Joi.number().integer().positive().required().messages({
+    product_id: Joi.number().integer().positive().allow(null).optional().messages({
       "number.base": '"product_id" debe ser un número válido',
       "any.required": '"product_id" es requerido'
     }),
-    quantity: Joi.number().precision(3).min(0.001).required().messages({
+    person_id: Joi.number().integer().positive().allow(null).optional().messages({
+      "number.base": '"person_id" debe ser un número válido',
+      "number.positive": '"person_id" debe ser un número positivo'
+    }),
+    quantity: Joi.number().precision(3).min(0.001).allow(null).optional().messages({
       "number.base": '"quantity" debe ser un número',
       "number.min": '"quantity" debe ser mayor a 0',
       "any.required": '"quantity" es requerido'

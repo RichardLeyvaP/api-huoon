@@ -1,6 +1,6 @@
 const { Recipe, Person, Home, RecipeProduct, PersonHomeWarehouseProduct, Product } = require("../models");
 const logger = require("../../config/logger");
-const { ImageService } = require("../services/ImageService");
+const ImageService  = require("../services/ImageService");
 
 const RecipeRepository = {
   async findAll() {
@@ -117,15 +117,17 @@ const RecipeRepository = {
   },
 
   async update(recipe, body, file, t) {
-    const fields = [
+    const fieldsToUpdate = [
       "home_id", "name", "description", "is_favorite", "image",
       "preparation_time", "servings", "calories", "protein", "carbs", "fats",
       "fiber", "sugar", "saturated_fats", "is_private"
     ];
-    const data = {};
-    fields.forEach(f => {
-      if (body[f] !== undefined) data[f] = body[f];
-    });
+    const updatedData = Object.keys(body)
+      .filter((key) => fieldsToUpdate.includes(key) && body[key] !== undefined)
+      .reduce((obj, key) => {
+        obj[key] = body[key];
+        return obj;
+      }, {});
     try {
         if (file) {
         if (recipe.image && recipe.image !== "recipes/default.jpg") {
@@ -141,8 +143,8 @@ const RecipeRepository = {
           newFilename
         );
       }
-      if (Object.keys(data).length > 0) {
-        await recipe.update(data, { transaction: t });
+      if (Object.keys(updatedData).length > 0) {
+        await recipe.update(updatedData, { transaction: t });
         logger.info(`Receta actualizada (ID: ${recipe.id})`);
       }
       return recipe;

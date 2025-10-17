@@ -96,6 +96,29 @@ const  PersonProductRepository = {
     });
   },
 
+  async getAllProductsByPersonAndHome(person_id, home_id) {
+  return await PersonHomeWarehouseProduct.findAll({
+    where: {
+      person_id: person_id,
+      home_id: home_id,
+      quantity: { [Op.gt]: 0 }
+    },
+    include: [
+      {
+        model: Product,
+        as: 'product',
+        attributes: ['id', 'name', 'image'], // Solo los campos necesarios
+        // Opcional: incluir categoría si la necesitas
+        // include: [{ model: Category, as: 'category', attributes: ['id', 'name'] }]
+      }
+    ],
+    attributes: [], // No necesitamos campos de PersonHomeWarehouseProduct
+    group: ['product.id', 'product.name', 'product.image'], // Evita duplicados
+    raw: true, // Devuelve objetos planos
+    nest: true // Anida el producto
+  });
+},
+
   async getTotalQuantityByWarehouse(homeId, warehouseId) {
   const result = await PersonHomeWarehouseProduct.sum('quantity', {
     where: {

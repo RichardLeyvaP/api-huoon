@@ -193,6 +193,47 @@ const PersonHomeWarehouseProductController = {
     }
   },
 
+  async getAllProductsForRecipe(req, res) {
+    logger.info(`${req.user.name} - Obtiene productos disponibles para recetas`);
+
+    const { home_id,  person_id: bodyPersonId } = req.body;
+    const person_id = bodyPersonId || req.person?.id;
+
+    try {
+      // Validar hogar (opcional, pero recomendado)
+      const home = await HomeRepository.findById(home_id);
+      if (!home) {
+        return res.status(204).json({ msg: "HomeNotFound" });
+      }
+
+      // Verificar que la persona pertenece al hogar
+      const personInHome = await PersonRepository.getPersonHouse(person_id, home_id);
+      if (!personInHome) {
+        return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
+      }
+
+      // Obtener productos
+      const products = await PersonProductRepository.getAllProductsByPersonAndHome(person_id, home_id);
+
+      if (!products || products.length === 0) {
+        return res.status(204).json({ msg: "NoProductsAvailable" });
+      }
+
+      // Formatear respuesta plana
+      const result = products.map(p => ({
+        id: p.product.id,
+        name: p.product.name,
+        image: p.product.image
+      }));
+
+      return res.status(200).json({ products: result });
+    } catch (error) {
+      const errorMsg = error.message || "Error desconocido";
+      logger.error("RecipeController->getAllProductsForRecipe: " + errorMsg);
+      return res.status(500).json({ error: "ServerError", details: errorMsg });
+    }
+  },
+
   async store(req, res) {
     logger.info(
       `${req.user.name} - Inicia el proceso de asociar un almacén y producto  de una persona a un hogar específico`

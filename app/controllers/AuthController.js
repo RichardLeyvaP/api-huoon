@@ -101,16 +101,16 @@ const AuthController = {
         ],
       });
       if (!user) {
-        return res.status(400).json({ msg: "Credenciales inválidas" });
+        return res.status(400).json({ msg: "Correo o contraseña incorrectos." });
       }
       // Verificar si el campo password es nulo o vacío
       if (!user.password || user.password === "") {
-        return res.status(400).json({ msg: "Credenciales inválidas" });
+        return res.status(400).json({ msg: "Correo o contraseña incorrectos." });
       }
 
       const isMatch = await bcrypt.compare(req.body.password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ msg: "Credenciales inválidas" });
+        return res.status(400).json({ msg: "Correo o contraseña incorrectos." });
       }
 
       // Extraemos los datos de 'person' del usuario
@@ -288,8 +288,8 @@ const AuthController = {
       if (existingUser) {
         logger.error("Usuario ya existe: " + req.body.user);
         return res
-          .status(400)
-          .json({ error: "El nombre de usuario ya existe." });
+          .status(404)
+          .json({ message: "El nombre de usuario ya existe." });
       }
     }
 
@@ -304,7 +304,7 @@ const AuthController = {
       logger.error("Correo ya existe: " + req.body.email);
       return res
         .status(400)
-        .json({ error: "El correo electrónico ya está registrado." });
+        .json({ message: "El correo ya está registrado." });
     }
 
     const t = await sequelize.transaction(); // Inicia una transacción
@@ -389,7 +389,7 @@ const AuthController = {
       // Revertir la transacción en caso de error
       await t.rollback();
       logger.error("Error al registrar usuario: " + err.message);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err.message, message: 'No pudimos completar el registro. Inténtalo nuevamente.' });
     }
   },
 
@@ -949,7 +949,7 @@ const AuthController = {
     // Para evitar enumeración, responde éxito incluso si no existe
     if (!user) {
       await t.commit();
-      return res.status(204).json({ success: true, message: "Si el correo existe, recibirás un código." });
+      return res.status(404).json({ success: true, message: "No encontramos una cuenta con este correo." });
     }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
@@ -969,13 +969,13 @@ const AuthController = {
       html: `<p>Tu código de recuperación es: <strong>${code}</strong></p>`
     }, {transaction: t});
     await t.commit();
-    res.status(200).json({ success: true, message: "Código enviado" });
+    res.status(200).json({ success: true, message: "Te enviamos un código para restablecer tu contraseña. Revisa tu correo." });
   } catch (error) {
      if (!t.finished) {
         await t.rollback();
       }
     logger.error("Error en forgotPassword:", error);
-    res.status(500).json({ success: false, message: "Error interno" });
+    res.status(500).json({ success: false, message: "Hubo un problema al enviar el correo. Inténtalo más tarde." });
   }
 },
 async verifyCode(req, res) {
