@@ -42,7 +42,7 @@ const RecipeRepository = require('./RecipeRepository');
 const RecipeProductRepository = require('./RecipeProductRepository');
 const MealEntryRepository = require('./MealEntryRepository');
 const MealRecipeRepository = require('./MealRecipeRepository');
-const HouseholdRequestRepository = require('./HouseholdRequestRepository;');
+const HouseholdRequestRepository = require('./HouseholdRequestRepository');
 
 module.exports = {
     CategoryRepository,

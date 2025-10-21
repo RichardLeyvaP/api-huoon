@@ -8,13 +8,13 @@ const storeRecipeSchema = Joi.object({
   home_id: Joi.number().integer().positive().allow(null).optional().messages({
     "number.base": '"home_id" debe ser un número válido'
   }),
-  name: Joi.string().min(1).max(100).required().messages({
+  name: Joi.string().min(1).required().messages({
     "string.base": '"name" debe ser texto',
     "string.min": '"name" no puede estar vacío',
     "string.max": '"name" no debe exceder 100 caracteres',
     "any.required": '"name" es requerido'
   }),
-  description: Joi.string().max(1000).allow(null, "").optional().messages({
+  description: Joi.string().allow(null, "").optional().messages({
     "string.max": '"description" no debe exceder 1000 caracteres'
   }),
   is_favorite: Joi.boolean().optional().messages({
@@ -33,37 +33,37 @@ const storeRecipeSchema = Joi.object({
         .messages({
             'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
         }),
-  preparation_time: Joi.number().integer().min(0).max(1440).allow(null).optional().messages({
+  preparation_time: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"preparation_time" debe ser un número entero (minutos)',
     "number.min": '"preparation_time" no puede ser negativo',
     "number.max": '"preparation_time" no puede exceder 1440 minutos (24h)'
   }),
-  servings: Joi.number().integer().min(1).max(100).required().messages({
+  servings: Joi.number().integer().min(1).optional().messages({
     "number.base": '"servings" debe ser un número entero',
     "number.min": '"servings" debe ser al menos 1',
     "number.max": '"servings" no puede exceder 100',
     "any.required": '"servings" es requerido'
   }),
-  calories: Joi.number().integer().min(0).max(10000).allow(null).optional().messages({
+  calories: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"calories" debe ser un número entero',
     "number.min": '"calories" no puede ser negativo'
   }),
-  protein: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  protein: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"protein" debe ser un número entero (gramos)'
   }),
-  carbs: Joi.number().integer().min(0).max(1000).allow(null).optional().messages({
+  carbs: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"carbs" debe ser un número entero (gramos)'
   }),
-  fats: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  fats: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"fats" debe ser un número entero (gramos)'
   }),
-  fiber: Joi.number().integer().min(0).max(100).allow(null).optional().messages({
+  fiber: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"fiber" debe ser un número entero (gramos)'
   }),
-  sugar: Joi.number().integer().min(0).max(200).allow(null).optional().messages({
+  sugar: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"sugar" debe ser un número entero (gramos)'
   }),
-  saturated_fats: Joi.number().integer().min(0).max(200).allow(null).optional().messages({
+  saturated_fats: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"saturated_fats" debe ser un número entero (gramos)'
   }),
   is_private: Joi.boolean().optional().messages({
@@ -105,8 +105,8 @@ const updateRecipeSchema = Joi.object({
     "any.required": '"id" es requerido'
   }),
   home_id: Joi.number().integer().positive().allow(null).optional(),
-  name: Joi.string().min(1).max(100).optional(),
-  description: Joi.string().max(1000).allow(null, "").optional(),
+  name: Joi.string().min(1).optional(),
+  description: Joi.string().allow(null, "").optional(),
   is_favorite: Joi.boolean().optional(),
   image: Joi.string()
         .pattern(/\.(jpg|jpeg|png|gif)$/i)  // Validar formato de imagen
@@ -121,15 +121,15 @@ const updateRecipeSchema = Joi.object({
         .messages({
             'string.pattern.base': 'El campo image debe ser una imagen válida (jpg, jpeg, png, gif)',
         }),
-  preparation_time: Joi.number().integer().min(0).max(1440).allow(null).optional(),
-  servings: Joi.number().integer().min(1).max(100).optional(),
-  calories: Joi.number().integer().min(0).max(10000).allow(null).optional(),
-  protein: Joi.number().integer().min(0).max(500).allow(null).optional(),
-  carbs: Joi.number().integer().min(0).max(1000).allow(null).optional(),
-  fats: Joi.number().integer().min(0).max(500).allow(null).optional(),
-  fiber: Joi.number().integer().min(0).max(100).allow(null).optional(),
-  sugar: Joi.number().integer().min(0).max(200).allow(null).optional(),
-  saturated_fats: Joi.number().integer().min(0).max(200).allow(null).optional(),
+  preparation_time: Joi.number().integer().min(0).allow(null).optional(),
+  servings: Joi.number().integer().min(1).optional(),
+  calories: Joi.number().integer().min(0).allow(null).optional(),
+  protein: Joi.number().integer().min(0).allow(null).optional(),
+  carbs: Joi.number().integer().min(0).allow(null).optional(),
+  fats: Joi.number().integer().min(0).allow(null).optional(),
+  fiber: Joi.number().integer().min(0).allow(null).optional(),
+  sugar: Joi.number().integer().min(0).allow(null).optional(),
+  saturated_fats: Joi.number().integer().min(0).allow(null).optional(),
   is_private: Joi.boolean().optional(),
   products: Joi.array().items(
   Joi.object({

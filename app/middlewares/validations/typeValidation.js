@@ -23,6 +23,11 @@ const idTypeSchema = Joi.object({
 const typeSchema = Joi.object({
     type: Joi.string().required(),
     query: Joi.string().allow(null).empty('').optional(),
+    person_id: Joi.number().integer().positive().allow(null).optional().messages({
+        "number.base": '"person_id" debe ser un número válido',
+        "number.positive": '"person_id" debe ser un número positivo',
+        "any.required": '"person_id" es requerido'
+      }),
 });
 
 module.exports = {

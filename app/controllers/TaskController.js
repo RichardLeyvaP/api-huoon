@@ -37,8 +37,8 @@ const IntentDetectionService = require("../services/IntentDetectionService");
 const TaskSuggestionService = require("../services/TaskSuggestionService");
 const openai = require("../../config/openaiClient");
 
-const STATUS_ORDER = { 'Pendiente': 1, 'Progreso': 2, 'Completada': 3 };
-const PRIORITY_ORDER = { 'Alta': 1, 'Media': 2, 'Normal': 3 };
+const STATUS_ORDER = { Pendiente: 1, Progreso: 2, Completada: 3 };
+const PRIORITY_ORDER = { Alta: 1, Media: 2, Normal: 3 };
 
 const TaskController = {
   // Obtener todas las tareas
@@ -175,9 +175,18 @@ const TaskController = {
         req.body.task_type,
         req.body.type,
         statuses
-      )
-      const goalStatus = TaskController.getGoalStatusFromSummary(sumaryData.summary);
-      return res.status(200).json({ tasks: mappedTasks, status: statuses, sumaryData: sumaryData, goalStatus }); // Tareas encontradas
+      );
+      const goalStatus = TaskController.getGoalStatusFromSummary(
+        sumaryData.summary
+      );
+      return res
+        .status(200)
+        .json({
+          tasks: mappedTasks,
+          status: statuses,
+          sumaryData: sumaryData,
+          goalStatus,
+        }); // Tareas encontradas
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
@@ -204,8 +213,12 @@ const TaskController = {
       }
       const personId = req.person.id;
       const statuses = await StatusService.getStatus("Task");
-       const completedStatusId = statuses.find(s => s.name === 'Completada')?.id;
-      const progressStatusId = statuses.find(s => s.name === 'En Progreso')?.id;
+      const completedStatusId = statuses.find(
+        (s) => s.name === "Completada"
+      )?.id;
+      const progressStatusId = statuses.find(
+        (s) => s.name === "En Progreso"
+      )?.id;
       // Obtener solo las tareas principales (sin padre) directamente en la consulta
       const tasks = await TaskRepository.findAllDateWeb(
         req.body.start_date,
@@ -215,21 +228,50 @@ const TaskController = {
         req.body.type,
         statuses
       );
-      const mappedTasks = tasks.map(task =>
-        TaskController.mapTaskTree(task, personId, completedStatusId, progressStatusId)
+      const mappedTasks = tasks.map((task) =>
+        TaskController.mapTaskTree(
+          task,
+          personId,
+          completedStatusId,
+          progressStatusId
+        )
       );
-        const sumaryData = TaskController.calculateGoalSummaryFromTasks(tasks, statuses, personId);
+      const sumaryData = TaskController.calculateGoalSummaryFromTasks(
+        tasks,
+        statuses,
+        personId
+      );
 
-        const topPriorityTasks = TaskController.getTopPriorityTasks(mappedTasks, 4);
+      const topPriorityTasks = TaskController.getTopPriorityTasks(
+        mappedTasks,
+        4
+      );
 
       // Extraer el porcentaje de tareas completadas
-      const completedCount = sumaryData.summary.find(s => s.id === 'completed')?.totalQuantity || 0;
+      const completedCount =
+        sumaryData.summary.find((s) => s.id === "completed")?.totalQuantity ||
+        0;
       const totalCount = sumaryData.totalTasks;
-      const percentageCompleted = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-      const goalStatus = TaskController.getGoalStatusFromSummary(sumaryData.summary);
-      const taskAlerts = TaskController.generateTaskAlerts(sumaryData, mappedTasks);
+      const percentageCompleted =
+        totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+      const goalStatus = TaskController.getGoalStatusFromSummary(
+        sumaryData.summary
+      );
+      const taskAlerts = TaskController.generateTaskAlerts(
+        sumaryData,
+        mappedTasks
+      );
       // Obtener el estado de las metas
-      return res.status(200).json({ tasks: mappedTasks, status: statuses, sumaryData: sumaryData, goalStatus, alerts: taskAlerts, topPriorityTasks }); // Tareas encontradas
+      return res
+        .status(200)
+        .json({
+          tasks: mappedTasks,
+          status: statuses,
+          sumaryData: sumaryData,
+          goalStatus,
+          alerts: taskAlerts,
+          topPriorityTasks,
+        }); // Tareas encontradas
     } catch (error) {
       const errorMsg = error.details
         ? error.details.map((detail) => detail.message).join(", ")
@@ -242,7 +284,7 @@ const TaskController = {
 
   mapTaskTree(task, personId, completedStatusId, progressStatusId) {
     // 1. Mapear personas desde homePersonTasks ya incluidos
-    const people = (task.homePersonTasks || []).map(hpt => {
+    const people = (task.homePersonTasks || []).map((hpt) => {
       const base = {
         id: hpt.person_id,
         homePersonTaskId: hpt.id,
@@ -251,19 +293,22 @@ const TaskController = {
         roleId: hpt.role_id || null,
         points: hpt.points || 0,
         description: hpt.description || "",
-        roleName: ""
+        roleName: "",
       };
 
       if (hpt.role) {
         const translated = i18n.__(`roles.${hpt.role.name}.name`);
-        base.roleName = translated !== `roles.${hpt.role.name}.name` ? translated : hpt.role.name;
+        base.roleName =
+          translated !== `roles.${hpt.role.name}.name`
+            ? translated
+            : hpt.role.name;
       }
 
       return base;
     });
 
     // 2. Si la persona no está en homePersonTasks pero es el creador
-    if (!people.some(p => p.id === personId) && task.person_id === personId) {
+    if (!people.some((p) => p.id === personId) && task.person_id === personId) {
       const creator = task.person;
       if (creator) {
         const creatorRole = i18n.__(`roles.Creador.name`);
@@ -275,14 +320,20 @@ const TaskController = {
           homePersonTaskId: 0,
           points: 0,
           description: "",
-          roleName: creatorRole !== `roles.Creador.name` ? creatorRole : "Creador"
+          roleName:
+            creatorRole !== `roles.Creador.name` ? creatorRole : "Creador",
         });
       }
     }
 
     // 3. Mapear hijos recursivamente
-    const children = (task.children || []).map(child =>
-      TaskController.mapTaskTree(child, personId, completedStatusId, progressStatusId)
+    const children = (task.children || []).map((child) =>
+      TaskController.mapTaskTree(
+        child,
+        personId,
+        completedStatusId,
+        progressStatusId
+      )
     );
 
     // 4. Calcular completionPercentage solo si es una meta (sin padre)
@@ -293,9 +344,9 @@ const TaskController = {
           ...task,
           children,
           statusId: task.status_id,
-          namePriority: task.priority?.name || 'Normal',
+          namePriority: task.priority?.name || "Normal",
           start_date: task.start_date,
-          end_date: task.end_date
+          end_date: task.end_date,
         },
         completedStatusId,
         progressStatusId
@@ -305,7 +356,9 @@ const TaskController = {
     // 5. Traducciones seguras
     const moduleName = i18n.__(`module.${task.module}.name`);
     const typeName = i18n.__(`typetask.${task.type}.name`);
-    const namePriority = i18n.__(`priority.${task.priority?.name || 'Normal'}.name`);
+    const namePriority = i18n.__(
+      `priority.${task.priority?.name || "Normal"}.name`
+    );
     const statusName = i18n.__(`status.${task.status?.name}.name`);
 
     // 6. Devolver el objeto exactamente como antes
@@ -327,25 +380,29 @@ const TaskController = {
       module: task.module,
       taskType: task.task_type,
       task_type: task.task_type,
-      moduleName: moduleName !== `module.${task.module}.name` ? moduleName : task.module,
-      typeName: typeName !== `typetask.${task.type}.name` ? typeName : task.type,
-      namePriority: namePriority !== `priority.${task.priority?.name || 'Normal'}.name`
-        ? namePriority
-        : task.priority?.name || 'Normal',
-      priority: task.priority?.name || 'Normal',
+      moduleName:
+        moduleName !== `module.${task.module}.name` ? moduleName : task.module,
+      typeName:
+        typeName !== `typetask.${task.type}.name` ? typeName : task.type,
+      namePriority:
+        namePriority !== `priority.${task.priority?.name || "Normal"}.name`
+          ? namePriority
+          : task.priority?.name || "Normal",
+      priority: task.priority?.name || "Normal",
       priorityId: task.priority_id,
       priority_id: task.priority_id,
       colorPriority: task.priority?.color,
       statusId: task.status_id,
       status_id: task.status_id,
-      nameStatus: task.status?.name || '',
-      status: statusName !== `status.${task.status?.name}.name`
-        ? statusName
-        : task.status?.name || '',
+      nameStatus: task.status?.name || "",
+      status:
+        statusName !== `status.${task.status?.name}.name`
+          ? statusName
+          : task.status?.name || "",
       categoryId: task.category_id,
       category_id: task.category_id,
-      nameCategory: task.category?.name || '',
-      iconCategory: task.category?.icon || '',
+      nameCategory: task.category?.name || "",
+      iconCategory: task.category?.icon || "",
       recurrence: task.recurrence,
       estimatedTime: task.estimated_time,
       estimated_time: task.estimated_time,
@@ -363,265 +420,282 @@ const TaskController = {
   },
 
   calculateGoalSummaryFromTasks(tasks, statuses, personId) {
-  const today = new Date();
+    const today = new Date();
 
-  // Extraer IDs necesarios
-  const COMPLETED_ID = statuses.find(s => s.name === 'Completada')?.id;
-  const IN_PROGRESS_ID = statuses.find(s => s.name === 'En Progreso')?.id;
-  const PENDING_ID = statuses.find(s => s.name === 'Pendiente')?.id;
+    // Extraer IDs necesarios
+    const COMPLETED_ID = statuses.find((s) => s.name === "Completada")?.id;
+    const IN_PROGRESS_ID = statuses.find((s) => s.name === "En Progreso")?.id;
+    const PENDING_ID = statuses.find((s) => s.name === "Pendiente")?.id;
 
-  if (!COMPLETED_ID || !IN_PROGRESS_ID || !PENDING_ID) {
-    throw new Error("Required statuses not found: 'Completada', 'En Progreso', 'Pendiente'");
-  }
+    if (!COMPLETED_ID || !IN_PROGRESS_ID || !PENDING_ID) {
+      throw new Error(
+        "Required statuses not found: 'Completada', 'En Progreso', 'Pendiente'"
+      );
+    }
 
-  // Rango de la semana actual (para "próximas a vencer")
-  const day = today.getDay();
-  const diffToMonday = today.getDate() - (day === 0 ? 6 : day - 1);
-  const monday = new Date(today);
-  monday.setDate(diffToMonday);
-  monday.setHours(0, 0, 0, 0);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
+    // Rango de la semana actual (para "próximas a vencer")
+    const day = today.getDay();
+    const diffToMonday = today.getDate() - (day === 0 ? 6 : day - 1);
+    const monday = new Date(today);
+    monday.setDate(diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
 
-  // Aplanar el árbol de tareas (porque `findAllDateWeb` devuelve tareas con hijos anidados)
-  const allTasks = [];
-  const flattenTasks = (taskList) => {
-    for (const task of taskList) {
-      allTasks.push(task);
-      if (task.children && task.children.length > 0) {
-        flattenTasks(task.children);
+    // Aplanar el árbol de tareas (porque `findAllDateWeb` devuelve tareas con hijos anidados)
+    const allTasks = [];
+    const flattenTasks = (taskList) => {
+      for (const task of taskList) {
+        allTasks.push(task);
+        if (task.children && task.children.length > 0) {
+          flattenTasks(task.children);
+        }
+      }
+    };
+    flattenTasks(tasks);
+
+    // Clasificar
+    const activas = [];
+    const completadas = [];
+    const retrasadas = [];
+    const proximasVencer = [];
+    const ownPending = [];
+
+    for (const task of allTasks) {
+      const statusId = task.status_id;
+      const taskId = task.id;
+
+      // Combinar fecha y hora para comparación precisa
+      const endDateTime = new Date(
+        `${task.end_date}T${task.end_time || "23:59:59"}`
+      );
+      // const startDateTime = new Date(`${task.start_date}T${task.start_time || '00:00:00'}`);
+
+      // Completadas
+      if (statusId === COMPLETED_ID) {
+        completadas.push(taskId);
+        continue;
+      }
+
+      // Solo considerar Pendientes y En Progreso
+      if (statusId !== PENDING_ID && statusId !== IN_PROGRESS_ID) {
+        continue;
+      }
+
+      if (statusId === PENDING_ID) {
+        ownPending.push(taskId);
+      }
+
+      // Retrasadas: fecha de fin ya pasó
+      if (today > endDateTime) {
+        retrasadas.push(taskId);
+      }
+      // Próximas a vencer: fecha de fin está en la semana actual
+      else if (endDateTime > today) {
+        const taskEndDate = new Date(task.end_date);
+        if (taskEndDate >= monday && taskEndDate <= sunday) {
+          proximasVencer.push(taskId);
+        }
+      }
+
+      // Activas: solo si están "En Progreso"
+      if (statusId === IN_PROGRESS_ID) {
+        activas.push(taskId);
       }
     }
-  };
-  flattenTasks(tasks);
 
-  // Clasificar
-  const activas = [];
-  const completadas = [];
-  const retrasadas = [];
-  const proximasVencer = [];
-  const ownPending = [];
+    const total = allTasks.length;
+    const calcPercentage = (value) =>
+      total === 0 ? 0 : Math.round((value / total) * 100);
 
-  for (const task of allTasks) {
-    const statusId = task.status_id;
-    const taskId = task.id;
+    const getFriendlyName = (id) => {
+      const status = statuses.find((s) => s.id === id);
+      return status ? status.name : "Desconocido";
+    };
 
-    // Combinar fecha y hora para comparación precisa
-    const endDateTime = new Date(`${task.end_date}T${task.end_time || '23:59:59'}`);
-    // const startDateTime = new Date(`${task.start_date}T${task.start_time || '00:00:00'}`);
+    return {
+      summary: [
+        {
+          id: "completed",
+          name: getFriendlyName(COMPLETED_ID),
+          totalQuantity: completadas.length,
+          percentage: calcPercentage(completadas.length),
+          taskIds: completadas,
+          icon: "mdi-check-circle-outline", // ✅
+        },
+        {
+          id: "active",
+          name: getFriendlyName(IN_PROGRESS_ID),
+          totalQuantity: activas.length,
+          percentage: calcPercentage(activas.length),
+          taskIds: activas,
+          icon: "mdi-progress-clock", // ✅
+        },
+        {
+          id: "ownPending",
+          name: "Pendientes",
+          totalQuantity: ownPending.length,
+          percentage: calcPercentage(ownPending.length),
+          taskIds: ownPending,
+          icon: "mdi-account-clock-outline", // ✅
+        },
+        {
+          id: "delayed",
+          name: "Retrasadas",
+          totalQuantity: retrasadas.length,
+          percentage: calcPercentage(retrasadas.length),
+          taskIds: retrasadas,
+          icon: "mdi-timer-off-outline", // ✅
+        },
+        {
+          id: "dueSoon",
+          name: "Próximas a vencer",
+          totalQuantity: proximasVencer.length,
+          percentage: calcPercentage(proximasVencer.length),
+          taskIds: proximasVencer,
+          icon: "mdi-alarm", // ✅
+        },
+      ],
+      totalTasks: total,
+    };
+  },
 
-    // Completadas
-    if (statusId === COMPLETED_ID) {
-      completadas.push(taskId);
-      continue;
-    }
+  getTopPriorityTasks(mappedTasks, limit = 4) {
+    // 1. Filtrar solo metas (sin padre)
+    const goals = mappedTasks.filter((task) => task.parentId == null);
 
-    // Solo considerar Pendientes y En Progreso
-    if (statusId !== PENDING_ID && statusId !== IN_PROGRESS_ID) {
-      continue;
-    }
+    // 2. Mapear prioridad a valor numérico para ordenar
+    const priorityOrder = {
+      Alta: 1,
+      Media: 2,
+      Baja: 3,
+      Normal: 4,
+    };
 
-    if (statusId === PENDING_ID) {
-      ownPending.push(taskId);
-    }
+    // 3. Ordenar
+    const sorted = goals.sort((a, b) => {
+      // a) Por prioridad (Alta primero)
+      const prioA = priorityOrder[a.priority] || 4;
+      const prioB = priorityOrder[b.priority] || 4;
+      if (prioA !== prioB) return prioA - prioB;
 
-    // Retrasadas: fecha de fin ya pasó
-    if (today > endDateTime) {
-      retrasadas.push(taskId);
-    }
-    // Próximas a vencer: fecha de fin está en la semana actual
-    else if (endDateTime > today) {
-      const taskEndDate = new Date(task.end_date);
-      if (taskEndDate >= monday && taskEndDate <= sunday) {
-        proximasVencer.push(taskId);
+      // b) Por % completado (menos completado primero)
+      const compA = a.completionPercentage ?? 100; // si no tiene, asumimos 100 (aunque no debería pasar)
+      const compB = b.completionPercentage ?? 100;
+      if (compA !== compB) return compA - compB;
+
+      // c) Por fecha de vencimiento (más cercana primero)
+      if (a.endDate && b.endDate) {
+        return new Date(a.endDate) - new Date(b.endDate);
       }
-    }
+      if (a.endDate) return -1; // a tiene fecha, b no → a va primero
+      if (b.endDate) return 1; // b tiene fecha, a no → b va primero
+      return 0; // ambos sin fecha
+    });
 
-    // Activas: solo si están "En Progreso"
-    if (statusId === IN_PROGRESS_ID) {
-      activas.push(taskId);
-    }
-  }
-
-  const total = allTasks.length;
-  const calcPercentage = (value) => total === 0 ? 0 : Math.round((value / total) * 100);
-
-  const getFriendlyName = (id) => {
-    const status = statuses.find(s => s.id === id);
-    return status ? status.name : "Desconocido";
-  };
-
-  return {
-  summary: [
-    {
-      id: "completed",
-      name: getFriendlyName(COMPLETED_ID),
-      totalQuantity: completadas.length,
-      percentage: calcPercentage(completadas.length),
-      taskIds: completadas,
-      icon: "mdi-check-circle-outline" // ✅
-    },
-    {
-      id: "active",
-      name: getFriendlyName(IN_PROGRESS_ID),
-      totalQuantity: activas.length,
-      percentage: calcPercentage(activas.length),
-      taskIds: activas,
-      icon: "mdi-progress-clock" // ✅
-    },
-    {
-      id: "ownPending",
-      name: "Pendientes",
-      totalQuantity: ownPending.length,
-      percentage: calcPercentage(ownPending.length),
-      taskIds: ownPending,
-      icon: "mdi-account-clock-outline" // ✅
-    },
-    {
-      id: "delayed",
-      name: "Retrasadas",
-      totalQuantity: retrasadas.length,
-      percentage: calcPercentage(retrasadas.length),
-      taskIds: retrasadas,
-      icon: "mdi-timer-off-outline" // ✅
-    },
-    {
-      id: "dueSoon",
-      name: "Próximas a vencer",
-      totalQuantity: proximasVencer.length,
-      percentage: calcPercentage(proximasVencer.length),
-      taskIds: proximasVencer,
-      icon: "mdi-alarm" // ✅
-    }
-  ],
-  totalTasks: total
-};
-},
-
-getTopPriorityTasks(mappedTasks, limit = 4) {
-  // 1. Filtrar solo metas (sin padre)
-  const goals = mappedTasks.filter(task => task.parentId == null);
-
-  // 2. Mapear prioridad a valor numérico para ordenar
-  const priorityOrder = {
-    'Alta': 1,
-    'Media': 2,
-    'Baja': 3,
-    'Normal': 4
-  };
-
-  // 3. Ordenar
-  const sorted = goals.sort((a, b) => {
-    // a) Por prioridad (Alta primero)
-    const prioA = priorityOrder[a.priority] || 4;
-    const prioB = priorityOrder[b.priority] || 4;
-    if (prioA !== prioB) return prioA - prioB;
-
-    // b) Por % completado (menos completado primero)
-    const compA = a.completionPercentage ?? 100; // si no tiene, asumimos 100 (aunque no debería pasar)
-    const compB = b.completionPercentage ?? 100;
-    if (compA !== compB) return compA - compB;
-
-    // c) Por fecha de vencimiento (más cercana primero)
-    if (a.endDate && b.endDate) {
-      return new Date(a.endDate) - new Date(b.endDate);
-    }
-    if (a.endDate) return -1; // a tiene fecha, b no → a va primero
-    if (b.endDate) return 1;  // b tiene fecha, a no → b va primero
-    return 0; // ambos sin fecha
-  });
-
-  // 4. Tomar las primeras N
-  return sorted.slice(0, limit).map(task => ({
-    id: task.id,
-    title: task.title,
-    priority: task.namePriority,
-    namePriority: task.priority,
-    priorityId: task.priorityId,
-    colorPriority: task.colorPriority,
-    completionPercentage: task.completionPercentage,
-    startDate: task.startDate,
-    endDate: task.endDate,
-    status: task.status,
-    nameStatus: task.nameStatus,
-    statusId: task.statusId
-  }));
-},
+    // 4. Tomar las primeras N
+    return sorted.slice(0, limit).map((task) => ({
+      id: task.id,
+      title: task.title,
+      priority: task.namePriority,
+      namePriority: task.priority,
+      priorityId: task.priorityId,
+      colorPriority: task.colorPriority,
+      completionPercentage: task.completionPercentage,
+      startDate: task.startDate,
+      endDate: task.endDate,
+      status: task.status,
+      nameStatus: task.nameStatus,
+      statusId: task.statusId,
+    }));
+  },
 
   getCurrentDateYYYYMMDD() {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .split('T')[0];
-},
+    const now = new Date();
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .split("T")[0];
+  },
 
-addDays(dateStr, days) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const date = new Date(y, m - 1, d);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0];
-},
+  addDays(dateStr, days) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + days);
+    return date.toISOString().split("T")[0];
+  },
 
-calculateChildProgress(child, today, completedStatusId, progressStatusId) {
-  if (child.statusId === completedStatusId) return 100;
-  if (child.statusId === progressStatusId) {
-    return child.start_date <= today ? 50 : 0;
-  }
-  return 0;
-},
-
-calculateGoalCompletion(task, completedStatusId, progressStatusId) {
-  const today = TaskController.getCurrentDateYYYYMMDD();
-  const children = task.children || [];
-
-  if (children.length > 0) {
-    const total = children.reduce((sum, child) => {
-      return sum + TaskController.calculateChildProgress(child, today, completedStatusId, progressStatusId);
-    }, 0);
-    return Math.round(total / children.length);
-  }
-
-  // Meta sin hijos
-  if (task.statusId === completedStatusId) return 100;
-
-  let base = 0;
-  if (task.statusId === progressStatusId && task.start_date <= today) {
-    base = 50;
-  }
-
-  // Ajuste por prioridad
-  if (task.namePriority === 'Alta') base += 20;
-  else if (task.namePriority === 'Media') base += 10;
-
-  // Ajuste por vencimiento
-  if (task.end_date && task.end_date < today) {
-    base -= 30;
-  } else if (task.end_date && task.end_date <= TaskController.addDays(today, 2)) {
-    if (task.statusId === progressStatusId && task.start_date <= today) {
-      base += 10;
+  calculateChildProgress(child, today, completedStatusId, progressStatusId) {
+    if (child.statusId === completedStatusId) return 100;
+    if (child.statusId === progressStatusId) {
+      return child.start_date <= today ? 50 : 0;
     }
-  }
+    return 0;
+  },
 
-  return Math.max(0, Math.min(100, Math.round(base)));
-},
+  calculateGoalCompletion(task, completedStatusId, progressStatusId) {
+    const today = TaskController.getCurrentDateYYYYMMDD();
+    const children = task.children || [];
+
+    if (children.length > 0) {
+      const total = children.reduce((sum, child) => {
+        return (
+          sum +
+          TaskController.calculateChildProgress(
+            child,
+            today,
+            completedStatusId,
+            progressStatusId
+          )
+        );
+      }, 0);
+      return Math.round(total / children.length);
+    }
+
+    // Meta sin hijos
+    if (task.statusId === completedStatusId) return 100;
+
+    let base = 0;
+    if (task.statusId === progressStatusId && task.start_date <= today) {
+      base = 50;
+    }
+
+    // Ajuste por prioridad
+    if (task.namePriority === "Alta") base += 20;
+    else if (task.namePriority === "Media") base += 10;
+
+    // Ajuste por vencimiento
+    if (task.end_date && task.end_date < today) {
+      base -= 30;
+    } else if (
+      task.end_date &&
+      task.end_date <= TaskController.addDays(today, 2)
+    ) {
+      if (task.statusId === progressStatusId && task.start_date <= today) {
+        base += 10;
+      }
+    }
+
+    return Math.max(0, Math.min(100, Math.round(base)));
+  },
 
   getGoalStatusFromSummary(summary) {
     // Extraer cantidades
-    const completed = summary.find(s => s.id === 'completed')?.totalQuantity || 0;
-    const active = summary.find(s => s.id === 'active')?.totalQuantity || 0;
-    const delayed = summary.find(s => s.id === 'delayed')?.totalQuantity || 0;
+    const completed =
+      summary.find((s) => s.id === "completed")?.totalQuantity || 0;
+    const active = summary.find((s) => s.id === "active")?.totalQuantity || 0;
+    const delayed = summary.find((s) => s.id === "delayed")?.totalQuantity || 0;
 
     const total = completed + active + delayed;
 
     // Si no hay tareas relevantes, consideramos "Excelente"
     if (total === 0) {
       return {
-        level: 'excellent',
-        levelLabel: 'Excelente',
-        message: 'Metas logradas o superadas',
-        icon: 'mdi-trophy',
-        color: 'teal'
+        level: "excellent",
+        levelLabel: "Excelente",
+        message: "Metas logradas o superadas",
+        icon: "mdi-trophy",
+        color: "teal",
       };
     }
 
@@ -632,122 +706,142 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
     // Asignar estado según porcentaje
     if (percentage >= 90) {
       return {
-        level: 'excellent',
-        levelLabel: 'Excelente',
-        message: 'Metas logradas o superadas',
-        icon: 'mdi-trophy',
-        color: 'teal'
+        level: "excellent",
+        levelLabel: "Excelente",
+        message: "Metas logradas o superadas",
+        icon: "mdi-trophy",
+        color: "teal",
       };
     } else if (percentage >= 60) {
       return {
-        level: 'good',
-        levelLabel: 'Bueno',
-        message: 'Avanzas de forma constante',
-        icon: 'mdi-emoticon-happy',
-        color: 'teal'
+        level: "good",
+        levelLabel: "Bueno",
+        message: "Avanzas de forma constante",
+        icon: "mdi-emoticon-happy",
+        color: "teal",
       };
     } else if (percentage >= 30) {
       return {
-        level: 'acceptable',
-        levelLabel: 'Aceptable',
-        message: 'Avance lento, pero con progreso',
-        icon: 'mdi-emoticon-neutral',
-        color: 'orange-darken-2'
+        level: "acceptable",
+        levelLabel: "Aceptable",
+        message: "Avance lento, pero con progreso",
+        icon: "mdi-emoticon-neutral",
+        color: "orange-darken-2",
       };
     } else if (percentage >= 20) {
       return {
-        level: 'at-risk',
-        levelLabel: 'En riesgo',
-        message: 'Te estás alejando de tus metas',
-        icon: 'mdi-alert',
-        color: 'orange-darken-4'
+        level: "at-risk",
+        levelLabel: "En riesgo",
+        message: "Te estás alejando de tus metas",
+        icon: "mdi-alert",
+        color: "orange-darken-4",
       };
     } else {
       return {
-        level: 'critical',
-        levelLabel: 'Crítico',
-        message: 'Metas detenidas o abandonadas',
-        icon: 'mdi-alert-octagram',
-        color: 'red-darken-3'
+        level: "critical",
+        levelLabel: "Crítico",
+        message: "Metas detenidas o abandonadas",
+        icon: "mdi-alert-octagram",
+        color: "red-darken-3",
       };
     }
   },
 
   generateTaskAlerts(summary, tasks) {
-  const alerts = [];
+    const alerts = [];
 
-  // --- 1. Primera meta completada ---
-  const completedTasks = tasks.filter(task => 
-    summary.summary.find(s => s.id === 'completed')?.taskIds?.includes(task.id)
-  );
+    // --- 1. Primera meta completada ---
+    const completedTasks = tasks.filter((task) =>
+      summary.summary
+        .find((s) => s.id === "completed")
+        ?.taskIds?.includes(task.id)
+    );
 
-  if (completedTasks.length > 0) {
-    const firstCompleted = completedTasks
-      .sort((a, b) => new Date(a.endDate) - new Date(b.endDate))[0];
+    if (completedTasks.length > 0) {
+      const firstCompleted = completedTasks.sort(
+        (a, b) => new Date(a.endDate) - new Date(b.endDate)
+      )[0];
 
-    alerts.push({
-      type: "FIRST_GOAL_COMPLETED",
-      scope: "task",
-      task: { id: firstCompleted.id, title: firstCompleted.title, endDate: firstCompleted.endDate },
-      message: `¡Felicidades! Completaste tu primera meta: "${firstCompleted.title}".`,
-      severity: "success",
-      icon: "mdi-check-circle-outline",
-      categoryTarget: "completed" // 👈 NUEVO: vincula con la categoría
-    });
-  }
-
-  // --- 2. Meta próxima a vencer ---
-  const dueSoonTaskIds = summary.summary.find(s => s.id === 'dueSoon')?.taskIds || [];
-  const dueSoonTasks = tasks.filter(task => dueSoonTaskIds.includes(task.id));
-
-  if (dueSoonTasks.length > 0) {
-    const nextDue = dueSoonTasks
-      .sort((a, b) => new Date(a.endDate) - new Date(b.endDate))[0];
-
-    const today = new Date();
-    const dueDate = new Date(nextDue.endDate);
-    const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-
-    let message;
-    if (daysUntilDue <= 1) {
-      message = `⚠️ ¡Atención! La meta "${nextDue.title}" vence hoy o ya está vencida.`;
-    } else if (daysUntilDue <= 3) {
-      message = `🔔 La meta "${nextDue.title}" vence en ${daysUntilDue} día${daysUntilDue > 1 ? 's' : ''}.`;
-    } else {
-      message = `📅 La meta "${nextDue.title}" vence pronto (${nextDue.endDate}).`;
-    }
-
-    alerts.push({
-      type: "GOAL_DUE_SOON",
-      scope: "task",
-      task: { id: nextDue.id, title: nextDue.title, endDate: nextDue.endDate, daysUntilDue: daysUntilDue > 0 ? daysUntilDue : 0 },
-      message,
-      severity: daysUntilDue <= 1 ? "high" : "warning",
-      icon: daysUntilDue <= 1 ? "mdi-alert-circle" : "mdi-clock-alert-outline",
-      categoryTarget: "dueSoon" // 👈 NUEVO
-    });
-  }
-
-  // --- 3. Muchas retrasadas ---
-  const delayedCount = summary.summary.find(s => s.id === 'delayed')?.totalQuantity || 0;
-  const totalCount = summary.totalTasks;
-
-  if (totalCount > 0 && delayedCount > 0) {
-    const delayedPercentage = (delayedCount / totalCount) * 100;
-    if (delayedPercentage >= 50) {
       alerts.push({
-        type: "HIGH_DELAYED_TASKS",
+        type: "FIRST_GOAL_COMPLETED",
         scope: "task",
-        message: `Más del 50% de tus metas están retrasadas. Considera replanificar.`,
-        severity: "high",
-        icon: "mdi-timer-off-outline",
-        categoryTarget: "delayed" // 👈 NUEVO
+        task: {
+          id: firstCompleted.id,
+          title: firstCompleted.title,
+          endDate: firstCompleted.endDate,
+        },
+        message: `¡Felicidades! Completaste tu primera meta: "${firstCompleted.title}".`,
+        severity: "success",
+        icon: "mdi-check-circle-outline",
+        categoryTarget: "completed", // 👈 NUEVO: vincula con la categoría
       });
     }
-  }
 
-  return alerts.length > 0 ? alerts : null;
-},
+    // --- 2. Meta próxima a vencer ---
+    const dueSoonTaskIds =
+      summary.summary.find((s) => s.id === "dueSoon")?.taskIds || [];
+    const dueSoonTasks = tasks.filter((task) =>
+      dueSoonTaskIds.includes(task.id)
+    );
+
+    if (dueSoonTasks.length > 0) {
+      const nextDue = dueSoonTasks.sort(
+        (a, b) => new Date(a.endDate) - new Date(b.endDate)
+      )[0];
+
+      const today = new Date();
+      const dueDate = new Date(nextDue.endDate);
+      const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+      let message;
+      if (daysUntilDue <= 1) {
+        message = `⚠️ ¡Atención! La meta "${nextDue.title}" vence hoy o ya está vencida.`;
+      } else if (daysUntilDue <= 3) {
+        message = `🔔 La meta "${nextDue.title}" vence en ${daysUntilDue} día${
+          daysUntilDue > 1 ? "s" : ""
+        }.`;
+      } else {
+        message = `📅 La meta "${nextDue.title}" vence pronto (${nextDue.endDate}).`;
+      }
+
+      alerts.push({
+        type: "GOAL_DUE_SOON",
+        scope: "task",
+        task: {
+          id: nextDue.id,
+          title: nextDue.title,
+          endDate: nextDue.endDate,
+          daysUntilDue: daysUntilDue > 0 ? daysUntilDue : 0,
+        },
+        message,
+        severity: daysUntilDue <= 1 ? "high" : "warning",
+        icon:
+          daysUntilDue <= 1 ? "mdi-alert-circle" : "mdi-clock-alert-outline",
+        categoryTarget: "dueSoon", // 👈 NUEVO
+      });
+    }
+
+    // --- 3. Muchas retrasadas ---
+    const delayedCount =
+      summary.summary.find((s) => s.id === "delayed")?.totalQuantity || 0;
+    const totalCount = summary.totalTasks;
+
+    if (totalCount > 0 && delayedCount > 0) {
+      const delayedPercentage = (delayedCount / totalCount) * 100;
+      if (delayedPercentage >= 50) {
+        alerts.push({
+          type: "HIGH_DELAYED_TASKS",
+          scope: "task",
+          message: `Más del 50% de tus metas están retrasadas. Considera replanificar.`,
+          severity: "high",
+          icon: "mdi-timer-off-outline",
+          categoryTarget: "delayed", // 👈 NUEVO
+        });
+      }
+    }
+
+    return alerts.length > 0 ? alerts : null;
+  },
 
   // Función para mapear un padre
   /*mapParent(parent) {
@@ -864,8 +958,7 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
               { transaction: t }
             );
             let pointsToAdd = 0;
-            logger.info(
-              `Score ${taskData.score}`);
+            logger.info(`Score ${taskData.score}`);
             if (taskData.score) {
               pointsToAdd = Number(taskData.score);
             } else {
@@ -1053,7 +1146,7 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
         "create",
         req.user.id,
         JSON.stringify(task),
-        task.home_id,
+        task.home_id
       );
 
       //Logica de empleo de la IA, para sugerir nuevas tareas
@@ -1079,15 +1172,15 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
 
           // 2. Solo generamos sugerencias si detectamos intención relevante
           //if (intentResult.is_meta) {
-            // Construir descripción de prioridades para el prompt
-            const priorityDescriptions = priorities
-              .map(
-                (p) =>
-                  `- ID ${p.id}: ${p.name} (Nivel ${p.level}): ${p.description}`
-              )
-              .join("\n");
+          // Construir descripción de prioridades para el prompt
+          const priorityDescriptions = priorities
+            .map(
+              (p) =>
+                `- ID ${p.id}: ${p.name} (Nivel ${p.level}): ${p.description}`
+            )
+            .join("\n");
 
-            const prompt = `
+          const prompt = `
             La siguiente es una meta que ha sido creada:
             Título: ${req.body.title}
             Descripción: ${req.body.description}
@@ -1114,11 +1207,15 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
             ${priorityDescriptions}
 
             REGLAS ESTRICTAS PARA FECHAS:
-            1. Si la meta TIENE fecha límite (${req.body.end_date || "NO TIENE"}):
+            1. Si la meta TIENE fecha límite (${
+              req.body.end_date || "NO TIENE"
+            }):
               - Todas las tareas deben estar COMPLETAMENTE dentro del rango [${
                 req.body.start_date
               } - ${req.body.end_date}]
-              - suggested_start_date NO puede ser anterior a ${req.body.start_date}
+              - suggested_start_date NO puede ser anterior a ${
+                req.body.start_date
+              }
               - suggested_end_date NO puede ser posterior a ${req.body.end_date}
 
             2. Si la meta NO TIENE fecha límite:
@@ -1146,96 +1243,94 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
               - Nivel de prioridad
             7. Para tareas de un solo día, suggested_end_date debe ser null
             `;
-            const response = await openai.chat.completions.create({
-              model: "gpt-4o",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "Eres un experto en descomposición de metas en tareas accionables.",
-                },
-                { role: "user", content: prompt },
-              ],
-              temperature: 0.3,
-              max_tokens: 1000,
-              response_format: { type: "json_object" }, // Forzar respuesta en JSON
-            });
+          const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Eres un experto en descomposición de metas en tareas accionables.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.3,
+            max_tokens: 1000,
+            response_format: { type: "json_object" }, // Forzar respuesta en JSON
+          });
 
-            // Procesar la respuesta
-            const content = response.choices[0].message.content;
-            let suggestions;
+          // Procesar la respuesta
+          const content = response.choices[0].message.content;
+          let suggestions;
 
-            try {
-              suggestions = JSON.parse(content);
-            } catch (error) {
-              logger.error("Error parsing JSON response from OpenAI:", error);
-              throw new Error("Invalid response format from AI");
-            }
+          try {
+            suggestions = JSON.parse(content);
+          } catch (error) {
+            logger.error("Error parsing JSON response from OpenAI:", error);
+            throw new Error("Invalid response format from AI");
+          }
 
-            // Validar que las prioridades sean correctas
-            const validPriorityIds = priorities.map((p) => p.id);
-            const invalidTasks = suggestions.suggested_tasks.filter(
-              (task) => !validPriorityIds.includes(task.priority_id)
+          // Validar que las prioridades sean correctas
+          const validPriorityIds = priorities.map((p) => p.id);
+          const invalidTasks = suggestions.suggested_tasks.filter(
+            (task) => !validPriorityIds.includes(task.priority_id)
+          );
+
+          if (invalidTasks.length > 0) {
+            logger.error(
+              "Algunas tareas sugeridas tienen prioridades inválidas"
+            );
+            throw new Error("Invalid priorities in suggested tasks");
+          }
+
+          // Validar que las puntuaciones estén entre 1 y 10
+          const invalidScores = suggestions.suggested_tasks.filter(
+            (task) => task.score < 1 || task.score > 10
+          );
+
+          if (invalidScores.length > 0) {
+            logger.error(
+              "Algunas tareas sugeridas tienen puntuaciones inválidas"
+            );
+            throw new Error("Invalid scores in suggested tasks");
+          }
+
+          // Formatear las sugerencias
+          suggestedTasks = suggestions.suggested_tasks.map((taskSuggestion) => {
+            // Encontrar la prioridad correspondiente
+            const priority = priorities.find(
+              (p) => p.id === taskSuggestion.priority_id
             );
 
-            if (invalidTasks.length > 0) {
-              logger.error(
-                "Algunas tareas sugeridas tienen prioridades inválidas"
-              );
-              throw new Error("Invalid priorities in suggested tasks");
-            }
+            return {
+              ...taskSuggestion,
+              parent_id: task.id,
+              type: "Tarea",
+              module: "Tarea",
+              taskType: task.task_type,
+              task_type: task.task_type,
+              home_id: req.body.home_id,
+              people: req.body.people,
+              start_date:
+                taskSuggestion.suggested_start_date || req.body.start_date,
+              end_date: taskSuggestion.suggested_end_date || null,
+              start_time: req.body.start_time,
+              status_id: status.id,
+              priority_id: String(taskSuggestion.priority_id),
+              priority_name: priority ? priority.name : "Unknown", // Nombre original
+              namePriority: priority
+                ? i18n.__(`priority.${priority.name}.name`) !==
+                  `priority.${priority.name}.name`
+                  ? i18n.__(`priority.${priority.name}.name`)
+                  : priority.name
+                : "Unknown", // Nombre traducido
+              estimated_time: String(taskSuggestion.estimated_time),
+              score: String(taskSuggestion.score),
+            };
+          });
 
-            // Validar que las puntuaciones estén entre 1 y 10
-            const invalidScores = suggestions.suggested_tasks.filter(
-              (task) => task.score < 1 || task.score > 10
-            );
-
-            if (invalidScores.length > 0) {
-              logger.error(
-                "Algunas tareas sugeridas tienen puntuaciones inválidas"
-              );
-              throw new Error("Invalid scores in suggested tasks");
-            }
-
-            // Formatear las sugerencias
-            suggestedTasks = suggestions.suggested_tasks.map(
-              (taskSuggestion) => {
-                // Encontrar la prioridad correspondiente
-                const priority = priorities.find(
-                  (p) => p.id === taskSuggestion.priority_id
-                );
-
-                return {
-                  ...taskSuggestion,
-                  parent_id: task.id,
-                  type: "Tarea",
-                  module: "Tarea",                  
-                  taskType: task.task_type,
-                  task_type: task.task_type,
-                  home_id: req.body.home_id,
-                  people: req.body.people,
-                  start_date:
-                    taskSuggestion.suggested_start_date || req.body.start_date,
-                  end_date: taskSuggestion.suggested_end_date || null,
-                  start_time: req.body.start_time,
-                  status_id: status.id,
-                  priority_id: String(taskSuggestion.priority_id),
-                  priority_name: priority ? priority.name : "Unknown", // Nombre original
-                  namePriority: priority
-                    ? i18n.__(`priority.${priority.name}.name`) !==
-                      `priority.${priority.name}.name`
-                      ? i18n.__(`priority.${priority.name}.name`)
-                      : priority.name
-                    : "Unknown", // Nombre traducido
-                  estimated_time: String(taskSuggestion.estimated_time),
-                  score: String(taskSuggestion.score),
-                };
-              }
-            );
-
-            logger.info(
-              `Generadas ${suggestedTasks.length} tareas sugeridas para la meta ${task.id}`
-            );
+          logger.info(
+            `Generadas ${suggestedTasks.length} tareas sugeridas para la meta ${task.id}`
+          );
           //}
         } catch (error) {
           logger.error(
@@ -1427,18 +1522,16 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
         };
       });
       //res.status(200).json({ suggestedTask: enhancedResponse.suggestedTask });
-      return res
-        .status(200)
-        .json({
-          suggestedTask: enhancedResponse.suggestedTask,
-          taskcategories: categories,
-          taskstatus: statuses,
-          taskpriorities: priorities,
-          taskpeople: people,
-          taskrecurrences: translatedRecurrenceData,
-          taskroles: roles,
-          tasktype: translatedTypeTaskData,
-        }); // Tareas encontradas
+      return res.status(200).json({
+        suggestedTask: enhancedResponse.suggestedTask,
+        taskcategories: categories,
+        taskstatus: statuses,
+        taskpriorities: priorities,
+        taskpeople: people,
+        taskrecurrences: translatedRecurrenceData,
+        taskroles: roles,
+        tasktype: translatedTypeTaskData,
+      }); // Tareas encontradas
     } catch (error) {
       logger.error("TaskSuggestionController error:", error);
 
@@ -1632,7 +1725,7 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
         "update",
         req.user.id,
         JSON.stringify(activityData),
-        task.home_id,
+        task.home_id
       );
       await t.commit();
       res.status(200).json({ task: task });
@@ -1890,20 +1983,32 @@ calculateGoalCompletion(task, completedStatusId, progressStatusId) {
       });
 
       const typeData = [
-                   { id: "Personal", name: "Personal", description: "Registro financiero personal" },
-                   { id: "Hogar", name: "Hogar", description: "Registro financiero del hogar" }
-                     ];
-           
-                     const translatedTypeData = typeData.map((item) => ({
-                   id: item.id,
-                   name: i18n.__(`financeType.${item.id}.name`) !== `financeType.${item.id}.name`
-                         ? i18n.__(`financeType.${item.id}.name`)
-                         : item.name,
-                   description: i18n.__(`financeType.${item.id}.description`) !== `financeType.${item.id}.description`
-                         ? i18n.__(`financeType.${item.id}.description`)
-                         : item.description,
-                   originalName: item.name
-                 }));
+        {
+          id: "Personal",
+          name: "Personal",
+          description: "Registro financiero personal",
+        },
+        {
+          id: "Hogar",
+          name: "Hogar",
+          description: "Registro financiero del hogar",
+        },
+      ];
+
+      const translatedTypeData = typeData.map((item) => ({
+        id: item.id,
+        name:
+          i18n.__(`financeType.${item.id}.name`) !==
+          `financeType.${item.id}.name`
+            ? i18n.__(`financeType.${item.id}.name`)
+            : item.name,
+        description:
+          i18n.__(`financeType.${item.id}.description`) !==
+          `financeType.${item.id}.description`
+            ? i18n.__(`financeType.${item.id}.description`)
+            : item.description,
+        originalName: item.name,
+      }));
 
       res.json({
         taskcategories: categories,

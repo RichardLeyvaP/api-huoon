@@ -1,90 +1,90 @@
 {
-    "category": {
-            "Limpieza": {
-              "name": "Hygiene/Cleaning",
-              "description": "Cleaning category"
-            },
-            "Cocina": {
-              "name": "Kitchen",
-              "description": "Kitchen category"
-            },
-            "Mantenimiento": {
-              "name": "Maintenance",
-              "description": "Maintenance category"
-            },
-            "Alimentos": {
-              "name": "Food",
-              "description": "Products for cooking"
-            },
-            "Mascotas": {
-               "name": "Pet",
-              "description": "Pet food and supplies category"
-            },
-            "Electrónicos": {
-              "name": "Electronics",
-              "description": "Products for the home"
-            },
-            "Pintura": {
-              "name": "Painting",
-              "description": "Painting the home"
-            },
-            "Cumpleaños": {
-              "name": "Birthday",
-              "description": "Birthday party"
-            },
-            "Mercado": {
-              "name": "Market",
-              "description": "Grocery shopping"
-            },
-            "Limpiar la Casa": {
-              "name": "Clean the House",
-              "description": "Clean bedrooms, kitchen, living room"
-            },
-            "Lavandería": {
-              "name": "Laundry",
-              "description": "Washing clothes"
-            },
-            "Alquiler": {
-        "name": "Rent",
-        "description": "Rent or mortgage payment"
-      },
-      "Electricidad": {
-        "name": "Electricity",
-        "description": "Electricity bill"
-      },
-      "Agua": {
-        "name": "Water",
-        "description": "Water utility bill"
-      },
-      "Gas": {
-        "name": "Gas",
-        "description": "Natural gas or propane supply"
-      },
-      "Internet": {
-        "name": "Internet",
-        "description": "Internet service"
-      },
-      "Telefonía": {
-        "name": "Phone",
-        "description": "Mobile/cell phone plan"
-      },
-      "Ahorros": {
-        "name": "Savings",
-        "description": "Monthly savings fund"
-      },
-      "Ocio": {
-        "name": "Leisure",
-        "description": "Entertainment and outings"
-      },
-      "Ropa": {
-        "name": "Clothing",
-        "description": "Apparel and footwear"
-      },
-      "Mantenimiento_Hogar": {
-        "name": "Home Maintenance",
-        "description": "Home repairs and improvements"
-      },
-      "Perros": {
+  "category": {
+    "Limpieza": {
+      "name": "Hygiene/Cleaning",
+      "description": "Cleaning category"
+    },
+    "Cocina": {
+      "name": "Kitchen",
+      "description": "Kitchen category"
+    },
+    "Mantenimiento": {
+      "name": "Maintenance",
+      "description": "Maintenance category"
+    },
+    "Alimentos": {
+      "name": "Food",
+      "description": "Products for cooking"
+    },
+    "Mascotas": {
+      "name": "Pet",
+      "description": "Pet food and supplies category"
+    },
+    "Electrónicos": {
+      "name": "Electronics",
+      "description": "Products for the home"
+    },
+    "Pintura": {
+      "name": "Painting",
+      "description": "Painting the home"
+    },
+    "Cumpleaños": {
+      "name": "Birthday",
+      "description": "Birthday party"
+    },
+    "Mercado": {
+      "name": "Market",
+      "description": "Grocery shopping"
+    },
+    "Limpiar la Casa": {
+      "name": "Clean the House",
+      "description": "Clean bedrooms, kitchen, living room"
+    },
+    "Lavandería": {
+      "name": "Laundry",
+      "description": "Washing clothes"
+    },
+    "Alquiler": {
+      "name": "Rent",
+      "description": "Rent or mortgage payment"
+    },
+    "Electricidad": {
+      "name": "Electricity",
+      "description": "Electricity bill"
+    },
+    "Agua": {
+      "name": "Water",
+      "description": "Water utility bill"
+    },
+    "Gas": {
+      "name": "Gas",
+      "description": "Natural gas or propane supply"
+    },
+    "Internet": {
+      "name": "Internet",
+      "description": "Internet service"
+    },
+    "Telefonía": {
+      "name": "Phone",
+      "description": "Mobile/cell phone plan"
+    },
+    "Ahorros": {
+      "name": "Savings",
+      "description": "Monthly savings fund"
+    },
+    "Ocio": {
+      "name": "Leisure",
+      "description": "Entertainment and outings"
+    },
+    "Ropa": {
+      "name": "Clothing",
+      "description": "Apparel and footwear"
+    },
+    "Mantenimiento_Hogar": {
+      "name": "Home Maintenance",
+      "description": "Home repairs and improvements"
+    },
+    "Perros": {
       "name": "Dogs",
       "description": "Dogs category"
     },
@@ -199,107 +199,107 @@
     "Medicamento": {
       "name": "Medications",
       "description": "Medications and pharmaceutical products category"
-        },
+    },
     "Seguros de salud": {
       "name": "Health Insurance",
       "description": "Private health coverage or copays"
     },
     "Educación": {
-  "name": "Education",
-  "description": "Expenses related to studies, courses, and academic development."
-},
-"Colegios / universidades": {
-  "name": "Schools / Universities",
-  "description": "Tuition, fees, and school or university expenses"
-},
-"Cursos / capacitaciones": {
-  "name": "Courses / Training",
-  "description": "Online courses, workshops, certifications, and professional training"
-},
-"Deudas y obligaciones": {
-  "name": "Debts and obligations",
-  "description": "Payments for loans, taxes, and mandatory insurance."
-},
-"Créditos / préstamos": {
-  "name": "Loans / Credit",
-  "description": "Installments for personal loans, mortgages, or vehicle financing"
-},
-"Impuestos": {
-  "name": "Taxes",
-  "description": "Personal, property, or vehicle tax payments"
-},
-"Seguros": {
-  "name": "Insurance",
-  "description": "Life, home, auto, or other types of insurance"
-},
-"Ahorro e inversión": {
-  "name": "Savings and investment",
-  "description": "Emergency funds, family savings, and financial investments."
-},
-"Fondo de emergencia": {
-  "name": "Emergency fund",
-  "description": "Savings set aside for unexpected or urgent situations"
-},
-"Ahorros familiares": {
-  "name": "Family savings",
-  "description": "Savings goals for family or personal projects"
-},
-"Inversiones": {
-  "name": "Investments",
-  "description": "Stocks, funds, cryptocurrencies, or other financial instruments"
-},
-"Ocio y estilo de vida": {
-  "name": "Leisure and lifestyle",
-  "description": "Entertainment, travel, and hobby activities."
-},
-"Entretenimiento": {
-  "name": "Entertainment",
-  "description": "Movies, streaming, concerts, and recreational activities"
-},
-"Viajes": {
-  "name": "Travel",
-  "description": "Vacations, getaways, and accommodation or transportation expenses"
-},
-"Deportes / hobbies": {
-  "name": "Sports / Hobbies",
-  "description": "Memberships, equipment, or classes for physical and recreational activities"
-},
-"Compras personales": {
-  "name": "Personal shopping",
-  "description": "Spending on clothing, technology, and gifts for others."
-},
-"Ropa y accesorios": {
-  "name": "Clothing and accessories",
-  "description": "Purchase of clothes, shoes, jewelry, and accessories"
-},
-"Tecnología": {
-  "name": "Technology",
-  "description": "Phones, computers, and electronic accessories"
-},
-"Regalos": {
-  "name": "Gifts",
-  "description": "Presents for birthdays, anniversaries, or special occasions"
-}
+      "name": "Education",
+      "description": "Expenses related to studies, courses, and academic development."
     },
-  "priority": {
-      "Baja": {
-        "name": "Low",
-        "description": "Low priority"
-      },
-      "Media": {
-        "name": "Medium",
-        "description": "Medium priority"
-      },
-      "Alta": {
-        "name": "High",
-        "description": "High priority"
-      },
-      "Normal": {
-        "name": "Normal",
-        "description": "Normal priority"
-      }
+    "Colegios / universidades": {
+      "name": "Schools / Universities",
+      "description": "Tuition, fees, and school or university expenses"
+    },
+    "Cursos / capacitaciones": {
+      "name": "Courses / Training",
+      "description": "Online courses, workshops, certifications, and professional training"
+    },
+    "Deudas y obligaciones": {
+      "name": "Debts and obligations",
+      "description": "Payments for loans, taxes, and mandatory insurance."
+    },
+    "Créditos / préstamos": {
+      "name": "Loans / Credit",
+      "description": "Installments for personal loans, mortgages, or vehicle financing"
+    },
+    "Impuestos": {
+      "name": "Taxes",
+      "description": "Personal, property, or vehicle tax payments"
+    },
+    "Seguros": {
+      "name": "Insurance",
+      "description": "Life, home, auto, or other types of insurance"
+    },
+    "Ahorro e inversión": {
+      "name": "Savings and investment",
+      "description": "Emergency funds, family savings, and financial investments."
+    },
+    "Fondo de emergencia": {
+      "name": "Emergency fund",
+      "description": "Savings set aside for unexpected or urgent situations"
+    },
+    "Ahorros familiares": {
+      "name": "Family savings",
+      "description": "Savings goals for family or personal projects"
+    },
+    "Inversiones": {
+      "name": "Investments",
+      "description": "Stocks, funds, cryptocurrencies, or other financial instruments"
+    },
+    "Ocio y estilo de vida": {
+      "name": "Leisure and lifestyle",
+      "description": "Entertainment, travel, and hobby activities."
+    },
+    "Entretenimiento": {
+      "name": "Entertainment",
+      "description": "Movies, streaming, concerts, and recreational activities"
+    },
+    "Viajes": {
+      "name": "Travel",
+      "description": "Vacations, getaways, and accommodation or transportation expenses"
+    },
+    "Deportes / hobbies": {
+      "name": "Sports / Hobbies",
+      "description": "Memberships, equipment, or classes for physical and recreational activities"
+    },
+    "Compras personales": {
+      "name": "Personal shopping",
+      "description": "Spending on clothing, technology, and gifts for others."
+    },
+    "Ropa y accesorios": {
+      "name": "Clothing and accessories",
+      "description": "Purchase of clothes, shoes, jewelry, and accessories"
+    },
+    "Tecnología": {
+      "name": "Technology",
+      "description": "Phones, computers, and electronic accessories"
+    },
+    "Regalos": {
+      "name": "Gifts",
+      "description": "Presents for birthdays, anniversaries, or special occasions"
+    }
   },
-  "status":{
+  "priority": {
+    "Baja": {
+      "name": "Low",
+      "description": "Low priority"
+    },
+    "Media": {
+      "name": "Medium",
+      "description": "Medium priority"
+    },
+    "Alta": {
+      "name": "High",
+      "description": "High priority"
+    },
+    "Normal": {
+      "name": "Normal",
+      "description": "Normal priority"
+    }
+  },
+  "status": {
     "Pendiente": {
       "name": "Pending",
       "description": "Pending state"
@@ -350,18 +350,18 @@
     }
   },
   "severity": {
-  "Leve": {
-    "name": "Mild",
-    "description": "Medical history with mild health impact"
-  },
-  "Moderado": {
-    "name": "Moderate",
-    "description": "Medical history with moderate health impact"
-  },
-  "Severo": {
-    "name": "Severe",
-    "description": "Medical history with severe health impact"
-  }
+    "Leve": {
+      "name": "Mild",
+      "description": "Medical history with mild health impact"
+    },
+    "Moderado": {
+      "name": "Moderate",
+      "description": "Medical history with moderate health impact"
+    },
+    "Severo": {
+      "name": "Severe",
+      "description": "Medical history with severe health impact"
+    }
   },
   "familyRelations": {
     "Padre": {
@@ -410,7 +410,7 @@
       "name": "It doesn't repeat"
     }
   },
-  "homeType":{
+  "homeType": {
     "Casa": {
       "name": "House",
       "description": "Family residence type"
@@ -571,129 +571,145 @@
       "description": "Bleeding inside the body"
     },
     "Enfermedad": {
-    "name": "Disease",
-    "description": "Abnormal condition affecting the body"
-  },
-  "Alergia": {
-    "name": "Allergy",
-    "description": "Adverse immune response to a substance"
-  },
-  "Cirugía": {
-    "name": "Surgery",
-    "description": "Medical procedure involving incision or tissue manipulation"
-  },
-  "Hospitalización": {
-    "name": "Hospitalization",
-    "description": "Stay in a hospital for medical treatment"
-  },
-  "Medicación": {
-    "name": "Medication",
-    "description": "Administration of drugs to treat or prevent diseases"
-  },
-  "Vacunación": {
-    "name": "Vaccination",
-    "description": "Administration of vaccines to prevent diseases"
-  },
-   "Presuntivo": {
-    "name": "Presumptive",
-    "description": "Initial diagnosis based on symptoms and preliminary evaluation"
-  },
-  "Definitivo": {
-    "name": "Definitive",
-    "description": "Diagnosis confirmed through tests, studies, or specialized evaluation"
-  },
-  "Control": {
-    "name": "Follow-up",
-    "description": "Medical follow-up or check-up consultation"
-  },
-  "Urgencia": {
-    "name": "Emergency",
-    "description": "Emergency medical consultation"
-  },
-  "Primera vez": {
-    "name": "First visit",
-    "description": "First consultation with the professional"
-  },
-  "Examen": {
-    "name": "Exam",
-    "description": "Consultation for medical tests"
-  },
-  "Otro": {
-    "name": "Other",
-    "description": "Unspecified consultation type"
-  },
-  "Cada 4 horas": {
-    "name": "Every 4 hours",
-    "description": "Medication to be taken every 4 hours (6 times a day)"
-  },
-  "Cada 6 horas": {
-    "name": "Every 6 hours",
-    "description": "Medication to be taken every 6 hours (4 times a day)"
-  },
-  "Cada 8 horas": {
-    "name": "Every 8 hours",
-    "description": "Medication to be taken every 8 hours (3 times a day)"
-  },
-  "Cada 12 horas": {
-    "name": "Every 12 hours",
-    "description": "Medication to be taken every 12 hours (morning and night)"
-  },
-  "Una vez al día": {
-    "name": "Once daily",
-    "description": "Medication to be taken once every 24 hours"
-  },
-  "Cada 2 horas": {
-   "name": "Every 2 hours",
-  "description": "Medication to be taken every 2 hours (12 times per day)"
-},
-  "Cada 48 horas": {
-    "name": "Every 48 hours",
-    "description": "Medication to be taken every two days"
-  },
-  "Cada semana": {
-    "name": "Weekly",
-    "description": "Medication to be taken once per week"
-  },
-  "Cada mes": {
-    "name": "Monthly",
-    "description": "Medication to be taken once a month"
-  },
-  "Antes de comer": {
-    "name": "Before meals",
-    "description": "Medication to be taken 30 minutes before meals"
-  },
-  "Después de comer": {
-    "name": "After meals",
-    "description": "Medication to be taken immediately after eating"
-  },
-  "En ayunas": {
-    "name": "On an empty stomach",
-    "description": "Medication to be taken with empty stomach, when waking up"
-  },
-  "Al acostarse": {
-    "name": "At bedtime",
-    "description": "Medication to be taken right before sleeping"
-  },
-  "Cuando sea necesario": {
-    "name": "As needed",
-    "description": "Medication to be taken only when specific symptoms appear"
-  },
-  "Mensual": {
-    "name": "Monthly",
-    "description": "Every month"
-  },
-  "Diario": {
-    "name": "Daily",
-    "description": "Every day"
-  },
-  "Anual": {
-    "name": "Annual",
-    "description": "Every year"
-  },
-  "Semanal": {
-    "name": "Weekly",
-    "description": "Every week"
-  }
+      "name": "Disease",
+      "description": "Abnormal condition affecting the body"
+    },
+    "Alergia": {
+      "name": "Allergy",
+      "description": "Adverse immune response to a substance"
+    },
+    "Cirugía": {
+      "name": "Surgery",
+      "description": "Medical procedure involving incision or tissue manipulation"
+    },
+    "Hospitalización": {
+      "name": "Hospitalization",
+      "description": "Stay in a hospital for medical treatment"
+    },
+    "Medicación": {
+      "name": "Medication",
+      "description": "Administration of drugs to treat or prevent diseases"
+    },
+    "Vacunación": {
+      "name": "Vaccination",
+      "description": "Administration of vaccines to prevent diseases"
+    },
+    "Presuntivo": {
+      "name": "Presumptive",
+      "description": "Initial diagnosis based on symptoms and preliminary evaluation"
+    },
+    "Definitivo": {
+      "name": "Definitive",
+      "description": "Diagnosis confirmed through tests, studies, or specialized evaluation"
+    },
+    "Control": {
+      "name": "Follow-up",
+      "description": "Medical follow-up or check-up consultation"
+    },
+    "Urgencia": {
+      "name": "Emergency",
+      "description": "Emergency medical consultation"
+    },
+    "Primera vez": {
+      "name": "First visit",
+      "description": "First consultation with the professional"
+    },
+    "Examen": {
+      "name": "Exam",
+      "description": "Consultation for medical tests"
+    },
+    "Otro": {
+      "name": "Other",
+      "description": "Unspecified consultation type"
+    },
+    "Cada 4 horas": {
+      "name": "Every 4 hours",
+      "description": "Medication to be taken every 4 hours (6 times a day)"
+    },
+    "Cada 6 horas": {
+      "name": "Every 6 hours",
+      "description": "Medication to be taken every 6 hours (4 times a day)"
+    },
+    "Cada 8 horas": {
+      "name": "Every 8 hours",
+      "description": "Medication to be taken every 8 hours (3 times a day)"
+    },
+    "Cada 12 horas": {
+      "name": "Every 12 hours",
+      "description": "Medication to be taken every 12 hours (morning and night)"
+    },
+    "Una vez al día": {
+      "name": "Once daily",
+      "description": "Medication to be taken once every 24 hours"
+    },
+    "Cada 2 horas": {
+      "name": "Every 2 hours",
+      "description": "Medication to be taken every 2 hours (12 times per day)"
+    },
+    "Cada 48 horas": {
+      "name": "Every 48 hours",
+      "description": "Medication to be taken every two days"
+    },
+    "Cada semana": {
+      "name": "Weekly",
+      "description": "Medication to be taken once per week"
+    },
+    "Cada mes": {
+      "name": "Monthly",
+      "description": "Medication to be taken once a month"
+    },
+    "Antes de comer": {
+      "name": "Before meals",
+      "description": "Medication to be taken 30 minutes before meals"
+    },
+    "Después de comer": {
+      "name": "After meals",
+      "description": "Medication to be taken immediately after eating"
+    },
+    "En ayunas": {
+      "name": "On an empty stomach",
+      "description": "Medication to be taken with empty stomach, when waking up"
+    },
+    "Al acostarse": {
+      "name": "At bedtime",
+      "description": "Medication to be taken right before sleeping"
+    },
+    "Cuando sea necesario": {
+      "name": "As needed",
+      "description": "Medication to be taken only when specific symptoms appear"
+    },
+    "Mensual": {
+      "name": "Monthly",
+      "description": "Every month"
+    },
+    "Diario": {
+      "name": "Daily",
+      "description": "Every day"
+    },
+    "Anual": {
+      "name": "Annual",
+      "description": "Every year"
+    },
+    "Semanal": {
+      "name": "Weekly",
+      "description": "Every week"
+    },
+    "Desayuno": {
+      "name": "Breakfast",
+      "description": "First meal of the day"
+    },
+    "Almuerzo": {
+      "name": "Lunch",
+      "description": "Main midday meal"
+    },
+    "Cena": {
+      "name": "Dinner",
+      "description": "Last meal of the day"
+    },
+    "Snack": {
+      "name": "Snack",
+      "description": "Light meal between main meals"
+    }
   },
   "gender": {
     "Male": { "name": "Male" },
@@ -722,83 +738,83 @@
     }
   },
   "suggestionStatus": {
-  "Pendiente": {
-    "name": "Pending",
-    "description": "The suggestion is awaiting review"
+    "Pendiente": {
+      "name": "Pending",
+      "description": "The suggestion is awaiting review"
+    },
+    "Revisado": {
+      "name": "Reviewed",
+      "description": "The suggestion has been reviewed"
+    },
+    "Completado": {
+      "name": "Completed",
+      "description": "The suggestion has been resolved"
+    }
   },
-  "Revisado": {
-    "name": "Reviewed",
-    "description": "The suggestion has been reviewed"
+  "modules": {
+    "Logros": { "name": "Achievements" },
+    "Deseos": { "name": "Wishes" },
+    "Metas": { "name": "Goals" },
+    "Tareas": { "name": "Tasks" },
+    "Finanzas": { "name": "Finances" },
+    "Salud": { "name": "Health" },
+    "Nutrición": { "name": "Nutrition" },
+    "Mascotas": { "name": "Pets" },
+    "Hogar": { "name": "Home" },
+    "Productos": { "name": "Warehouses" },
+    "Archivos": { "name": "Files" },
+    "Sugerencias": { "name": "Suggestions" }
   },
-  "Completado": {
-    "name": "Completed",
-    "description": "The suggestion has been resolved"
+  "administrationRoutes": {
+    "Oral": {
+      "name": "Oral",
+      "description": "Administration through the mouth"
+    },
+    "Sublingual": {
+      "name": "Sublingual",
+      "description": "Under the tongue"
+    },
+    "Topica": {
+      "name": "Topical",
+      "description": "Applied to skin or mucous membranes"
+    },
+    "Inyectable": {
+      "name": "Injectable",
+      "description": "Injected (intramuscular, intravenous, subcutaneous)"
+    },
+    "Rectal": {
+      "name": "Rectal",
+      "description": "Through the rectum (suppositories)"
+    },
+    "Otica": {
+      "name": "Otic",
+      "description": "In the ear"
+    },
+    "Nasal": {
+      "name": "Nasal",
+      "description": "Through the nose (sprays, drops)"
+    }
+  },
+  "foodTypes": {
+    "Seco": {
+      "name": "Dry",
+      "description": "Dry food/kibble"
+    },
+    "Humedo": {
+      "name": "Wet",
+      "description": "Canned or pouched food"
+    },
+    "RecetaMedica": {
+      "name": "Prescription",
+      "description": "Veterinary prescribed diet"
+    },
+    "Natural": {
+      "name": "Natural",
+      "description": "Homemade or raw food"
+    },
+    "Snacks": {
+      "name": "Snacks",
+      "description": "Treats or pet snacks"
+    }
   }
-},
-"modules": {
-  "Logros": { "name": "Achievements" },
-  "Deseos": { "name": "Wishes" },
-  "Metas": { "name": "Goals" },
-  "Tareas": { "name": "Tasks" },
-  "Finanzas": { "name": "Finances" },
-  "Salud": { "name": "Health" },
-  "Nutrición": { "name": "Nutrition" },
-  "Mascotas": { "name": "Pets" },
-  "Hogar": { "name": "Home" },
-  "Productos": { "name": "Warehouses" },
-  "Archivos": { "name": "Files" },
-  "Sugerencias": { "name": "Suggestions" }
-},
-"administrationRoutes": {
-  "Oral": {
-    "name": "Oral",
-    "description": "Administration through the mouth"
-  },
-  "Sublingual": {
-    "name": "Sublingual",
-    "description": "Under the tongue"
-  },
-  "Topica": {
-    "name": "Topical",
-    "description": "Applied to skin or mucous membranes"
-  },
-  "Inyectable": {
-    "name": "Injectable",
-    "description": "Injected (intramuscular, intravenous, subcutaneous)"
-  },
-  "Rectal": {
-    "name": "Rectal",
-    "description": "Through the rectum (suppositories)"
-  },
-  "Otica": {
-    "name": "Otic",
-    "description": "In the ear"
-  },
-  "Nasal": {
-    "name": "Nasal",
-    "description": "Through the nose (sprays, drops)"
-  }
-},
-"foodTypes": {
-  "Seco": {
-    "name": "Dry",
-    "description": "Dry food/kibble"
-  },
-  "Humedo": {
-    "name": "Wet",
-    "description": "Canned or pouched food"
-  },
-  "RecetaMedica": {
-    "name": "Prescription",
-    "description": "Veterinary prescribed diet"
-  },
-  "Natural": {
-    "name": "Natural",
-    "description": "Homemade or raw food"
-  },
-  "Snacks": {
-    "name": "Snacks",
-    "description": "Treats or pet snacks"
-  }
-}
 }

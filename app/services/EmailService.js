@@ -46,8 +46,8 @@ require("dotenv").config();
 const nodemailer = require("nodemailer");
 const logger = require("../../config/logger");
 
-console.log("USER:", process.env.EMAIL_USER);
-console.log("PASS length:", process.env.EMAIL_PASSWORD?.length);
+//logger.info("USER:", process.env.EMAIL_USER);
+//logger.log("PASS length:", process.env.EMAIL_PASSWORD?.length);
 // Cargar configuración desde .env (mejor que JSON para credenciales)
 const transporter = nodemailer.createTransport({
   host: "mail.klint.cl",

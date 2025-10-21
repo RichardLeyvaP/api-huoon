@@ -580,6 +580,7 @@ router.post('/recipe-ingredient-delete', validateSchema(idRecipeProductSchema), 
 // MealEntry
 router.get('/meal-entries', MealEntryController.index);
 router.post('/meal-entries-by-daily-log', validateSchema(getMealEntriesByDailyLogSchema), MealEntryController.getByDailyLogId);
+router.post('/meal-entries-by-person', validateSchema(getMealEntriesByDailyLogSchema), MealEntryController.getByPersonIdAndDate);
 router.post('/meal-entry-show', validateSchema(idMealEntrySchema), MealEntryController.show);
 router.post('/meal-entry', validateSchema(storeMealEntrySchema), MealEntryController.store);
 router.post('/meal-entry-update', validateSchema(updateMealEntrySchema), MealEntryController.update);
@@ -607,6 +608,6 @@ router.post('/get-type-diagnoses', validateSchema(typeSchema), DiagnosisControll
 router.post('/get-type-treatment', validateSchema(typeSchema), TreatmentController.getTypesByType);
 router.post('/get-type-consultations', validateSchema(typeSchema), MedicalConsultationController.getTypesByTypeRelation);
 router.post('/activity-log-model', ActivityLogController.getActivityLogsByModel);
-
+router.post('/get-type-recipes', validateSchema(typeSchema), MealEntryController.getTypesByRecipes);
 
 module.exports = router;

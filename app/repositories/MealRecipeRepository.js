@@ -56,7 +56,35 @@ const MealRecipeRepository = {
       logger.error(`Error en MealRecipeRepository->delete: ${err.message}`);
       throw err;
     }
+  },
+  async upsertForMealEntry(meal_entry_id, mealRecipes, transaction) {
+  // 1. Obtener asociaciones actuales
+  const current = await MealRecipe.findAll({ where: { meal_entry_id }, transaction });
+  const currentIds = new Set(current.map(mr => mr.recipe_id));
+
+  // 2. Eliminar las que ya no están
+  const toDelete = current.filter(mr => !mealRecipes.some(m => m.recipe_id === mr.recipe_id));
+  if (toDelete.length > 0) {
+    await MealRecipe.destroy({
+      where: { id: toDelete.map(mr => mr.id) },
+      transaction
+    });
   }
+
+  // 3. Crear/actualizar
+  for (const mr of mealRecipes) {
+    const existing = current.find(m => m.recipe_id === mr.recipe_id);
+    if (existing) {
+      await existing.update({ servings: mr.servings }, { transaction });
+    } else {
+      await MealRecipe.create({
+        meal_entry_id,
+        recipe_id: mr.recipe_id,
+        servings: mr.servings
+      }, { transaction });
+    }
+  }
+},
 };
 
 module.exports = MealRecipeRepository;

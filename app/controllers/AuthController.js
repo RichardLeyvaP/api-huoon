@@ -984,17 +984,20 @@ async verifyCode(req, res) {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(204).json({ success: false, message: "Usuario no encontrado" });
+      logger.info('Usuario no encontrado');
+      return res.status(404).json({ success: false, message: "Usuario no encontrado" });
     }
 
     const isMatch = await bcrypt.compare(code, user.reset_token);
     if (!isMatch) {
-      return res.status(204).json({ success: false, message: "Código incorrecto" });
+      logger.info('Código incorrecto');
+      return res.status(400).json({ success: false, message: "Código incorrecto" });
     }
 
     // Opcional: verificar expiración
     if (user.reset_expire < Date.now()) {
-       return res.status(204).json({ success: false, message: "Código expirado" });
+      logger.info('Código expirado');
+       return res.status(400).json({ success: false, message: "Código expirado" });
      }
 
     res.status(200).json({

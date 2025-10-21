@@ -61,6 +61,15 @@ const RecipeRepository = {
     });
   },
 
+  async findByIds(ids, t = null) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return [];
+    }
+    return await Recipe.findAll({
+      where: { id: ids }
+    }, { transaction: t });
+  },
+
   async findById(id) {
     return await Recipe.findByPk(id, {
       attributes: [
@@ -160,7 +169,6 @@ const RecipeRepository = {
          await ImageService.deleteFile(recipe.image);
         }
       await recipe.destroy();
-      logger.info(`Receta eliminada (ID: ${recipe.id})`);
       return true;
     } catch (err) {
       logger.error(`Error en RecipeRepository->delete: ${err.message}`);

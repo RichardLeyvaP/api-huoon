@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
         as: 'recipe',
         onDelete: 'CASCADE'
       });
-
     }
   }
 

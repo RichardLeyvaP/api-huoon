@@ -1,134 +1,134 @@
 {
-    "category": {
-        "Limpieza": {
-          "name": "Higiene/Limpieza",
-          "description": "Categoría de limpieza"
-        },
-        "Cocina": {
-          "name": "Cocina",
-          "description": "Categoría de cocina"
-        },
-        "Mantenimiento": {
-          "name": "Mantenimiento",
-          "description": "Categoría de mantenimiento"
-        },
-        "Alimentos": {
-          "name": "Alimentos",
-          "description": "Productos para cocinar"
-        },
-        "Mascotas": {
-          "name": "Mascotas",
-          "description": "Categoría de alimentos y productos para mascotas"
-        },
-        "Medicamento": {
-        "name": "Medicamentos",
-        "description": "Categoría de medicamentos y productos farmacéuticos"
-        },
-        "Electrónicos": {
-          "name": "Electrónicos",
-          "description": "Productos para el hogar"
-        },
-        "Pintura": {
-          "name": "Pintura",
-          "description": "Pintura del hogar"
-        },
-        "Cumpleaños": {
-          "name": "Cumpleaños",
-          "description": "Fiesta de cumpleaños"
-        },
-        "Mercado": {
-          "name": "Mercado",
-          "description": "Compra de víveres"
-        },
-        "Limpiar la Casa": {
-          "name": "Limpiar la Casa",
-          "description": "Limpiar dormitorios, cocina, sala de estar"
-        },
-        "Lavandería": {
-          "name": "Lavandería",
-          "description": "Lavar la ropa"
-        },
-        "Alquiler": {
-        "name": "Alquiler",
-        "description": "Pago de alquiler o hipoteca"
-      },
-      "Electricidad": {
-        "name": "Electricidad",
-        "description": "Factura de luz"
-      },
-      "Agua": {
-        "name": "Agua",
-        "description": "Factura de agua"
-      },
-      "Gas": {
-        "name": "Gas",
-        "description": "Suministro de gas natural o bombonas"
-      },
-      "Internet": {
-        "name": "Internet",
-        "description": "Servicio de conexión a internet"
-      },
-      "Telefonía": {
-        "name": "Telefonía",
-        "description": "Plan de celular/teléfono fijo"
-      },
-      "Ahorros": {
-        "name": "Ahorros",
-        "description": "Fondo de ahorro mensual"
-      },
-      "Ocio": {
-        "name": "Ocio",
-        "description": "Entretenimiento y salidas"
-      },
-      "Ropa": {
-        "name": "Ropa",
-        "description": "Prendas de vestir y calzado"
-      },
-      "Mantenimiento_Hogar": {
-        "name": "Mantenimiento Hogar",
-        "description": "Reparaciones y mejoras del hogar"
-      },
-      "Perros": {
-        "name": "Perros",
-        "description": "Categoría de perros"
-      },
-      "Gatos": {
-        "name": "Gatos",
-        "description": "Categoría de gatos"
-      },
-      "Aves": {
-        "name": "Aves",
-        "description": "Categoría de aves domésticas"
-      },
-      "Peces": {
-        "name": "Peces",
-        "description": "Categoría de peces y acuarios"
-      },
-      "Roedores": {
-        "name": "Roedores",
-        "description": "Categoría de roedores como hámsters, cobayos y ratones"
-      },
-      "Reptiles": {
-        "name": "Reptiles",
-        "description": "Categoría de reptiles como lagartos, tortugas y serpientes"
-      },
-      "Conejos": {
-        "name": "Conejos",
-        "description": "Categoría de conejos domésticos"
-      },
-      "Hurones": {
-        "name": "Hurones",
-        "description": "Categoría de hurones como mascotas"
-      },
-      "Anfibios": {
-        "name": "Anfibios",
-        "description": "Categoría de anfibios como ranas y salamandras"
-      },
-      "Insectos": {
-        "name": "Insectos",
-        "description": "Categoría de insectos y artrópodos como grillos, escarabajos y arácnidos"
-      },
-      "Necesidades básicas": {
+  "category": {
+    "Limpieza": {
+      "name": "Higiene/Limpieza",
+      "description": "Categoría de limpieza"
+    },
+    "Cocina": {
+      "name": "Cocina",
+      "description": "Categoría de cocina"
+    },
+    "Mantenimiento": {
+      "name": "Mantenimiento",
+      "description": "Categoría de mantenimiento"
+    },
+    "Alimentos": {
+      "name": "Alimentos",
+      "description": "Productos para cocinar"
+    },
+    "Mascotas": {
+      "name": "Mascotas",
+      "description": "Categoría de alimentos y productos para mascotas"
+    },
+    "Medicamento": {
+      "name": "Medicamentos",
+      "description": "Categoría de medicamentos y productos farmacéuticos"
+    },
+    "Electrónicos": {
+      "name": "Electrónicos",
+      "description": "Productos para el hogar"
+    },
+    "Pintura": {
+      "name": "Pintura",
+      "description": "Pintura del hogar"
+    },
+    "Cumpleaños": {
+      "name": "Cumpleaños",
+      "description": "Fiesta de cumpleaños"
+    },
+    "Mercado": {
+      "name": "Mercado",
+      "description": "Compra de víveres"
+    },
+    "Limpiar la Casa": {
+      "name": "Limpiar la Casa",
+      "description": "Limpiar dormitorios, cocina, sala de estar"
+    },
+    "Lavandería": {
+      "name": "Lavandería",
+      "description": "Lavar la ropa"
+    },
+    "Alquiler": {
+      "name": "Alquiler",
+      "description": "Pago de alquiler o hipoteca"
+    },
+    "Electricidad": {
+      "name": "Electricidad",
+      "description": "Factura de luz"
+    },
+    "Agua": {
+      "name": "Agua",
+      "description": "Factura de agua"
+    },
+    "Gas": {
+      "name": "Gas",
+      "description": "Suministro de gas natural o bombonas"
+    },
+    "Internet": {
+      "name": "Internet",
+      "description": "Servicio de conexión a internet"
+    },
+    "Telefonía": {
+      "name": "Telefonía",
+      "description": "Plan de celular/teléfono fijo"
+    },
+    "Ahorros": {
+      "name": "Ahorros",
+      "description": "Fondo de ahorro mensual"
+    },
+    "Ocio": {
+      "name": "Ocio",
+      "description": "Entretenimiento y salidas"
+    },
+    "Ropa": {
+      "name": "Ropa",
+      "description": "Prendas de vestir y calzado"
+    },
+    "Mantenimiento_Hogar": {
+      "name": "Mantenimiento Hogar",
+      "description": "Reparaciones y mejoras del hogar"
+    },
+    "Perros": {
+      "name": "Perros",
+      "description": "Categoría de perros"
+    },
+    "Gatos": {
+      "name": "Gatos",
+      "description": "Categoría de gatos"
+    },
+    "Aves": {
+      "name": "Aves",
+      "description": "Categoría de aves domésticas"
+    },
+    "Peces": {
+      "name": "Peces",
+      "description": "Categoría de peces y acuarios"
+    },
+    "Roedores": {
+      "name": "Roedores",
+      "description": "Categoría de roedores como hámsters, cobayos y ratones"
+    },
+    "Reptiles": {
+      "name": "Reptiles",
+      "description": "Categoría de reptiles como lagartos, tortugas y serpientes"
+    },
+    "Conejos": {
+      "name": "Conejos",
+      "description": "Categoría de conejos domésticos"
+    },
+    "Hurones": {
+      "name": "Hurones",
+      "description": "Categoría de hurones como mascotas"
+    },
+    "Anfibios": {
+      "name": "Anfibios",
+      "description": "Categoría de anfibios como ranas y salamandras"
+    },
+    "Insectos": {
+      "name": "Insectos",
+      "description": "Categoría de insectos y artrópodos como grillos, escarabajos y arácnidos"
+    },
+    "Necesidades básicas": {
       "name": "Necesidades básicas",
       "description": "Gastos esenciales para vivir: vivienda, alimentación, transporte y salud."
     },
@@ -205,99 +205,99 @@
       "description": "Cobertura médica privada o copagos"
     },
     "Educación": {
-  "name": "Educación",
-  "description": "Gastos relacionados con estudios, cursos y desarrollo académico."
-},
-"Colegios / universidades": {
-  "name": "Colegios / universidades",
-  "description": "Matrículas, pensiones y gastos escolares o universitarios"
-},
-"Cursos / capacitaciones": {
-  "name": "Cursos / capacitaciones",
-  "description": "Cursos en línea, talleres, certificaciones y formación profesional"
-},
-"Deudas y obligaciones": {
-  "name": "Deudas y obligaciones",
-  "description": "Pagos de créditos, impuestos y seguros obligatorios."
-},
-"Créditos / préstamos": {
-  "name": "Créditos / préstamos",
-  "description": "Cuotas de préstamos personales, hipotecas o vehículos"
-},
-"Impuestos": {
-  "name": "Impuestos",
-  "description": "Pago de impuestos personales, patrimoniales o vehiculares"
-},
-"Seguros": {
-  "name": "Seguros",
-  "description": "Seguros de vida, hogar, automóvil u otros"
-},
-"Ahorro e inversión": {
-  "name": "Ahorro e inversión",
-  "description": "Reservas para emergencias, ahorro familiar e inversiones financieras."
-},
-"Fondo de emergencia": {
-  "name": "Fondo de emergencia",
-  "description": "Ahorro destinado a imprevistos o situaciones urgentes"
-},
-"Ahorros familiares": {
-  "name": "Ahorros familiares",
-  "description": "Metas de ahorro para proyectos familiares o personales"
-},
-"Inversiones": {
-  "name": "Inversiones",
-  "description": "Acciones, fondos, criptomonedas u otros instrumentos financieros"
-},
-"Ocio y estilo de vida": {
-  "name": "Ocio y estilo de vida",
-  "description": "Actividades de entretenimiento, viajes y hobbies."
-},
-"Entretenimiento": {
-  "name": "Entretenimiento",
-  "description": "Cine, streaming, conciertos y actividades recreativas"
-},
-"Viajes": {
-  "name": "Viajes",
-  "description": "Vacaciones, escapadas y gastos de alojamiento o transporte"
-},
-"Deportes / hobbies": {
-  "name": "Deportes / hobbies",
-  "description": "Membresías, equipos o clases de actividades físicas y recreativas"
-},
-"Compras personales": {
-  "name": "Compras personales",
-  "description": "Gastos en ropa, tecnología y regalos para otros."
-},
-"Ropa y accesorios": {
-  "name": "Ropa y accesorios",
-  "description": "Compra de prendas, calzado, joyas y complementos"
-},
-"Tecnología": {
-  "name": "Tecnología",
-  "description": "Celulares, computadoras, accesorios electrónicos"
-},
-"Regalos": {
-  "name": "Regalos",
-  "description": "Obsequios para cumpleaños, aniversarios u ocasiones especiales"
-}
-      },
-    "priority": {
-      "Baja": {
-        "name": "Baja",
-        "description": "Prioridad baja"
-      },
-      "Media": {
-        "name": "Media",
-        "description": "Prioridad media"
-      },
-      "Alta": {
-        "name": "Alta",
-        "description": "Prioridad alta"
-      },
-      "Normal": {
-        "name": "Normal",
-        "description": "Prioridad normal"
-      }
+      "name": "Educación",
+      "description": "Gastos relacionados con estudios, cursos y desarrollo académico."
+    },
+    "Colegios / universidades": {
+      "name": "Colegios / universidades",
+      "description": "Matrículas, pensiones y gastos escolares o universitarios"
+    },
+    "Cursos / capacitaciones": {
+      "name": "Cursos / capacitaciones",
+      "description": "Cursos en línea, talleres, certificaciones y formación profesional"
+    },
+    "Deudas y obligaciones": {
+      "name": "Deudas y obligaciones",
+      "description": "Pagos de créditos, impuestos y seguros obligatorios."
+    },
+    "Créditos / préstamos": {
+      "name": "Créditos / préstamos",
+      "description": "Cuotas de préstamos personales, hipotecas o vehículos"
+    },
+    "Impuestos": {
+      "name": "Impuestos",
+      "description": "Pago de impuestos personales, patrimoniales o vehiculares"
+    },
+    "Seguros": {
+      "name": "Seguros",
+      "description": "Seguros de vida, hogar, automóvil u otros"
+    },
+    "Ahorro e inversión": {
+      "name": "Ahorro e inversión",
+      "description": "Reservas para emergencias, ahorro familiar e inversiones financieras."
+    },
+    "Fondo de emergencia": {
+      "name": "Fondo de emergencia",
+      "description": "Ahorro destinado a imprevistos o situaciones urgentes"
+    },
+    "Ahorros familiares": {
+      "name": "Ahorros familiares",
+      "description": "Metas de ahorro para proyectos familiares o personales"
+    },
+    "Inversiones": {
+      "name": "Inversiones",
+      "description": "Acciones, fondos, criptomonedas u otros instrumentos financieros"
+    },
+    "Ocio y estilo de vida": {
+      "name": "Ocio y estilo de vida",
+      "description": "Actividades de entretenimiento, viajes y hobbies."
+    },
+    "Entretenimiento": {
+      "name": "Entretenimiento",
+      "description": "Cine, streaming, conciertos y actividades recreativas"
+    },
+    "Viajes": {
+      "name": "Viajes",
+      "description": "Vacaciones, escapadas y gastos de alojamiento o transporte"
+    },
+    "Deportes / hobbies": {
+      "name": "Deportes / hobbies",
+      "description": "Membresías, equipos o clases de actividades físicas y recreativas"
+    },
+    "Compras personales": {
+      "name": "Compras personales",
+      "description": "Gastos en ropa, tecnología y regalos para otros."
+    },
+    "Ropa y accesorios": {
+      "name": "Ropa y accesorios",
+      "description": "Compra de prendas, calzado, joyas y complementos"
+    },
+    "Tecnología": {
+      "name": "Tecnología",
+      "description": "Celulares, computadoras, accesorios electrónicos"
+    },
+    "Regalos": {
+      "name": "Regalos",
+      "description": "Obsequios para cumpleaños, aniversarios u ocasiones especiales"
+    }
+  },
+  "priority": {
+    "Baja": {
+      "name": "Baja",
+      "description": "Prioridad baja"
+    },
+    "Media": {
+      "name": "Media",
+      "description": "Prioridad media"
+    },
+    "Alta": {
+      "name": "Alta",
+      "description": "Prioridad alta"
+    },
+    "Normal": {
+      "name": "Normal",
+      "description": "Prioridad normal"
+    }
   },
   "status": {
     "Pendiente": {
@@ -350,18 +350,18 @@
     }
   },
   "severity": {
-  "Leve": {
-    "name": "Leve",
-    "description": "Antecedente de enfermedad con impacto leve en la salud"
-  },
-  "Moderado": {
-    "name": "Moderado",
-    "description": "Antecedente de enfermedad con impacto moderado en la salud"
-  },
-  "Severo": {
-    "name": "Severo",
-    "description": "Antecedente de enfermedad con impacto severo en la salud"
-  }
+    "Leve": {
+      "name": "Leve",
+      "description": "Antecedente de enfermedad con impacto leve en la salud"
+    },
+    "Moderado": {
+      "name": "Moderado",
+      "description": "Antecedente de enfermedad con impacto moderado en la salud"
+    },
+    "Severo": {
+      "name": "Severo",
+      "description": "Antecedente de enfermedad con impacto severo en la salud"
+    }
   },
   "familyRelations": {
     "Padre": {
@@ -410,7 +410,7 @@
       "name": "No se repite"
     }
   },
-  "homeType":{
+  "homeType": {
     "Casa": {
       "name": "Casa",
       "description": "Tipo de residencia familiar"
@@ -444,7 +444,7 @@
     "Colaborador": {
       "name": "Colaborador",
       "description": "Colaborador de la tarea"
-    },    
+    },
     "Creador": {
       "name": "Creador",
       "description": "Creador de la tarea"
@@ -571,129 +571,145 @@
       "description": "Sangrado dentro del cuerpo"
     },
     "Enfermedad": {
-    "name": "Enfermedad",
-    "description": "Condición anormal que afecta el cuerpo"
-  },
-  "Alergia": {
-    "name": "Alergia",
-    "description": "Respuesta inmunológica adversa a una sustancia"
-  },
-  "Cirugía": {
-    "name": "Cirugía",
-    "description": "Procedimiento médico que implica incisión o manipulación de tejido"
-  },
-  "Hospitalización": {
-    "name": "Hospitalización",
-    "description": "Estancia en un hospital para tratamiento médico"
-  },
-  "Medicación": {
-    "name": "Medicación",
-    "description": "Administración de fármacos para tratar o prevenir enfermedades"
-  },
-  "Vacunación": {
-    "name": "Vacunación",
-    "description": "Administración de vacunas para prevenir enfermedades"
-  },
-  "Presuntivo": {
-    "name": "Presuntivo",
-    "description": "Diagnóstico inicial basado en síntomas y evaluación preliminar"
-  },
-  "Definitivo": {
-    "name": "Definitivo",
-    "description": "Diagnóstico confirmado mediante pruebas, estudios o evaluación especializada"
-  },
-  "Control": {
-    "name": "Control",
-    "description": "Consulta de seguimiento o control médico"
-  },
-  "Urgencia": {
-    "name": "Urgencia",
-    "description": "Consulta por emergencia médica"
-  },
-  "Primera vez": {
-    "name": "Primera vez",
-    "description": "Primera consulta con el profesional"
-  },
-  "Examen": {
-    "name": "Examen",
-    "description": "Consulta para realización de exámenes médicos"
-  },
-  "Otro": {
-    "name": "Otro",
-    "description": "Otro tipo de consulta no especificada"
-  },
-  "Cada 4 horas": {
-    "name": "Cada 4 horas",
-    "description": "Medicación que debe tomarse cada 4 horas (6 veces al día)"
-  },
-  "Cada 6 horas": {
-    "name": "Cada 6 horas",
-    "description": "Medicación que debe tomarse cada 6 horas (4 veces al día)"
-  },
-  "Cada 8 horas": {
-    "name": "Cada 8 horas",
-    "description": "Medicación que debe tomarse cada 8 horas (3 veces al día)"
-  },
-  "Cada 12 horas": {
-    "name": "Cada 12 horas",
-    "description": "Medicación que debe tomarse cada 12 horas (mañana y noche)"
-  },
-  "Una vez al día": {
-    "name": "Una vez al día",
-    "description": "Medicación que debe tomarse una vez cada 24 horas"
-  },
-  "Cada 2 horas": {
-  "name": "Cada 2 horas",
-  "description": "Medicación que debe tomarse cada 2 horas (12 veces al día)"
-},
-  "Cada 48 horas": {
-    "name": "Cada 48 horas",
-    "description": "Medicación que debe tomarse cada dos días"
-  },
-  "Cada semana": {
-    "name": "Cada semana",
-    "description": "Medicación que debe tomarse una vez por semana"
-  },
-  "Cada mes": {
-    "name": "Cada mes",
-    "description": "Medicación que debe tomarse una vez al mes"
-  },
-  "Antes de comer": {
-    "name": "Antes de comer",
-    "description": "Medicación que debe tomarse 30 minutos antes de las comidas"
-  },
-  "Después de comer": {
-    "name": "Después de comer",
-    "description": "Medicación que debe tomarse inmediatamente después de comer"
-  },
-  "En ayunas": {
-    "name": "En ayunas",
-    "description": "Medicación que debe tomarse con el estómago vacío, al levantarse"
-  },
-  "Al acostarse": {
-    "name": "Al acostarse",
-    "description": "Medicación que debe tomarse justo antes de dormir"
-  },
-  "Cuando sea necesario": {
-    "name": "Cuando sea necesario",
-    "description": "Medicación que se toma solo cuando aparecen síntomas específicos"
-  },
-  "Mensual": {
-    "name": "Mensual",
-    "description": "Cada mes"
-  },
-  "Diario": {
-    "name": "Diario",
-    "description": "Cada día"
-  },
-  "Anual": {
-    "name": "Anual",
-    "description": "Cada año"
-  },
-  "Semanal": {
-    "name": "Semanal",
-    "description": "Cada semana"
-  }
+      "name": "Enfermedad",
+      "description": "Condición anormal que afecta el cuerpo"
+    },
+    "Alergia": {
+      "name": "Alergia",
+      "description": "Respuesta inmunológica adversa a una sustancia"
+    },
+    "Cirugía": {
+      "name": "Cirugía",
+      "description": "Procedimiento médico que implica incisión o manipulación de tejido"
+    },
+    "Hospitalización": {
+      "name": "Hospitalización",
+      "description": "Estancia en un hospital para tratamiento médico"
+    },
+    "Medicación": {
+      "name": "Medicación",
+      "description": "Administración de fármacos para tratar o prevenir enfermedades"
+    },
+    "Vacunación": {
+      "name": "Vacunación",
+      "description": "Administración de vacunas para prevenir enfermedades"
+    },
+    "Presuntivo": {
+      "name": "Presuntivo",
+      "description": "Diagnóstico inicial basado en síntomas y evaluación preliminar"
+    },
+    "Definitivo": {
+      "name": "Definitivo",
+      "description": "Diagnóstico confirmado mediante pruebas, estudios o evaluación especializada"
+    },
+    "Control": {
+      "name": "Control",
+      "description": "Consulta de seguimiento o control médico"
+    },
+    "Urgencia": {
+      "name": "Urgencia",
+      "description": "Consulta por emergencia médica"
+    },
+    "Primera vez": {
+      "name": "Primera vez",
+      "description": "Primera consulta con el profesional"
+    },
+    "Examen": {
+      "name": "Examen",
+      "description": "Consulta para realización de exámenes médicos"
+    },
+    "Otro": {
+      "name": "Otro",
+      "description": "Otro tipo de consulta no especificada"
+    },
+    "Cada 4 horas": {
+      "name": "Cada 4 horas",
+      "description": "Medicación que debe tomarse cada 4 horas (6 veces al día)"
+    },
+    "Cada 6 horas": {
+      "name": "Cada 6 horas",
+      "description": "Medicación que debe tomarse cada 6 horas (4 veces al día)"
+    },
+    "Cada 8 horas": {
+      "name": "Cada 8 horas",
+      "description": "Medicación que debe tomarse cada 8 horas (3 veces al día)"
+    },
+    "Cada 12 horas": {
+      "name": "Cada 12 horas",
+      "description": "Medicación que debe tomarse cada 12 horas (mañana y noche)"
+    },
+    "Una vez al día": {
+      "name": "Una vez al día",
+      "description": "Medicación que debe tomarse una vez cada 24 horas"
+    },
+    "Cada 2 horas": {
+      "name": "Cada 2 horas",
+      "description": "Medicación que debe tomarse cada 2 horas (12 veces al día)"
+    },
+    "Cada 48 horas": {
+      "name": "Cada 48 horas",
+      "description": "Medicación que debe tomarse cada dos días"
+    },
+    "Cada semana": {
+      "name": "Cada semana",
+      "description": "Medicación que debe tomarse una vez por semana"
+    },
+    "Cada mes": {
+      "name": "Cada mes",
+      "description": "Medicación que debe tomarse una vez al mes"
+    },
+    "Antes de comer": {
+      "name": "Antes de comer",
+      "description": "Medicación que debe tomarse 30 minutos antes de las comidas"
+    },
+    "Después de comer": {
+      "name": "Después de comer",
+      "description": "Medicación que debe tomarse inmediatamente después de comer"
+    },
+    "En ayunas": {
+      "name": "En ayunas",
+      "description": "Medicación que debe tomarse con el estómago vacío, al levantarse"
+    },
+    "Al acostarse": {
+      "name": "Al acostarse",
+      "description": "Medicación que debe tomarse justo antes de dormir"
+    },
+    "Cuando sea necesario": {
+      "name": "Cuando sea necesario",
+      "description": "Medicación que se toma solo cuando aparecen síntomas específicos"
+    },
+    "Mensual": {
+      "name": "Mensual",
+      "description": "Cada mes"
+    },
+    "Diario": {
+      "name": "Diario",
+      "description": "Cada día"
+    },
+    "Anual": {
+      "name": "Anual",
+      "description": "Cada año"
+    },
+    "Semanal": {
+      "name": "Semanal",
+      "description": "Cada semana"
+    },
+    "Desayuno": {
+      "name": "Desayuno",
+      "description": "Primera comida del día"
+    },
+    "Almuerzo": {
+      "name": "Almuerzo",
+      "description": "Comida principal del mediodía"
+    },
+    "Cena": {
+      "name": "Cena",
+      "description": "Última comida del día"
+    },
+    "Snack": {
+      "name": "Snack",
+      "description": "Merienda ligera entre comidas"
+    }
   },
   "gender": {
     "Male": { "name": "Masculino" },
@@ -721,7 +737,7 @@
       "description": "Registro financiero del hogar"
     }
   },
-    "suggestionStatus": {
+  "suggestionStatus": {
     "Pendiente": {
       "name": "Pendiente",
       "description": "La sugerencia está en espera de revisión"
@@ -736,69 +752,69 @@
     }
   },
   "modules": {
-  "Logros": { "name": "Logros" },
-  "Deseos": { "name": "Deseos" },
-  "Meta": { "name": "Metas" },
-  "Tarea": { "name": "Tareas" },
-  "Finanzas": { "name": "Finanzas" },
-  "Salud": { "name": "Salud" },
-  "Nutrición": { "name": "Nutrición" },
-  "Mascotas": { "name": "Mascotas" },
-  "Hogar": { "name": "Hogar" },
-  "Productos": { "name": "Almacenes" },
-  "Archivos": { "name": "Archivos" },
-  "Sugerencias": { "name": "Sugerencias" }
-},
-"administrationRoutes": {
-  "Oral": {
-    "name": "Oral",
-    "description": "Vía de administración por boca"
+    "Logros": { "name": "Logros" },
+    "Deseos": { "name": "Deseos" },
+    "Meta": { "name": "Metas" },
+    "Tarea": { "name": "Tareas" },
+    "Finanzas": { "name": "Finanzas" },
+    "Salud": { "name": "Salud" },
+    "Nutrición": { "name": "Nutrición" },
+    "Mascotas": { "name": "Mascotas" },
+    "Hogar": { "name": "Hogar" },
+    "Productos": { "name": "Almacenes" },
+    "Archivos": { "name": "Archivos" },
+    "Sugerencias": { "name": "Sugerencias" }
   },
-  "Sublingual": {
-    "name": "Sublingual",
-    "description": "Bajo la lengua"
+  "administrationRoutes": {
+    "Oral": {
+      "name": "Oral",
+      "description": "Vía de administración por boca"
+    },
+    "Sublingual": {
+      "name": "Sublingual",
+      "description": "Bajo la lengua"
+    },
+    "Topica": {
+      "name": "Tópica",
+      "description": "Aplicación en piel o mucosas"
+    },
+    "Inyectable": {
+      "name": "Inyectable",
+      "description": "Por vía inyectable (intramuscular, intravenosa, subcutánea)"
+    },
+    "Rectal": {
+      "name": "Rectal",
+      "description": "Por vía rectal (supositorios)"
+    },
+    "Otica": {
+      "name": "Ótica",
+      "description": "En el oído"
+    },
+    "Nasal": {
+      "name": "Nasal",
+      "description": "Por vía nasal (sprays, gotas)"
+    }
   },
-  "Topica": {
-    "name": "Tópica",
-    "description": "Aplicación en piel o mucosas"
-  },
-  "Inyectable": {
-    "name": "Inyectable",
-    "description": "Por vía inyectable (intramuscular, intravenosa, subcutánea)"
-  },
-  "Rectal": {
-    "name": "Rectal",
-    "description": "Por vía rectal (supositorios)"
-  },
-  "Otica": {
-    "name": "Ótica",
-    "description": "En el oído"
-  },
-  "Nasal": {
-    "name": "Nasal",
-    "description": "Por vía nasal (sprays, gotas)"
+  "foodTypes": {
+    "Seco": {
+      "name": "Seco",
+      "description": "Alimento seco/croquetas"
+    },
+    "Humedo": {
+      "name": "Húmedo",
+      "description": "Alimento enlatado o en sobres"
+    },
+    "RecetaMedica": {
+      "name": "Receta médica",
+      "description": "Alimento formulado para condiciones específicas"
+    },
+    "Natural": {
+      "name": "Natural",
+      "description": "Dieta casera o alimentos naturales"
+    },
+    "Snacks": {
+      "name": "Snacks",
+      "description": "Premios o golosinas para mascotas"
+    }
   }
-},
-"foodTypes": {
-  "Seco": {
-    "name": "Seco",
-    "description": "Alimento seco/croquetas"
-  },
-  "Humedo": {
-    "name": "Húmedo",
-    "description": "Alimento enlatado o en sobres"
-  },
-  "RecetaMedica": {
-    "name": "Receta médica",
-    "description": "Alimento formulado para condiciones específicas"
-  },
-  "Natural": {
-    "name": "Natural",
-    "description": "Dieta casera o alimentos naturales"
-  },
-  "Snacks": {
-    "name": "Snacks",
-    "description": "Premios o golosinas para mascotas"
-  }
-}
 }

@@ -346,7 +346,7 @@ const NutritionProfileController = {
 
       if (dailyLog) {
         mealsOfTheDay = dailyLog.mealEntries.map(meal => ({
-          type: meal.mealType?.name || 'Sin tipo',
+          type: meal.type?.name || 'Sin tipo',
           recipes: meal.mealRecipes?.map(mr => mr.recipe.name).join(' + ') || 'Sin recetas'
         }));
 
@@ -458,7 +458,7 @@ const NutritionProfileController = {
       if (dailyLog) {
         const meals = await MealEntryRepository.findByDailyLogId(dailyLog.id);
         mealsOfTheDay = meals.map(meal => ({
-          type: meal.mealType?.name || 'Sin tipo',
+          type: meal.type?.name || 'Sin tipo',
           recipes: meal.mealRecipes?.map(mr => mr.recipe.name).join(' + ') || 'Sin recetas',
           details: meal.mealRecipes?.map(mr => ({
             name: mr.recipe.name,
@@ -610,7 +610,7 @@ const NutritionProfileController = {
     const totalRecipes = recipes.length;
 
     // 3. Registro diario
-    const dailyLog = await DailyLogRepository.findByPersonIdAndDate(person_id, today);
+    const dailyLog = await DailyLogRepository.findByPersonIdAndToday(person_id, today);
     const waterIntake = dailyLog?.water_intake || 0;
     const sleepHours = dailyLog?.sleep_hours || 0;
     const steps = dailyLog?.steps || 0;
@@ -621,7 +621,7 @@ const NutritionProfileController = {
       const meals = await MealEntryRepository.findByDailyLogId(dailyLog.id);
       mealsOfTheDay = meals.map(meal => ({
         id: meal.id,
-        type: meal.mealType?.name || 'Sin tipo',
+        type: meal.type?.name || 'Sin tipo',
         recipes: meal.mealRecipes?.map(mr => mr.recipe.name).join(' + ') || 'Sin recetas',
         count: meal.mealRecipes?.length || 0
       }));

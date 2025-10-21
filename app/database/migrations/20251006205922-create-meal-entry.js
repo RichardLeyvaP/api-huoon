@@ -8,7 +8,6 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
-        comment: 'PK – Identificador único de la comida registrada'
       },
       daily_log_id: {
         type: Sequelize.INTEGER,
@@ -18,7 +17,7 @@ module.exports = {
         },
         onDelete: 'CASCADE',
         allowNull: false,
-        comment: 'FK → daily_logs.id – Registro diario al que pertenece'
+        comment: 'FK → daily_logs.id Registro diario al que pertenece'
       },
       type_id: {
         type: Sequelize.INTEGER,
@@ -28,7 +27,7 @@ module.exports = {
         },
         onDelete: 'RESTRICT',
         allowNull: false,
-        comment: 'FK → types.id – Tipo de comida (Desayuno, Almuerzo, etc.)'
+        comment: 'FK → types.id Tipo de comida (Desayuno, Almuerzo, etc.)'
       },
       notes: {
         type: Sequelize.TEXT,

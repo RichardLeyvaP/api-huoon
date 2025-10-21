@@ -6,27 +6,27 @@ const storeNutritionProfileSchema = Joi.object({
     "number.base": '"person_id" debe ser un número válido',
     "number.positive": '"person_id" debe ser un número positivo'
   }),
-  calories: Joi.number().integer().min(0).max(10000).allow(null).optional().messages({
+  calories: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"calories" debe ser un número entero',
     "number.min": '"calories" no puede ser negativo',
     "number.max": '"calories" no puede exceder 10,000'
   }),
-  protein: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  protein: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"protein" debe ser un número entero (gramos)',
     "number.min": '"protein" no puede ser negativo',
     "number.max": '"protein" no puede exceder 500g'
   }),
-  carbs: Joi.number().integer().min(0).max(1000).allow(null).optional().messages({
+  carbs: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"carbs" debe ser un número entero (gramos)',
     "number.min": '"carbs" no puede ser negativo',
     "number.max": '"carbs" no puede exceder 1000g'
   }),
-  fats: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  fats: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"fats" debe ser un número entero (gramos)',
     "number.min": '"fats" no puede ser negativo',
     "number.max": '"fats" no puede exceder 500g'
   }),
-  fiber: Joi.number().integer().min(0).max(100).allow(null).optional().messages({
+  fiber: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"fiber" debe ser un número entero (gramos)',
     "number.min": '"fiber" no puede ser negativo',
     "number.max": '"fiber" no puede exceder 100g'
@@ -56,22 +56,22 @@ const updateNutritionProfileSchema = Joi.object({
     "number.positive": '"id" debe ser un número positivo',
     "any.required": '"id" del perfil nutricional es requerido'
   }),
-  calories: Joi.number().integer().min(0).max(10000).allow(null).optional().messages({
+  calories: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"calories" debe ser un número entero',
     "number.min": '"calories" no puede ser negativo',
     "number.max": '"calories" no puede exceder 10,000'
   }),
-  protein: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  protein: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"protein" debe ser un número entero (gramos)',
     "number.min": '"protein" no puede ser negativo',
     "number.max": '"protein" no puede exceder 500g'
   }),
-  carbs: Joi.number().integer().min(0).max(1000).allow(null).optional().messages({
+  carbs: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"carbs" debe ser un número entero (gramos)',
     "number.min": '"carbs" no puede ser negativo',
     "number.max": '"carbs" no puede exceder 1000g'
   }),
-  fats: Joi.number().integer().min(0).max(500).allow(null).optional().messages({
+  fats: Joi.number().integer().min(0).allow(null).optional().messages({
     "number.base": '"fats" debe ser un número entero (gramos)',
     "number.min": '"fats" no puede ser negativo',
     "number.max": '"fats" no puede exceder 500g'
@@ -113,7 +113,6 @@ const getNutritionProfileByPersonSchema = Joi.object({
   person_id: Joi.number().integer().positive().allow(null).optional().messages({
     "number.base": '"person_id" debe ser un número válido',
     "number.positive": '"person_id" debe ser un número positivo',
-    "any.required": '"person_id" es requerido'
   })
 });
 

@@ -13,7 +13,7 @@ const storeRecipeProductSchema = Joi.object({
     "number.base": '"product_id" debe ser un número válido',
     "any.required": '"product_id" es requerido'
   }),
-  quantity: Joi.number().precision(3).min(0.001).max(10000).required().messages({
+  quantity: Joi.number().precision(3).min(0.001).required().messages({
     "number.base": '"quantity" debe ser un número',
     "number.min": '"quantity" debe ser mayor a 0',
     "any.required": '"quantity" es requerido'
@@ -36,7 +36,7 @@ const updateRecipeProductSchema = Joi.object({
     "number.base": '"id" debe ser un número válido',
     "any.required": '"id" es requerido'
   }),
-  quantity: Joi.number().precision(3).min(0.001).max(10000).optional(),
+  quantity: Joi.number().precision(3).min(0.001).optional(),
   unit: Joi.string().valid('g', 'ml', 'unidad', 'taza', 'cda', 'cdta', 'kg', 'L').optional(),
   calories_per_unit: Joi.number().precision(2).min(0).allow(null).optional(),
   protein_per_unit: Joi.number().precision(2).min(0).allow(null).optional(),

@@ -77,9 +77,8 @@ const getDailyLogByPersonAndDateSchema = Joi.object({
     "number.positive": '"person_id" debe ser positivo',
     "any.required": '"person_id" es requerido'
   }),
-  date: Joi.date().iso().required().messages({
+  date: Joi.date().iso().optional().messages({
     "date.base": '"date" debe ser una fecha válida (YYYY-MM-DD)',
-    "any.required": '"date" es requerido'
   })
 });
 

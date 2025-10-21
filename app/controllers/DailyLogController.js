@@ -38,9 +38,12 @@ const DailyLogController = {
         id: l.id,
         date: l.date,
         waterIntake: l.water_intake,
+        water_intake: l.water_intake,
         sleepHours: l.sleep_hours,
+        sleep_hours: l.sleep_hours,
         steps: l.steps,
-        notes: l.notes
+        notes: l.notes,
+        meal_tries: log.mealEntries
       }));
 
       res.status(200).json({ logs: mapped });
@@ -51,24 +54,28 @@ const DailyLogController = {
   },
 
   async getByPersonIdAndDate(req, res) {
-    const { person_id, date } = req.body;
-    if (!person_id || !date) return res.status(400).json({ msg: "PersonIdAndDateRequired" });
-
+    logger.info(`${req.user.name} - Busca los registros diarios en nutrición`);
+    const { person_id: bodyPersonId, date } = req.body;
+    const person_id = bodyPersonId || req.person?.id;
     try {
-      const log = await DailyLogRepository.findByPersonIdAndDate(person_id, date);
-      if (!log) return res.status(204).json({ msg: "DailyLogNotFound" });
+      const logs = await DailyLogRepository.findByPersonIdAndDate(person_id, date);
+      if (!logs.length) return res.status(204).json({ msg: "DailyLogNotFound" });
 
-      const mapped = {
+      const mapped = logs.map(log => ({
         id: log.id,
         personId: log.person_id,
+        person_id: log.person_id,
         date: log.date,
         waterIntake: log.water_intake,
+        water_intake: log.water_intake,
         sleepHours: log.sleep_hours,
+        sleep_hours: log.sleep_hours,
         steps: log.steps,
-        notes: log.notes
-      };
+        notes: log.notes,
+        meal_entries: log.mealEntries
+      }));
 
-      res.status(200).json({ log: mapped });
+      res.status(200).json({ dailylogs: mapped });
     } catch (err) {
       logger.error("DailyLogController->getByPersonIdAndDate: " + err.message);
       res.status(500).json({ error: "ServerError", details: err.message });
@@ -113,7 +120,7 @@ const DailyLogController = {
 
       const log = await DailyLogRepository.create(req.body, t);
       await t.commit();
-      res.status(201).json({ log });
+      res.status(201).json({ dailyLog: log, message: "Registro creado Correctamente" });
     } catch (err) {
       await t.rollback();
       logger.error("DailyLogController->store: " + err.message);
@@ -133,7 +140,7 @@ const DailyLogController = {
       try {
         const updated = await DailyLogRepository.update(log, req.body, t);
         await t.commit();
-        res.status(200).json({ log: updated });
+        res.status(200).json({ dailyLog: updated, message: "Registro actualizado Correctamente" });
       } catch (err) {
         await t.rollback();
         throw err;
