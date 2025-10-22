@@ -130,27 +130,30 @@ const  PersonProductRepository = {
   },
 
   
-  async getSuggestedShoppingList(person_id, home_id) {
+async getSuggestedShoppingList(person_id, home_id) {
   const today = new Date();
-  const nextWeek = new Date();
+  today.setHours(0, 0, 0, 0); // Normalizar a inicio del día
+  const nextWeek = new Date(today);
   nextWeek.setDate(today.getDate() + 7);
 
   const LOW_STOCK_THRESHOLD = 2;
 
+  // Incluir productos con quantity >= 0 (incluye agotados)
   const results = await PersonHomeWarehouseProduct.findAll({
     where: {
       person_id: person_id,
       home_id: home_id,
-      quantity: { [Op.gt]: 0 },
+      quantity: { [Op.gte]: 0 }, // Ahora incluimos 0
       [Op.or]: [
-        { expiration_date: { [Op.lt]: today } },
+        { quantity: 0 }, // Agotados
+        { quantity: { [Op.lte]: LOW_STOCK_THRESHOLD, [Op.gt]: 0 } }, // Por agotarse
+        { expiration_date: { [Op.lt]: today } }, // Vencidos
         {
           expiration_date: {
             [Op.gte]: today,
             [Op.lte]: nextWeek,
           },
-        },
-        { quantity: { [Op.lte]: LOW_STOCK_THRESHOLD } },
+        }, // Próximo a vencer
       ],
     },
     include: [
@@ -173,29 +176,34 @@ const  PersonProductRepository = {
         ],
       },
     ],
-    attributes: ["id", "product_id", "quantity", "expiration_date"],
+    attributes: ["id", "product_id", "quantity", "expiration_date", "home_id", "person_id"],
     raw: true,
     nest: true,
   });
 
-  // Mapear y asignar motivo
   const mapped = results.map((item) => {
-    const expDate = item.expiration_date
-      ? new Date(item.expiration_date)
-      : null;
+    const expDate = item.expiration_date ? new Date(item.expiration_date) : null;
     let reason = "";
 
-    if (expDate && expDate < today) {
+    // Determinar motivo en orden de prioridad lógica
+    if (item.quantity === 0) {
+      reason = "Agotado";
+    } else if (item.quantity <= LOW_STOCK_THRESHOLD) {
+      reason = "Por agotarse";
+    } else if (expDate && expDate < today) {
       reason = "Vencido";
     } else if (expDate && expDate <= nextWeek) {
-      reason = "Próximo a vencer";
-    } else if (item.quantity <= LOW_STOCK_THRESHOLD) {
-      reason = "Stock bajo";
+      reason = "Por vencer";
+    } else {
+      // Este caso no debería ocurrir por la cláusula WHERE, pero por seguridad:
+      reason = "Otro";
     }
 
     return {
-      id: item.id,
+      person_home_warehouse_product_id: item.id,
       product_id: item.product_id,
+      person_id: item.person_id,
+      home_id: item.home_id,
       name: item.product.name,
       image: item.product.image || "products/default.jpg",
       quantity: item.quantity,
@@ -205,35 +213,37 @@ const  PersonProductRepository = {
     };
   });
 
-  // Definir prioridad de cada motivo
+  // Nueva prioridad
   const priority = {
-    "Vencido": 1,
-    "Próximo a vencer": 2,
-    "Stock bajo": 3,
+    "Agotado": 1,
+    "Por agotarse": 2,
+    "Vencido": 3,
+    "Por vencer": 4,
   };
 
-  // Ordenar
   mapped.sort((a, b) => {
-    // 1. Por prioridad del motivo
+    // 1. Prioridad del motivo
     if (priority[a.reason] !== priority[b.reason]) {
       return priority[a.reason] - priority[b.reason];
     }
 
-    // 2. Dentro de "Vencido" o "Próximo a vencer": ordenar por fecha de vencimiento (más antigua primero)
-    if (a.expiration_date && b.expiration_date) {
-      return new Date(a.expiration_date) - new Date(b.expiration_date);
+    // 2. Dentro de "Vencido" o "Por vencer": ordenar por fecha (más antigua primero)
+    if (["Vencido", "Por vencer"].includes(a.reason)) {
+      const dateA = a.expiration_date ? new Date(a.expiration_date) : new Date(8640000000000000); // fecha muy alta
+      const dateB = b.expiration_date ? new Date(b.expiration_date) : new Date(8640000000000000);
+      return dateA - dateB;
     }
 
-    // 3. Dentro de "Stock bajo": ordenar por cantidad (menor primero)
-    if (a.reason === "Stock bajo" && b.reason === "Stock bajo") {
+    // 3. Dentro de "Agotado" o "Por agotarse": ordenar por cantidad (menor primero)
+    if (["Agotado", "Por agotarse"].includes(a.reason)) {
       return a.quantity - b.quantity;
     }
 
-    // 4. Por nombre como fallback
+    // 4. Fallback: por nombre
     return a.name.localeCompare(b.name);
   });
 
-  // Eliminar el campo auxiliar si no lo necesitas en la respuesta final
+  // Eliminar campo auxiliar
   return mapped.map(({ expiration_date, ...rest }) => rest);
 },
   async getTotalQuantityByWarehouse(homeId, warehouseId) {

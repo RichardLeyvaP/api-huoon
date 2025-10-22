@@ -43,6 +43,7 @@ const RecipeProductRepository = require('./RecipeProductRepository');
 const MealEntryRepository = require('./MealEntryRepository');
 const MealRecipeRepository = require('./MealRecipeRepository');
 const HouseholdRequestRepository = require('./HouseholdRequestRepository');
+const ShoppingListRepository = require('./ShoppingListRepository');
 
 module.exports = {
     CategoryRepository,
@@ -89,5 +90,6 @@ module.exports = {
     RecipeProductRepository,
     MealEntryRepository,
     MealRecipeRepository,
-    HouseholdRequestRepository
+    HouseholdRequestRepository,
+    ShoppingListRepository
 };

@@ -70,6 +70,7 @@ module.exports = (sequelize, DataTypes) => {
         Person.hasMany(models.PetDiet, { foreignKey: 'person_id', as: 'petdiets', });
         Person.hasOne(models.NutritionProfile, { foreignKey: 'person_id', as: 'nutritionProfile',  onDelete: 'CASCADE' });
         Person.hasMany(models.DailyLog, { foreignKey: 'person_id', as: 'dailylogs',  onDelete: 'CASCADE' });
+        Person.hasMany(models.ShoppingList, { foreignKey: 'person_id', as: 'shoppingLists',  onDelete: 'CASCADE' });
     }
 
   }

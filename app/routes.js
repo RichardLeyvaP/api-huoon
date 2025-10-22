@@ -107,6 +107,8 @@ const RecipeController = require('./controllers/RecipeController');
 const RecipeProductController = require('./controllers/RecipeProductController');
 const MealEntryController = require('./controllers/MealEntryController');
 const MealRecipeController = require('./controllers/MealRecipeController');
+const ShoppingListController = require('./controllers/ShoppingListController');
+const { getByHomePersonSchema } = require('./middlewares/validations/shoppingListValidation');
 
 
 router.get('/', (req, res) => res.json({ hello: "World" }));
@@ -593,6 +595,9 @@ router.post('/meal-recipe-show', validateSchema(idMealRecipeSchema), MealRecipeC
 router.post('/meal-recipe', validateSchema(storeMealRecipeSchema), MealRecipeController.store);
 router.post('/meal-recipe-update', validateSchema(updateMealRecipeSchema), MealRecipeController.update);
 router.post('/meal-recipe-delete', validateSchema(idMealRecipeSchema), MealRecipeController.destroy);
+
+//rutas de Lista de sugerencia de compras
+router.post('/get-shopping-list', validateSchema(getByHomePersonSchema),  ShoppingListController.getShoppingList);
 
 //Rutas Unificadas
 router.post('/productcategory-productstatus-apk', ProductController.category_status);

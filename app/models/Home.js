@@ -52,35 +52,14 @@ module.exports = (sequelize, DataTypes) => {
   Home.hasMany(models.Notification, { foreignKey: 'home_id', as: 'notifications', onDelete: 'CASCADE' });
   Home.hasMany(models.ActivityLog, { foreignKey: 'home_id', as: 'activitylogs', onDelete: 'SET NULL' });
   Home.belongsTo(models.Person, { as: 'person', foreignKey: 'person_id' }); // Relación directa
-  Home.hasMany(models.FamilyBackground, {
-        foreignKey: 'home_id',
-        as: 'familyBackgrounds'
-      });
-    
-    Home.hasMany(models.Budget, {
-      foreignKey: 'home_id',
-      as: 'budgets'
-    });
-    Home.hasMany(models.Pet, {
-      foreignKey: 'home_id',
-      as: 'pets'
-    });
-    Home.hasMany(models.PetTreatment, {
-          foreignKey: 'home_id',
-          as: 'pettreatments',
-        });
-    Home.hasMany(models.VetVisit, {
-          foreignKey: 'home_id',
-          as: 'vetvisits',
-        });
-    Home.hasMany(models.CurrentMedication, {
-          foreignKey: 'home_id',
-          as: 'currentmedications',
-        });
-    Home.hasMany(models.PetDiet, {
-          foreignKey: 'home_id',
-          as: 'petdiets',
-        });
+  Home.hasMany(models.FamilyBackground, { foreignKey: 'home_id', as: 'familyBackgrounds' });    
+  Home.hasMany(models.Budget, { foreignKey: 'home_id', as: 'budgets' });
+  Home.hasMany(models.Pet, { foreignKey: 'home_id', as: 'pets' });
+  Home.hasMany(models.PetTreatment, { foreignKey: 'home_id', as: 'pettreatments', });
+  Home.hasMany(models.VetVisit, { foreignKey: 'home_id', as: 'vetvisits', });
+  Home.hasMany(models.CurrentMedication, { foreignKey: 'home_id', as: 'currentmedications', });
+  Home.hasMany(models.PetDiet, { foreignKey: 'home_id', as: 'petdiets', });
+  Home.hasMany(models.ShoppingList, { foreignKey: 'home_id', as: 'shoppingLists',  onDelete: 'CASCADE' });
     }
   }
   Home.init({
