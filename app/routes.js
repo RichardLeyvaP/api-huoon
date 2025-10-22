@@ -424,6 +424,7 @@ router.post('/person-home-warehouse-product-destroy', validateSchema(idPersonPro
 router.post("/process-ocr", validateSchema(ocrStringSchema), PersonHomeWarehouseProductController.processOCR);
 router.post('/warehouse-product-move', validateSchema(moveProductSchema), PersonHomeWarehouseProductController.move);
 router.post('/available-products', PersonHomeWarehouseProductController.getAllProductsForRecipe);
+router.post('/suggested-shopping-list', PersonHomeWarehouseProductController.getSuggestedShoppingList);
 
 //Rutas Finanzas
 router.get('/finance', FinanceController.index);

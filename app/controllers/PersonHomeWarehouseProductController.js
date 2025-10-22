@@ -22,7 +22,7 @@ const {
   StatusRepository,
   CategoryRepository,
   PersonRepository,
-  ProductRepository
+  ProductRepository,
 } = require("../repositories");
 const WarehouseRepository = require("../repositories/WareHouseRepository");
 const { ActivityLogService } = require("../services");
@@ -40,16 +40,15 @@ const PersonHomeWarehouseProductController = {
         await PersonProductRepository.findAll();
 
       if (!personHomeWarehouseProducts.length) {
-        return res
-          .status(404)
-          .json({
-            msg: "No se encontraron productos",
-            personHomeWarehouseProduct: personHomeWarehouseProducts,
-          });
+        return res.status(404).json({
+          msg: "No se encontraron productos",
+          personHomeWarehouseProduct: personHomeWarehouseProducts,
+        });
       }
 
       res.status(200).json({
-        personHomeWarehouseProduct: personHomeWarehouseProducts.map((homeWarehouseProduct) => ({
+        personHomeWarehouseProduct: personHomeWarehouseProducts.map(
+          (homeWarehouseProduct) => ({
             id: homeWarehouseProduct.id,
             homeId: homeWarehouseProduct.home_id,
             home_id: homeWarehouseProduct.home_id,
@@ -79,10 +78,15 @@ const PersonHomeWarehouseProductController = {
             purchasePlace: homeWarehouseProduct.purchase_place,
             purchase_place: homeWarehouseProduct.purchase_place,
             brand: homeWarehouseProduct.brand ? homeWarehouseProduct.brand : "",
-            additional_notes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
-            additionalNotes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
+            additional_notes: homeWarehouseProduct.additional_notes
+              ? homeWarehouseProduct.additional_notes
+              : "",
+            additionalNotes: homeWarehouseProduct.additional_notes
+              ? homeWarehouseProduct.additional_notes
+              : "",
             image: homeWarehouseProduct.image,
-        })),
+          })
+        ),
       });
     } catch (error) {
       const errorMsg = error.details
@@ -105,7 +109,7 @@ const PersonHomeWarehouseProductController = {
     try {
       // Obtener el ID de la persona del usuario autenticado
       const person_id = req.person.id;
-      
+
       // Verificar que el hogar existe
       const home = await HomeRepository.findById(home_id);
       if (!home) {
@@ -168,15 +172,27 @@ const PersonHomeWarehouseProductController = {
         unitPrice: homeWarehouseProduct.unit_price,
         totalPrice: homeWarehouseProduct.total_price,
         total_price: homeWarehouseProduct.total_price,
-        purchaseDate: homeWarehouseProduct.purchase_date?.toISOString().split('T')[0],
-        purchase_date: homeWarehouseProduct.purchase_date?.toISOString().split('T')[0],
-        expirationDate: homeWarehouseProduct.expiration_date?.toISOString().split('T')[0],
-        expiration_date: homeWarehouseProduct.expiration_date?.toISOString().split('T')[0],
+        purchaseDate: homeWarehouseProduct.purchase_date
+          ?.toISOString()
+          .split("T")[0],
+        purchase_date: homeWarehouseProduct.purchase_date
+          ?.toISOString()
+          .split("T")[0],
+        expirationDate: homeWarehouseProduct.expiration_date
+          ?.toISOString()
+          .split("T")[0],
+        expiration_date: homeWarehouseProduct.expiration_date
+          ?.toISOString()
+          .split("T")[0],
         purchasePlace: homeWarehouseProduct.purchase_place,
         purchase_place: homeWarehouseProduct.purchase_place,
         brand: homeWarehouseProduct.brand ? homeWarehouseProduct.brand : "",
-        additional_notes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
-        additionalNotes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
+        additional_notes: homeWarehouseProduct.additional_notes
+          ? homeWarehouseProduct.additional_notes
+          : "",
+        additionalNotes: homeWarehouseProduct.additional_notes
+          ? homeWarehouseProduct.additional_notes
+          : "",
         image: homeWarehouseProduct.image,
       }));
 
@@ -194,9 +210,11 @@ const PersonHomeWarehouseProductController = {
   },
 
   async getAllProductsForRecipe(req, res) {
-    logger.info(`${req.user.name} - Obtiene productos disponibles para recetas`);
+    logger.info(
+      `${req.user.name} - Obtiene productos disponibles para recetas`
+    );
 
-    const { home_id,  person_id: bodyPersonId } = req.body;
+    const { home_id, person_id: bodyPersonId } = req.body;
     const person_id = bodyPersonId || req.person?.id;
 
     try {
@@ -207,29 +225,90 @@ const PersonHomeWarehouseProductController = {
       }
 
       // Verificar que la persona pertenece al hogar
-      const personInHome = await PersonRepository.getPersonHouse(person_id, home_id);
+      const personInHome = await PersonRepository.getPersonHouse(
+        person_id,
+        home_id
+      );
       if (!personInHome) {
         return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
       }
 
       // Obtener productos
-      const products = await PersonProductRepository.getAllProductsByPersonAndHome(person_id, home_id);
+      const products =
+        await PersonProductRepository.getAllProductsByPersonAndHome(
+          person_id,
+          home_id
+        );
 
       if (!products || products.length === 0) {
         return res.status(204).json({ msg: "NoProductsAvailable" });
       }
 
       // Formatear respuesta plana
-      const result = products.map(p => ({
+      const result = products.map((p) => ({
         id: p.product.id,
         name: p.product.name,
-        image: p.product.image
+        image: p.product.image,
       }));
 
       return res.status(200).json({ products: result });
     } catch (error) {
       const errorMsg = error.message || "Error desconocido";
       logger.error("RecipeController->getAllProductsForRecipe: " + errorMsg);
+      return res.status(500).json({ error: "ServerError", details: errorMsg });
+    }
+  },
+
+  async getSuggestedShoppingList(req, res) {
+    logger.info(
+      `${req.user?.name || "Anonymous"} - Obtiene lista de compra sugerida`
+    );
+
+    const { home_id, person_id: bodyPersonId } = req.body;
+    const person_id = bodyPersonId || req.person?.id;
+
+    try {
+      // Validar hogar
+      const home = await HomeRepository.findById(home_id);
+      if (!home) {
+        return res
+          .status(404)
+          .json({ error: "HomeNotFound", details: "La hogar no existe" });
+      }
+
+      // Verificar que la persona pertenece al hogar
+      const personInHome = await PersonRepository.getPersonHouse(
+        person_id,
+        home_id
+      );
+      if (!personInHome) {
+        return res
+          .status(403)
+          .json({
+            error: "PersonNotAssociatedWithHome",
+            details: "La persona no pertenece al hogar",
+          });
+      }
+
+      // Obtener lista sugerida
+      const suggestedItems =
+        await PersonProductRepository.getSuggestedShoppingList(
+          person_id,
+          home_id
+        );
+
+      if (!suggestedItems || suggestedItems.length === 0) {
+        return res.status(200).json({
+          products: [],
+          message: "No se requiere reposición en este momento",
+        });
+      }
+
+      // Ya viene en el formato deseado desde el repositorio
+      return res.status(200).json({ products: suggestedItems });
+    } catch (error) {
+      const errorMsg = error.message || "Error desconocido";
+      logger.error("RecipeController->getSuggestedShoppingList: " + errorMsg);
       return res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
@@ -402,37 +481,41 @@ const PersonHomeWarehouseProductController = {
 
       const result = {
         id: homeWarehouseProduct.id,
-          homeId: homeWarehouseProduct.home_id,
-          home_id: homeWarehouseProduct.home_id,
-          homeName: homeWarehouseProduct.home.name, // Relación con el hogar
-          warehouseId: homeWarehouseProduct.warehouse_id,
-          warehouse_id: homeWarehouseProduct.warehouse_id,
-          warehouseName: homeWarehouseProduct.warehouse.title, // Relación con el almacén
-          productId: homeWarehouseProduct.product_id,
-          product_id: homeWarehouseProduct.product_id,
-          productName: homeWarehouseProduct.product.name, // Relación con el producto,
-          name: homeWarehouseProduct.product.name, // Relación con el producto
-          categoryId: homeWarehouseProduct.product.category_id,
-          category_id: homeWarehouseProduct.product.category_id,
-          nameCategory: homeWarehouseProduct.product.category.name, // Lógica para obtener traducción de la categoría
-          statusId: homeWarehouseProduct.status_id,
-          status_id: homeWarehouseProduct.status_id,
-          nameStatus: homeWarehouseProduct.status.name, // Lógica para obtener traducción del estado
-          quantity: homeWarehouseProduct.quantity,
-          unit_price: homeWarehouseProduct.unit_price,
-          unitPrice: homeWarehouseProduct.unit_price,
-          totalPrice: homeWarehouseProduct.total_price,
-          total_price: homeWarehouseProduct.total_price,
-          purchaseDate: homeWarehouseProduct.purchase_date,
-          purchase_date: homeWarehouseProduct.purchase_date,
-          expirationDate: homeWarehouseProduct.expiration_date,
-          expiration_date: homeWarehouseProduct.expiration_date,
-          purchasePlace: homeWarehouseProduct.purchase_place,
-          purchase_place: homeWarehouseProduct.purchase_place,
-          brand: homeWarehouseProduct.brand ? homeWarehouseProduct.brand : "",
-          additional_notes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
-          additionalNotes: homeWarehouseProduct.additional_notes ? homeWarehouseProduct.additional_notes : "",
-          image: homeWarehouseProduct.image,
+        homeId: homeWarehouseProduct.home_id,
+        home_id: homeWarehouseProduct.home_id,
+        homeName: homeWarehouseProduct.home.name, // Relación con el hogar
+        warehouseId: homeWarehouseProduct.warehouse_id,
+        warehouse_id: homeWarehouseProduct.warehouse_id,
+        warehouseName: homeWarehouseProduct.warehouse.title, // Relación con el almacén
+        productId: homeWarehouseProduct.product_id,
+        product_id: homeWarehouseProduct.product_id,
+        productName: homeWarehouseProduct.product.name, // Relación con el producto,
+        name: homeWarehouseProduct.product.name, // Relación con el producto
+        categoryId: homeWarehouseProduct.product.category_id,
+        category_id: homeWarehouseProduct.product.category_id,
+        nameCategory: homeWarehouseProduct.product.category.name, // Lógica para obtener traducción de la categoría
+        statusId: homeWarehouseProduct.status_id,
+        status_id: homeWarehouseProduct.status_id,
+        nameStatus: homeWarehouseProduct.status.name, // Lógica para obtener traducción del estado
+        quantity: homeWarehouseProduct.quantity,
+        unit_price: homeWarehouseProduct.unit_price,
+        unitPrice: homeWarehouseProduct.unit_price,
+        totalPrice: homeWarehouseProduct.total_price,
+        total_price: homeWarehouseProduct.total_price,
+        purchaseDate: homeWarehouseProduct.purchase_date,
+        purchase_date: homeWarehouseProduct.purchase_date,
+        expirationDate: homeWarehouseProduct.expiration_date,
+        expiration_date: homeWarehouseProduct.expiration_date,
+        purchasePlace: homeWarehouseProduct.purchase_place,
+        purchase_place: homeWarehouseProduct.purchase_place,
+        brand: homeWarehouseProduct.brand ? homeWarehouseProduct.brand : "",
+        additional_notes: homeWarehouseProduct.additional_notes
+          ? homeWarehouseProduct.additional_notes
+          : "",
+        additionalNotes: homeWarehouseProduct.additional_notes
+          ? homeWarehouseProduct.additional_notes
+          : "",
+        image: homeWarehouseProduct.image,
       };
       res.status(200).json({ homewarehouseproduct: [result] });
     } catch (error) {
@@ -482,12 +565,10 @@ const PersonHomeWarehouseProductController = {
       logger.error(
         `PersonHomeWarehouseProductsController->update: Registro no encontrado con ID ${id}`
       );
-      return res
-        .status(204)
-        .json({
-          error: "NotFound",
-          message: `No se encontró un registro con el ID ${id}`,
-        });
+      return res.status(204).json({
+        error: "NotFound",
+        message: `No se encontró un registro con el ID ${id}`,
+      });
     }
 
     const t = await sequelize.transaction();
@@ -571,62 +652,74 @@ const PersonHomeWarehouseProductController = {
     }
   },
   async move(req, res) {
-    logger.info(`${req.user.name} - Inicia el proceso de mover un producto entre almacenes`);
+    logger.info(
+      `${req.user.name} - Inicia el proceso de mover un producto entre almacenes`
+    );
     logger.info("Datos recibidos al mover un producto de almacén");
     logger.info(JSON.stringify(req.body));
-    const { id, warehouse_id, product_id, quantity_mov, unit_price, total_price } = req.body;
-
+    const {
+      id,
+      warehouse_id,
+      product_id,
+      quantity_mov,
+      unit_price,
+      total_price,
+    } = req.body;
 
     const t = await sequelize.transaction();
     try {
       const result = await PersonProductRepository.moveProduct(req.body, t);
       const original_warehouse = await PersonProductRepository.findById(id);
       if (!original_warehouse) {
-         logger.error(
-            `PersonHomeWarehouseProductsController->move: producto en almacén no encontrado con ID ${id}`
-          );
-      throw new Error("Registro de producto en almacén no encontrado");
-    }
-    const destination_warehouse = await WarehouseRepository.findById(warehouse_id);
-    if (!destination_warehouse) {
-         logger.error(
-            `PersonHomeWarehouseProductsController->move: almacén a mover producto no encontrado con ID ${warehouse_id}`
-          );
-      throw new Error("Almacén a mover producto no encontrado");
-    }
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(now.getUTCDate()).padStart(2, '0');
-    const today = `${year}-${month}-${day}`;
-    const activityData = {
-      ...req.body,
-      originalWarehouse: original_warehouse.warehouse.title,
-      original_id: original_warehouse.warehouse_id,
-      destinationWarehouse: destination_warehouse.title,
-      productName: original_warehouse.product.name,
-      productImage: original_warehouse.image,
-      quantity_moved: quantity_mov,
-      personName: req.person.name,
-      personImage: req.person.image,
-      date: today
-    };
+        logger.error(
+          `PersonHomeWarehouseProductsController->move: producto en almacén no encontrado con ID ${id}`
+        );
+        throw new Error("Registro de producto en almacén no encontrado");
+      }
+      const destination_warehouse = await WarehouseRepository.findById(
+        warehouse_id
+      );
+      if (!destination_warehouse) {
+        logger.error(
+          `PersonHomeWarehouseProductsController->move: almacén a mover producto no encontrado con ID ${warehouse_id}`
+        );
+        throw new Error("Almacén a mover producto no encontrado");
+      }
+      const now = new Date();
+      const year = now.getUTCFullYear();
+      const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(now.getUTCDate()).padStart(2, "0");
+      const today = `${year}-${month}-${day}`;
+      const activityData = {
+        ...req.body,
+        originalWarehouse: original_warehouse.warehouse.title,
+        original_id: original_warehouse.warehouse_id,
+        destinationWarehouse: destination_warehouse.title,
+        productName: original_warehouse.product.name,
+        productImage: original_warehouse.image,
+        quantity_moved: quantity_mov,
+        personName: req.person.name,
+        personImage: req.person.image,
+        date: today,
+      };
 
-    await ActivityLogService.createActivityLog(
-      "PersonHomeWarehouseProduct", // o el nombre que uses para este modelo
-      id, // ID del registro afectado
-      "move", // tipo de acción
-      req.user.id,
-      JSON.stringify(activityData, null, 2), // datos personalizados
-      original_warehouse.home_id,
-      { transaction: t }
-    );
+      await ActivityLogService.createActivityLog(
+        "PersonHomeWarehouseProduct", // o el nombre que uses para este modelo
+        id, // ID del registro afectado
+        "move", // tipo de acción
+        req.user.id,
+        JSON.stringify(activityData, null, 2), // datos personalizados
+        original_warehouse.home_id,
+        { transaction: t }
+      );
       await t.commit();
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       await t.rollback();
-      logger.error(`Error en PersonHomeWarehouseController->move: ${error.message}`);
-      res.status(500).json({ error: 'ServerError', details: error.message });
+      logger.error(
+        `Error en PersonHomeWarehouseController->move: ${error.message}`
+      );
+      res.status(500).json({ error: "ServerError", details: error.message });
     }
   },
   // Eliminar un producto de un almacen en un hogar
@@ -649,7 +742,8 @@ const PersonHomeWarehouseProductController = {
           .json({ msg: "PersonHomeWarehouseProductNotFound" });
       }
 
-      const personHomeWarehouseProductDelete = await PersonProductRepository.delete(personHomeWarehouseProduct);
+      const personHomeWarehouseProductDelete =
+        await PersonProductRepository.delete(personHomeWarehouseProduct);
       // Responder con éxito
       res.status(200).json({ msg: "PersonHomeWarehouseProductDeleted" });
     } catch (error) {
@@ -663,190 +757,206 @@ const PersonHomeWarehouseProductController = {
 
   async processOCR(req, res) {
     try {
-      const { ocrText, home_id, warehouse_id, status_id, category_id} = req.body;
+      const { ocrText, home_id, warehouse_id, status_id, category_id } =
+        req.body;
 
       const home = await HomeRepository.findById(home_id);
-    if (!home) {
-      logger.error(
-        `PersonHomeWarehouseController->processOCR: Hogar no encontrado con ID ${home_id}`
-      );
-      return res.status(204).json({ msg: "HomeNotFound" });
-    }
+      if (!home) {
+        logger.error(
+          `PersonHomeWarehouseController->processOCR: Hogar no encontrado con ID ${home_id}`
+        );
+        return res.status(204).json({ msg: "HomeNotFound" });
+      }
 
-    // Obtener el ID de la persona del usuario autenticado
-    const person_id = req.person.id;
+      // Obtener el ID de la persona del usuario autenticado
+      const person_id = req.person.id;
 
-    // Verificar si la persona está asociada con el hogar
-    const person = await Person.findByPk(person_id, {
-      include: [
-        {
-          model: HomePerson,
-          as: "homePeople",
-          where: { home_id: home_id }, // Filtra por el home_id que buscas
-          required: true, // Esto asegura que solo se devuelvan personas que tengan esa relación
-        },
-      ],
-    });
+      // Verificar si la persona está asociada con el hogar
+      const person = await Person.findByPk(person_id, {
+        include: [
+          {
+            model: HomePerson,
+            as: "homePeople",
+            where: { home_id: home_id }, // Filtra por el home_id que buscas
+            required: true, // Esto asegura que solo se devuelvan personas que tengan esa relación
+          },
+        ],
+      });
 
-    if (!person) {
-      logger.error(
-        `PersonHomeWarehouseController->processOCR: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
-      );
-      return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
-    }
+      if (!person) {
+        logger.error(
+          `PersonHomeWarehouseController->processOCR: La persona con ID ${person_id} no está asociada con el hogar con ID ${home_id}`
+        );
+        return res.status(204).json({ msg: "PersonNotAssociatedWithHome" });
+      }
 
-    // Verificar si el almacén existe
-    const warehouse = await WareHouseRepository.findById(warehouse_id);
-    if (!warehouse) {
-      logger.error(
-        `PersonHomeWarehouseController->processOCR: Almacén no encontrado con ID ${warehouse_id}`
-      );
-      return res.status(204).json({ msg: "WarehouseNotFound" });
-    }
+      // Verificar si el almacén existe
+      const warehouse = await WareHouseRepository.findById(warehouse_id);
+      if (!warehouse) {
+        logger.error(
+          `PersonHomeWarehouseController->processOCR: Almacén no encontrado con ID ${warehouse_id}`
+        );
+        return res.status(204).json({ msg: "WarehouseNotFound" });
+      }
 
-    // Verificar si el estado existe
-    const status = await StatusRepository.findById(status_id);
-    if (!status) {
-      logger.error(
-        `PersonHomeWarehouseController->processOCR: Estado no encontrado con ID ${status_id}`
-      );
-      return res.status(204).json({ msg: "StatusNotFound" });
-    }
-
+      // Verificar si el estado existe
+      const status = await StatusRepository.findById(status_id);
+      if (!status) {
+        logger.error(
+          `PersonHomeWarehouseController->processOCR: Estado no encontrado con ID ${status_id}`
+        );
+        return res.status(204).json({ msg: "StatusNotFound" });
+      }
 
       const products = await ocrProcessor.extractProductsFromOCR(ocrText);
-      logger.info("Resultado del procesamiento OCR:", JSON.stringify(products, null, 2));
+      logger.info(
+        "Resultado del procesamiento OCR:",
+        JSON.stringify(products, null, 2)
+      );
 
       const processedProducts = [];
       const errors = [];
       const transaction = await sequelize.transaction();
       // Hacer una copia del array para evitar modificaciones accidentales
-        const productosAProcesar = [...products.productos];
-        
-        for (const producto of productosAProcesar) {
-            try {
-                // Validación defensiva - asegurar que producto existe
-                if (!producto || !producto.nombre) {
-                    errors.push({
-                        productName: 'Producto sin nombre',
-                        error: 'El producto no tiene estructura válida'
-                    });
-                    continue;
-                }
+      const productosAProcesar = [...products.productos];
 
-                const nombreProducto = String(producto.nombre).trim();
-                logger.info(`Procesando producto: ${nombreProducto}`);
+      for (const producto of productosAProcesar) {
+        try {
+          // Validación defensiva - asegurar que producto existe
+          if (!producto || !producto.nombre) {
+            errors.push({
+              productName: "Producto sin nombre",
+              error: "El producto no tiene estructura válida",
+            });
+            continue;
+          }
 
-                let dbProduct = await ProductRepository.findByNameAndCategory(nombreProducto, category_id);
-                
-                if (!dbProduct) {
-                    logger.info("Creando nuevo producto para:", nombreProducto);
-                    
-                    // Crear producto principal
-                    dbProduct = await ProductRepository.create(
-                        { name: nombreProducto, category_id },
-                        null,
-                        transaction
-                    );
+          const nombreProducto = String(producto.nombre).trim();
+          logger.info(`Procesando producto: ${nombreProducto}`);
 
-                    // Crear relación en el almacén
-                    await PersonProductRepository.create(
-                        {
-                            product_id: dbProduct.id,
-                            warehouse_id,
-                            status_id,
-                            home_id,
-                            unit_price: producto.precioUnitario,
-                            total_price: producto.total,
-                            quantity: producto.cantidad,
-                            purchase_date: products.documento.fecha,
-                            purchase_place: products.documento.lugar?.nombre || 'Desconocido',
-                        },
-                        null,
-                        transaction,
-                        person_id
-                    );
-                } else {
-                    logger.info("Producto encontrado en DB:", dbProduct.id);
-                    
-                    // Buscar registro existente
-                    const existingRecord = await PersonProductRepository.findOneByFilters(
-                        dbProduct.id,
-                        warehouse_id,
-                        home_id,
-                        person_id
-                    );
-                    logger.info("Registro existente encontrado:", existingRecord?.id || 'Ninguno');
-                    
-                    if (existingRecord) {
-                        // Actualizar registro existente
-                        await PersonProductRepository.updateExistingProduct(
-                            existingRecord,
-                            {
-                                unit_price: producto.precioUnitario,
-                                total_price: producto.total,
-                                quantity: producto.cantidad,
-                                purchase_date: products.documento.fecha,
-                                purchase_place: products.documento.lugar?.nombre || existingRecord.purchase_place,
-                            },
-                            transaction
-                        );
-                        logger.info("Producto existente actualizado");
-                    } else {
-                        // Crear nueva relación
-                        await PersonProductRepository.create(
-                            {
-                                product_id: dbProduct.id,
-                                warehouse_id,
-                                status_id,
-                                home_id,
-                                unit_price: producto.precioUnitario,
-                                total_price: producto.total,
-                                quantity: producto.cantidad,
-                                purchase_date: products.documento.fecha,
-                                purchase_place: products.documento.lugar?.nombre || 'Desconocido',
-                            },
-                            null,
-                            transaction,
-                            person_id
-                        );
-                        logger.info("Nueva relación producto-almacén creada");
-                    }
-                }
+          let dbProduct = await ProductRepository.findByNameAndCategory(
+            nombreProducto,
+            category_id
+          );
 
-                processedProducts.push({
-                    ...producto,
-                    dbMatch: dbProduct,
-                    priceValid: false
-                });
+          if (!dbProduct) {
+            logger.info("Creando nuevo producto para:", nombreProducto);
 
-            } catch (error) {
-                logger.error(`Error procesando producto ${producto?.nombre || 'desconocido'}:`, error);
-                errors.push({
-                    productName: producto?.nombre || 'Producto desconocido',
-                    error: error.message
-                });
+            // Crear producto principal
+            dbProduct = await ProductRepository.create(
+              { name: nombreProducto, category_id },
+              null,
+              transaction
+            );
+
+            // Crear relación en el almacén
+            await PersonProductRepository.create(
+              {
+                product_id: dbProduct.id,
+                warehouse_id,
+                status_id,
+                home_id,
+                unit_price: producto.precioUnitario,
+                total_price: producto.total,
+                quantity: producto.cantidad,
+                purchase_date: products.documento.fecha,
+                purchase_place:
+                  products.documento.lugar?.nombre || "Desconocido",
+              },
+              null,
+              transaction,
+              person_id
+            );
+          } else {
+            logger.info("Producto encontrado en DB:", dbProduct.id);
+
+            // Buscar registro existente
+            const existingRecord =
+              await PersonProductRepository.findOneByFilters(
+                dbProduct.id,
+                warehouse_id,
+                home_id,
+                person_id
+              );
+            logger.info(
+              "Registro existente encontrado:",
+              existingRecord?.id || "Ninguno"
+            );
+
+            if (existingRecord) {
+              // Actualizar registro existente
+              await PersonProductRepository.updateExistingProduct(
+                existingRecord,
+                {
+                  unit_price: producto.precioUnitario,
+                  total_price: producto.total,
+                  quantity: producto.cantidad,
+                  purchase_date: products.documento.fecha,
+                  purchase_place:
+                    products.documento.lugar?.nombre ||
+                    existingRecord.purchase_place,
+                },
+                transaction
+              );
+              logger.info("Producto existente actualizado");
+            } else {
+              // Crear nueva relación
+              await PersonProductRepository.create(
+                {
+                  product_id: dbProduct.id,
+                  warehouse_id,
+                  status_id,
+                  home_id,
+                  unit_price: producto.precioUnitario,
+                  total_price: producto.total,
+                  quantity: producto.cantidad,
+                  purchase_date: products.documento.fecha,
+                  purchase_place:
+                    products.documento.lugar?.nombre || "Desconocido",
+                },
+                null,
+                transaction,
+                person_id
+              );
+              logger.info("Nueva relación producto-almacén creada");
             }
+          }
+
+          processedProducts.push({
+            ...producto,
+            dbMatch: dbProduct,
+            priceValid: false,
+          });
+        } catch (error) {
+          logger.error(
+            `Error procesando producto ${producto?.nombre || "desconocido"}:`,
+            error
+          );
+          errors.push({
+            productName: producto?.nombre || "Producto desconocido",
+            error: error.message,
+          });
         }
-        await transaction.commit();
-        // Devolver resultados (en un controlador de ruta)
-         // Enviar respuesta al cliente
-        return res.status(200).json({
-            success: true,
-            count: processedProducts.length,
-            products: processedProducts,
-            errors,
-            documentInfo: products.documento
-        });
-    } catch (error) { 
+      }
+      await transaction.commit();
+      // Devolver resultados (en un controlador de ruta)
+      // Enviar respuesta al cliente
+      return res.status(200).json({
+        success: true,
+        count: processedProducts.length,
+        products: processedProducts,
+        errors,
+        documentInfo: products.documento,
+      });
+    } catch (error) {
       if (transaction) await transaction.rollback();
-      logger.error('Error en el controlador:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error.message || 'Error al procesar el OCR' 
+      logger.error("Error en el controlador:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Error al procesar el OCR",
       });
     }
-  }
+  },
 };
 
 module.exports = PersonHomeWarehouseProductController;

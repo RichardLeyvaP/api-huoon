@@ -97,28 +97,145 @@ const  PersonProductRepository = {
   },
 
   async getAllProductsByPersonAndHome(person_id, home_id) {
-  return await PersonHomeWarehouseProduct.findAll({
+    return await PersonHomeWarehouseProduct.findAll({
+      where: {
+        person_id: person_id,
+        home_id: home_id,
+        quantity: { [Op.gt]: 0 }
+      },
+      include: [
+        {
+          model: Product,
+          as: 'product',
+          required: true,
+          attributes: ['id', 'name', 'image', 'category_id'],
+          include: [
+            {
+              model: Category,
+              as: 'category', // Asegúrate de que este alias coincida con tu asociación
+              attributes: [], // No necesitas devolver campos de categoría
+              where: {
+                name: 'Alimentos',
+                type: 'Product'
+              }
+            }
+          ]
+        }
+      ],
+      attributes: [], // Solo queremos los datos del producto
+      group: ['product.id', 'product.name', 'product.image', 'product.category_id'],
+      raw: true,
+      nest: true
+    });
+  },
+
+  
+  async getSuggestedShoppingList(person_id, home_id) {
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+
+  const LOW_STOCK_THRESHOLD = 2;
+
+  const results = await PersonHomeWarehouseProduct.findAll({
     where: {
       person_id: person_id,
       home_id: home_id,
-      quantity: { [Op.gt]: 0 }
+      quantity: { [Op.gt]: 0 },
+      [Op.or]: [
+        { expiration_date: { [Op.lt]: today } },
+        {
+          expiration_date: {
+            [Op.gte]: today,
+            [Op.lte]: nextWeek,
+          },
+        },
+        { quantity: { [Op.lte]: LOW_STOCK_THRESHOLD } },
+      ],
     },
     include: [
       {
         model: Product,
-        as: 'product',
-        attributes: ['id', 'name', 'image'], // Solo los campos necesarios
-        // Opcional: incluir categoría si la necesitas
-        // include: [{ model: Category, as: 'category', attributes: ['id', 'name'] }]
-      }
+        as: "product",
+        required: true,
+        attributes: ["id", "name", "image"],
+        include: [
+          {
+            model: Category,
+            as: "category",
+            required: true,
+            attributes: [],
+            where: {
+              name: "Alimentos",
+              type: "Product",
+            },
+          },
+        ],
+      },
     ],
-    attributes: [], // No necesitamos campos de PersonHomeWarehouseProduct
-    group: ['product.id', 'product.name', 'product.image'], // Evita duplicados
-    raw: true, // Devuelve objetos planos
-    nest: true // Anida el producto
+    attributes: ["id", "product_id", "quantity", "expiration_date"],
+    raw: true,
+    nest: true,
   });
-},
 
+  // Mapear y asignar motivo
+  const mapped = results.map((item) => {
+    const expDate = item.expiration_date
+      ? new Date(item.expiration_date)
+      : null;
+    let reason = "";
+
+    if (expDate && expDate < today) {
+      reason = "Vencido";
+    } else if (expDate && expDate <= nextWeek) {
+      reason = "Próximo a vencer";
+    } else if (item.quantity <= LOW_STOCK_THRESHOLD) {
+      reason = "Stock bajo";
+    }
+
+    return {
+      id: item.id,
+      product_id: item.product_id,
+      name: item.product.name,
+      image: item.product.image || "products/default.jpg",
+      quantity: item.quantity,
+      reason: reason,
+      // Campos auxiliares para ordenar
+      expiration_date: item.expiration_date,
+    };
+  });
+
+  // Definir prioridad de cada motivo
+  const priority = {
+    "Vencido": 1,
+    "Próximo a vencer": 2,
+    "Stock bajo": 3,
+  };
+
+  // Ordenar
+  mapped.sort((a, b) => {
+    // 1. Por prioridad del motivo
+    if (priority[a.reason] !== priority[b.reason]) {
+      return priority[a.reason] - priority[b.reason];
+    }
+
+    // 2. Dentro de "Vencido" o "Próximo a vencer": ordenar por fecha de vencimiento (más antigua primero)
+    if (a.expiration_date && b.expiration_date) {
+      return new Date(a.expiration_date) - new Date(b.expiration_date);
+    }
+
+    // 3. Dentro de "Stock bajo": ordenar por cantidad (menor primero)
+    if (a.reason === "Stock bajo" && b.reason === "Stock bajo") {
+      return a.quantity - b.quantity;
+    }
+
+    // 4. Por nombre como fallback
+    return a.name.localeCompare(b.name);
+  });
+
+  // Eliminar el campo auxiliar si no lo necesitas en la respuesta final
+  return mapped.map(({ expiration_date, ...rest }) => rest);
+},
   async getTotalQuantityByWarehouse(homeId, warehouseId) {
   const result = await PersonHomeWarehouseProduct.sum('quantity', {
     where: {

@@ -291,8 +291,7 @@ const NutritionProfileController = {
     }));
 
     // === NUTRICIÓN ===
-    let nutritionData = null;
-    const today = new Date().toISOString().split('T')[0];
+    const today = await NutritionProfileController.getCurrentLocalDate();
 
     // Función para determinar el estado nutricional
     const getNutritionStatus = (score) => {
@@ -328,7 +327,7 @@ const NutritionProfileController = {
       };
     };
 
-    const householdMembers = await NutritionProfileRepository.findNutritionDataByHomeId(
+    const householdMembers = await NutritionProfileRepository.findRawNutritionDataByHomeId(
       home_id,
       today,
       type === 'Personal' ? person_id : null
@@ -336,10 +335,11 @@ const NutritionProfileController = {
 
     const membersData = [];
     let membersWithData = 0;
+    let hasDailyLogToday = null;
 
     for (const person of householdMembers) {
       const profile = person.nutritionProfile;
-      const dailyLog = person.dailyLogs?.[0]; // Solo el log del día
+      const dailyLog = person.dailylogs?.[0];
 
       let mealsOfTheDay = [];
       let caloriesConsumed = 0, protein = 0, carbs = 0, fats = 0, fiber = 0;
@@ -362,22 +362,43 @@ const NutritionProfileController = {
         });
       }
 
-      const caloriesGoal = profile?.calories || 2000;
-      const waterGoal = profile?.water || 2.0;
-      const fiberGoal = profile?.fiber || 30;
+      const caloriesGoal = parseFloat(profile?.calories) || 0;
+      const waterGoal = parseFloat(profile?.water) || 0;
+      const fiberGoal = parseFloat(profile?.fiber) || 0;
+      const proteinGoal = parseFloat(profile?.protein) || 0;
 
-      const caloriesScore = Math.min(100, Math.round((caloriesConsumed / caloriesGoal) * 100));
-      const waterScore = Math.min(100, Math.round(((dailyLog?.water_intake || 0) / waterGoal) * 100));
-      const fiberScore = Math.min(100, Math.round((fiber / fiberGoal) * 100));
+      const waterConsumed = parseFloat(dailyLog?.water_intake) || 0;
+
+            const caloriesScore = caloriesGoal > 0 
+        ? Math.min(100, Math.round((caloriesConsumed / caloriesGoal) * 100)) 
+        : 0;
+      const waterScore = waterGoal > 0 
+        ? Math.min(100, Math.round((waterConsumed / waterGoal) * 100)) 
+        : 0;
+      const fiberScore = fiberGoal > 0 
+        ? Math.min(100, Math.round((fiber / fiberGoal) * 100)) 
+        : 0;
       const overallScore = Math.round((caloriesScore + waterScore + fiberScore) / 3);
 
-      const status = getNutritionStatus(overallScore); // ← extrae la función
+      const status = getNutritionStatus(overallScore);
 
+      // === ALERTAS POR MIEMBRO ===
       const alerts = [];
-      if (fiber < fiberGoal) alerts.push("Bajo consumo de fibra hoy");
-      if ((dailyLog?.water_intake || 0) < waterGoal) alerts.push("Bajo consumo de agua hoy");
+      if (dailyLog) {
+        if (fiber < fiberGoal) alerts.push("Bajo consumo de fibra hoy");
+        if ((dailyLog.water_intake || 0) < waterGoal) alerts.push("Bajo consumo de agua hoy");
+        if (caloriesConsumed < caloriesGoal) alerts.push("Bajo consumo de calorías hoy");
+      } else {
+        // Solo en modo Personal se muestra alerta individual
+        if (type === 'Personal') {
+          alerts.push("No has registrado datos nutricionales hoy.");
+        }
+      }
 
       const hasData = !!dailyLog;
+      if (Number(person.id) === Number(person_id)) {
+        hasDailyLogToday = hasData;
+      }
       if (hasData) membersWithData++;
 
       membersData.push({
@@ -390,6 +411,7 @@ const NutritionProfileController = {
           waterConsumed: dailyLog?.water_intake || 0,
           waterGoal,
           protein: Math.round(protein),
+          proteinGoal,
           carbs: Math.round(carbs),
           fats: Math.round(fats),
           fiber: Math.round(fiber),
@@ -398,14 +420,12 @@ const NutritionProfileController = {
         status,
         alerts,
         hasData,
-        mealsOfTheDay
+        mealsOfTheDay,
       });
     }
 
-    // === Calcular estado AGREGADO del hogar ===
+    // === CÁLCULO DEL STATUS GLOBAL (NO TOCAR) ===
     let excellent = 0, bueno = 0, aceptable = 0, enRiesgo = 0, critico = 0;
-    let totalFiberAlerts = 0, totalWaterAlerts = 0;
-
     membersData.forEach(member => {
       if (member.hasData) {
         switch (member.status.level) {
@@ -415,8 +435,6 @@ const NutritionProfileController = {
           case 'En riesgo': enRiesgo++; break;
           case 'Crítico': critico++; break;
         }
-        if (member.alerts.includes("Bajo consumo de fibra hoy")) totalFiberAlerts++;
-        if (member.alerts.includes("Bajo consumo de agua hoy")) totalWaterAlerts++;
       }
     });
 
@@ -428,162 +446,71 @@ const NutritionProfileController = {
       (enRiesgo / totalMembers) * 25 +
       (critico / totalMembers) * 0
     );
-
     const globalStatus = getNutritionStatus(globalScore);
 
-    // === Alertas generales ===
-    const globalAlerts = [];
-    if (totalFiberAlerts > 0) {
-      globalAlerts.push(`${totalFiberAlerts} ${totalFiberAlerts === 1 ? 'miembro' : 'miembros'} con bajo consumo de fibra`);
-    }
-    if (totalWaterAlerts > 0) {
-      globalAlerts.push(`${totalWaterAlerts} ${totalWaterAlerts === 1 ? 'miembro' : 'miembros'} con bajo consumo de agua`);
-    }
+    // === ALERTAS GLOBALES (MEJORADAS) ===
+    let totalNoData = 0;
+    let totalLowCalories = 0;
+    let totalLowWater = 0;
+    let totalLowFiber = 0;
 
-    nutritionData = {
+    membersData.forEach(member => {
+      if (!member.hasData) {
+        totalNoData++;
+      } else {
+        const waterConsumed = parseFloat(member.summary.waterConsumed) || 0;
+        const waterGoal = parseFloat(member.summary.waterGoal) || 0;
+        const caloriesConsumed = parseFloat(member.summary.caloriesConsumed) || 0;
+        const caloriesGoal = parseFloat(member.summary.caloriesGoal) || 0;
+        const fiber = parseFloat(member.summary.fiber) || 0;
+        const fiberGoal = parseFloat(member.summary.fiberGoal) || 0;
+
+        if (caloriesConsumed < caloriesGoal) totalLowCalories++;
+        if (waterConsumed < waterGoal) totalLowWater++;
+        if (fiber < fiberGoal) totalLowFiber++;
+      }
+    });
+
+    const globalAlerts = [];
+
+    if (type === 'Hogar') {
+      if (totalNoData === totalMembers && totalMembers > 0) {
+        globalAlerts.push("Ningún miembro ha registrado datos nutricionales hoy.");
+      } else if (totalNoData > 0) {
+        globalAlerts.push(`${totalNoData} ${totalNoData === 1 ? 'miembro sin registro nutricional' : 'miembros sin registro nutricional'} hoy.`);
+      }
+
+      if (totalLowCalories > 0) {
+        globalAlerts.push(`${totalLowCalories} ${totalLowCalories === 1 ? 'miembro con bajo consumo de calorías' : 'miembros con bajo consumo de calorías'}.`);
+      }
+      if (totalLowWater > 0) {
+        globalAlerts.push(`${totalLowWater} ${totalLowWater === 1 ? 'miembro con bajo consumo de agua' : 'miembros con bajo consumo de agua'}.`);
+      }
+      if (totalLowFiber > 0) {
+        globalAlerts.push(`${totalLowFiber} ${totalLowFiber === 1 ? 'miembro con bajo consumo de fibra' : 'miembros con bajo consumo de fibra'}.`);
+    }
+  }else {
+    const currentUser = membersData.find(m => m.id === person_id);
+    if (currentUser?.alerts) {
+      globalAlerts.push(...currentUser.alerts);
+    }
+  }
+
+    const nutritionData = {
       membersData,
       totalMembers,
       membersWithNutritionData: membersWithData,
-      status: globalStatus,   // ← estado agregado
-      alerts: globalAlerts    // ← alertas agregadas
+      status: globalStatus,
+      alerts: globalAlerts
     };
-
-    /*if (type === 'Personal') {
-      const profile = await NutritionProfileRepository.findByPersonId(person_id);
-      const dailyLog = await DailyLogRepository.findByPersonIdAndDate(person_id, today);
-      
-      let mealsOfTheDay = [];
-      let caloriesConsumed = 0, protein = 0, carbs = 0, fats = 0, fiber = 0;
-
-      if (dailyLog) {
-        const meals = await MealEntryRepository.findByDailyLogId(dailyLog.id);
-        mealsOfTheDay = meals.map(meal => ({
-          type: meal.type?.name || 'Sin tipo',
-          recipes: meal.mealRecipes?.map(mr => mr.recipe.name).join(' + ') || 'Sin recetas',
-          details: meal.mealRecipes?.map(mr => ({
-            name: mr.recipe.name,
-            servings: mr.servings
-          })) || []
-        }));
-
-        meals.forEach(meal => {
-          meal.mealRecipes?.forEach(mr => {
-            const ratio = mr.servings / (mr.recipe.servings || 1);
-            caloriesConsumed += (mr.recipe.calories || 0) * ratio;
-            protein += (mr.recipe.protein || 0) * ratio;
-            carbs += (mr.recipe.carbs || 0) * ratio;
-            fats += (mr.recipe.fats || 0) * ratio;
-            fiber += (mr.recipe.fiber || 0) * ratio;
-          });
-        });
-      }
-
-      const caloriesGoal = profile?.calories || 2000;
-      const waterGoal = profile?.water || 2.0;
-      const fiberGoal = profile?.fiber || 30;
-
-      const caloriesScore = Math.min(100, Math.round((caloriesConsumed / caloriesGoal) * 100));
-      const waterScore = Math.min(100, Math.round(((dailyLog?.water_intake || 0) / waterGoal) * 100));
-      const fiberScore = Math.min(100, Math.round((fiber / fiberGoal) * 100));
-
-      const overallScore = Math.round((caloriesScore + waterScore + fiberScore) / 3);
-      const status = getNutritionStatus(overallScore);
-
-      const alerts = [];
-      if (fiber < fiberGoal) alerts.push("Bajo consumo de fibra hoy");
-      if ((dailyLog?.water_intake || 0) < waterGoal) alerts.push("Bajo consumo de agua hoy");
-
-      nutritionData = {
-        type: 'Personal',
-        status,
-        summary: {
-          caloriesConsumed: Math.round(caloriesConsumed),
-          caloriesGoal,
-          waterConsumed: dailyLog?.water_intake || 0,
-          waterGoal,
-          protein: Math.round(protein),
-          carbs: Math.round(carbs),
-          fats: Math.round(fats),
-          fiber: Math.round(fiber),
-          fiberGoal
-        },
-        alerts,
-        mealsOfTheDay
-      };
-
-    } else if (type === 'Hogar') {
-      const homePersons = await HomePersonRepository.getPersonByHomeId(home_id);
-      const personIds = homePersons.map(p => p.id);
-
-      let totalCalories = 0, totalWater = 0, totalFiber = 0;
-      let membersWithData = 0;
-
-      for (const pid of personIds) {
-        const profile = await NutritionProfileRepository.findByPersonId(pid);
-        const dailyLog = await DailyLogRepository.findByPersonIdAndDate(pid, today);
-        
-        if (dailyLog) {
-          membersWithData++;
-          const meals = await MealEntryRepository.findByDailyLogId(dailyLog.id);
-          let personCalories = 0, personFiber = 0;
-          
-          meals.forEach(meal => {
-            meal.mealRecipes?.forEach(mr => {
-              const ratio = mr.servings / (mr.recipe.servings || 1);
-              personCalories += (mr.recipe.calories || 0) * ratio;
-              personFiber += (mr.recipe.fiber || 0) * ratio;
-            });
-          });
-
-          totalCalories += personCalories;
-          totalWater += dailyLog.water_intake || 0;
-          totalFiber += personFiber;
-        }
-      }
-
-      const avgCalories = membersWithData ? totalCalories / membersWithData : 0;
-      const avgWater = membersWithData ? totalWater / membersWithData : 0;
-      const avgFiber = membersWithData ? totalFiber / membersWithData : 0;
-
-      const caloriesGoal = 2000;
-      const waterGoal = 2.0;
-      const fiberGoal = 30;
-
-      const caloriesScore = Math.min(100, Math.round((avgCalories / caloriesGoal) * 100));
-      const waterScore = Math.min(100, Math.round((avgWater / waterGoal) * 100));
-      const fiberScore = Math.min(100, Math.round((avgFiber / fiberGoal) * 100));
-
-      const overallScore = Math.round((caloriesScore + waterScore + fiberScore) / 3);
-      const status = getNutritionStatus(overallScore);
-
-      nutritionData = {
-        type: 'Hogar',
-        status,
-        summary: {
-          averageCaloriesConsumed: Math.round(avgCalories),
-          averageWaterConsumed: parseFloat(avgWater.toFixed(1)),
-          averageFiberConsumed: Math.round(avgFiber),
-          caloriesGoal,
-          waterGoal,
-          fiberGoal
-        },
-        weeklyProgress: {
-          calories: caloriesScore,
-          water: waterScore,
-          fiber: fiberScore
-        },
-        totalMembers: personIds.length,
-        membersWithNutritionData: membersWithData
-      };
-    }*/
-
     // === RESPUESTA FINAL ===
     res.status(200).json({
       person: mappedPerson,
       homeperson: homePerson,
       suggestions: mappedSuggestions,
       statusuggestions: translatedSuggestionStatusData,
-      nutritionData // 👈 Datos nutricionales completos
+      nutritionData, // 👈 Datos nutricionales completos
+      hasDailyLogToday
     });
 
     } catch (error) {
