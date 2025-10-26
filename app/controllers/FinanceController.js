@@ -262,7 +262,7 @@ const FinanceController = {
     try {
       const finance = await FinanceRepository.create(req.body, req.file, t);
       await t.commit();
-      res.status(201).json({ finance });
+      res.status(201).json({ finance: finance, message: "Registro financiero creado correctamente" });
     } catch (error) {
       await t.rollback();
       const errorMsg = error.details
@@ -392,7 +392,7 @@ const FinanceController = {
         t
       );
       await t.commit();
-      res.status(200).json({ finance: financeUpdate });
+      res.status(200).json({ finance: financeUpdate, message: "Registro financiero actualizado correctamente" });
     } catch (error) {
       await t.rollback();
       const errorMsg = error.details

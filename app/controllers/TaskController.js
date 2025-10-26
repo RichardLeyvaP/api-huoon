@@ -1442,7 +1442,7 @@ const TaskController = {
       }
       res
         .status(201)
-        .json({ task, suggestedTasks: isMeta ? suggestedTasks : undefined });
+        .json({ message: "Meta creada Correctamente", task, suggestedTasks: isMeta ? suggestedTasks : undefined });
     } catch (error) {
       // Revertir la transacción si ocurre un error
       await t.rollback();
@@ -1728,7 +1728,7 @@ const TaskController = {
         task.home_id
       );
       await t.commit();
-      res.status(200).json({ task: task });
+      res.status(200).json({ task: task, message: "Meta creada Correctamente." });
     } catch (error) {
       if (!t.finished) {
         await t.rollback();
