@@ -177,7 +177,7 @@ RESPONDER CON JSON que contenga:
 }`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-4o",
         messages: [
           { 
             role: "system", 

@@ -61,7 +61,7 @@ ${textoUsuario}
       `;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: "Eres un analizador de intenciones en lenguaje natural." },
           { role: "user", content: prompt }
@@ -321,7 +321,7 @@ Instrucciones adicionales:
 Texto a analizar: "${textoUsuario}"
 `;
     const respuesta = await openai.chat.completions.create({
-      model: "gpt-5-nano",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",

@@ -198,7 +198,7 @@ RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO. NADA MÁS.
 `;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
