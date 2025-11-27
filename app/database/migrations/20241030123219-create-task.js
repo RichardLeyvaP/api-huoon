@@ -128,6 +128,21 @@ module.exports = {
         allowNull: true,  // El campo end_time puede ser nulo
         defaultValue: 'Personal'
       },
+      currency_reward: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        comment: 'Cantidad de monedas que otorga la tarea al completarse'
+      },
+      diamonds_reward: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        comment: 'Cantidad de diamantes que otorga la tarea al completarse'
+      },
+      completion_date: {
+        type: Sequelize.DATEONLY,
+        allowNull: true,
+        comment: 'Fecha en que se completó la tarea (solo fecha)'
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

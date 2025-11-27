@@ -61,7 +61,7 @@ ${textoUsuario}
       `;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-5-nano",
         messages: [
           { role: "system", content: "Eres un analizador de intenciones en lenguaje natural." },
           { role: "user", content: prompt }
@@ -321,7 +321,7 @@ Instrucciones adicionales:
 Texto a analizar: "${textoUsuario}"
 `;
     const respuesta = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5-nano",
       messages: [
         {
           role: "system",
@@ -344,6 +344,117 @@ Texto a analizar: "${textoUsuario}"
       return {
         error: "No se pudo interpretar la respuesta como JSON",
         raw: contenido,
+      };
+    }
+  },
+
+  // En TaskService.js o IntentDetectionService.js
+  async calculateRewardsWithAI (taskData) {
+  // ✅ 1. Obtener prioridades dentro del método (como en detectarIntentTask)
+    const priorities = await PriorityRepository.findAll();
+
+    const { 
+      type, 
+      title, 
+      description, 
+      priority_id, 
+      start_date,   // ✅ ahora usamos start_date
+      end_date,     // ✅ y end_date
+      estimated_time, 
+      recurrence 
+    } = taskData;
+
+    // Obtener nombre de la prioridad para contexto
+    const priority = priorities.find(p => p.id === priority_id);
+    const priorityName = priority ? priority.name : "Desconocida";
+
+    // Calcular duración en semanas (solo si ambas fechas existen)
+    let durationWeeks = null;
+    if (start_date && end_date) {
+      const start = new Date(start_date);
+      const end = new Date(end_date);
+      const diffTime = Math.abs(end - start);
+      durationWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)); // días → semanas
+    }
+
+    const prompt = `
+  Eres un sistema de recompensas inteligente para un gestor de productividad personal.
+
+  Tu tarea es analizar los datos de una tarea o meta y devolver **exactamente** cuántas monedas y diamantes debe otorgar al usuario al completarla.
+
+  ### Reglas estrictas:
+  1. **Si es una "Tarea"**:
+    - Solo otorga **monedas** (currency_reward entre 1 y 10).
+    - **Nunca otorgues diamantes** (diamonds_reward = 0).
+    - Las monedas se basan en: prioridad, tiempo estimado y complejidad.
+      * Prioridad Baja → 1-3 monedas
+      * Prioridad Media → 4-6 monedas
+      * Prioridad Alta → 7-10 monedas
+
+  2. **Si es una "Meta"**:
+    - Siempre otorga **monedas** (5-10).
+    - **Diamantes (solo 1 o 0)** se otorgan **solo si la meta es compleja**, evaluada por:
+      * **Duración**: diferencia entre start_date y end_date en **semanas**.
+        - Menos de 4 semanas → 0 diamantes.
+        - 4 a 12 semanas → 1 diamante **solo si prioridad es Alta**.
+        - Más de 12 semanas → 1 diamante (si prioridad Media o Alta).
+      * **Prioridad**: Baja → nunca da diamantes.
+      * **Descripción ambiciosa**: palabras como "maestría", "certificación", "construir", "lanzar", etc., refuerzan complejidad.
+    - Si no cumple los criterios → diamonds_reward = 0.
+
+  3. **Valores permitidos**:
+    - currency_reward: entero entre 1 y 10.
+    - diamonds_reward: 0 o 1 (nunca más de 1).
+
+  ### Datos de la tarea/meta:
+  - Tipo: "${type}"
+  - Título: "${title}"
+  - Descripción: "${description || 'Sin descripción'}"
+  - Prioridad ID: ${priority_id} (${priorityName})
+  - Fecha de inicio: ${start_date || 'No especificada'}
+  - Fecha de fin: ${end_date || 'No especificada'}
+  - Duración calculada: ${durationWeeks !== null ? `${durationWeeks} semanas` : 'No calculable'}
+  - Tiempo estimado: ${estimated_time ? `${estimated_time} minutos` : 'No especificado'}
+  - Repetición: "${recurrence || 'No se repite'}"
+  - Lista de prioridades disponibles: ${priorities.map(p => `${p.id}(${p.name})`).join(', ')}
+
+  ### Formato de respuesta (JSON estricto):
+  {
+    "currency_reward": número,
+    "diamonds_reward": número
+  }
+  `;
+
+    try {
+      const respuesta = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "Eres un calculador de recompensas. Responde SOLO con el JSON solicitado, sin explicaciones."
+          },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.3,
+        response_format: { type: "json_object" }
+      });
+
+      const contenido = respuesta.choices[0].message.content;
+      const rewards = JSON.parse(contenido);
+
+      // ✅ Validación final
+      rewards.currency_reward = Math.max(1, Math.min(10, Math.round(rewards.currency_reward || 5)));
+      rewards.diamonds_reward = type === "Tarea" 
+        ? 0 
+        : Math.max(0, Math.min(1, Math.round(rewards.diamonds_reward || 0)));
+
+      return rewards;
+    } catch (error) {
+      logger.error("Error en calculateRewardsWithAI:", error);
+      // Fallback seguro
+      return {
+        currency_reward: type === "Meta" ? 7 : 5,
+        diamonds_reward: (type === "Meta" && priority_id === 3 && durationWeeks >= 4) ? 1 : 0
       };
     }
   }

@@ -27,7 +27,7 @@ async getAIResponse(req, res) {
     try {
       // Realizar la solicitud a OpenAI
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",// Puedes usar "gpt-3.5-turbo" si prefieres
+        model: "gpt-5-nano",// Puedes usar "gpt-3.5-turbo" si prefieres
       messages: [
         { role: 'system', content: issue },
         ...userConversations[userId]  // Pasar el historial de la conversación
@@ -104,7 +104,7 @@ async getAITask(req, res) {
 }
       // Realizar la solicitud a OpenAI
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",// Puedes usar "gpt-3.5-turbo" si prefieres
+        model: "gpt-5-nano",// Puedes usar "gpt-3.5-turbo" si prefieres
       messages: [
         { role: 'system', content: issue },
         ...userConversations[userId]  // Pasar el historial de la conversación

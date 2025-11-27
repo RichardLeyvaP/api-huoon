@@ -32,6 +32,7 @@ const {
   StatusRepository,
   RoleRepository,
   HomePersonRepository,
+  HomePersonTaskRepository,
 } = require("../repositories");
 const IntentDetectionService = require("../services/IntentDetectionService");
 const TaskSuggestionService = require("../services/TaskSuggestionService");
@@ -196,6 +197,14 @@ const TaskController = {
       res.status(500).json({ error: "ServerError", details: errorMsg });
     }
   },
+
+  async getLocalISODate() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+    },
 
   async getTaskDateWeb(req, res) {
     logger.info(
@@ -913,8 +922,11 @@ const TaskController = {
           continue;
         }
 
-        // Resto del código de creación de tarea (status, etc.)
-        // ... (mantener todo el código existente hasta la creación de la tarea)
+        const rewards = await IntentDetectionService.calculateRewardsWithAI(taskData);
+
+        // ✅ 2. Asignar recompensas al taskData
+        taskData.currency_reward = rewards.currency_reward || 0;
+        taskData.diamonds_reward = rewards.diamonds_reward || 0;
 
         // Crear la tarea
         const task = await TaskRepository.create(taskData, null, personId, t);
@@ -1137,6 +1149,10 @@ const TaskController = {
     // Iniciar la transacción
     const t = await sequelize.transaction();
     try {
+       const taskData = { ...req.body };
+       const rewards = await IntentDetectionService.calculateRewardsWithAI(taskData);
+       req.body.currency_reward = rewards.currency_reward || 0;
+        req.body.diamonds_reward = rewards.diamonds_reward || 0;
       const task = await TaskRepository.create(req.body, req.file, personId, t);
 
       // Llamada a ActivityLogService para registrar la creación
@@ -1244,7 +1260,7 @@ const TaskController = {
             7. Para tareas de un solo día, suggested_end_date debe ser null
             `;
           const response = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: "gpt-5-nano",
             messages: [
               {
                 role: "system",
@@ -1710,6 +1726,38 @@ const TaskController = {
           toAdd.length || toUpdate.length || toDelete.length
             ? { added: toAdd, updated: toUpdate, deleted: toDelete }
             : null;
+      }
+
+       if (req.body.status_id) {
+        const statuses = await StatusService.getStatus("Task");
+        const completedStatus = statuses.find(s => s.name === "Completada");
+        if (completedStatus && req.body.status_id == completedStatus.id) {
+          const people = await HomePersonTaskRepository.getPeopleByTaskId(task.id);
+          if (people.length > 0) {
+            let currency = task.currency_reward || 0;
+            let diamonds = task.diamonds_reward || 0;
+
+            // 🔑 NUEVA LÓGICA con getLocalISODate()
+            if (task.type === "Meta" && diamonds > 0) {
+              const todayISO = await TaskController.getLocalISODate(); // ✅ usa tu método
+              const completionDate = task.completion_date; // string YYYY-MM-DD o null
+
+              // Comparar como strings: "2025-10-28" > "2025-10-27" → true
+              if (!completionDate || todayISO > completionDate) {
+                diamonds = 0;
+                logger.info(`Meta completada fuera de plazo. Hoy: ${todayISO}, completion_date: ${completionDate}`);
+              }
+            }
+
+            const rewards = { currency, diamonds };
+
+
+            if (rewards.currency > 0 || rewards.diamonds > 0) {
+              await TaskRepository.incrementPersonRewards(people, rewards, t);
+              logger.info(`Recompensas asignadas a ${people.length} persona(s):`, JSON.stringify(rewards));
+            }
+          }
+        }
       }
 
       // Registrar la tarea y las asociaciones en el log de actividades

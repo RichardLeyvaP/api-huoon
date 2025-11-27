@@ -155,6 +155,16 @@ module.exports = (sequelize, DataTypes) => {
     validate: {
       is: /^(A|B|AB|O)[+-]$/i // Validación básica para grupos sanguíneos
     }
+  },
+  currency: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  diamonds: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
   }, {
     sequelize,

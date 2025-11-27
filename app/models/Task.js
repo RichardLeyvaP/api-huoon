@@ -153,6 +153,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: 'Personal'
     },
+    currency_reward: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    diamonds_reward: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    completion_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    }
   }, {
     sequelize,
     modelName: 'Task',

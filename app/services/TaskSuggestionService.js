@@ -219,7 +219,7 @@ ${data.recurrenceOptions}
   // Obtener respuesta de OpenAI
   async _getAIResponse(prompt) {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5-nano",
       messages: [
         {
           role: "system",
@@ -489,7 +489,7 @@ ${data.recurrenceOptions}
     const prompt = this._buildPrompt(metaData, priorityDescriptions);
     
     const response = await this.openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5-nano",
       messages: [
         { role: "system", content: "Eres un experto en descomposición de metas en tareas accionables." },
         { role: "user", content: prompt }

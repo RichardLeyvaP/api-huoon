@@ -44,6 +44,7 @@ const MealEntryRepository = require('./MealEntryRepository');
 const MealRecipeRepository = require('./MealRecipeRepository');
 const HouseholdRequestRepository = require('./HouseholdRequestRepository');
 const ShoppingListRepository = require('./ShoppingListRepository');
+const HomePersonTaskRepository = require('./HomePersonTaskRepository');
 
 module.exports = {
     CategoryRepository,
@@ -91,5 +92,6 @@ module.exports = {
     MealEntryRepository,
     MealRecipeRepository,
     HouseholdRequestRepository,
-    ShoppingListRepository
+    ShoppingListRepository,
+    HomePersonTaskRepository
 };

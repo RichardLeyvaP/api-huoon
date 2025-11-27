@@ -750,6 +750,7 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
           description: body.description,
           start_date: body.start_date,
           end_date: body.end_date,
+          completion_date: body.end_date,
           start_time: body.start_time,
           end_time: body.end_time,
           type: body.type,
@@ -768,6 +769,8 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
           attachments: "tasks/default.jpg",
           geo_location: body.geo_location,
           parent_id: body.parent_id,
+          currency_reward: body.currency_reward,
+          diamonds_reward: body.diamonds_reward
         },
         { transaction: t }
       );
@@ -1403,6 +1406,61 @@ async findAllDateWeb(start_date = null, personId, homeId, task_type = null, type
     ],
     totalTasks: total
   };
+},
+
+async incrementPersonRewards(persons, rewards = {}, t = null) {
+  try {
+    const { currency, diamonds } = rewards;
+
+    if (currency === undefined && diamonds === undefined) {
+      throw new Error("Debe proporcionar al menos 'currency' o 'diamonds' para incrementar");
+    }
+
+    if (currency !== undefined && (typeof currency !== 'number' || currency < 0)) {
+      throw new Error("'currency' debe ser un número positivo");
+    }
+    if (diamonds !== undefined && (typeof diamonds !== 'number' || diamonds < 0)) {
+      throw new Error("'diamonds' debe ser un número positivo");
+    }
+
+    // ✅ Normalizar a array de IDs
+    let personIds = [];
+
+    if (Array.isArray(persons)) {
+      if (persons.length === 0) return;
+      // Si es array de objetos con 'id'
+      if (typeof persons[0] === 'object' && persons[0] !== null && 'id' in persons[0]) {
+        personIds = persons.map(p => p.id).filter(id => id != null);
+      } else {
+        // Array de números
+        personIds = persons.filter(id => id != null);
+      }
+    } else if (typeof persons === 'number') {
+      // Solo un ID
+      personIds = [persons];
+    } else {
+      throw new Error("El parámetro 'persons' debe ser un número, un array de números o un array de objetos con 'id'");
+    }
+
+    if (personIds.length === 0) return;
+
+    // Construir campos a incrementar
+    const incrementFields = {};
+    if (currency !== undefined) incrementFields.currency = currency;
+    if (diamonds !== undefined) incrementFields.diamonds = diamonds;
+
+    // Ejecutar incremento (funciona en MySQL, PostgreSQL, etc.)
+    await Person.increment(
+      incrementFields,
+      {
+        where: { id: personIds },
+        transaction: t
+      }
+    );
+  } catch (error) {
+    logger.error(`Error en TaskRepository->incrementPersonRewards:`, error);
+    throw new Error(`Error al incrementar recompensas: ${error.message}`);
+  }
 }
 };
 

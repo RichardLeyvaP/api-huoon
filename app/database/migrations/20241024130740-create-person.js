@@ -54,6 +54,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      currency: {
+       type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: 'Cantidad actual de monedas del usuario'
+      },
+      diamonds: {
+       type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        comment: 'Cantidad actual de diamantes del usuario'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
