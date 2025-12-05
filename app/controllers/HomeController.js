@@ -545,9 +545,33 @@ const HomeController = {
     logger.info(JSON.stringify(req.body));
 
     const { homeName, minorName, guardianEmail, minorEmail, home_id, user_id, request_id } = req.body;
-
+    let request;
+    const userId = req.user.id;
     let t = await sequelize.transaction();
     try {
+      
+      if (request_id){
+      request = await HouseholdRequestRepository.findById(request_id, { transaction: t });
+      if (!request) {
+        await t.rollback();
+        return res.status(404).json({
+          success: false,
+          message: "La solicitud indicada no existe."
+        });
+      }
+    }else {
+      // ✅ Caso 2: crear nueva solicitud (invitación proactiva)
+      request = await HouseholdRequestRepository.create({
+        userId: userId,
+        targetUserId: userId,
+        requesterName: minorName,
+        requesterEmail: minorEmail,
+        moduleId: home_id, // o el campo que uses para el hogar
+        status: 'Create',
+        type: 'Home',
+        // Puedes agregar más campos si los usas (ej. createdBy, etc.)
+      }, { transaction: t });
+    }
       const code = await HouseholdRequestRepository.generateAndSetCode(request_id, home_id, t);
       //const code = await HomeRepository.generateAndSaveCode(home_id);
       const emailHtml = `

@@ -1456,9 +1456,10 @@ const TaskController = {
         const firebaseResults =
           await NotificationRepository.sendNotificationMultiCast(notifications);
       }
+     const entityType = task.type === "Meta" ? "Meta" : "Tarea";
       res
         .status(201)
-        .json({ message: "Meta creada Correctamente", task, suggestedTasks: isMeta ? suggestedTasks : undefined });
+        .json({ message: `${entityType} creada correctamente.`, task, suggestedTasks: isMeta ? suggestedTasks : undefined });
     } catch (error) {
       // Revertir la transacción si ocurre un error
       await t.rollback();
@@ -1776,7 +1777,8 @@ const TaskController = {
         task.home_id
       );
       await t.commit();
-      res.status(200).json({ task: task, message: "Meta creada Correctamente." });
+      const entityType = task.type === "Meta" ? "Meta" : "Tarea";
+      res.status(200).json({ task: task, message: `${entityType} actualizada correctamente.` });
     } catch (error) {
       if (!t.finished) {
         await t.rollback();
