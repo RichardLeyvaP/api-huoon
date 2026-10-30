@@ -7,8 +7,7 @@ node_modules/
 public/
 
 config/serviceAccountKey.json
-
-cconfig/account_transport.json
+config/account_transport.json
 
 
 combined.log

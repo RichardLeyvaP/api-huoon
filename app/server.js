@@ -3,6 +3,7 @@ const app = express();
 const admin = require('firebase-admin');
 const { sequelize } = require("./models/index");
 const serviceAccount = require('../config/serviceAccountKey.json');
+const authConfig = require('../config/auth');
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
@@ -81,7 +82,7 @@ passport.deserializeUser((user, done) => {
 // Configuración de sesión
 app.use(
   session({
-    secret: "tu_secreto_aqui",
+    secret: authConfig.secret,
     resave: false,
     saveUninitialized: true,
   })

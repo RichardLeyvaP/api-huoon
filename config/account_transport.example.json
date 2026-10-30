@@ -1,0 +1,11 @@
+{
+  "service": "gmail",
+  "auth": {
+    "type": "OAuth2",
+    "user": "tu-correo@example.com",
+    "clientId": "tu-client-id",
+    "clientSecret": "tu-client-secret",
+    "refreshToken": "tu-refresh-token",
+    "redirectUri": "https://developers.google.com/oauthplayground"
+  }
+}

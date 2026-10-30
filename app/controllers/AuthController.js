@@ -954,7 +954,6 @@ const AuthController = {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
     const hashedCode = bcrypt.hashSync(code, parseInt(authConfig.rounds));
-
     // Opcional: guardar expiración
     await user.update({
       reset_token: hashedCode,
